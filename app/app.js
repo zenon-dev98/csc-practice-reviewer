@@ -265,6 +265,7 @@
           <button class="text-link" data-action="show-signin" type="button">Select existing profile</button>
         </form>
       </section>
+      ${toast()}
     `);
   }
 
@@ -289,6 +290,7 @@
           <button class="text-link" data-action="show-create" type="button">Back to Create Profile</button>
         </form>
       </section>
+      ${toast()}
     `);
   }
 
@@ -1283,8 +1285,7 @@
       await loadUserData();
       setView({ name: "dashboard" });
     } else {
-      showToast("Account created. Sign in to continue.");
-      setView({ name: "signin" });
+      await signIn(data);
     }
   }
 

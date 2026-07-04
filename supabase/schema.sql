@@ -259,6 +259,13 @@ for select
 to authenticated
 using (active = true);
 
+grant select, insert, update, delete on public.profiles to authenticated;
+grant select, insert, update, delete on public.setup_drafts to authenticated;
+grant select, insert, update, delete on public.attempts to authenticated;
+grant select, insert, update, delete on public.attempt_answers to authenticated;
+grant select, insert, update, delete on public.pause_events to authenticated;
+grant select on public.app_updates to authenticated;
+
 create index if not exists attempts_user_started_idx on public.attempts(user_id, started_at desc);
 create index if not exists attempt_answers_user_attempt_idx on public.attempt_answers(user_id, attempt_id, position);
 create index if not exists attempt_answers_user_flagged_idx on public.attempt_answers(user_id, flagged) where flagged = true;
