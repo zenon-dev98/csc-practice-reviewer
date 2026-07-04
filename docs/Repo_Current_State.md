@@ -78,6 +78,7 @@ Current source item boundaries:
 - The original image-backed `app/question-data.js` remains available as source fallback and audit trail.
 - Impeccable CLI detection has been run against `app/` and currently returns no findings.
 - Browser fixture QA has been run for `create`, `select`, `dashboard`, `setup`, `exam`, `exam-collapsed`, `graph`, `pause`, `submit`, `results`, `review`, `practice`, `recent`, and `profile-modal` at desktop and mobile widths with no horizontal overflow, no containment offenders, and no console errors.
+- Microsoft Edge desktop QA at `1536x816` exposed and repaired screenshot-specific layout regressions in the dashboard top cards, exam topbar, exam sidebar chip grids, graph question split view, and modal backdrops. Static assets are cache-busted through `v=20260704-8`.
 - Stitch was used in an authenticated browser session to generate the `Civil Service Exam Cockpit` dashboard direction. Stitch's `Code to Clipboard` export returned the original prompt rather than source code, so the app implementation was manually matched to the generated visual and agent summary.
 
 ## Current Active Ticket

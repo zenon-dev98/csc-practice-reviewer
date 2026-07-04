@@ -4444,3 +4444,288 @@ metric span {
     max-width: 100%;
   }
 }
+
+/* Edge desktop visual QA repair pass. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+#app,
+#app * {
+  box-sizing: border-box;
+}
+
+#app .dash-page.screenshot-dashboard {
+  width: min(1408px, calc(100% - 80px));
+}
+
+#app .screenshot-dashboard .dashboard-grid {
+  grid-template-columns: minmax(470px, 1.26fr) minmax(330px, 0.86fr) minmax(350px, 0.88fr);
+  gap: 24px;
+}
+
+#app .screenshot-dashboard .profile-summary,
+#app .screenshot-dashboard .continue-card,
+#app .screenshot-dashboard .start-card {
+  height: auto;
+  min-height: 274px;
+}
+
+#app .screenshot-dashboard .profile-summary .profile-main > div {
+  min-width: 0;
+  padding-right: 0;
+}
+
+#app .screenshot-dashboard .profile-main h2,
+#app .screenshot-dashboard .continue-card h2,
+#app .screenshot-dashboard .start-card h2,
+#app .screenshot-dashboard .review-card h2 {
+  overflow-wrap: anywhere;
+}
+
+#app .screenshot-dashboard .profile-summary .text-button {
+  top: auto;
+  bottom: 28px;
+  max-width: 118px;
+  justify-content: end;
+  white-space: nowrap;
+}
+
+#app .screenshot-dashboard .start-card {
+  row-gap: 14px;
+  padding-bottom: 24px;
+}
+
+#app .screenshot-dashboard .start-card .mini-facts span + span::before {
+  content: "/";
+}
+
+#app .screenshot-dashboard .start-card p {
+  line-height: 1.45;
+}
+
+#app .exam-topbar {
+  grid-template-columns: minmax(320px, 1fr) minmax(430px, auto) minmax(280px, auto);
+  gap: 18px;
+  padding: 18px 28px;
+}
+
+#app .exam-brand {
+  min-width: 0;
+}
+
+#app .exam-brand strong,
+#app .exam-brand span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#app .exam-status {
+  min-width: 0;
+  gap: 18px;
+}
+
+#app .exam-status span {
+  padding-inline: 14px;
+  white-space: nowrap;
+}
+
+#app .exam-actions {
+  min-width: 0;
+}
+
+#app .exam-actions .btn {
+  min-width: 124px;
+  padding-inline: 18px;
+  white-space: nowrap;
+}
+
+#app .exam-actions .btn.danger {
+  min-width: 158px;
+}
+
+#app .exam-body,
+#app .exam-body.with-stimulus {
+  grid-template-columns: 500px minmax(0, 1fr);
+  gap: 28px;
+  padding: 30px 40px 44px;
+  overflow-x: hidden;
+}
+
+#app .exam-nav {
+  min-width: 0;
+  top: 0;
+  align-self: start;
+}
+
+#app .question-group {
+  display: block;
+  height: auto;
+  max-width: 100%;
+}
+
+#app .question-group[open] {
+  overflow: visible;
+}
+
+#app .question-group summary {
+  min-width: 0;
+}
+
+#app .question-group summary span,
+#app .question-group summary strong,
+#app .question-group summary small,
+#app .question-group summary em {
+  min-width: 0;
+}
+
+#app .chip-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0 18px 18px;
+}
+
+#app .question-chip {
+  height: 40px;
+  min-height: 40px;
+}
+
+#app .question-panel {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#app .choices,
+#app .choice {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#app .choice strong,
+#app .prompt,
+#app .question-index {
+  overflow-wrap: anywhere;
+}
+
+#app .question-actions {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+#app .question-actions .btn {
+  min-width: 0;
+  padding-inline: 12px;
+  white-space: normal;
+}
+
+#app .question-actions .btn.primary {
+  width: 100%;
+}
+
+#app .exam-body.with-stimulus .exam-question {
+  grid-template-columns: minmax(300px, 0.92fr) minmax(360px, 1fr);
+  gap: 24px;
+  padding: 28px;
+}
+
+#app .exam-body.with-stimulus .stimulus-panel {
+  padding-right: 24px;
+}
+
+#app .exam-body.with-stimulus .question-panel {
+  padding-left: 0;
+}
+
+#app .stimulus-actions {
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+#app .linked-items > div {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 1500px) {
+  #app .screenshot-dashboard .dashboard-grid {
+    grid-template-columns: minmax(430px, 1.16fr) minmax(310px, 0.84fr) minmax(330px, 0.86fr);
+  }
+
+  #app .screenshot-dashboard .profile-main h2 {
+    font-size: 24px;
+  }
+
+  #app .screenshot-dashboard .profile-summary .profile-main {
+    gap: 34px;
+  }
+
+  #app .screenshot-dashboard .practice-panel .category-card-grid.compact {
+    gap: 18px;
+  }
+
+  #app .screenshot-dashboard .dashboard-category {
+    grid-template-columns: 54px minmax(0, 1fr) 36px;
+    padding: 15px;
+  }
+
+  #app .exam-topbar {
+    grid-template-columns: minmax(360px, 1fr) minmax(420px, auto) minmax(300px, auto);
+    min-height: 112px;
+    padding-inline: 28px;
+  }
+
+  #app .exam-status strong {
+    font-size: 19px;
+  }
+
+  #app .exam-status span,
+  #app .exam-actions .btn {
+    font-size: 16px;
+  }
+
+  #app .exam-body,
+  #app .exam-body.with-stimulus {
+    grid-template-columns: 500px minmax(0, 1fr);
+    padding-inline: 40px;
+  }
+
+  #app .question-panel {
+    padding: 34px;
+  }
+
+  #app .prompt {
+    font-size: 21px;
+  }
+
+  #app .choice {
+    min-height: 78px;
+    padding-inline: 22px;
+  }
+
+  #app .exam-body.with-stimulus .exam-question {
+    grid-template-columns: minmax(300px, 0.9fr) minmax(340px, 1fr);
+    padding: 24px;
+  }
+
+  #app .chart-plot {
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 1320px) {
+  #app .exam-topbar {
+    grid-template-columns: 1fr;
+  }
+
+  #app .exam-actions {
+    justify-content: start;
+  }
+
+  #app .exam-body,
+  #app .exam-body.with-stimulus {
+    grid-template-columns: 420px minmax(0, 1fr);
+  }
+}

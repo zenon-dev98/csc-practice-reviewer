@@ -523,3 +523,36 @@ Risks:
 
 - Inline icon shapes are still from the app icon set rather than exact screenshot-exported icons.
 - Normal production auth keeps password and invite-code fields even though the fixture create/select screenshots omit them.
+
+## 2026-07-04 - T0012 Edge Desktop Visual Repair
+
+Summary:
+
+- Ran the state fixture set in the user's Microsoft Edge window at `1536x816`.
+- Found Edge-visible regressions that the previous browser sweep missed: dashboard card/button collisions, mojibake before `20 versions`, clipped exam submit button from horizontal overflow, clipped sidebar chips, and an oversized graph split view.
+- Added desktop containment overrides for the screenshot dashboard, exam topbar, sidebar chip grid, question action grid, and graph stimulus/question layout.
+- Cache-busted app assets to `v=20260704-8`.
+
+Files changed:
+
+- `app/index.html`
+- `app/styles.css`
+- `docs/Repo_Current_State.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- `node --check app\app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- Microsoft Edge fixture screenshots from local `app/index.html?fixture=...`
+
+Verification:
+
+- Static validation, JavaScript syntax, dependency check, and Impeccable detector passed.
+- Local Microsoft Edge repair screenshots show no horizontal scrollbar, no clipped submit button, contained 5-column sidebar chips, dashboard text/button separation, and a bounded graph question split view.
+
+Risks:
+
+- Full live Microsoft Edge screenshot/interactions QA still needs to be rerun after GitHub Pages deployment serves `v=20260704-8`.
