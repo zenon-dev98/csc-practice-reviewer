@@ -10,7 +10,7 @@ Path:
 
 ## Repository
 
-- This folder is not currently a git repository.
+- This folder is a git repository on `main`.
 - `package.json` contains helper scripts only; it has no dependency declarations.
 - The runnable app is a static browser app in `app/`.
 - The runnable bank uses 20 generated typed Professional mock versions, 170 items each, generated from a CSC coverage matrix.
@@ -18,7 +18,8 @@ Path:
 - Runtime persistence is now implemented against Supabase email/password auth and online tables, with per-attempt question snapshots and timing analytics.
 - The app is deployed through GitHub Pages Actions at `https://zenon-dev98.github.io/csc-practice-reviewer/`.
 - The public GitHub repository is `https://github.com/zenon-dev98/csc-practice-reviewer`.
-- The Supabase SQL/Auth Hook setup is prepared in `supabase/schema.sql` but has not been applied yet because the dashboard session was at sign-in during automation.
+- The Supabase SQL/Auth Hook setup from `supabase/schema.sql` has been applied, including authenticated table grants and the `public.hook_validate_invite_code` Before User Created hook.
+- Supabase Auth email/password is enabled with email confirmation disabled for this invite-gated small-group reviewer, avoiding free email quota failures during signup.
 - Project dependencies must not be installed in this Google Drive folder.
 - Optional local server dependencies are installed under `%LOCALAPPDATA%\csc-reviewer\node-deps`.
 
@@ -79,8 +80,8 @@ Current source item boundaries:
 
 ## Current Active Ticket
 
-- T0011 - State-Image Redesign And Online Supabase Deployment is blocked only on applying Supabase SQL/Auth Hook while signed into the dashboard.
+- No active implementation ticket. T0011 is complete.
 
 ## Next Ticket
 
-- Apply `supabase/schema.sql`, enable Authentication > Hooks > Before User Created > `public.hook_validate_invite_code`, and add the GitHub Pages URL to Supabase redirect URLs.
+- Add a Supabase backup/export workflow before broader public use.

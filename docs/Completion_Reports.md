@@ -355,7 +355,7 @@ Risks:
 - Further exact Stitch fidelity would require a working Figma/MCP/source export route from Stitch.
 ## T0011 - State-Image Redesign And Online Supabase Deployment
 
-Status: blocked on Supabase dashboard sign-in
+Status: done
 
 Summary:
 
@@ -363,6 +363,8 @@ Summary:
 - Implemented state-image-inspired auth, dashboard, setup, exam, graph stimulus, pause, submit, results, review, practice, recent-attempts, mistake review, bookmarks, and manage-profile flows.
 - Added post-exam performance insights and per-question timing fields.
 - Added Supabase schema, RLS policies, invite-code hook SQL, setup docs, GitHub Pages workflow, and public GitHub deployment.
+- Applied Supabase SQL, authenticated table grants, invite-code auth hook, Auth redirect URLs, and provider settings.
+- Disabled email confirmation for the invite-gated small-group build to avoid free email sender rate-limit failures.
 
 Files changed:
 
@@ -385,6 +387,7 @@ Commands run:
 - `gh api -X POST repos/zenon-dev98/csc-practice-reviewer/pages -f build_type=workflow`
 - `gh run rerun 28698923979 --repo zenon-dev98/csc-practice-reviewer`
 - `gh run watch 28698923979 --repo zenon-dev98/csc-practice-reviewer --exit-status`
+- `gh run watch 28700637561 --repo zenon-dev98/csc-practice-reviewer --exit-status`
 
 Verification:
 
@@ -395,13 +398,19 @@ Verification:
 - Local create-account and sign-in public states loaded with no console errors.
 - Mobile viewport check had no horizontal overflow.
 - GitHub Pages deployment succeeded and the live URL loaded with no console errors.
+- Live Supabase signup API accepts the shared invite code and creates users.
+- Live app resumed an authenticated dashboard at `https://zenon-dev98.github.io/csc-practice-reviewer/` with no console errors.
+- Live full mock exam started with 170 items, grouped navigation, timer, answer selection, and submit confirmation.
+- Live results page rendered score, category breakdown, average time, fastest/longest item, strongest/weakest area, changed-answer stats, and retry recommendation.
+- Supabase REST verification confirmed a submitted full attempt row and answer rows with selected choice, correct choice, time spent, and visit count.
 
 Risks:
 
-- Supabase tables/RLS/Auth Hook were not applied because the dashboard opened at Supabase sign-in.
-- End-to-end signup, attempt save, and cross-device resume cannot be verified until the Supabase SQL/Auth Hook setup is applied.
+- Content is structurally complete but still needs human pedagogy/relevance review before serious exam use.
+- Supabase backup/export workflow is still needed before broader public use.
+- Email confirmation is disabled until a custom SMTP sender or different auth policy is chosen.
 
 Follow-ups:
 
-- Sign into Supabase, run `supabase/schema.sql`, enable the Before User Created hook, and add the GitHub Pages redirect URL.
-- After that, create a test account with the shared invite code and complete one short practice/full attempt to verify online persistence.
+- Add a Supabase backup/export ticket before public use.
+- Run a second manual scoring/content verification pass over generated Filipino, data interpretation, legal/general-information, and symbolic reasoning items.

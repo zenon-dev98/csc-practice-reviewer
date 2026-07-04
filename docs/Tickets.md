@@ -170,7 +170,7 @@ Acceptance criteria:
 
 ## T0011 - State-Image Redesign And Online Supabase Deployment
 
-Status: blocked
+Status: done
 
 Replace the current local static reviewer shell with the state-image UI system, Supabase email/password auth, online attempt storage, invite-code signup gate, post-exam performance insights, and GitHub Pages deployment.
 
@@ -186,6 +186,8 @@ Acceptance criteria:
 - GitHub repository and GitHub Pages Actions deployment are configured.
 - Validation, browser smoke tests, responsive checks, and Impeccable audit pass.
 
-Blocker:
+Completion notes:
 
-- The app is deployed to GitHub Pages, but Supabase SQL/Auth Hook setup still must be applied in the Supabase dashboard. Browser automation reached Supabase sign-in and cannot apply SQL without the user being signed in.
+- Supabase SQL, RLS policies, authenticated table grants, invite-code Before User Created hook, Auth redirect URLs, and email/password provider settings are applied.
+- GitHub Pages is live at `https://zenon-dev98.github.io/csc-practice-reviewer/`.
+- Live QA verified dashboard load, full exam start, grouped navigation, answer selection, submit modal, results insights, and Supabase attempt/answer persistence.

@@ -1,6 +1,6 @@
 # Supabase Data Model
 
-Supabase is planned as the hosted v1 backend, but the current runnable app saves locally so it can work immediately without credentials.
+Supabase is the hosted v1 backend for the deployed reviewer. The static app keeps question content in browser JavaScript and stores private user/account/progress data in Supabase.
 
 ## Schema
 
@@ -11,26 +11,22 @@ The SQL schema is in:
 It defines:
 
 - `profiles`
-- `questions`
-- `question_choices`
-- `exam_versions`
-- `exam_version_questions`
+- `setup_drafts`
 - `attempts`
-- `attempt_question_state`
+- `attempt_answers`
 - `pause_events`
-- `profile_seen_questions`
+- `app_updates`
+- `invite_codes`
+- `hook_validate_invite_code(event jsonb)`
 
-Question content supports both source-image questions and generated typed questions through:
+Question content is not imported into Supabase as a shared bank. Each attempt stores per-question snapshots in `attempt_answers`, including:
 
-- `source_type`: `source_image` or `generated`
-- `mode`: `image` or `typed`
-- `exam_version_id` and `version_number` for generated versions
-- nullable source-image fields for generated typed questions
 - `csc_skill`, `quality_status`, and optional `stimulus` JSON for generated audit and shared chart/table/logic questions
+- prompt, choices, correct choice, selected choice, timing, flags, skips, visit count, and answer history
 
 ## Privacy
 
-The schema enables Row Level Security on user/private tables. Policies are intentionally not opened yet because a real Supabase Auth decision must be made before public hosting.
+The schema enables Row Level Security on user/private tables and grants authenticated users only the table privileges needed for their own rows. Policies use `auth.uid() = user_id`. `app_updates` is read-only for authenticated users. Invite codes are not readable by app users.
 
 ## Free-Tier Notes
 
@@ -45,13 +41,14 @@ The app should keep large images as static assets and store only text/state/stat
 
 ## Current Runtime
 
-The static app uses browser `localStorage` for:
+The deployed app uses Supabase for:
 
 - profiles
 - attempts
 - answers
 - timing
 - pause events
-- seen questions
+- setup drafts
+- results and review data
 
-This keeps the mini-project usable before Supabase credentials are available.
+The local static server is still supported for development, but it points at the same Supabase project when `app/supabase-config.js` is present.

@@ -3,13 +3,13 @@
 ## Stack
 
 - Frontend: static HTML, CSS, and browser JavaScript in `app/`
-- Runtime storage: browser `localStorage`
+- Runtime storage: Supabase Auth + Postgres tables with RLS
 - Question bank: coverage-matrix generated typed browser data in `app/generated-question-bank.js`, with source-image fallback in `app/question-data.js`
 - Optional local server: `http-server` installed outside the project folder by `scripts/setup-local-deps.ps1`
-- Backend plan: Supabase Free
-- Database plan: Supabase Postgres using `supabase/schema.sql`
-- Auth/profile v1: profile by name/email, with an auth upgrade path
-- Hosting: decide in a later deployment ticket
+- Backend: Supabase Free
+- Database: Supabase Postgres using `supabase/schema.sql`
+- Auth/profile v1: Supabase email/password with shared invite-code signup gate
+- Hosting: GitHub Pages at `https://zenon-dev98.github.io/csc-practice-reviewer/`
 
 ## Initial App Views
 
@@ -20,17 +20,15 @@
 
 ## Supabase Tables
 
-Planned tables:
+Active tables:
 
 - `profiles`
-- `questions`
-- `question_choices`
-- `exam_versions`
-- `exam_version_questions`
 - `attempts`
 - `pause_events`
-- `attempt_question_state`
-- `profile_seen_questions`
+- `attempt_answers`
+- `setup_drafts`
+- `app_updates`
+- `invite_codes`
 
 Derived or later tables:
 
@@ -41,10 +39,9 @@ Derived or later tables:
 ## Save Strategy
 
 - Create an `attempt` when the user starts an exam.
-- Save answer changes immediately to browser storage.
-- Save question timing every second while in progress.
+- Save answer changes and question timing to Supabase through live dirty-row sync.
 - Save pause/resume intervals separately.
-- On reload, resume from the persisted browser state.
+- On reload or another device, resume from the persisted Supabase state.
 - On timeout, force-submit the attempt and calculate score from persisted answers.
 
 ## Timer Rules
@@ -87,9 +84,8 @@ Collect:
 
 ## Error Handling
 
-- Current static app saves to browser storage immediately.
-- When Supabase sync is added, show a save warning and retry if Supabase is unavailable.
-- If remote save fails during an active exam, keep the local browser copy and retry.
+- Current static app saves to Supabase through the signed-in account.
+- If Supabase sync fails during an active exam, show a sync warning and retry on the next dirty sync.
 - If restore fails, do not start a new attempt silently; show the recoverable state.
 
 ## Validation
