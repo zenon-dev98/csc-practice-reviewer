@@ -260,7 +260,7 @@
           <label>Email Address<input name="email" type="email" autocomplete="email" required /></label>
           <label>Password<input name="password" type="password" autocomplete="new-password" minlength="8" required /></label>
           <label>Invite Code<input name="inviteCode" autocomplete="off" required /></label>
-          <button class="btn primary" type="submit">${icon("spark")} Start Reviewing</button>
+          <button class="btn primary" data-action="signup-submit" type="button">${icon("spark")} Start Reviewing</button>
           <div class="auth-divider"><span>or</span></div>
           <button class="text-link" data-action="show-signin" type="button">Select existing profile</button>
         </form>
@@ -284,7 +284,7 @@
           </div>
           <label>Email Address<input name="email" type="email" autocomplete="email" required /></label>
           <label>Password<input name="password" type="password" autocomplete="current-password" required /></label>
-          <button class="btn primary" type="submit">${icon("arrow")} Continue</button>
+          <button class="btn primary" data-action="signin-submit" type="button">${icon("arrow")} Continue</button>
           <button class="text-link" data-action="forgot-password" type="button">Forgot Password?</button>
           <button class="text-link" data-action="show-create" type="button">Back to Create Profile</button>
         </form>
@@ -463,7 +463,7 @@
               <span>Quiet review space</span>
               <span>At least 3 hours available</span>
             </div>
-            <button class="btn primary" type="submit">${icon("play")} Start Exam</button>
+            <button class="btn primary" data-action="setup-submit" type="button">${icon("play")} Start Exam</button>
             <button class="btn secondary" data-action="save-setup" type="button">${icon("save")} Save for Later</button>
           </form>
         </div>
@@ -747,7 +747,7 @@
               <option value="hard">Hard</option>
             </select>
           </label>
-          <button class="btn primary" type="submit">${icon("play")} Start Custom Practice</button>
+          <button class="btn primary" data-action="custom-practice-submit" type="button">${icon("play")} Start Custom Practice</button>
         </form>
         <section class="note-card">
           <strong>Study Tip</strong>
@@ -941,7 +941,7 @@
               <form class="mini-form" data-form="change-password">
                 <label>Current Password<input name="currentPassword" type="password" autocomplete="current-password" required /></label>
                 <label>New Password<input name="newPassword" type="password" minlength="8" autocomplete="new-password" required /></label>
-                <button class="btn secondary" type="submit">${icon("key")} Change Password</button>
+                <button class="btn secondary" data-action="password-submit" type="button">${icon("key")} Change Password</button>
               </form>
               <button class="btn ghost full" data-action="signout" type="button">${icon("logout")} Sign Out</button>
               <div class="tip-box"><strong>Tip</strong><p>Use the same email/password to open your profile from another device.</p></div>
@@ -963,7 +963,7 @@
               <label>Notes<textarea name="notes">${escapeHtml(profile.notes || "")}</textarea></label>
               <div class="modal-actions">
                 <button class="btn ghost" data-action="close-modal" type="button">Cancel</button>
-                <button class="btn primary" type="submit">${icon("save")} Save Changes</button>
+                <button class="btn primary" data-action="profile-submit" type="button">${icon("save")} Save Changes</button>
               </div>
               <button class="delete-link" data-action="delete-profile" type="button">Delete This Profile</button>
             </form>
@@ -1190,6 +1190,15 @@
     try {
       if (action === "show-signin") return setView({ name: "signin" });
       if (action === "show-create") return setView({ name: "create" });
+      if (action === "signup-submit") return signUp(formDataFromButton(target));
+      if (action === "signin-submit") return signIn(formDataFromButton(target));
+      if (action === "setup-submit") return startFullExam(formOptions(target.closest("form")));
+      if (action === "profile-submit") return saveProfile(target.closest("form"));
+      if (action === "password-submit") return changePassword(formDataFromButton(target));
+      if (action === "custom-practice-submit") {
+        const values = formDataFromButton(target);
+        return startPractice(values.category, Number(values.count), values.difficulty);
+      }
       if (action === "dashboard") return setView({ name: "dashboard" });
       if (action === "open-setup" || action === "setup-page" || action === "retake-setup") return setView({ name: "setup" });
       if (action === "practice-page") return setView({ name: "practice" });
@@ -1357,6 +1366,11 @@
       shuffleQuestions: Boolean(values.shuffleQuestions),
       shuffleAnswers: Boolean(values.shuffleAnswers)
     };
+  }
+
+  function formDataFromButton(button) {
+    const form = button.closest("form");
+    return form ? Object.fromEntries(new FormData(form).entries()) : {};
   }
 
   async function saveSetupDraft(notify = true) {
