@@ -14,8 +14,8 @@ Path:
 - `package.json` contains helper scripts only; it has no dependency declarations.
 - The runnable app is a static browser app in `app/`.
 - The runnable bank uses 20 generated typed Professional mock versions, 170 items each, generated from a CSC coverage matrix.
-- The app has been redesigned around the supplied `states/` screenshots, with approved source-backed deviations for A-D choices, section ranges, and one-profile-per-account auth.
-- A follow-up state-image UI correction pass has been applied after live QA feedback: auth, dashboard, exam player, results, answer review, practice heading, and profile modal markup/styles now more closely mirror the supplied `states/` screenshots. The dashboard was further tightened to match `states/profile_dashboard.png` density, margins, row heights, and card proportions.
+- The app has been redesigned around the supplied `states/` screenshots, with approved source-backed deviations for A-D choices, section ranges, and one-profile-per-account auth in normal production mode.
+- A screenshot-parity repair pass has added fixture-state QA URLs, bounded dashboard/exam/sidebar/graph/modal contracts, expandable graph subgroups, and desktop/mobile overflow checks across every supplied state.
 - Runtime persistence is now implemented against Supabase email/password auth and online tables, with per-attempt question snapshots and timing analytics.
 - The app is deployed through GitHub Pages Actions at `https://zenon-dev98.github.io/csc-practice-reviewer/`.
 - The public GitHub repository is `https://github.com/zenon-dev98/csc-practice-reviewer`.
@@ -77,11 +77,12 @@ Current source item boundaries:
 - Generated questions include CSC skill metadata, quality status, and optional shared stimulus data.
 - The original image-backed `app/question-data.js` remains available as source fallback and audit trail.
 - Impeccable CLI detection has been run against `app/` and currently returns no findings.
+- Browser fixture QA has been run for `create`, `select`, `dashboard`, `setup`, `exam`, `exam-collapsed`, `graph`, `pause`, `submit`, `results`, `review`, `practice`, `recent`, and `profile-modal` at desktop and mobile widths with no horizontal overflow, no containment offenders, and no console errors.
 - Stitch was used in an authenticated browser session to generate the `Civil Service Exam Cockpit` dashboard direction. Stitch's `Code to Clipboard` export returned the original prompt rather than source code, so the app implementation was manually matched to the generated visual and agent summary.
 
 ## Current Active Ticket
 
-- No active implementation ticket. T0011 is complete.
+- No active implementation ticket. T0012 is complete.
 
 ## Next Ticket
 

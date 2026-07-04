@@ -479,3 +479,47 @@ Verification:
 
 - Local dashboard preview matched key state-image positions: left margin `52px`, title top `120px`, first card top `195px`, first card height `222px`, practice row top `437px`, no horizontal overflow.
 - JavaScript syntax, data validation, dependency check, and Impeccable detector all passed.
+
+## 2026-07-04 - T0012 Screenshot-Parity Repair And Manual State QA
+
+Summary:
+
+- Added fixture-state QA mode via `?fixture=` for every supplied state image: create, select, dashboard, setup, exam, collapsed exam, graph, pause, submit, results, review, practice, recent, and profile modal.
+- Rebuilt the dashboard/exam/sidebar/graph/modal layout contracts with bounded grids, fixed card anatomy, cache-busted assets, and mobile-specific clamps.
+- Reworked the exam sidebar so expanded section grids and graph/table stimulus subgroups are contained inside their cards, with expandable Chart Set/Numerical Set groups.
+- Moved graph chart actions into the screenshot order and added a grouped bar chart renderer for connected stimulus questions.
+- Preserved production Supabase auth, invite code, 20 versions, 170-item exams, timing analytics, pause/submit/results/review/practice/recent flows, and real persistence.
+
+Files changed:
+
+- `app/index.html`
+- `app/app.js`
+- `app/styles.css`
+- `docs/Repo_Current_State.md`
+- `docs/Known_Issues_And_Followups.md`
+- `docs/Tickets.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- `node --check app\app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- Browser fixture QA through `http://127.0.0.1:4173/index.html?fixture=...`
+
+Verification:
+
+- Static data validation passed.
+- JavaScript syntax check passed.
+- Dependency check passed with local dependencies outside the Google Drive workspace.
+- Impeccable detector exited successfully for `app/`.
+- Desktop fixture sweep: all 14 states had no horizontal overflow, no containment offenders, and no console errors.
+- Mobile fixture sweep: all 14 states had no horizontal overflow, no containment offenders, and no console errors.
+- Manual browser interactions exercised: answer choice selection, clear answer, flag, skip, previous/next, all sidebar group expand/collapse controls, full Verbal chip grid expansion/collapse, submit modal review-unanswered/review-flagged/confirm-submit, graph subgroup expansion, graph linked item chips, and pause/resume.
+- Captured desktop screenshots for dashboard, collapsed exam, and graph states, plus mobile collapsed exam state, after the clean sweeps.
+
+Risks:
+
+- Inline icon shapes are still from the app icon set rather than exact screenshot-exported icons.
+- Normal production auth keeps password and invite-code fields even though the fixture create/select screenshots omit them.

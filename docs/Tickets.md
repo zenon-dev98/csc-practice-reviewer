@@ -192,3 +192,18 @@ Completion notes:
 - GitHub Pages is live at `https://zenon-dev98.github.io/csc-practice-reviewer/`.
 - Live QA verified dashboard load, full exam start, grouped navigation, answer selection, submit modal, results insights, and Supabase attempt/answer persistence.
 - Follow-up UI correction pass replaced the remaining recolor-like surfaces with closer state-image structures for auth, dashboard, exam, results, review, practice, and profile modal.
+
+## T0012 - Screenshot-Parity Repair And Manual State QA
+
+Status: done
+
+Rebuild the screenshot-state UI contracts and verify every supplied state before redeploying.
+
+Acceptance criteria:
+
+- Fixture mode can force create/select/dashboard/setup/exam/collapsed exam/graph/pause/submit/results/review/practice/recent/profile-modal states without Supabase writes.
+- Dashboard, exam sidebar, graph stimulus, submit/pause, results/review, practice/recent, and profile modal layouts use bounded screenshot contracts.
+- Expanded exam groups and graph subgroups never overflow their cards or viewport.
+- Answer selection, clear, skip, flag, previous/next, pause/resume, submit/review paths, and graph linked chips are manually exercised.
+- Desktop and mobile fixture sweeps show no horizontal overflow, no containment offenders, and no console errors.
+- Static checks, dependency check, and Impeccable detector pass.

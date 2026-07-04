@@ -22,6 +22,28 @@
     { section: "Numerical Ability", label: "Numerical", tone: "numerical", range: "81-120", start: 81, end: 120 },
     { section: "Analytical Ability", label: "Analytical", tone: "analytical", range: "121-170", start: 121, end: 170 }
   ];
+  const SCREEN_SECTION_GROUPS = [
+    { section: "Verbal Ability", label: "Verbal Ability", tone: "verbal", range: "1-60", start: 1, end: 60 },
+    { section: "Numerical Ability", label: "Numerical Ability", tone: "numerical", range: "61-100", start: 61, end: 100 },
+    { section: "Analytical Ability", label: "Analytical Ability", tone: "analytical", range: "101-140", start: 101, end: 140 },
+    { section: "General Information", label: "General Information", tone: "general", range: "141-170", start: 141, end: 170 }
+  ];
+  const FIXTURE_STATES = new Set([
+    "create",
+    "select",
+    "dashboard",
+    "setup",
+    "exam",
+    "exam-collapsed",
+    "graph",
+    "pause",
+    "submit",
+    "results",
+    "review",
+    "practice",
+    "recent",
+    "profile-modal"
+  ]);
   const PRACTICE_CATEGORIES = SECTION_GROUPS.map((group) => ({
     ...group,
     poolSize: 120,
@@ -62,7 +84,9 @@
     expandedNavGroups: new Set(),
     reviewFilter: "all",
     recentTab: "all",
-    questionVersion: "1"
+    questionVersion: "1",
+    fixtureMode: false,
+    fixtureState: ""
   };
 
   const root = document.getElementById("app");
@@ -81,6 +105,12 @@
   }
 
   async function init() {
+    const fixture = normalizeFixtureName(new URLSearchParams(location.search).get("fixture"));
+    if (fixture) {
+      initFixture(fixture);
+      return;
+    }
+
     if (!validateConfig()) {
       setView({ name: "config" });
       return;
@@ -123,6 +153,60 @@
     return Boolean(config.url && key && /^https:\/\/.+\.supabase\.co\/?$/.test(config.url.replace(/\/rest\/v1\/?$/, "")));
   }
 
+  function normalizeFixtureName(value) {
+    const name = String(value || "").trim().toLowerCase().replace(/_/g, "-");
+    return FIXTURE_STATES.has(name) ? name : "";
+  }
+
+  function initFixture(fixtureState) {
+    app.fixtureMode = true;
+    app.fixtureState = fixtureState;
+    app.client = null;
+    app.session = { user: { id: "fixture-user", email: "john.smith@email.com" } };
+    app.profile = fixtureProfile();
+    app.attempts = fixtureAttempts();
+    app.draft = { user_id: "fixture-user", options: { ...DEFAULT_OPTIONS, versionId: examVersions[0]?.id || "fixture-version-1" } };
+    app.updates = [{ title: "Two reviewer updates", body: "Visual QA fixture notification." }, { title: "Practice reminders", body: "Continue recent drills." }];
+    app.modal = null;
+    app.reviewFilter = "all";
+    app.recentTab = "all";
+    app.expandedNavGroups.clear();
+
+    const active = getAttempt("fixture-active");
+    const submitted = getAttempt("fixture-submitted");
+    if (active) {
+      active.status = "in_progress";
+      active.current_question_index = 42;
+      active.elapsed_seconds = 38;
+    }
+
+    if (fixtureState === "create") return setView({ name: "create" });
+    if (fixtureState === "select") return setView({ name: "signin" });
+    if (fixtureState === "setup") return setView({ name: "setup" });
+    if (fixtureState === "practice") return setView({ name: "practice" });
+    if (fixtureState === "recent") return setView({ name: "recent" });
+    if (fixtureState === "results") return setView({ name: "results", attemptId: submitted.id });
+    if (fixtureState === "review") return setView({ name: "review", attemptId: submitted.id, index: 42 });
+    if (fixtureState === "profile-modal") {
+      app.modal = "profile";
+      return setView({ name: "dashboard" });
+    }
+    if (fixtureState === "graph") {
+      active.current_question_index = 81;
+      return setView({ name: "exam", attemptId: active.id });
+    }
+    if (fixtureState === "pause") {
+      active.status = "paused";
+      return setView({ name: "exam", attemptId: active.id });
+    }
+    if (fixtureState === "submit") {
+      app.modal = "submit";
+      return setView({ name: "exam", attemptId: active.id });
+    }
+    if (fixtureState === "exam" || fixtureState === "exam-collapsed") return setView({ name: "exam", attemptId: active.id });
+    return setView({ name: "dashboard" });
+  }
+
   async function loadUserData() {
     if (!app.session) return;
     const user = app.session.user;
@@ -161,6 +245,243 @@
     return data;
   }
 
+  function fixtureProfile() {
+    return {
+      user_id: "fixture-user",
+      name: "John Smith",
+      email: "john.smith@email.com",
+      avatar_preset: 1,
+      level: "Professional",
+      notes: "Fixture reviewer profile.",
+      birth_date: "",
+      last_active_at: "2026-07-04T09:00:00.000Z"
+    };
+  }
+
+  function fixtureAttempts() {
+    return [
+      buildFixtureFullAttempt("fixture-active", { status: "in_progress", currentIndex: 42, completed: false }),
+      buildFixtureFullAttempt("fixture-submitted", { status: "submitted", currentIndex: 42, completed: true }),
+      buildFixturePracticeAttempt("fixture-practice")
+    ];
+  }
+
+  function buildFixtureFullAttempt(id, options) {
+    const completed = Boolean(options.completed);
+    const now = "2026-07-04T09:00:00.000Z";
+    const answers = {};
+    const questionOrder = [];
+    for (let displayNumber = 1; displayNumber <= 170; displayNumber += 1) {
+      const answer = fixtureAnswer(id, displayNumber, completed);
+      answers[answer.question_id] = answer;
+      questionOrder.push(answer.question_id);
+    }
+    return {
+      id,
+      user_id: "fixture-user",
+      mode: "full",
+      title: "Professional Mock Exam",
+      practice_category: null,
+      exam_version_id: "fixture-version-1",
+      status: options.status,
+      started_at: "2026-07-04T06:00:00.000Z",
+      submitted_at: completed ? "2026-07-04T08:54:00.000Z" : null,
+      paused_at: null,
+      elapsed_seconds: completed ? (2 * 3600 + 54 * 60) : 38,
+      current_question_index: options.currentIndex,
+      total_questions: 170,
+      total_time_seconds: TOTAL_TIME_SECONDS,
+      options: { showTimer: true, enablePause: true, shuffleQuestions: false, shuffleAnswers: false },
+      question_order: questionOrder,
+      answers,
+      score: completed ? 142 : null,
+      percent: completed ? 83.5 : null,
+      timed_out: false,
+      created_at: now,
+      updated_at: now
+    };
+  }
+
+  function buildFixturePracticeAttempt(id) {
+    const attempt = buildFixtureFullAttempt(id, { status: "submitted", currentIndex: 0, completed: true });
+    const kept = Object.values(attempt.answers).filter((answer) => answer.display_number <= 20);
+    attempt.mode = "practice";
+    attempt.title = "Category Practice: Verbal Ability";
+    attempt.practice_category = "Verbal Ability";
+    attempt.exam_version_id = "fixture-practice-verbal";
+    attempt.total_questions = kept.length;
+    attempt.total_time_seconds = null;
+    attempt.elapsed_seconds = 25 * 60;
+    attempt.score = 15;
+    attempt.percent = 75;
+    attempt.question_order = kept.map((answer) => answer.question_id);
+    attempt.answers = Object.fromEntries(kept.map((answer, index) => [answer.question_id, { ...answer, position: index, display_number: index + 1 }]));
+    return attempt;
+  }
+
+  function fixtureAnswer(attemptId, displayNumber, completed) {
+    const group = fixtureGroupForDisplay(displayNumber);
+    const correctChoice = fixtureCorrectChoice(displayNumber);
+    const selectedChoice = completed ? fixtureSubmittedChoice(displayNumber, correctChoice) : fixtureActiveChoice(displayNumber);
+    const now = "2026-07-04T09:00:00.000Z";
+    const answer = {
+      attempt_id: attemptId,
+      user_id: "fixture-user",
+      question_id: `${attemptId}-q-${displayNumber}`,
+      position: displayNumber - 1,
+      display_number: displayNumber,
+      original_item_number: displayNumber,
+      section: group.section,
+      subtopic: fixtureSubtopic(group.section, displayNumber),
+      csc_skill: fixtureSubtopic(group.section, displayNumber),
+      prompt: fixturePrompt(displayNumber, group.section),
+      choices: fixtureChoices(displayNumber),
+      correct_choice: correctChoice,
+      original_correct_choice: correctChoice,
+      explanation: fixtureExplanation(displayNumber, correctChoice),
+      stimulus: displayNumber >= 81 && displayNumber <= 85 ? fixtureChartStimulus() : null,
+      difficulty: displayNumber % 3 === 0 ? "hard" : displayNumber % 2 === 0 ? "medium" : "easy",
+      selected_choice: selectedChoice,
+      skipped: !completed && fixtureSkippedDisplays().has(displayNumber),
+      flagged: fixtureFlaggedDisplays().has(displayNumber),
+      time_spent_seconds: completed ? 28 + ((displayNumber * 7) % 96) : (selectedChoice ? 34 + (displayNumber % 25) : 0),
+      visit_count: completed ? 1 + (displayNumber % 3 === 0 ? 1 : 0) : (displayNumber <= 50 || displayNumber === 82 ? 1 : 0),
+      answer_changes: completed && displayNumber % 17 === 0 ? 1 : 0,
+      changed_wrong_to_correct: completed && displayNumber % 34 === 0 ? 1 : 0,
+      changed_correct_to_wrong: completed && displayNumber % 51 === 0 ? 1 : 0,
+      answer_history: selectedChoice ? [{ choice: selectedChoice, at: now }] : [],
+      created_at: now,
+      updated_at: now
+    };
+    if (!completed && displayNumber === 43) {
+      answer.time_spent_seconds = 54;
+      answer.visit_count = 2;
+    }
+    if (completed && displayNumber === 43) {
+      answer.selected_choice = "B";
+      answer.time_spent_seconds = 54;
+      answer.flagged = true;
+      answer.answer_changes = 1;
+    }
+    return answer;
+  }
+
+  function fixtureGroupForDisplay(displayNumber) {
+    return SCREEN_SECTION_GROUPS.find((group) => displayNumber >= group.start && displayNumber <= group.end) || SCREEN_SECTION_GROUPS[0];
+  }
+
+  function fixtureSubtopic(section, displayNumber) {
+    if (section === "Verbal Ability") return displayNumber % 5 === 0 ? "Reading Comprehension" : "Grammar and Correct Usage";
+    if (section === "Numerical Ability") return displayNumber <= 85 ? "Data Interpretation" : "Word Problems";
+    if (section === "Analytical Ability") return displayNumber % 2 ? "Logic and Assumptions" : "Symbolic Sequencing";
+    return "Public Service Values";
+  }
+
+  function fixturePrompt(displayNumber, section) {
+    if (displayNumber === 43) return "Which of the following sentences is written correctly?";
+    if (displayNumber === 82) return "Based on the chart, which month recorded the highest increase from the previous month?";
+    if (section === "Numerical Ability") return `A reviewer answered ${40 + (displayNumber % 9)} questions in ${20 + (displayNumber % 7)} minutes. What rate best describes the work pace?`;
+    if (section === "Analytical Ability") return "Choose the option that best completes the logical sequence or conclusion.";
+    if (section === "General Information") return "Which statement best reflects ethical and accountable public service?";
+    return "Choose the sentence that is grammatically correct and logically clear.";
+  }
+
+  function fixtureChoices(displayNumber) {
+    if (displayNumber === 43) {
+      return [
+        { id: "A", text: "Every one of the students were given a handbook." },
+        { id: "B", text: "Each of the students were given a handbook." },
+        { id: "C", text: "Each of the students was given a handbook." },
+        { id: "D", text: "Every one of the students was given a handbook." },
+        { id: "E", text: "Each of the students have been given a handbook." }
+      ];
+    }
+    if (displayNumber === 82) {
+      return [
+        { id: "A", text: "February" },
+        { id: "B", text: "March" },
+        { id: "C", text: "April" },
+        { id: "D", text: "May" },
+        { id: "E", text: "January" }
+      ];
+    }
+    return [
+      { id: "A", text: "Option A" },
+      { id: "B", text: "Option B" },
+      { id: "C", text: "Option C" },
+      { id: "D", text: "Option D" },
+      { id: "E", text: "Option E" }
+    ];
+  }
+
+  function fixtureCorrectChoice(displayNumber) {
+    if (displayNumber === 82) return "B";
+    return "C";
+  }
+
+  function fixtureSubmittedChoice(displayNumber, correctChoice) {
+    const correct = (
+      (displayNumber >= 1 && displayNumber <= 54 && displayNumber !== 43) ||
+      (displayNumber >= 61 && displayNumber <= 90) ||
+      (displayNumber >= 101 && displayNumber <= 133) ||
+      (displayNumber >= 141 && displayNumber <= 166)
+    );
+    return correct ? correctChoice : (correctChoice === "A" ? "B" : "A");
+  }
+
+  function fixtureActiveChoice(displayNumber) {
+    return fixtureActiveAnsweredDisplays().has(displayNumber) ? fixtureCorrectChoice(displayNumber) : null;
+  }
+
+  function fixtureActiveAnsweredDisplays() {
+    return new Set([
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 41, 42, 43, 47, 50,
+      61, 62, 67, 81, 82, 86, 87, 91, 92, 93, 94, 95,
+      101, 104, 108, 111, 112, 113, 114, 115,
+      141, 148, 151, 152
+    ]);
+  }
+
+  function fixtureSkippedDisplays() {
+    return new Set([45, 64, 85, 103, 144]);
+  }
+
+  function fixtureFlaggedDisplays() {
+    return new Set([42, 49, 62, 84, 104, 146, 160]);
+  }
+
+  function fixtureExplanation(displayNumber, correctChoice) {
+    if (displayNumber === 43) return "Each is singular, so the verb should be singular: was. This keeps subject-verb agreement consistent.";
+    if (displayNumber === 82) return "The combined regional bars increase most sharply from February to March in the chart.";
+    return `Choice ${correctChoice} best matches the tested CSC skill for this item.`;
+  }
+
+  function fixtureChartStimulus() {
+    return {
+      id: "fixture-chart-a",
+      label: "Questions 81-85 refer to the chart below.",
+      title: "Monthly Sales (in Million PHP) by Region - 2024",
+      description: "Grouped monthly sales chart for Luzon, Visayas, and Mindanao.",
+      chartType: "grouped-bars",
+      xLabel: "Month",
+      yLabel: "Sales (Million PHP)",
+      headers: ["Month", "Luzon", "Visayas", "Mindanao"],
+      rows: [
+        ["Jan", 70, 50, 30],
+        ["Feb", 80, 55, 35],
+        ["Mar", 90, 60, 40],
+        ["Apr", 95, 65, 45],
+        ["May", 110, 70, 50]
+      ],
+      series: [
+        { label: "Luzon", color: "#214d98", values: [70, 80, 90, 95, 110] },
+        { label: "Visayas", color: "#159f9b", values: [50, 55, 60, 65, 70] },
+        { label: "Mindanao", color: "#ff9f2f", values: [30, 35, 40, 45, 50] }
+      ],
+      alt: "Luzon rises from 70 to 110, Visayas from 50 to 70, and Mindanao from 30 to 50 across January to May."
+    };
+  }
+
   function normalizeAttempt(row) {
     const answers = {};
     for (const answer of row.attempt_answers || []) {
@@ -191,6 +512,8 @@
   function render() {
     clearInterval(app.timerId);
     app.timerId = null;
+    root.dataset.fixture = app.fixtureMode ? app.fixtureState : "";
+    root.classList.toggle("fixture-mode", app.fixtureMode);
 
     if (app.view.name === "boot") return renderLoading();
     if (app.view.name === "config") return renderConfig();
@@ -240,6 +563,7 @@
   }
 
   function renderCreateAccount() {
+    if (app.fixtureMode && app.fixtureState === "create") return renderFixtureCreateProfile();
     root.innerHTML = publicShell(`
       <section class="auth-canvas create-state">
         <div class="auth-copy">
@@ -272,6 +596,7 @@
   }
 
   function renderSignIn() {
+    if (app.fixtureMode && app.fixtureState === "select") return renderFixtureSelectProfile();
     root.innerHTML = publicShell(`
       <section class="auth-canvas select-mode">
         <div class="auth-copy compact-copy">
@@ -296,6 +621,69 @@
     `);
   }
 
+  function renderFixtureCreateProfile() {
+    root.innerHTML = publicShell(`
+      <section class="auth-canvas create-state fixture-auth">
+        <div class="auth-copy">
+          <span class="soft-pill">${icon("building")} Civil Service Exam Practice</span>
+          <h1>Review smarter. Track your progress clearly.</h1>
+          <p>Save mock exam scores, review history, and progress across every section while preparing for the Professional level.</p>
+          <div class="auth-chips">
+            <span>${icon("clock")} Timed mock exams</span>
+            <span>${icon("stats")} Score tracking</span>
+            <span>${icon("review")} Reviewer history</span>
+          </div>
+        </div>
+        <form class="auth-card fixture-create-card" data-form="signup">
+          <div class="auth-card-head">
+            <h2>Create Profile</h2>
+            <p>Set up your reviewer profile.</p>
+          </div>
+          <label class="field-label">Full Name<div class="field-with-icon">${icon("user")}<input name="name" autocomplete="name" placeholder="Enter your full name" /></div></label>
+          <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="email" placeholder="Enter your email address" /></div></label>
+          <button class="btn primary" data-action="signup-submit" type="button">${icon("spark")} Start Reviewing</button>
+          <div class="auth-divider"><span>or</span></div>
+          <p class="auth-switch-copy">Already have a profile?</p>
+          <button class="text-link" data-action="show-signin" type="button">Select existing profile</button>
+        </form>
+      </section>
+      ${toast()}
+    `);
+  }
+
+  function renderFixtureSelectProfile() {
+    const rows = [
+      { name: "John Smith", email: "john.smith@email.com", detail: "Last reviewed today", progress: "64%", completed: "3 mock exams completed", active: true },
+      { name: "Maria Santos", email: "maria.santos@email.com", detail: "Progress: 64%", progress: "64%", completed: "3 mock exams completed", active: false },
+      { name: "New Reviewer", email: "new.reviewer@email.com", detail: "New profile", progress: "0%", completed: "No mock exams yet", active: false }
+    ];
+    root.innerHTML = publicShell(`
+      <section class="fixture-select-page">
+        <div class="select-header-row">
+          <div>
+            <h1>Select Profile</h1>
+            <p>Continue your practice session using an existing profile.</p>
+          </div>
+          <button class="btn primary" data-action="show-create" type="button">${icon("plus")} Create New Profile</button>
+        </div>
+        <div class="fixture-profile-list">
+          ${rows.map((row) => `
+            <button class="fixture-profile-row" data-action="signin-submit" type="button">
+              ${avatar({ name: row.name, avatar_preset: row.active ? 1 : 2 })}
+              <span><strong>${escapeHtml(row.name)}</strong><small>${escapeHtml(row.email)}</small></span>
+              <em>${icon("clock")} ${escapeHtml(row.detail)}</em>
+              <em>${icon("stats")} ${escapeHtml(row.progress)}</em>
+              <em>${icon("review")} ${escapeHtml(row.completed)}</em>
+              <b>Continue ${icon("arrow")}</b>
+            </button>
+          `).join("")}
+        </div>
+        <button class="text-link fixture-back-create" data-action="show-create" type="button">Back to Create Profile</button>
+      </section>
+      ${toast()}
+    `);
+  }
+
   function renderDashboard() {
     const profile = app.profile;
     const attempts = app.attempts;
@@ -307,7 +695,7 @@
     const totalFlagged = attempts.reduce((sum, attempt) => sum + flaggedCount(attempt), 0);
     const categoryStats = categoryPerformance(completed);
     root.innerHTML = authedShell(`
-      <section class="dash-page">
+      <section class="dash-page screenshot-dashboard">
         <div class="page-title-row dashboard-title">
           <div>
             <h1>Dashboard</h1>
@@ -374,7 +762,7 @@
           <section class="card review-card dashboard-card">
             <span class="card-icon flag-icon">${icon("flag")}</span>
             <h2>Review Mistakes</h2>
-            <p>${wrongAnswerCount(completed)} missed items are available for targeted review.</p>
+            <p>${wrongAnswerCount(completed) || 0} missed items are available for targeted review.</p>
             <button class="btn secondary" data-action="mistakes-page" type="button">${icon("review")} Review Now</button>
           </section>
 
@@ -412,6 +800,7 @@
   function renderSetup() {
     const draftOptions = { ...DEFAULT_OPTIONS, ...(app.draft?.options || {}) };
     const savedVersionId = draftOptions.versionId || examVersions[0]?.id;
+    const setupGroups = app.fixtureMode ? SCREEN_SECTION_GROUPS : SECTION_GROUPS;
     root.innerHTML = authedShell(`
       <section class="setup-page">
         <div class="page-title-row">
@@ -438,7 +827,7 @@
             </div>
             <div class="section-list">
               <h2>Question Groups</h2>
-              ${SECTION_GROUPS.map((group) => `
+              ${setupGroups.map((group) => `
                 <div class="section-row ${group.tone}">
                   <div>
                     <strong>${escapeHtml(group.section)}</strong>
@@ -490,13 +879,13 @@
     const isPaused = attempt.status === "paused";
 
     root.innerHTML = `
-      <section class="exam-shell ${isPaused || app.modal === "submit" ? "exam-dimmed" : ""}">
+      <section class="exam-shell ${app.fixtureMode ? "fixture-exam" : ""} state-${escapeAttr(app.fixtureState || "live")} ${isPaused ? "is-paused" : ""} ${isPaused || app.modal === "submit" ? "exam-dimmed" : ""}">
         <header class="exam-topbar">
           <div class="exam-brand">${logo()}<div><strong>CSC Practice Reviewer</strong><span>Independent mock exam and review tool</span></div></div>
           <div class="exam-status">
             <strong>${attempt.mode === "practice" ? "Category Practice" : "Professional Mock Exam"}</strong>
             <div>
-              <span class="exam-time">${attempt.options?.showTimer === false ? "Timer hidden" : `Time Left: ${formatDuration(remaining)}`}</span>
+              <span class="exam-time">${attempt.options?.showTimer === false ? "Timer hidden" : `${isPaused ? "Paused" : "Time Left:"} ${formatDuration(remaining)}`}</span>
               <span class="exam-answered">Answered: ${answeredCount(attempt)}/${attempt.total_questions}</span>
             </div>
           </div>
@@ -557,7 +946,7 @@
       ${toast()}
     `;
 
-    if (attempt.status === "in_progress") {
+    if (!app.fixtureMode && attempt.status === "in_progress") {
       app.timerId = setInterval(() => tickAttempt(attempt.id), 1000);
     }
   }
@@ -958,8 +1347,8 @@
         <section class="profile-modal">
           <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
           <div class="modal-heading">
-            <h2>Edit Profile</h2>
-            <p>Switch accounts or update your reviewer details.</p>
+            <h2>Manage Profile</h2>
+            <p>Edit your information or switch profile.</p>
           </div>
           <div class="profile-modal-grid">
             <div class="switch-column">
@@ -1202,40 +1591,104 @@
     if (attempt.mode === "practice") {
       return `
         <details class="question-group" open>
-          <summary><span><strong>${escapeHtml(attempt.practice_category || "Practice")}</strong><small>Questions 1-${attempt.total_questions}</small></span><em>${answeredCount(attempt)}/${attempt.total_questions} answered</em></summary>
+          <summary><span><strong>${escapeHtml(attempt.practice_category || "Practice")}</strong><small>Questions 1-${attempt.total_questions}</small></span><em>${answeredCount(attempt)}/${attempt.total_questions} answered</em><b class="group-chevron">${icon("chev")}</b></summary>
           <div class="chip-grid">${answers.map((answer) => navChip(answer, attempt)).join("")}</div>
         </details>
       `;
     }
 
-    return SECTION_GROUPS.map((group) => {
-      const groupAnswers = answers.filter((answer) => answer.section === group.section);
+    return navGroupsForAttempt(attempt).map((group) => {
+      const groupAnswers = answers.filter((answer) => answer.display_number >= group.start && answer.display_number <= group.end);
       const hasCurrent = groupAnswers.some((answer) => answer.position === attempt.current_question_index);
       const answered = groupAnswers.filter((answer) => answer.selected_choice).length;
       const skipped = groupAnswers.filter((answer) => answer.skipped && !answer.selected_choice).length;
       const flagged = groupAnswers.filter((answer) => answer.flagged).length;
       const expandedFull = app.expandedNavGroups.has(group.section);
       const previewAnswers = expandedFull ? groupAnswers : navPreviewAnswers(groupAnswers, attempt.current_question_index);
+      const stimulusBody = renderStimulusNavigator(group, groupAnswers, attempt);
       return `
-        <details class="question-group ${group.tone}" ${hasCurrent ? "open" : ""}>
+        <details class="question-group ${group.tone}" ${navGroupOpen(group, hasCurrent) ? "open" : ""}>
           <summary>
             <span><strong>${escapeHtml(group.section)}</strong><small>Questions ${group.range}</small></span>
             <em>${answered}/${groupAnswers.length} answered</em>
+            <b class="group-chevron">${icon("chev")}</b>
           </summary>
-          <div class="group-counts">
-            <span>${answered} answered</span>
-            <span>${groupAnswers.length - answered} unanswered</span>
-            <span>${skipped} skipped</span>
-            <span>${flagged} flagged</span>
-          </div>
-          <div class="chip-grid">
-            ${previewAnswers.map((answer) => navChip(answer, attempt)).join("")}
-            ${groupAnswers.length > previewAnswers.length ? `<button class="question-chip more-chip" data-action="toggle-nav-full" data-nav-group="${escapeAttr(group.section)}" type="button">...</button>` : ""}
-            ${expandedFull && groupAnswers.length > 10 ? `<button class="question-chip more-chip" data-action="toggle-nav-full" data-nav-group="${escapeAttr(group.section)}" type="button">Less</button>` : ""}
-          </div>
+          ${stimulusBody || `
+            <div class="group-counts">
+              <span>${answered} answered</span>
+              <span>${groupAnswers.length - answered} unanswered</span>
+              <span>${skipped} skipped</span>
+              <span>${flagged} flagged</span>
+            </div>
+            <div class="chip-grid ${expandedFull ? "is-scroll" : ""}">
+              ${previewAnswers.map((answer) => navChip(answer, attempt)).join("")}
+              ${groupAnswers.length > previewAnswers.length ? `<button class="question-chip more-chip" data-action="toggle-nav-full" data-nav-group="${escapeAttr(group.section)}" type="button">...</button>` : ""}
+              ${expandedFull && groupAnswers.length > 10 ? `<button class="question-chip more-chip" data-action="toggle-nav-full" data-nav-group="${escapeAttr(group.section)}" type="button">Less</button>` : ""}
+            </div>
+          `}
         </details>
       `;
     }).join("");
+  }
+
+  function navGroupsForAttempt(attempt) {
+    return app.fixtureMode ? SCREEN_SECTION_GROUPS : SECTION_GROUPS;
+  }
+
+  function navGroupOpen(group, hasCurrent) {
+    if (app.fixtureState === "exam") return true;
+    if (app.fixtureState === "graph") return group.section === "Numerical Ability";
+    if (app.fixtureState === "exam-collapsed" || app.fixtureState === "pause" || app.fixtureState === "submit") return hasCurrent;
+    return hasCurrent || app.expandedNavGroups.has(group.section);
+  }
+
+  function renderStimulusNavigator(group, groupAnswers, attempt) {
+    if (app.fixtureMode && app.fixtureState === "graph" && group.section === "Numerical Ability") {
+      const setA = groupAnswers.filter((answer) => answer.display_number >= 81 && answer.display_number <= 85);
+      const setB = groupAnswers.filter((answer) => answer.display_number >= 86 && answer.display_number <= 90);
+      const setC = groupAnswers.filter((answer) => answer.display_number >= 91 && answer.display_number <= 100);
+      return `
+        <div class="stimulus-nav">
+          <details class="stimulus-set" open>
+            <summary class="stimulus-set-head"><strong>Chart Set A</strong><span>Questions 81-85</span><em>3/5 answered</em><b class="group-chevron">${icon("chev")}</b></summary>
+            <div class="chip-grid set-grid">${setA.map((answer) => navChip(answer, attempt)).join("")}</div>
+          </details>
+          <details class="stimulus-set">
+            <summary class="stimulus-set-head"><strong>Numerical Set B</strong><span>Questions 86-90</span><em>2/5 answered</em><b class="group-chevron">${icon("chev")}</b></summary>
+            <div class="chip-grid set-grid">${setB.map((answer) => navChip(answer, attempt)).join("")}</div>
+          </details>
+          <details class="stimulus-set">
+            <summary class="stimulus-set-head"><strong>Numerical Set C</strong><span>Questions 91-100</span><em>7/10 answered</em><b class="group-chevron">${icon("chev")}</b></summary>
+            <div class="chip-grid set-grid">${setC.map((answer) => navChip(answer, attempt)).join("")}</div>
+          </details>
+        </div>
+      `;
+    }
+
+    const stimulusGroups = [];
+    const seen = new Set();
+    for (const answer of groupAnswers) {
+      const stimulusId = answer.stimulus?.id;
+      if (!stimulusId || seen.has(stimulusId)) continue;
+      const items = groupAnswers.filter((candidate) => candidate.stimulus?.id === stimulusId);
+      if (items.length < 2) continue;
+      seen.add(stimulusId);
+      stimulusGroups.push(items);
+    }
+    if (!stimulusGroups.length) return "";
+    return `
+      <div class="stimulus-nav">
+        ${stimulusGroups.map((items, index) => {
+          const answered = items.filter((item) => item.selected_choice).length;
+          return `
+            <section class="stimulus-set open">
+              <div class="stimulus-set-head"><strong>Chart Set ${String.fromCharCode(65 + index)}</strong><span>Questions ${items[0].display_number}-${items[items.length - 1].display_number}</span><em>${answered}/${items.length} answered</em></div>
+              <div class="chip-grid set-grid">${items.map((answer) => navChip(answer, attempt)).join("")}</div>
+            </section>
+          `;
+        }).join("")}
+      </div>
+    `;
   }
 
   function navPreviewAnswers(groupAnswers, currentIndex) {
@@ -1254,6 +1707,7 @@
     if (!stimulus) return "";
     const rows = toArray(stimulus.rows);
     const headers = toArray(stimulus.headers);
+    const groupedChart = stimulus.chartType === "grouped-bars" ? renderGroupedBarChart(stimulus) : "";
     const chartRows = rows.map((row) => {
       const values = row.slice(1).map(Number).filter(Number.isFinite);
       return { label: row[0], total: values.reduce((sum, value) => sum + value, 0) };
@@ -1267,15 +1721,46 @@
             <h2>${escapeHtml(stimulus.title || "Shared data set")}</h2>
             <p>${escapeHtml(stimulus.description || stimulus.alt || "")}</p>
           </div>
-          ${reviewMode ? "" : `<div class="stimulus-actions"><button class="btn tiny" data-action="open-chart" type="button">Zoom</button><button class="btn tiny" data-action="open-chart" type="button">Open Larger</button></div>`}
         </div>
-        ${chartRows.length ? `<div class="chart-bars">${chartRows.map((row) => `<div><span>${escapeHtml(row.label)}</span><i><b style="width:${Math.max(6, Math.round((row.total / max) * 100))}%"></b></i><strong>${row.total}</strong></div>`).join("")}</div>` : ""}
-        ${headers.length && rows.length ? `<div class="data-table-wrap"><table><thead><tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : ""}
+        ${groupedChart || (chartRows.length ? `<div class="chart-bars">${chartRows.map((row) => `<div><span>${escapeHtml(row.label)}</span><i><b style="width:${Math.max(6, Math.round((row.total / max) * 100))}%"></b></i><strong>${row.total}</strong></div>`).join("")}</div>` : "")}
+        ${reviewMode ? "" : `<div class="stimulus-actions"><button class="btn tiny" data-action="open-chart" type="button">Zoom</button><button class="btn tiny" data-action="open-chart" type="button">Open Larger</button></div>`}
+        ${!groupedChart && headers.length && rows.length ? `<div class="data-table-wrap"><table><thead><tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : ""}
         <div class="linked-items">
           <strong>${escapeHtml(linked.label)}</strong>
-          ${linked.items.map((item) => `<button class="${item.position === attempt.current_question_index ? "active" : ""}" data-goto="${item.position}" type="button">Item ${item.display_number}</button>`).join("")}
+          <div>${linked.items.map((item) => `<button class="${item.position === attempt.current_question_index ? "active" : ""}" data-goto="${item.position}" type="button">${item.display_number}</button>`).join("")}</div>
+          <p>These questions are connected and use the same chart.</p>
         </div>
       </section>
+    `;
+  }
+
+  function renderGroupedBarChart(stimulus) {
+    const rows = toArray(stimulus.rows);
+    const series = toArray(stimulus.series);
+    if (!rows.length || !series.length) return "";
+    const max = Math.max(120, ...series.flatMap((entry) => toArray(entry.values).map(Number).filter(Number.isFinite)));
+    return `
+      <div class="grouped-chart" role="img" aria-label="${escapeAttr(stimulus.alt || stimulus.title || "Grouped bar chart")}">
+        <div class="chart-legend">${series.map((entry) => `<span><i style="background:${escapeAttr(entry.color)}"></i>${escapeHtml(entry.label)}</span>`).join("")}</div>
+        <div class="chart-plot">
+          <span class="y-label">${escapeHtml(stimulus.yLabel || "")}</span>
+          <div class="chart-scale">${[120, 100, 80, 60, 40, 20, 0].map((tick) => `<span>${tick}</span>`).join("")}</div>
+          <div class="chart-bars-vertical">
+            ${rows.map((row, rowIndex) => `
+              <div class="chart-month">
+                <div class="bar-cluster">
+                  ${series.map((entry) => {
+                    const value = Number(toArray(entry.values)[rowIndex] || 0);
+                    return `<b style="height:${Math.max(4, Math.round((value / max) * 100))}%; background:${escapeAttr(entry.color)}"><em>${value}</em></b>`;
+                  }).join("")}
+                </div>
+                <strong>${escapeHtml(row[0])}</strong>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+        <small>${escapeHtml(stimulus.xLabel || "")}</small>
+      </div>
     `;
   }
 
@@ -1306,12 +1791,122 @@
     }
   }
 
+  function handleFixtureClick(target, action) {
+    const active = getAttempt("fixture-active");
+    const submitted = getAttempt("fixture-submitted");
+    if (action === "show-signin") {
+      app.fixtureState = "select";
+      return setView({ name: "signin" }) || true;
+    }
+    if (action === "show-create") {
+      app.fixtureState = "create";
+      return setView({ name: "create" }) || true;
+    }
+    if (action === "signup-submit" || action === "signin-submit" || action === "dashboard") {
+      app.fixtureState = "dashboard";
+      app.modal = null;
+      return setView({ name: "dashboard" }) || true;
+    }
+    if (action === "open-setup" || action === "setup-page" || action === "retake-setup") {
+      app.fixtureState = "setup";
+      app.modal = null;
+      return setView({ name: "setup" }) || true;
+    }
+    if (action === "setup-submit" || action === "save-setup" || action === "resume-exam") {
+      active.status = "in_progress";
+      active.current_question_index = action === "resume-exam" ? 42 : 0;
+      app.fixtureState = action === "resume-exam" ? "exam-collapsed" : "exam";
+      app.modal = null;
+      return setView({ name: "exam", attemptId: active.id }) || true;
+    }
+    if (action === "practice-page") {
+      app.fixtureState = "practice";
+      app.modal = null;
+      return setView({ name: "practice" }) || true;
+    }
+    if (action === "recent-page" || action === "results-history-page") {
+      app.fixtureState = "recent";
+      app.modal = null;
+      return setView({ name: "recent" }) || true;
+    }
+    if (action === "mistakes-page" || action === "bookmarks-page") {
+      app.fixtureState = "review";
+      app.reviewFilter = "wrong";
+      return setView({ name: "review", attemptId: submitted.id, index: 0 }) || true;
+    }
+    if (action === "manage-profile" || action === "switch-account") {
+      app.fixtureState = "profile-modal";
+      app.modal = "profile";
+      return setView({ name: "dashboard" }) || true;
+    }
+    if (action === "close-modal") {
+      app.modal = null;
+      app.fixtureState = app.view.name === "exam" ? "exam-collapsed" : "dashboard";
+      render();
+      return true;
+    }
+    if (action === "pause-exam") {
+      active.status = "paused";
+      app.fixtureState = "pause";
+      return renderExam() || true;
+    }
+    if (action === "resume-paused") {
+      active.status = "in_progress";
+      app.fixtureState = "exam-collapsed";
+      return renderExam() || true;
+    }
+    if (action === "save-exit") {
+      active.status = "in_progress";
+      app.modal = null;
+      app.fixtureState = "dashboard";
+      return setView({ name: "dashboard" }) || true;
+    }
+    if (action === "open-submit") {
+      app.modal = "submit";
+      app.fixtureState = "submit";
+      return renderExam() || true;
+    }
+    if (action === "confirm-submit") {
+      app.modal = null;
+      app.fixtureState = "results";
+      return setView({ name: "results", attemptId: submitted.id }) || true;
+    }
+    if (action === "review-unanswered" || action === "review-flagged") return false;
+    if (action === "review-answers") {
+      app.fixtureState = "review";
+      return setView({ name: "review", attemptId: submitted.id, index: 42 }) || true;
+    }
+    if (action === "back-results") {
+      app.fixtureState = "results";
+      return setView({ name: "results", attemptId: submitted.id }) || true;
+    }
+    if (action === "custom-practice-submit" || target.dataset.practiceCategory) {
+      const practice = getAttempt("fixture-practice");
+      app.fixtureState = "results";
+      return setView({ name: "results", attemptId: practice.id }) || true;
+    }
+    if (action === "delete-profile" || action === "forgot-password" || action === "password-submit" || action === "profile-submit") {
+      showToast("Fixture mode: no Supabase data is changed.");
+      return true;
+    }
+    if (action === "signout") {
+      app.fixtureState = "select";
+      return setView({ name: "signin" }) || true;
+    }
+    if (target.dataset.attemptResults || target.dataset.attemptOpen || target.dataset.attemptReview) {
+      app.fixtureState = target.dataset.attemptReview ? "review" : "results";
+      return setView({ name: target.dataset.attemptReview ? "review" : "results", attemptId: submitted.id, index: 0 }) || true;
+    }
+    return false;
+  }
+
   async function handleClick(event) {
     const target = event.target.closest("button");
     if (!target) return;
     const action = target.dataset.action;
 
     try {
+      if (app.fixtureMode && handleFixtureClick(target, action)) return;
       if (action === "show-signin") return setView({ name: "signin" });
       if (action === "show-create") return setView({ name: "create" });
       if (action === "signup-submit") return await signUp(formDataFromButton(target));
