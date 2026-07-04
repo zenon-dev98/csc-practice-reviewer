@@ -602,3 +602,45 @@ Risks:
 
 - This pass intentionally prioritized maximized desktop Microsoft Edge. Mobile density should be handled as a separate pass if needed.
 - The no-scroll desktop contract uses previews for long question/recent lists; full lists remain reachable through their dedicated pages or navigation controls rather than being displayed all at once.
+
+## 2026-07-05 - T0014 Desktop Screenshot Quality Regression Repair
+
+Summary:
+
+- Repaired the T0013 forced-fit regression that made the UI technically fit while losing spacing, proportion, and card quality.
+- Restored dashboard row rhythm and card breathing room so primary buttons no longer hug card bottoms and large cards no longer feel arbitrarily stretched.
+- Fixed the exam sidebar by removing grid row distribution from `.exam-nav`; question groups now flow naturally, and expanded `More` groups use internal sidebar scrolling instead of clipping lower groups.
+- Rebalanced results/practice-complete into a cleaner two-column desktop layout, added a richer Exam Overview list, and compacted fun facts at smaller desktop widths.
+- Kept Supabase auth, invite flow, 20 versions, 170-item exams, graph/table sets, timing analytics, pause/submit/results/review/practice/recent/profile flows intact.
+
+Files changed:
+
+- `app/app.js`
+- `app/index.html`
+- `app/styles.css`
+- `docs/Tickets.md`
+- `docs/Repo_Current_State.md`
+- `docs/Known_Issues_And_Followups.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- `node --check app\app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- Microsoft Edge-channel Playwright fixture sweeps at `1904x913` and `1536x816`
+- Microsoft Edge-channel interaction pass for exam sidebar expansion/scrolling, answer selection, clear, flag, skip, pause, and submit modal
+
+Verification:
+
+- Both viewport sweeps passed for `create`, `select`, `dashboard`, `setup`, `exam`, `exam-collapsed`, `graph`, `pause`, `submit`, `results`, `review`, `practice`, `recent`, and `profile-modal`.
+- No document/body horizontal or vertical scrollbars were detected in fixture states.
+- No sampled containment offenders remained; intentional exam sidebar overflow is internal and scrollable when `More` is expanded.
+- No console errors were detected after adding the favicon.
+- QA screenshots and reports were saved under `qa/t0014-quality-final-1904x913`, `qa/t0014-quality-final-1536x816`, and `qa/t0014-quality-interactions`.
+
+Risks:
+
+- The compact `1536x816` results layout hides the extra descriptive sentence in each fun-fact card to preserve the no-scroll one-screen contract; the wide desktop layout keeps the fuller text.
+- Mobile polish remains a separate follow-up if mobile becomes a priority again.

@@ -9,7 +9,8 @@
 - Supabase email confirmation is intentionally disabled for now because signup is invite-gated and the free email sender hit rate limits during QA. Revisit if using a custom SMTP sender.
 - GitHub Actions reports a Node 20 deprecation warning for current action versions, but deployment succeeds under the forced Node 24 runner.
 - Exact iconography may still differ from the generated `states/` assets where the app uses the existing inline icon set, but the screenshot-state layout, containment, and interactions now have a fixture QA harness and desktop/mobile browser sweep.
-- T0013 intentionally prioritizes a maximized desktop Microsoft Edge viewport. Mobile should get a separate polish pass if it becomes a priority again.
+- T0014 repaired the desktop quality regression at `1904x913` and `1536x816`. Mobile still should get a separate polish pass if it becomes a priority again.
+- At the smaller `1536x816` desktop fixture, the Results fun-fact cards use a compact mode that shows titles and values while hiding the extra descriptive sentence to preserve the one-screen no-scroll contract.
 
 ## Follow-Up Ticket Ideas
 

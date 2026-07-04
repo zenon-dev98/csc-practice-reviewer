@@ -232,3 +232,27 @@ Completion notes:
 - Dashboard recent attempts now previews two attempts on the dashboard; the full recent table remains on the Recent Attempts page.
 - QA screenshots were saved under `qa/t0013-density-edge-final`, `qa/t0013-density-interactions`, and `qa/t0013-density-edge-1536x816-r4`.
 - Static checks, data validation, dependency check, Impeccable detector, automated fixture sweeps, interaction sweeps, and real maximized Microsoft Edge checks passed.
+
+## T0014 - Desktop Screenshot Quality Regression Repair
+
+Status: done
+
+Repair the T0013 forced-fit regression where cards, buttons, groups, and text technically fit a maximized desktop viewport but lost the spacing, proportions, and polish of the `states/` mockups.
+
+Acceptance criteria:
+
+- Dashboard, setup, exam, results, practice, answer review, recent attempts, and profile modal preserve mockup-like proportions instead of stretched full-width strips or cramped controls.
+- Primary buttons, text blocks, score cards, and form controls have consistent breathing room and never hug card edges.
+- Exam question groups can expand without hiding lower groups; the sidebar uses bounded internal scrolling with hidden or unobtrusive scrollbars instead of clipping content.
+- Long dashboard/review/results regions avoid giant unused voids while keeping text and controls readable on a maximized 16:9 desktop.
+- The app still avoids document/body scrollbars on the target desktop fixture states where the mockups fit in one screen.
+- Desktop screenshot QA is rerun after changes and saved under `qa/`.
+
+Completion notes:
+
+- Replaced the forced-fit desktop layer with quality-preserving dashboard, exam, setup, results, review, profile modal, and side-page layout contracts.
+- Fixed the exam sidebar by changing it back to normal block flow with bounded internal scrolling; expanded `More` question groups no longer clip lower groups or force page scroll.
+- Rebalanced dashboard card rows so cards keep breathing room without giant bottom voids or buttons touching card edges.
+- Reworked results layout into a two-column desktop composition with a richer Exam Overview list and compact fun-fact cards for smaller desktop viewports.
+- Added a favicon and cache-busted static assets through `v=20260705-3`.
+- Edge-channel screenshot sweeps passed at `1904x913` and `1536x816`; interaction screenshots covered sidebar expansion/scrolling, answer selection, clear, flag, skip, pause, and submit modal.

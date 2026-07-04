@@ -1028,11 +1028,15 @@
 
         <section class="card overview-card">
           <h2>Exam Overview</h2>
-          <div class="overview-row">
-            <span>${skippedCount(attempt)} skipped</span>
-            <span>${unansweredCount(attempt)} unanswered</span>
-            <span>${visitedCount(attempt)} visited</span>
-            <span>${attempt.options?.shuffleQuestions ? "Question shuffle on" : "Bank order"}</span>
+          <div class="overview-list">
+            <div><span>Exam Type</span><strong>${escapeHtml(isPractice ? "Category Practice" : "Professional Mock Exam")}</strong></div>
+            <div><span>Total Questions</span><strong>${attempt.total_questions}</strong></div>
+            <div><span>Answered</span><strong>${answeredCount(attempt)} / ${attempt.total_questions}</strong></div>
+            <div><span>Skipped</span><strong>${skippedCount(attempt)}</strong></div>
+            <div><span>Unanswered</span><strong>${unansweredCount(attempt)}</strong></div>
+            <div><span>Visited</span><strong>${visitedCount(attempt)}</strong></div>
+            <div><span>Duration</span><strong>${formatDuration(attempt.elapsed_seconds)}</strong></div>
+            <div><span>Question Order</span><strong>${attempt.options?.shuffleQuestions ? "Shuffled" : "Bank order"}</strong></div>
           </div>
         </section>
 
