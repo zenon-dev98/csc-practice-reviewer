@@ -1190,14 +1190,14 @@
     try {
       if (action === "show-signin") return setView({ name: "signin" });
       if (action === "show-create") return setView({ name: "create" });
-      if (action === "signup-submit") return signUp(formDataFromButton(target));
-      if (action === "signin-submit") return signIn(formDataFromButton(target));
-      if (action === "setup-submit") return startFullExam(formOptions(target.closest("form")));
-      if (action === "profile-submit") return saveProfile(target.closest("form"));
-      if (action === "password-submit") return changePassword(formDataFromButton(target));
+      if (action === "signup-submit") return await signUp(formDataFromButton(target));
+      if (action === "signin-submit") return await signIn(formDataFromButton(target));
+      if (action === "setup-submit") return await startFullExam(formOptions(target.closest("form")));
+      if (action === "profile-submit") return await saveProfile(target.closest("form"));
+      if (action === "password-submit") return await changePassword(formDataFromButton(target));
       if (action === "custom-practice-submit") {
         const values = formDataFromButton(target);
-        return startPractice(values.category, Number(values.count), values.difficulty);
+        return await startPractice(values.category, Number(values.count), values.difficulty);
       }
       if (action === "dashboard") return setView({ name: "dashboard" });
       if (action === "open-setup" || action === "setup-page" || action === "retake-setup") return setView({ name: "setup" });
@@ -1208,15 +1208,15 @@
       if (action === "results-history-page") return setView({ name: "recent" });
       if (action === "manage-profile") return openModal("profile");
       if (action === "close-modal") return closeModal();
-      if (action === "switch-account" || action === "signout") return signOut();
-      if (action === "forgot-password") return forgotPassword();
-      if (action === "save-setup") return saveSetupDraft();
+      if (action === "switch-account" || action === "signout") return await signOut();
+      if (action === "forgot-password") return await forgotPassword();
+      if (action === "save-setup") return await saveSetupDraft();
       if (action === "resume-exam") return resumeActiveAttempt();
-      if (action === "pause-exam") return pauseAttempt();
-      if (action === "resume-paused") return resumePausedAttempt();
-      if (action === "save-exit") return saveAndExit();
+      if (action === "pause-exam") return await pauseAttempt();
+      if (action === "resume-paused") return await resumePausedAttempt();
+      if (action === "save-exit") return await saveAndExit();
       if (action === "open-submit") return openModal("submit");
-      if (action === "confirm-submit") return submitCurrentAttempt(false);
+      if (action === "confirm-submit") return await submitCurrentAttempt(false);
       if (action === "review-unanswered") return jumpToFirst((answer) => !answer.selected_choice);
       if (action === "review-flagged") return jumpToFirst((answer) => answer.flagged);
       if (action === "previous-question") return navigateQuestion(-1);
@@ -1230,18 +1230,18 @@
       if (action === "review-prev") return moveReview(-1);
       if (action === "review-next") return moveReview(1);
       if (action === "toggle-updates") return openModal(app.modal === "updates" ? null : "updates");
-      if (action === "delete-profile") return deleteProfile();
+      if (action === "delete-profile") return await deleteProfile();
 
       if (target.dataset.choice) return chooseAnswer(target.dataset.choice);
       if (target.dataset.goto !== undefined) return gotoQuestion(Number(target.dataset.goto));
       if (target.dataset.reviewFilter) return setReviewFilter(target.dataset.reviewFilter);
       if (target.dataset.reviewIndex !== undefined) return setView({ ...app.view, index: Number(target.dataset.reviewIndex) });
-      if (target.dataset.practiceCategory) return startPractice(target.dataset.practiceCategory, DEFAULT_PRACTICE_COUNT, "mixed");
+      if (target.dataset.practiceCategory) return await startPractice(target.dataset.practiceCategory, DEFAULT_PRACTICE_COUNT, "mixed");
       if (target.dataset.attemptOpen) return openAttempt(target.dataset.attemptOpen);
       if (target.dataset.attemptResults) return setView({ name: "results", attemptId: target.dataset.attemptResults });
       if (target.dataset.attemptReview) return setView({ name: "review", attemptId: target.dataset.attemptReview, index: 0 });
       if (target.dataset.attemptRetake) return setView({ name: "setup" });
-      if (target.dataset.attemptDelete) return deleteAttempt(target.dataset.attemptDelete);
+      if (target.dataset.attemptDelete) return await deleteAttempt(target.dataset.attemptDelete);
       if (target.dataset.overflow) return openModal(app.modal === `overflow:${target.dataset.overflow}` ? null : `overflow:${target.dataset.overflow}`);
       if (target.dataset.recentTab) {
         app.recentTab = target.dataset.recentTab;

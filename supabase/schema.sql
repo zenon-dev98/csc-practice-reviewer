@@ -26,6 +26,8 @@ on conflict (code_hash) do nothing;
 create or replace function public.hook_validate_invite_code(event jsonb)
 returns jsonb
 language plpgsql
+security definer
+set search_path = public, extensions
 as $$
 declare
   submitted_code text;
