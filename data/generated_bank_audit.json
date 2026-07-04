@@ -1,0 +1,1137 @@
+{
+  "generatedAt": "2026-07-03T20:48:45.794Z",
+  "versionCount": 20,
+  "totalQuestions": 3400,
+  "coverageMatrix": {
+    "General Information": [
+      "Philippine Constitution",
+      "RA 6713 / Code of Conduct",
+      "Peace and human rights",
+      "Environment management and protection",
+      "Public accountability and service ethics"
+    ],
+    "Verbal Ability": [
+      "English vocabulary",
+      "Filipino vocabulary",
+      "Grammar and correct usage",
+      "Reading comprehension",
+      "Correct reasoning of thought process"
+    ],
+    "Numerical Ability": [
+      "Basic operations",
+      "Number sequence",
+      "Word problems",
+      "Percent, ratio, average, rate, and discount",
+      "Data interpretation"
+    ],
+    "Analytical Ability": [
+      "Word analogy",
+      "Symbolic logic / abstract reasoning",
+      "Identifying assumptions and drawing conclusions",
+      "Data interpretation",
+      "Pattern and sequence reasoning"
+    ]
+  },
+  "versions": [
+    {
+      "id": "generated-professional-v01",
+      "title": "Professional Practice Version 1",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v01-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v01-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v02",
+      "title": "Professional Practice Version 2",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v02-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v02-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v03",
+      "title": "Professional Practice Version 3",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v03-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v03-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v04",
+      "title": "Professional Practice Version 4",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v04-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v04-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v05",
+      "title": "Professional Practice Version 5",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v05-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v05-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v06",
+      "title": "Professional Practice Version 6",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v06-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v06-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v07",
+      "title": "Professional Practice Version 7",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v07-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v07-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v08",
+      "title": "Professional Practice Version 8",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v08-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v08-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v09",
+      "title": "Professional Practice Version 9",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v09-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v09-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v10",
+      "title": "Professional Practice Version 10",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v10-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v10-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v11",
+      "title": "Professional Practice Version 11",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v11-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v11-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v12",
+      "title": "Professional Practice Version 12",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v12-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v12-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v13",
+      "title": "Professional Practice Version 13",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v13-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v13-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v14",
+      "title": "Professional Practice Version 14",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v14-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v14-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v15",
+      "title": "Professional Practice Version 15",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v15-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v15-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v16",
+      "title": "Professional Practice Version 16",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v16-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v16-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v17",
+      "title": "Professional Practice Version 17",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v17-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v17-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v18",
+      "title": "Professional Practice Version 18",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v18-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v18-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v19",
+      "title": "Professional Practice Version 19",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v19-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v19-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generated-professional-v20",
+      "title": "Professional Practice Version 20",
+      "totalQuestions": 170,
+      "bySection": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "bySkill": {
+        "RA 6713 / Code of Conduct": 4,
+        "Philippine Constitution": 4,
+        "Public accountability and service ethics": 6,
+        "Environment management and protection": 3,
+        "Peace and human rights": 3,
+        "English vocabulary": 10,
+        "Filipino vocabulary": 10,
+        "Grammar and correct usage": 15,
+        "Reading comprehension": 20,
+        "Correct reasoning of thought process": 5,
+        "Word problems": 22,
+        "Basic operations": 10,
+        "Number sequence": 4,
+        "Data interpretation": 11,
+        "Word analogy": 9,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Pattern and sequence reasoning": 10,
+        "Symbolic logic / abstract reasoning": 10
+      },
+      "stimulusGroups": [
+        {
+          "id": "stim-v20-numerical-101",
+          "label": "Chart for Items 101-104",
+          "kind": "bar-table",
+          "itemNumbers": [
+            101,
+            102,
+            103,
+            104
+          ]
+        },
+        {
+          "id": "stim-v20-logic-151",
+          "label": "Logic setup for Items 151-154",
+          "kind": "logic-grid",
+          "itemNumbers": [
+            151,
+            152,
+            153,
+            154
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+.env
+.env.*
+!app/supabase-config.example.js
+app/supabase-config.js
+dist/
+coverage/
+.DS_Store
+Thumbs.db
+desktop.ini
