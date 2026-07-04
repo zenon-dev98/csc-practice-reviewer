@@ -353,3 +353,55 @@ Verification:
 Risks:
 
 - Further exact Stitch fidelity would require a working Figma/MCP/source export route from Stitch.
+## T0011 - State-Image Redesign And Online Supabase Deployment
+
+Status: blocked on Supabase dashboard sign-in
+
+Summary:
+
+- Replaced the localStorage app shell with a Supabase-backed static app.
+- Implemented state-image-inspired auth, dashboard, setup, exam, graph stimulus, pause, submit, results, review, practice, recent-attempts, mistake review, bookmarks, and manage-profile flows.
+- Added post-exam performance insights and per-question timing fields.
+- Added Supabase schema, RLS policies, invite-code hook SQL, setup docs, GitHub Pages workflow, and public GitHub deployment.
+
+Files changed:
+
+- `app/index.html`, `app/app.js`, `app/styles.css`, `app/assets/logo.png`
+- `supabase/schema.sql`
+- `.github/workflows/pages.yml`
+- `docs/Supabase_Online_Setup.md`, `docs/Deployment_GitHub_Pages.md`, ticket/current-state docs
+
+Commands run:
+
+- `node --check app\app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- `git init -b main`
+- `git commit -m "feat: launch state-image reviewer with Supabase"`
+- `gh repo create zenon-dev98/csc-practice-reviewer --public --source . --remote origin --push`
+- `gh secret set SUPABASE_URL`
+- `gh secret set SUPABASE_PUBLISHABLE_KEY`
+- `gh api -X POST repos/zenon-dev98/csc-practice-reviewer/pages -f build_type=workflow`
+- `gh run rerun 28698923979 --repo zenon-dev98/csc-practice-reviewer`
+- `gh run watch 28698923979 --repo zenon-dev98/csc-practice-reviewer --exit-status`
+
+Verification:
+
+- Static data validation passed.
+- JavaScript syntax check passed.
+- Dependency check passed and confirmed dependencies remain outside the Google Drive workspace.
+- Impeccable detector returned no findings.
+- Local create-account and sign-in public states loaded with no console errors.
+- Mobile viewport check had no horizontal overflow.
+- GitHub Pages deployment succeeded and the live URL loaded with no console errors.
+
+Risks:
+
+- Supabase tables/RLS/Auth Hook were not applied because the dashboard opened at Supabase sign-in.
+- End-to-end signup, attempt save, and cross-device resume cannot be verified until the Supabase SQL/Auth Hook setup is applied.
+
+Follow-ups:
+
+- Sign into Supabase, run `supabase/schema.sql`, enable the Before User Created hook, and add the GitHub Pages redirect URL.
+- After that, create a test account with the shared invite code and complete one short practice/full attempt to verify online persistence.

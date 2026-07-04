@@ -14,8 +14,11 @@ Path:
 - `package.json` contains helper scripts only; it has no dependency declarations.
 - The runnable app is a static browser app in `app/`.
 - The runnable bank uses 20 generated typed Professional mock versions, 170 items each, generated from a CSC coverage matrix.
-- The home/menu UI uses a Stitch-generated cockpit-dashboard direction: left profile rail, active exam resume/start panel, section blueprint, mock-version grid, latest attempt, recent runs, local-save status, and disclaimer.
-- The exam UI uses a dark exam-console sidebar, grouped section navigation, compact question surfaces, chart/table stimulus panels, and logic-rule stimulus panels.
+- The app has been redesigned around the supplied `states/` screenshots, with approved source-backed deviations for A-D choices, section ranges, and one-profile-per-account auth.
+- Runtime persistence is now implemented against Supabase email/password auth and online tables, with per-attempt question snapshots and timing analytics.
+- The app is deployed through GitHub Pages Actions at `https://zenon-dev98.github.io/csc-practice-reviewer/`.
+- The public GitHub repository is `https://github.com/zenon-dev98/csc-practice-reviewer`.
+- The Supabase SQL/Auth Hook setup is prepared in `supabase/schema.sql` but has not been applied yet because the dashboard session was at sign-in during automation.
 - Project dependencies must not be installed in this Google Drive folder.
 - Optional local server dependencies are installed under `%LOCALAPPDATA%\csc-reviewer\node-deps`.
 
@@ -76,8 +79,8 @@ Current source item boundaries:
 
 ## Current Active Ticket
 
-- T0011 - State-Image Redesign And Online Supabase Deployment.
+- T0011 - State-Image Redesign And Online Supabase Deployment is blocked only on applying Supabase SQL/Auth Hook while signed into the dashboard.
 
 ## Next Ticket
 
-- None currently open after T0011. External setup is being folded into T0011 for the hosted build.
+- Apply `supabase/schema.sql`, enable Authentication > Hooks > Before User Created > `public.hook_validate_invite_code`, and add the GitHub Pages URL to Supabase redirect URLs.

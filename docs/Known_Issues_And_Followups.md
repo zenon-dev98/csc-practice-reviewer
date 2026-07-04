@@ -12,6 +12,7 @@
 - Public hosting is not configured. The app is currently local/static and browser-storage based.
 - Stitch was used for the menu/dashboard redesign, but generated code export was not available through `Code to Clipboard`; it copied the prompt instead. Future Stitch iterations may still use Figma, MCP, or other export routes if configured.
 - T0011 is replacing browser-storage runtime persistence with Supabase email/password auth and GitHub Pages deployment. Until the Supabase SQL and auth hook are applied, the new online app will show auth/storage errors.
+- GitHub Pages deployment is live, but online signup/storage will not work until `supabase/schema.sql` is run and the `public.hook_validate_invite_code` Before User Created hook is selected in Supabase Authentication > Hooks.
 
 ## Follow-Up Ticket Ideas
 

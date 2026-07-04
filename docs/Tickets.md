@@ -170,7 +170,7 @@ Acceptance criteria:
 
 ## T0011 - State-Image Redesign And Online Supabase Deployment
 
-Status: in_progress
+Status: blocked
 
 Replace the current local static reviewer shell with the state-image UI system, Supabase email/password auth, online attempt storage, invite-code signup gate, post-exam performance insights, and GitHub Pages deployment.
 
@@ -185,3 +185,7 @@ Acceptance criteria:
 - Results include post-exam performance insights: average time, fastest/slowest item, fastest/slowest section, strongest/weakest section, changed-answer stats, and retry recommendation.
 - GitHub repository and GitHub Pages Actions deployment are configured.
 - Validation, browser smoke tests, responsive checks, and Impeccable audit pass.
+
+Blocker:
+
+- The app is deployed to GitHub Pages, but Supabase SQL/Auth Hook setup still must be applied in the Supabase dashboard. Browser automation reached Supabase sign-in and cannot apply SQL without the user being signed in.
