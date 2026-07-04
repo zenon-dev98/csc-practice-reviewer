@@ -556,3 +556,49 @@ Verification:
 Risks:
 
 - Full live Microsoft Edge screenshot/interactions QA still needs to be rerun after GitHub Pages deployment serves `v=20260704-8`.
+
+## 2026-07-05 - T0013 Maximized Edge No-Scroll Desktop Density Repair
+
+Summary:
+
+- Reworked the desktop density layer so every supplied fixture state fits without a document/body scrollbar in a maximized Microsoft Edge PC viewport.
+- Reduced oversized headers, cards, buttons, choices, dashboard rows, results cards, side navigation, modal controls, graph panels, and table rows.
+- Changed review and exam navigators to bounded preview windows so 170-item or 60-item chip walls do not force page scrolling.
+- Dashboard Recent Attempts now previews two attempts; the full attempt list remains available on the Recent Attempts page.
+- Verified the user's real maximized Microsoft Edge window, which captured at `1536x816`, after automated `1920x920` checks had missed density issues.
+
+Files changed:
+
+- `app/app.js`
+- `app/styles.css`
+- `app/index.html`
+- `AGENTS.md`
+- `docs/Tickets.md`
+- `docs/Repo_Current_State.md`
+- `docs/Known_Issues_And_Followups.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- `node --check app\app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- Playwright fixture sweeps from `%LOCALAPPDATA%\csc-reviewer\qa-deps` against local `http://127.0.0.1:4173/index.html?fixture=...`
+- Microsoft Edge maximized live checks at local fixture URLs.
+
+Verification:
+
+- Static data validation passed.
+- JavaScript syntax check passed.
+- Dependency check passed with dependencies outside the Google Drive workspace.
+- Impeccable detector exited successfully for `app/`.
+- `1920x920` fixture sweep for all 14 states reported no document/body scrollbars and no sampled container overflow.
+- `1536x816` fixture sweep for dashboard, exam, graph, results, review, practice, recent, and profile modal reported no document/body scrollbars.
+- Interaction sweep exercised all exam groups open, More preview, answer selection, flag, skip, clear, graph subgroups, chart modal, submit modal, and review-flagged path with no document or exam-nav overflow.
+- Real maximized Microsoft Edge screenshots verified dashboard, active exam, and results states without page scrollbars.
+
+Risks:
+
+- This pass intentionally prioritized maximized desktop Microsoft Edge. Mobile density should be handled as a separate pass if needed.
+- The no-scroll desktop contract uses previews for long question/recent lists; full lists remain reachable through their dedicated pages or navigation controls rather than being displayed all at once.

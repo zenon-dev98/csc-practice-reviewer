@@ -9,9 +9,11 @@
 - Supabase email confirmation is intentionally disabled for now because signup is invite-gated and the free email sender hit rate limits during QA. Revisit if using a custom SMTP sender.
 - GitHub Actions reports a Node 20 deprecation warning for current action versions, but deployment succeeds under the forced Node 24 runner.
 - Exact iconography may still differ from the generated `states/` assets where the app uses the existing inline icon set, but the screenshot-state layout, containment, and interactions now have a fixture QA harness and desktop/mobile browser sweep.
+- T0013 intentionally prioritizes a maximized desktop Microsoft Edge viewport. Mobile should get a separate polish pass if it becomes a priority again.
 
 ## Follow-Up Ticket Ideas
 
 - Add a Supabase backup/export ticket before public use.
 - Add a human content review ticket for generated Filipino, data-interpretation, legal/general-information, and symbolic-reasoning items.
 - Add a Stitch MCP/Figma export ticket if direct generated-source handoff becomes available.
+- Add a mobile-specific screenshot-density ticket after the desktop no-scroll contract stabilizes.

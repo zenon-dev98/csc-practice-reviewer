@@ -1,6 +1,6 @@
 # Repo Current State
 
-Last updated: 2026-07-04
+Last updated: 2026-07-05
 
 ## Workspace
 
@@ -15,7 +15,7 @@ Path:
 - The runnable app is a static browser app in `app/`.
 - The runnable bank uses 20 generated typed Professional mock versions, 170 items each, generated from a CSC coverage matrix.
 - The app has been redesigned around the supplied `states/` screenshots, with approved source-backed deviations for A-D choices, section ranges, and one-profile-per-account auth in normal production mode.
-- A screenshot-parity repair pass has added fixture-state QA URLs, bounded dashboard/exam/sidebar/graph/modal contracts, expandable graph subgroups, and desktop/mobile overflow checks across every supplied state.
+- Screenshot-parity and desktop-density repair passes have added fixture-state QA URLs, bounded dashboard/exam/sidebar/graph/modal contracts, expandable graph subgroups, and no-scroll desktop overflow checks across every supplied state.
 - Runtime persistence is now implemented against Supabase email/password auth and online tables, with per-attempt question snapshots and timing analytics.
 - The app is deployed through GitHub Pages Actions at `https://zenon-dev98.github.io/csc-practice-reviewer/`.
 - The public GitHub repository is `https://github.com/zenon-dev98/csc-practice-reviewer`.
@@ -23,6 +23,7 @@ Path:
 - Supabase Auth email/password is enabled with email confirmation disabled for this invite-gated small-group reviewer, avoiding free email quota failures during signup.
 - Project dependencies must not be installed in this Google Drive folder.
 - Optional local server dependencies are installed under `%LOCALAPPDATA%\csc-reviewer\node-deps`.
+- Optional local QA dependencies are installed under `%LOCALAPPDATA%\csc-reviewer\qa-deps`, outside the Google Drive workspace.
 
 ## Existing Files
 
@@ -77,13 +78,13 @@ Current source item boundaries:
 - Generated questions include CSC skill metadata, quality status, and optional shared stimulus data.
 - The original image-backed `app/question-data.js` remains available as source fallback and audit trail.
 - Impeccable CLI detection has been run against `app/` and currently returns no findings.
-- Browser fixture QA has been run for `create`, `select`, `dashboard`, `setup`, `exam`, `exam-collapsed`, `graph`, `pause`, `submit`, `results`, `review`, `practice`, `recent`, and `profile-modal` at desktop and mobile widths with no horizontal overflow, no containment offenders, and no console errors.
-- Microsoft Edge desktop QA at `1536x816` exposed and repaired screenshot-specific layout regressions in the dashboard top cards, exam topbar, exam sidebar chip grids, graph question split view, and modal backdrops. Static assets are cache-busted through `v=20260704-8`.
+- Browser fixture QA has been run for `create`, `select`, `dashboard`, `setup`, `exam`, `exam-collapsed`, `graph`, `pause`, `submit`, `results`, `review`, `practice`, `recent`, and `profile-modal` at `1920x920` and the user's maximized Microsoft Edge viewport size of `1536x816`; document/body scrollbars and sampled container overflow were clean after T0013.
+- Microsoft Edge desktop QA at `1536x816` exposed and repaired no-scroll density regressions in dashboard card rows, dashboard recent preview, results section/fun-fact rows, exam sidebar preview chips, graph subgroups, and modal sizing. Static assets are cache-busted through `v=20260705-2`.
 - Stitch was used in an authenticated browser session to generate the `Civil Service Exam Cockpit` dashboard direction. Stitch's `Code to Clipboard` export returned the original prompt rather than source code, so the app implementation was manually matched to the generated visual and agent summary.
 
 ## Current Active Ticket
 
-- No active implementation ticket. T0012 is complete.
+- No active implementation ticket. T0013 is complete.
 
 ## Next Ticket
 

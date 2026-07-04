@@ -207,3 +207,28 @@ Acceptance criteria:
 - Answer selection, clear, skip, flag, previous/next, pause/resume, submit/review paths, and graph linked chips are manually exercised.
 - Desktop and mobile fixture sweeps show no horizontal overflow, no containment offenders, and no console errors.
 - Static checks, dependency check, and Impeccable detector pass.
+
+## T0013 - Maximized Edge No-Scroll Desktop Density Repair
+
+Status: done
+
+Redesign every supplied desktop state so it fits within a maximized Microsoft Edge PC viewport without root/page scrollbars caused by oversized cards, typography, spacing, or panels.
+
+Acceptance criteria:
+
+- Target viewport is a maximized Microsoft Edge window on the user's PC; windowed captures are invalid and must be retaken after maximizing.
+- Fixture states for create/select/dashboard/setup/exam/exam-collapsed/graph/pause/submit/results/review/practice/recent/profile-modal render without a document/body scrollbar on desktop.
+- Oversized typography, paddings, card heights, modal dimensions, and button heights are reduced to match the density of the `states/` mockups.
+- Long content uses compact grids, pagination, tabs, collapsible sections, or bounded internal controls instead of forcing the whole page to scroll.
+- Exam states keep all primary controls visible in one viewport: timer/status, pause/submit, grouped navigator, prompt, choices, and question actions.
+- Results/review/practice/recent/profile states fit the desktop viewport without hiding important controls below the fold.
+- A screenshot loop is run in maximized Microsoft Edge and QA screenshots are saved under `qa/`.
+
+Completion notes:
+
+- Added a desktop density contract for the supplied fixture states at `1920x920` and the user's maximized Microsoft Edge viewport, measured at `1536x816`.
+- Reduced oversized desktop headers, cards, buttons, modals, exam choices, graph panels, sidebar chips, dashboard rows, results cards, practice/recent layouts, and profile modal controls.
+- Replaced full review/question chip walls with bounded preview windows so long question lists do not force page scrolling.
+- Dashboard recent attempts now previews two attempts on the dashboard; the full recent table remains on the Recent Attempts page.
+- QA screenshots were saved under `qa/t0013-density-edge-final`, `qa/t0013-density-interactions`, and `qa/t0013-density-edge-1536x816-r4`.
+- Static checks, data validation, dependency check, Impeccable detector, automated fixture sweeps, interaction sweeps, and real maximized Microsoft Edge checks passed.

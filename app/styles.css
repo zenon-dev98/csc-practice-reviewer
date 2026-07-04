@@ -4729,3 +4729,1603 @@ body {
     grid-template-columns: 420px minmax(0, 1fr);
   }
 }
+
+#app .modal-backdrop {
+  align-items: start;
+  justify-items: center;
+  overflow: auto;
+  padding: 18px;
+}
+
+#app .profile-modal {
+  width: min(1040px, calc(100vw - 48px));
+  max-height: calc(100vh - 36px);
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+#app .profile-modal-grid {
+  min-height: 0;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+#app .profile-modal .edit-profile-form input,
+#app .profile-modal .edit-profile-form select {
+  min-height: 40px;
+}
+
+#app .profile-modal .edit-profile-form textarea {
+  min-height: 82px;
+}
+
+#app .side-brand .brand strong {
+  font-size: 17px;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+#app .side-brand .brand span {
+  white-space: normal;
+}
+
+/* T0013: maximized desktop no-scroll density contract. */
+@media (min-width: 1000px) {
+  html,
+  body,
+  #app {
+    width: 100%;
+    height: 100%;
+    overflow: hidden !important;
+  }
+
+  #app {
+    --desktop-header: 74px;
+    --exam-header: 82px;
+    color: #071d49;
+    font-size: 13px;
+  }
+
+  #app .app-header,
+  #app .signed-header {
+    display: grid !important;
+    grid-template-columns: minmax(280px, 1fr) auto minmax(280px, 1fr) !important;
+    min-height: var(--desktop-header) !important;
+    height: var(--desktop-header) !important;
+    padding: 10px 42px !important;
+  }
+
+  #app .brand,
+  #app .exam-brand {
+    gap: 12px !important;
+  }
+
+  #app .brand .logo,
+  #app .exam-brand .logo {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  #app .brand strong,
+  #app .exam-brand strong {
+    font-size: 21px !important;
+    line-height: 1.05 !important;
+  }
+
+  #app .brand span,
+  #app .exam-brand span {
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+  }
+
+  #app .signed-header .disclaimer-pill {
+    min-height: 38px !important;
+    border-radius: 999px !important;
+    padding: 7px 16px !important;
+    font-size: 13px !important;
+  }
+
+  #app .signed-header .header-actions {
+    gap: 10px !important;
+  }
+
+  #app .btn,
+  #app button.btn {
+    min-height: 34px !important;
+    padding: 8px 12px !important;
+    border-radius: 7px !important;
+    font-size: 13px !important;
+    line-height: 1 !important;
+  }
+
+  #app .icon,
+  #app .btn .icon {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  #app .signed-header .header-actions .btn {
+    min-height: 44px !important;
+    padding-inline: 16px !important;
+  }
+
+  #app .signed-header .avatar-button {
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 14px !important;
+  }
+
+  #app .avatar {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 14px !important;
+  }
+
+  #app .avatar.large {
+    width: 82px !important;
+    height: 82px !important;
+    font-size: 29px !important;
+  }
+
+  #app .card,
+  #app .dashboard-card {
+    border-radius: 9px !important;
+    padding: 14px !important;
+    box-shadow: 0 12px 28px rgba(21, 40, 77, 0.06) !important;
+  }
+
+  #app .page-title-row {
+    margin-bottom: 12px !important;
+  }
+
+  #app .page-title-row h1,
+  #app .dashboard-title h1,
+  #app .results-heading h1,
+  #app .review-heading h1 {
+    font-size: 31px !important;
+    line-height: 1.05 !important;
+  }
+
+  #app .page-title-row p,
+  #app .dashboard-title p,
+  #app .results-heading p,
+  #app .review-heading p {
+    font-size: 14px !important;
+  }
+
+  #app .auth-canvas,
+  #app .fixture-auth,
+  #app .fixture-select-page {
+    width: min(1180px, calc(100% - 80px)) !important;
+    height: calc(100vh - var(--desktop-header)) !important;
+    margin: 0 auto !important;
+    overflow: hidden !important;
+    padding: 28px 0 !important;
+  }
+
+  #app .auth-card,
+  #app .fixture-create-card {
+    gap: 11px !important;
+    max-width: 440px !important;
+    padding: 18px !important;
+  }
+
+  #app .auth-card-head h2,
+  #app .select-header-row h1 {
+    font-size: 34px !important;
+  }
+
+  #app .auth-card input,
+  #app .auth-card select {
+    min-height: 38px !important;
+    padding: 7px 10px !important;
+  }
+
+  #app .select-header-row {
+    align-items: center !important;
+    margin-bottom: 16px !important;
+  }
+
+  #app .fixture-profile-list {
+    gap: 12px !important;
+  }
+
+  #app .fixture-profile-row {
+    grid-template-columns: 50px minmax(190px, 1.2fr) minmax(150px, 0.9fr) 90px minmax(170px, 0.9fr) 96px !important;
+    gap: 14px !important;
+    min-height: 78px !important;
+    padding: 13px 18px !important;
+    border-radius: 9px !important;
+  }
+
+  #app .dash-page.screenshot-dashboard {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    width: min(1760px, calc(100% - 84px)) !important;
+    height: calc(100vh - var(--desktop-header)) !important;
+    padding: 14px 0 18px !important;
+    overflow: hidden !important;
+  }
+
+  #app .screenshot-dashboard .dashboard-title {
+    margin-bottom: 12px !important;
+  }
+
+  #app .screenshot-dashboard .dashboard-title h1 {
+    font-size: 34px !important;
+  }
+
+  #app .screenshot-dashboard .dashboard-title p {
+    font-size: 14px !important;
+  }
+
+  #app .screenshot-dashboard .dashboard-grid {
+    display: grid !important;
+    grid-template-columns: minmax(420px, 1.28fr) minmax(320px, 0.82fr) minmax(330px, 0.86fr) !important;
+    grid-template-rows: 186px 172px minmax(0, 158px) !important;
+    gap: 14px 18px !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #app .screenshot-dashboard .profile-summary,
+  #app .screenshot-dashboard .continue-card,
+  #app .screenshot-dashboard .start-card {
+    height: 186px !important;
+    min-height: 186px !important;
+    overflow: hidden !important;
+  }
+
+  #app .screenshot-dashboard .practice-panel,
+  #app .screenshot-dashboard .review-card {
+    min-height: 172px !important;
+    height: 172px !important;
+  }
+
+  #app .screenshot-dashboard .progress-card,
+  #app .screenshot-dashboard .performance-card,
+  #app .screenshot-dashboard .recent-card {
+    min-height: 158px !important;
+    height: 158px !important;
+  }
+
+  #app .screenshot-dashboard .profile-summary {
+    grid-template-rows: 1fr auto !important;
+    gap: 6px !important;
+    padding: 17px 18px !important;
+  }
+
+  #app .screenshot-dashboard .profile-summary .profile-main {
+    grid-template-columns: 82px minmax(0, 1fr) !important;
+    gap: 20px !important;
+  }
+
+  #app .screenshot-dashboard .profile-summary .avatar.large {
+    width: 82px !important;
+    height: 82px !important;
+    font-size: 29px !important;
+  }
+
+  #app .screenshot-dashboard .profile-main h2,
+  #app .screenshot-dashboard .continue-card h2,
+  #app .screenshot-dashboard .start-card h2,
+  #app .screenshot-dashboard .review-card h2,
+  #app .screenshot-dashboard .practice-panel h2,
+  #app .screenshot-dashboard .progress-card h2,
+  #app .screenshot-dashboard .performance-card h2,
+  #app .screenshot-dashboard .recent-card h2 {
+    font-size: 18px !important;
+    line-height: 1.1 !important;
+  }
+
+  #app .screenshot-dashboard .profile-main p,
+  #app .screenshot-dashboard .profile-main span,
+  #app .screenshot-dashboard .continue-card p,
+  #app .screenshot-dashboard .start-card p,
+  #app .screenshot-dashboard .review-card p,
+  #app .screenshot-dashboard .practice-panel p {
+    margin-top: 4px !important;
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+  }
+
+  #app .screenshot-dashboard .profile-facts {
+    margin-left: 102px !important;
+    gap: 6px !important;
+    font-size: 12px !important;
+  }
+
+  #app .screenshot-dashboard .profile-summary .text-button {
+    top: 18px !important;
+    right: 18px !important;
+    font-size: 12px !important;
+  }
+
+  #app .screenshot-dashboard .continue-card,
+  #app .screenshot-dashboard .start-card,
+  #app .screenshot-dashboard .review-card {
+    grid-template-columns: 50px minmax(0, 1fr) !important;
+    gap: 9px 14px !important;
+    padding: 18px !important;
+  }
+
+  #app .screenshot-dashboard .card-icon {
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  #app .screenshot-dashboard .continue-card > .btn,
+  #app .screenshot-dashboard .start-card > .btn,
+  #app .screenshot-dashboard .review-card > .btn {
+    grid-column: 1 / -1 !important;
+    min-height: 36px !important;
+    margin-top: 0 !important;
+    font-size: 13px !important;
+  }
+
+  #app .screenshot-dashboard .start-card .mini-facts,
+  #app .screenshot-dashboard .continue-card > .resume-facts {
+    gap: 8px !important;
+    font-size: 12px !important;
+  }
+
+  #app .screenshot-dashboard .start-card .mini-facts span {
+    font-size: 12px !important;
+  }
+
+  #app .screenshot-dashboard .practice-panel {
+    padding: 16px !important;
+  }
+
+  #app .screenshot-dashboard .practice-panel .card-head {
+    margin-bottom: 8px !important;
+  }
+
+  #app .screenshot-dashboard .practice-panel .category-card-grid.compact {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  #app .screenshot-dashboard .dashboard-category {
+    min-height: 84px !important;
+    grid-template-columns: 42px minmax(0, 1fr) 30px !important;
+    gap: 8px 10px !important;
+    padding: 11px !important;
+  }
+
+  #app .screenshot-dashboard .category-symbol {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 14px !important;
+  }
+
+  #app .screenshot-dashboard .dashboard-category strong,
+  #app .screenshot-dashboard .dashboard-category small,
+  #app .screenshot-dashboard .dashboard-category em {
+    font-size: 12px !important;
+  }
+
+  #app .screenshot-dashboard .metric-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  #app .screenshot-dashboard metric {
+    min-height: 78px !important;
+    padding: 8px !important;
+  }
+
+  #app .screenshot-dashboard metric strong {
+    font-size: 24px !important;
+  }
+
+  #app .performance-bars {
+    gap: 7px !important;
+  }
+
+  #app .performance-row {
+    min-height: 22px !important;
+    font-size: 12px !important;
+  }
+
+  #app .screenshot-dashboard .dashboard-table {
+    font-size: 11px !important;
+  }
+
+  #app .screenshot-dashboard .dashboard-table-head,
+  #app .screenshot-dashboard .dashboard-table-row {
+    grid-template-columns: minmax(112px, 1.2fr) 62px 48px 62px 78px !important;
+    min-height: 24px !important;
+    padding: 4px 0 !important;
+  }
+
+  #app .setup-page,
+  #app .results-page,
+  #app .review-page {
+    width: min(1600px, calc(100% - 70px)) !important;
+    height: calc(100vh - var(--desktop-header)) !important;
+    margin: 0 auto !important;
+    padding: 14px 0 !important;
+    overflow: hidden !important;
+  }
+
+  #app .setup-grid {
+    grid-template-columns: minmax(0, 1fr) 330px !important;
+    gap: 14px !important;
+    height: calc(100% - 60px) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #app .setup-main,
+  #app .setup-options {
+    gap: 10px !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #app .exam-badge-row {
+    min-height: 34px !important;
+    font-size: 13px !important;
+  }
+
+  #app .setup-facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  #app .setup-facts div {
+    min-height: 58px !important;
+    padding: 9px !important;
+  }
+
+  #app .setup-facts strong {
+    font-size: 18px !important;
+  }
+
+  #app .section-list {
+    gap: 7px !important;
+  }
+
+  #app .section-list h2,
+  #app .setup-options h2 {
+    font-size: 18px !important;
+  }
+
+  #app .section-row {
+    min-height: 44px !important;
+    padding: 8px 10px !important;
+  }
+
+  #app .note-box,
+  #app .readiness-card {
+    padding: 10px !important;
+    font-size: 12px !important;
+  }
+
+  #app .setup-options label {
+    gap: 5px !important;
+    font-size: 12px !important;
+  }
+
+  #app .setup-options input,
+  #app .setup-options select {
+    min-height: 36px !important;
+  }
+
+  #app .toggle-row {
+    min-height: 32px !important;
+    padding: 7px 9px !important;
+  }
+
+  #app .exam-shell {
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+  }
+
+  #app .exam-topbar {
+    grid-template-columns: minmax(300px, 1fr) auto minmax(300px, 1fr) !important;
+    min-height: var(--exam-header) !important;
+    height: var(--exam-header) !important;
+    padding: 12px 34px !important;
+  }
+
+  #app .exam-status {
+    gap: 14px !important;
+  }
+
+  #app .exam-status strong {
+    font-size: 16px !important;
+  }
+
+  #app .exam-status span {
+    min-height: 28px !important;
+    padding: 0 10px !important;
+    font-size: 13px !important;
+  }
+
+  #app .exam-actions {
+    gap: 8px !important;
+  }
+
+  #app .exam-actions .btn {
+    min-height: 38px !important;
+    padding-inline: 13px !important;
+    font-size: 13px !important;
+  }
+
+  #app .exam-body,
+  #app .exam-body.with-stimulus {
+    display: grid !important;
+    grid-template-columns: 360px minmax(0, 1fr) !important;
+    gap: 18px !important;
+    height: calc(100vh - var(--exam-header)) !important;
+    min-height: 0 !important;
+    padding: 14px 34px 18px !important;
+    overflow: hidden !important;
+  }
+
+  #app .exam-nav {
+    position: static !important;
+    top: auto !important;
+    height: 100% !important;
+    max-height: none !important;
+    padding: 13px !important;
+    overflow: hidden !important;
+  }
+
+  #app .nav-title {
+    gap: 8px !important;
+    margin-bottom: 8px !important;
+  }
+
+  #app .nav-title h2 {
+    font-size: 20px !important;
+  }
+
+  #app .legend {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 5px 8px !important;
+  }
+
+  #app .legend span {
+    font-size: 10px !important;
+  }
+
+  #app .question-group {
+    border-radius: 7px !important;
+  }
+
+  #app .question-group + .question-group {
+    margin-top: 7px !important;
+  }
+
+  #app .question-group summary {
+    grid-template-columns: minmax(0, 1fr) auto 18px !important;
+    gap: 6px !important;
+    min-height: 39px !important;
+    padding: 7px 9px !important;
+  }
+
+  #app .question-group summary strong {
+    font-size: 12px !important;
+  }
+
+  #app .question-group small,
+  #app .question-group em {
+    font-size: 10px !important;
+  }
+
+  #app .group-chevron,
+  #app .group-chevron .icon {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  #app .chip-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    padding: 0 9px 9px !important;
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+
+  #app .chip-grid.is-scroll {
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+
+  #app .question-chip {
+    height: 27px !important;
+    min-height: 27px !important;
+    border-radius: 5px !important;
+    font-size: 12px !important;
+  }
+
+  #app .more-chip {
+    height: 20px !important;
+    min-height: 20px !important;
+    font-size: 11px !important;
+  }
+
+  #app .stimulus-nav {
+    padding: 0 9px 9px !important;
+  }
+
+  #app .stimulus-set {
+    padding-top: 7px !important;
+  }
+
+  #app .stimulus-set + .stimulus-set {
+    margin-top: 6px !important;
+  }
+
+  #app .stimulus-set-head {
+    grid-template-columns: minmax(0, 1fr) auto 16px !important;
+    gap: 2px 6px !important;
+    font-size: 11px !important;
+  }
+
+  #app .stimulus-set .set-grid {
+    gap: 5px !important;
+    padding: 7px 0 3px !important;
+  }
+
+  #app .exam-question {
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #app .question-panel,
+  #app .stimulus-panel {
+    border-radius: 9px !important;
+  }
+
+  #app .question-panel {
+    display: grid !important;
+    grid-template-rows: auto auto minmax(0, 1fr) auto !important;
+    gap: 14px !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 21px 24px !important;
+    overflow: hidden !important;
+  }
+
+  #app .question-title {
+    align-items: start !important;
+    gap: 12px !important;
+  }
+
+  #app .question-index {
+    font-size: 21px !important;
+  }
+
+  #app .topic-pill,
+  #app .status-pill {
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+    font-size: 12px !important;
+  }
+
+  #app .prompt {
+    max-width: 100% !important;
+    font-size: 18px !important;
+    line-height: 1.32 !important;
+  }
+
+  #app .choices,
+  #app .review-choices {
+    gap: 9px !important;
+    min-height: 0 !important;
+  }
+
+  #app .choice {
+    min-height: 54px !important;
+    grid-template-columns: 38px minmax(0, 1fr) 22px !important;
+    gap: 10px !important;
+    padding: 9px 14px !important;
+  }
+
+  #app .choice strong {
+    font-size: 15px !important;
+    line-height: 1.25 !important;
+  }
+
+  #app .choice .choice-letter,
+  #app .review-choice span {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 14px !important;
+  }
+
+  #app .choice-radio {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  #app .question-actions {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    padding-top: 12px !important;
+  }
+
+  #app .question-actions .btn,
+  #app .question-actions .btn.primary {
+    width: 100% !important;
+    min-height: 40px !important;
+    font-size: 13px !important;
+  }
+
+  #app .exam-body.with-stimulus .exam-question {
+    grid-template-columns: minmax(420px, 0.95fr) minmax(0, 1.05fr) !important;
+    gap: 0 !important;
+    height: 100% !important;
+    padding: 18px !important;
+    overflow: hidden !important;
+  }
+
+  #app .exam-body.with-stimulus .stimulus-panel,
+  #app .exam-body.with-stimulus .question-panel {
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  #app .exam-body.with-stimulus .stimulus-panel {
+    padding-right: 18px !important;
+  }
+
+  #app .exam-body.with-stimulus .question-panel {
+    padding-left: 18px !important;
+  }
+
+  #app .stimulus-head {
+    gap: 5px !important;
+  }
+
+  #app .stimulus-head h2 {
+    font-size: 15px !important;
+  }
+
+  #app .stimulus-head p,
+  #app .linked-items p {
+    font-size: 11px !important;
+    line-height: 1.25 !important;
+  }
+
+  #app .stimulus-head span {
+    padding: 6px 9px !important;
+    font-size: 11px !important;
+  }
+
+  #app .chart-legend {
+    gap: 14px !important;
+    font-size: 11px !important;
+  }
+
+  #app .chart-plot {
+    min-height: 250px !important;
+    grid-template-columns: 34px minmax(0, 1fr) !important;
+    padding-top: 8px !important;
+  }
+
+  #app .chart-bars-vertical {
+    inset: 28px 4px 26px 60px !important;
+    gap: 10px !important;
+  }
+
+  #app .bar-cluster {
+    gap: 3px !important;
+  }
+
+  #app .linked-items {
+    gap: 7px !important;
+    padding: 9px !important;
+  }
+
+  #app .linked-items > div {
+    grid-template-columns: repeat(5, 34px) !important;
+    gap: 9px !important;
+  }
+
+  #app .linked-items button {
+    height: 28px !important;
+    font-size: 12px !important;
+  }
+
+  #app .stimulus-actions {
+    gap: 10px !important;
+  }
+
+  #app .results-page {
+    display: grid !important;
+    grid-template-rows: 50px 96px 58px 122px 154px 58px 44px !important;
+    gap: 9px !important;
+  }
+
+  #app .result-summary-grid {
+    grid-template-columns: minmax(0, 1fr) 220px !important;
+    gap: 10px !important;
+  }
+
+  #app .result-message-card,
+  #app .final-score-card {
+    min-height: 0 !important;
+    padding: 12px !important;
+  }
+
+  #app .result-trophy {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  #app .result-message-card h2 {
+    font-size: 18px !important;
+  }
+
+  #app .final-score-card strong {
+    font-size: 34px !important;
+  }
+
+  #app .result-stats-strip,
+  #app .review-score-strip,
+  #app .summary-cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+  }
+
+  #app .result-stats-strip metric,
+  #app .review-score-strip metric,
+  #app .summary-cards metric {
+    min-height: 54px !important;
+    padding: 8px !important;
+  }
+
+  #app metric strong {
+    font-size: 22px !important;
+  }
+
+  #app metric span {
+    font-size: 11px !important;
+  }
+
+  #app .breakdown-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  #app .breakdown-card,
+  #app .insight-card {
+    gap: 5px !important;
+    padding: 9px !important;
+  }
+
+  #app .breakdown-card strong,
+  #app .insight-card strong {
+    font-size: 14px !important;
+  }
+
+  #app .breakdown-card small,
+  #app .insight-card span,
+  #app .insight-card p {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+  }
+
+  #app .insight-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(0, 58px)) !important;
+    gap: 8px !important;
+  }
+
+  #app .overview-card {
+    min-height: 0 !important;
+    padding: 10px 12px !important;
+  }
+
+  #app .overview-card h2 {
+    font-size: 16px !important;
+  }
+
+  #app .overview-row {
+    gap: 8px !important;
+    font-size: 12px !important;
+  }
+
+  #app .bottom-actions {
+    align-items: center !important;
+    gap: 8px !important;
+    margin-top: 0 !important;
+  }
+
+  #app .review-page {
+    display: grid !important;
+    grid-template-rows: 50px 58px minmax(0, 1fr) !important;
+    gap: 9px !important;
+  }
+
+  #app .review-layout {
+    grid-template-columns: 250px minmax(0, 1fr) !important;
+    gap: 12px !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #app .review-sidebar,
+  #app .review-main {
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #app .review-sidebar {
+    gap: 8px !important;
+  }
+
+  #app .review-sidebar h2 {
+    font-size: 15px !important;
+  }
+
+  #app .filter-list {
+    gap: 5px !important;
+  }
+
+  #app .filter-list button {
+    min-height: 30px !important;
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+  }
+
+  #app .navigator-range {
+    color: #66758e !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+  }
+
+  #app .review-dots {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+  }
+
+  #app .review-dots button {
+    height: 25px !important;
+    min-height: 25px !important;
+    border-radius: 5px !important;
+    font-size: 11px !important;
+  }
+
+  #app .review-main {
+    grid-template-rows: auto auto minmax(0, auto) auto auto auto !important;
+    gap: 10px !important;
+  }
+
+  #app .review-choice {
+    min-height: 42px !important;
+    grid-template-columns: 32px minmax(0, 1fr) 110px !important;
+    gap: 9px !important;
+    padding: 7px 10px !important;
+  }
+
+  #app .review-choice strong,
+  #app .explanation-box p {
+    font-size: 13px !important;
+    line-height: 1.25 !important;
+  }
+
+  #app .review-choice em {
+    font-size: 11px !important;
+  }
+
+  #app .explanation-box,
+  #app .metadata-strip {
+    padding: 9px !important;
+  }
+
+  #app .side-layout {
+    grid-template-columns: 238px minmax(0, 1fr) !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #app .side-nav {
+    position: static !important;
+    height: 100vh !important;
+    max-height: none !important;
+    gap: 9px !important;
+    padding: 12px !important;
+    overflow: hidden !important;
+  }
+
+  #app .side-brand {
+    padding-bottom: 8px !important;
+  }
+
+  #app .side-profile {
+    min-height: 54px !important;
+    padding: 8px !important;
+  }
+
+  #app .side-nav nav {
+    gap: 3px !important;
+  }
+
+  #app .side-nav nav button {
+    min-height: 30px !important;
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+  }
+
+  #app .study-tip {
+    gap: 4px !important;
+    padding: 9px !important;
+    font-size: 11px !important;
+  }
+
+  #app .side-content {
+    height: 100vh !important;
+    overflow: hidden !important;
+  }
+
+  #app .content-page {
+    display: grid !important;
+    width: min(1320px, calc(100% - 34px)) !important;
+    height: 100vh !important;
+    margin: 0 auto !important;
+    padding: 16px 0 !important;
+    overflow: hidden !important;
+  }
+
+  #app .content-page .page-title-row {
+    min-height: 52px !important;
+  }
+
+  #app .category-card-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  #app .category-card {
+    gap: 8px !important;
+    min-height: 250px !important;
+    padding: 14px !important;
+  }
+
+  #app .category-card h2 {
+    font-size: 18px !important;
+  }
+
+  #app .category-card p,
+  #app .category-meta,
+  #app .note-card p {
+    font-size: 12px !important;
+    line-height: 1.28 !important;
+  }
+
+  #app .category-icon {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  #app .custom-practice {
+    grid-template-columns: 1.05fr repeat(3, minmax(150px, 1fr)) 160px !important;
+    gap: 10px !important;
+    min-height: 96px !important;
+    margin-top: 12px !important;
+  }
+
+  #app .custom-practice input,
+  #app .custom-practice select {
+    min-height: 36px !important;
+  }
+
+  #app .note-card {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 8px 14px !important;
+    align-items: center !important;
+    min-height: 66px !important;
+    margin-top: 12px !important;
+    padding: 12px !important;
+  }
+
+  #app .attempts-table-card {
+    height: calc(100vh - 190px) !important;
+    margin-top: 12px !important;
+    overflow: hidden !important;
+  }
+
+  #app .tabs {
+    gap: 6px !important;
+    margin-bottom: 8px !important;
+  }
+
+  #app .tabs button {
+    padding: 6px 9px !important;
+    font-size: 12px !important;
+  }
+
+  #app .attempt-table {
+    overflow: hidden !important;
+  }
+
+  #app .table-head,
+  #app .table-row {
+    min-width: 0 !important;
+    min-height: 42px !important;
+    padding: 7px 8px !important;
+    font-size: 12px !important;
+  }
+
+  #app .modal-backdrop {
+    align-items: center !important;
+    justify-items: center !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    padding: 18px !important;
+  }
+
+  #app .pause-modal,
+  #app .submit-modal,
+  #app .chart-modal,
+  #app .profile-modal {
+    max-height: calc(100vh - 36px) !important;
+    overflow: hidden !important;
+  }
+
+  #app .pause-modal {
+    width: 420px !important;
+    padding: 24px !important;
+    gap: 12px !important;
+  }
+
+  #app .submit-modal {
+    width: 660px !important;
+    padding: 22px !important;
+    gap: 13px !important;
+  }
+
+  #app .submit-stats {
+    gap: 8px !important;
+  }
+
+  #app .submit-stats metric {
+    min-height: 72px !important;
+  }
+
+  #app .profile-modal {
+    width: min(920px, calc(100vw - 60px)) !important;
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    padding: 18px !important;
+  }
+
+  #app .modal-heading {
+    margin-bottom: 10px !important;
+  }
+
+  #app .modal-heading h2,
+  #app .pause-modal h2,
+  #app .submit-modal h2 {
+    font-size: 24px !important;
+  }
+
+  #app .modal-heading p,
+  #app .pause-modal p,
+  #app .submit-modal p {
+    font-size: 13px !important;
+  }
+
+  #app .profile-modal-grid {
+    grid-template-columns: 265px minmax(0, 1fr) !important;
+    gap: 14px !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    padding-right: 0 !important;
+  }
+
+  #app .switch-column {
+    gap: 9px !important;
+  }
+
+  #app .profile-switch-row {
+    min-height: 58px !important;
+    padding: 8px !important;
+  }
+
+  #app .tip-box {
+    padding: 10px !important;
+    font-size: 12px !important;
+  }
+
+  #app .edit-profile-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px 10px !important;
+    align-content: start !important;
+  }
+
+  #app .edit-avatar-block,
+  #app .avatar-picker,
+  #app .modal-actions,
+  #app .password-details,
+  #app .delete-link {
+    grid-column: 1 / -1 !important;
+  }
+
+  #app .edit-avatar-block {
+    min-height: 74px !important;
+    grid-template-columns: 62px auto !important;
+    justify-content: start !important;
+    padding: 9px !important;
+  }
+
+  #app .profile-modal .avatar.large {
+    width: 58px !important;
+    height: 58px !important;
+    font-size: 21px !important;
+  }
+
+  #app .avatar-picker {
+    gap: 5px !important;
+  }
+
+  #app .avatar-option .avatar {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 11px !important;
+  }
+
+  #app .profile-modal .edit-profile-form label {
+    gap: 4px !important;
+    font-size: 11px !important;
+  }
+
+  #app .profile-modal .edit-profile-form input,
+  #app .profile-modal .edit-profile-form select {
+    min-height: 34px !important;
+    padding: 7px 9px !important;
+  }
+
+  #app .profile-modal .edit-profile-form textarea {
+    min-height: 52px !important;
+    padding: 7px 9px !important;
+  }
+
+  #app .password-details {
+    font-size: 12px !important;
+  }
+
+  #app .mini-form {
+    grid-template-columns: 1fr 1fr auto !important;
+    gap: 8px !important;
+    margin-top: 8px !important;
+  }
+}
+
+@media (min-width: 1000px) and (max-height: 820px) {
+  #app {
+    --desktop-header: 66px;
+    --exam-header: 72px;
+    font-size: 12px;
+  }
+
+  #app .app-header,
+  #app .signed-header {
+    padding-block: 7px !important;
+  }
+
+  #app .brand .logo,
+  #app .exam-brand .logo {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  #app .brand strong,
+  #app .exam-brand strong {
+    font-size: 18px !important;
+  }
+
+  #app .dash-page.screenshot-dashboard {
+    width: min(1760px, calc(100% - 56px)) !important;
+    padding: 10px 0 12px !important;
+  }
+
+  #app .screenshot-dashboard .dashboard-grid {
+    grid-template-rows: 186px 172px minmax(0, 158px) !important;
+    gap: 12px 14px !important;
+  }
+
+  #app .screenshot-dashboard .profile-summary,
+  #app .screenshot-dashboard .continue-card,
+  #app .screenshot-dashboard .start-card {
+    height: 186px !important;
+    min-height: 186px !important;
+  }
+
+  #app .screenshot-dashboard .practice-panel,
+  #app .screenshot-dashboard .review-card {
+    height: 172px !important;
+    min-height: 172px !important;
+  }
+
+  #app .screenshot-dashboard .progress-card,
+  #app .screenshot-dashboard .performance-card,
+  #app .screenshot-dashboard .recent-card {
+    height: 158px !important;
+    min-height: 158px !important;
+  }
+
+  #app .screenshot-dashboard .profile-summary .avatar.large {
+    width: 68px !important;
+    height: 68px !important;
+    font-size: 24px !important;
+  }
+
+  #app .screenshot-dashboard .profile-summary .profile-main {
+    grid-template-columns: 68px minmax(0, 1fr) !important;
+  }
+
+  #app .screenshot-dashboard .profile-facts {
+    margin-left: 88px !important;
+  }
+
+  #app .exam-body,
+  #app .exam-body.with-stimulus {
+    grid-template-columns: 330px minmax(0, 1fr) !important;
+    padding: 10px 24px 12px !important;
+  }
+
+  #app .question-panel {
+    gap: 10px !important;
+    padding: 16px 20px !important;
+  }
+
+  #app .question-index {
+    font-size: 18px !important;
+  }
+
+  #app .prompt {
+    font-size: 16px !important;
+  }
+
+  #app .choice {
+    min-height: 46px !important;
+  }
+
+  #app .chart-plot {
+    min-height: 210px !important;
+  }
+
+  #app .results-page {
+    grid-template-rows: 42px 86px 50px 108px 132px 48px 38px !important;
+    gap: 7px !important;
+  }
+
+  #app .review-page {
+    grid-template-rows: 42px 50px minmax(0, 1fr) !important;
+  }
+
+  #app .review-choice {
+    min-height: 36px !important;
+  }
+}
+
+@media (min-width: 1000px) {
+  #app .avatar,
+  #app .avatar-button {
+    display: inline-grid !important;
+    place-items: center !important;
+    text-align: center !important;
+    line-height: 1 !important;
+  }
+
+  #app .screenshot-dashboard .recent-card {
+    overflow: hidden !important;
+  }
+
+  #app .screenshot-dashboard .dashboard-table {
+    display: grid !important;
+    grid-template-rows: auto repeat(2, 27px) !important;
+    overflow: hidden !important;
+  }
+
+  #app .screenshot-dashboard .dashboard-table-head,
+  #app .screenshot-dashboard .dashboard-table-row {
+    min-height: 27px !important;
+    grid-template-columns: minmax(112px, 1.18fr) 62px 48px 62px 78px !important;
+    gap: 5px !important;
+    overflow: hidden !important;
+  }
+
+  #app .screenshot-dashboard .dashboard-table .btn.tiny {
+    min-height: 22px !important;
+    padding: 4px 6px !important;
+    font-size: 10px !important;
+  }
+
+  #app .more-chip {
+    letter-spacing: 0 !important;
+   }
+
+  #app .screenshot-dashboard .dashboard-table-row:nth-of-type(n + 4) {
+    display: none !important;
+  }
+
+  #app .results-page {
+    grid-template-rows: 50px 98px 58px 164px 234px 72px 44px !important;
+    gap: 9px !important;
+  }
+
+  #app .results-page > section.card,
+  #app .result-summary-grid,
+  #app .result-stats-strip {
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #app .result-message-card,
+  #app .final-score-card {
+    display: grid !important;
+    align-content: center !important;
+  }
+
+  #app .final-score-card {
+    justify-items: center !important;
+    gap: 1px !important;
+  }
+
+  #app .final-score-card strong {
+    line-height: 1 !important;
+  }
+
+  #app .results-page .card-head {
+    margin-bottom: 8px !important;
+  }
+
+  #app .breakdown-grid {
+    align-items: stretch !important;
+  }
+
+  #app .breakdown-card {
+    min-height: 78px !important;
+  }
+
+  #app .insight-grid {
+    grid-template-rows: repeat(2, minmax(0, 70px)) !important;
+  }
+
+  #app .insight-card {
+    min-height: 0 !important;
+  }
+
+  #app .overview-card {
+    overflow: hidden !important;
+  }
+
+  #app .overview-row span {
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+  }
+
+  #app .side-layout {
+    grid-template-columns: 260px minmax(0, 1fr) !important;
+  }
+
+  #app .side-brand {
+    min-width: 0 !important;
+    overflow: visible !important;
+  }
+
+  #app .side-brand strong,
+  #app .side-brand .brand strong {
+    max-width: none !important;
+    overflow: visible !important;
+    font-size: 15px !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+  }
+
+  #app .side-brand span,
+  #app .side-brand .brand span {
+    font-size: 11px !important;
+    white-space: normal !important;
+  }
+
+  #app .attempts-table-card {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    align-content: stretch !important;
+    gap: 8px !important;
+  }
+
+  #app .tabs {
+    align-self: start !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 7px !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  #app .tabs button {
+    display: inline-flex !important;
+    width: auto !important;
+    min-height: 32px !important;
+    height: 32px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 6px 10px !important;
+  }
+
+  #app .attempt-table {
+    min-height: 0 !important;
+    align-content: start !important;
+    overflow: hidden !important;
+  }
+
+  #app .table-head,
+  #app .table-row {
+    min-height: 58px !important;
+  }
+}
+
+@media (min-width: 1000px) and (max-height: 820px) {
+  #app .results-page {
+    grid-template-rows: 42px 82px 50px 150px 224px 70px 38px !important;
+    gap: 7px !important;
+  }
+
+  #app .results-page .card {
+    padding: 10px !important;
+  }
+
+  #app .results-page .card-head {
+    margin-bottom: 5px !important;
+  }
+
+  #app .result-message-card h2 {
+    font-size: 16px !important;
+  }
+
+  #app .result-trophy {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  #app .final-score-card strong {
+    font-size: 28px !important;
+  }
+
+  #app .result-stats-strip metric {
+    min-height: 48px !important;
+  }
+
+  #app .breakdown-card {
+    min-height: 64px !important;
+  }
+
+  #app .insight-grid {
+    grid-template-rows: repeat(2, minmax(0, 70px)) !important;
+    gap: 7px !important;
+  }
+
+  #app .insight-card {
+    padding: 7px !important;
+  }
+
+  #app .overview-card h2 {
+    font-size: 14px !important;
+  }
+
+  #app .overview-row span {
+    padding: 5px 8px !important;
+  }
+
+  #app .bottom-actions .btn {
+    min-height: 34px !important;
+  }
+}

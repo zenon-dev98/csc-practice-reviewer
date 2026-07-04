@@ -32,3 +32,20 @@ Follow the documentation-first workflow for this project.
 - Keep the interface quiet, focused, readable, and exam-like.
 - Support answer selection, skip/revisit, pause/resume, timeout submit, and post-exam statistics.
 - Use small animations only where they support the exam-results experience.
+
+## Frontend Screenshot Loop Agent
+
+Use this mandatory loop for any frontend, UI, styling, layout, state-image, or screenshot-parity work. This is based on the Codex frontend-design workflow discussed in https://www.reddit.com/r/codex/comments/1ujqm5t/any_tips_for_good_codex_frontend_design/: implement from a concrete mockup/reference, take screenshots, compare the screenshots to the target, then iterate until the screenshots match instead of relying on code inspection or subjective claims.
+
+- Start from concrete visual references: `states/` images, Stitch/Impeccable output, generated mockups, or user-provided screenshots. If the reference is missing or ambiguous, state the ambiguity before coding.
+- Before editing, map the target state: layout grid, spacing, typography, colors, icons, button positions, scroll behavior, hover/focus/active states, and responsive constraints.
+- After each meaningful UI change, run the app in a browser and capture screenshots of the changed state. Do not declare UI work done from CSS/HTML inspection alone.
+- Compare captured screenshots against the reference and write down specific visual differences: overflow, clipped text, bad spacing, wrong hierarchy, wrong color, bad alignment, missing icons, incorrect scroll position, or mismatched interaction state.
+- Fix the differences and repeat the screenshot loop until there are no obvious visual defects for the target viewport.
+- For PC-priority work, test a maximized desktop browser first, preferably the user's requested browser. Mobile is secondary unless the active request says otherwise.
+- Before any PC-view screenshot, verify the captured browser window is maximized. If the screenshot dimensions show a windowed browser, maximize the browser and retake the screenshot; do not use windowed captures for desktop visual QA.
+- For long pages or modals, capture multiple screenshots while scrolling. A state with hidden lower content is not verified by a single top-of-page screenshot.
+- For interactive screens, press every relevant button/control and capture the resulting state: open/close, expand/collapse, selected/unselected, disabled, modal, error, empty, loading, and submitted states.
+- Store QA screenshots under `qa/<date-or-ticket>-<browser-or-scope>/` and summarize the pass/fail findings. Screenshot artifacts do not need to be committed unless the user asks.
+- If browser control is interrupted or screenshots cannot be captured, mark visual QA incomplete. Do not call the UI finished.
+- If screenshots show an obvious visual defect, repair it before reporting completion, then rerun the affected screenshots.

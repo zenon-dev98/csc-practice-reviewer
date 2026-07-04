@@ -788,7 +788,7 @@
               <h2>Recent Attempts</h2>
               <button class="btn ghost" data-action="recent-page" type="button">View All</button>
             </div>
-            ${dashboardRecentTable(attempts.slice(0, 4), latestCompleted)}
+            ${dashboardRecentTable(attempts.slice(0, 2), latestCompleted)}
           </section>
         </div>
       </section>
@@ -1055,6 +1055,7 @@
     const correct = answer?.selected_choice === answer?.correct_choice;
     const score = scoreAttempt(attempt);
     const pct = resultPercent(attempt);
+    const navWindow = reviewNavigatorWindow(filtered, index);
     root.innerHTML = authedShell(`
       <section class="review-page">
         <div class="page-title-row review-heading">
@@ -1077,8 +1078,9 @@
               ${["all", "wrong", "correct", "flagged"].map((filter) => `<button class="${app.reviewFilter === filter ? "active" : ""}" data-review-filter="${filter}" type="button">${filterLabel(filter)}</button>`).join("")}
             </div>
             <h2>Question Navigator</h2>
+            <small class="navigator-range">${navWindow.label}</small>
             <div class="review-dots">
-              ${filtered.map((item, itemIndex) => `<button class="${itemIndex === index ? "current" : ""} ${item.selected_choice === item.correct_choice ? "correct" : "wrong"} ${item.flagged ? "flagged" : ""}" data-review-index="${itemIndex}" type="button">${item.display_number}</button>`).join("") || `<span>No items</span>`}
+              ${navWindow.items.map(({ item, itemIndex }) => `<button class="${itemIndex === index ? "current" : ""} ${item.selected_choice === item.correct_choice ? "correct" : "wrong"} ${item.flagged ? "flagged" : ""}" data-review-index="${itemIndex}" type="button">${item.display_number}</button>`).join("") || `<span>No items</span>`}
             </div>
           </aside>
           <main class="card review-main">
@@ -1604,7 +1606,7 @@
       const skipped = groupAnswers.filter((answer) => answer.skipped && !answer.selected_choice).length;
       const flagged = groupAnswers.filter((answer) => answer.flagged).length;
       const expandedFull = app.expandedNavGroups.has(group.section);
-      const previewAnswers = expandedFull ? groupAnswers : navPreviewAnswers(groupAnswers, attempt.current_question_index);
+      const previewAnswers = expandedFull ? navExpandedPreviewAnswers(groupAnswers, attempt.current_question_index) : navPreviewAnswers(groupAnswers, attempt.current_question_index);
       const stimulusBody = renderStimulusNavigator(group, groupAnswers, attempt);
       return `
         <details class="question-group ${group.tone}" ${navGroupOpen(group, hasCurrent) ? "open" : ""}>
@@ -1622,7 +1624,7 @@
             </div>
             <div class="chip-grid ${expandedFull ? "is-scroll" : ""}">
               ${previewAnswers.map((answer) => navChip(answer, attempt)).join("")}
-              ${groupAnswers.length > previewAnswers.length ? `<button class="question-chip more-chip" data-action="toggle-nav-full" data-nav-group="${escapeAttr(group.section)}" type="button">...</button>` : ""}
+              ${!expandedFull && groupAnswers.length > previewAnswers.length ? `<button class="question-chip more-chip" data-action="toggle-nav-full" data-nav-group="${escapeAttr(group.section)}" type="button">More</button>` : ""}
               ${expandedFull && groupAnswers.length > 10 ? `<button class="question-chip more-chip" data-action="toggle-nav-full" data-nav-group="${escapeAttr(group.section)}" type="button">Less</button>` : ""}
             </div>
           `}
@@ -1696,6 +1698,13 @@
     const currentPosition = groupAnswers.findIndex((answer) => answer.position === currentIndex);
     const blockStart = currentPosition >= 0 ? Math.floor(currentPosition / 10) * 10 : 0;
     return groupAnswers.slice(blockStart, blockStart + 10);
+  }
+
+  function navExpandedPreviewAnswers(groupAnswers, currentIndex) {
+    if (groupAnswers.length <= 20) return groupAnswers;
+    const currentPosition = groupAnswers.findIndex((answer) => answer.position === currentIndex);
+    const blockStart = currentPosition >= 0 ? Math.floor(currentPosition / 10) * 10 : 0;
+    return groupAnswers.slice(blockStart, blockStart + 20);
   }
 
   function navChip(answer, attempt) {
@@ -2559,6 +2568,19 @@
     if (filter === "correct") return answers.filter((answer) => answer.selected_choice === answer.correct_choice);
     if (filter === "flagged") return answers.filter((answer) => answer.flagged);
     return answers;
+  }
+
+  function reviewNavigatorWindow(items, currentIndex) {
+    if (!items.length) return { items: [], label: "No items" };
+    const pageSize = 40;
+    const pageStart = Math.max(0, Math.min(items.length - pageSize, Math.floor(currentIndex / pageSize) * pageSize));
+    const visible = items.slice(pageStart, pageStart + pageSize).map((item, offset) => ({ item, itemIndex: pageStart + offset }));
+    const first = visible[0]?.item.display_number;
+    const last = visible[visible.length - 1]?.item.display_number;
+    return {
+      items: visible,
+      label: items.length > pageSize ? `Showing items ${first}-${last} of ${items.length}` : `${items.length} item${items.length === 1 ? "" : "s"}`
+    };
   }
 
   function wrongAnswers(attempt) {
