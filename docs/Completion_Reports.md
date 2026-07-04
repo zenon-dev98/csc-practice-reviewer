@@ -451,3 +451,31 @@ Verification:
 Risks:
 
 - Pixel-level parity still depends on final human comparison against the state images, especially for exact iconography and any screenshot-only controls without defined behavior.
+
+## 2026-07-04 - Dashboard State Fidelity Hotfix
+
+Summary:
+
+- Corrected the live dashboard after screenshot review showed it was still too spacious and off-ratio.
+- Matched the dashboard to `states/profile_dashboard.png` more closely: 52px page margin, 94px header, smaller title, 222px top cards, wider profile card, compact category cards, compact review card, and first-viewport row placement.
+- Added cache-busting for `styles.css` in `app/index.html` so GitHub Pages clients receive the corrected stylesheet.
+
+Files changed:
+
+- `app/index.html`
+- `app/styles.css`
+- `docs/Repo_Current_State.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- `node --check app\app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- Local browser preview at `1920x940`
+
+Verification:
+
+- Local dashboard preview matched key state-image positions: left margin `52px`, title top `120px`, first card top `195px`, first card height `222px`, practice row top `437px`, no horizontal overflow.
+- JavaScript syntax, data validation, dependency check, and Impeccable detector all passed.

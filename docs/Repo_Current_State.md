@@ -15,7 +15,7 @@ Path:
 - The runnable app is a static browser app in `app/`.
 - The runnable bank uses 20 generated typed Professional mock versions, 170 items each, generated from a CSC coverage matrix.
 - The app has been redesigned around the supplied `states/` screenshots, with approved source-backed deviations for A-D choices, section ranges, and one-profile-per-account auth.
-- A follow-up state-image UI correction pass has been applied after live QA feedback: auth, dashboard, exam player, results, answer review, practice heading, and profile modal markup/styles now more closely mirror the supplied `states/` screenshots.
+- A follow-up state-image UI correction pass has been applied after live QA feedback: auth, dashboard, exam player, results, answer review, practice heading, and profile modal markup/styles now more closely mirror the supplied `states/` screenshots. The dashboard was further tightened to match `states/profile_dashboard.png` density, margins, row heights, and card proportions.
 - Runtime persistence is now implemented against Supabase email/password auth and online tables, with per-attempt question snapshots and timing analytics.
 - The app is deployed through GitHub Pages Actions at `https://zenon-dev98.github.io/csc-practice-reviewer/`.
 - The public GitHub repository is `https://github.com/zenon-dev98/csc-practice-reviewer`.

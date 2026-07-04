@@ -2024,8 +2024,8 @@ metric span {
 
 /* State-image correction pass */
 .app-header {
-  min-height: 68px;
-  padding: 10px 22px;
+  min-height: 94px;
+  padding: 14px 36px;
 }
 
 .signed-header {
@@ -2063,7 +2063,7 @@ metric span {
   grid-template-columns: minmax(320px, 1fr) minmax(360px, 440px);
   gap: 42px;
   width: min(1120px, calc(100% - 44px));
-  min-height: calc(100vh - 68px);
+  min-height: calc(100vh - 94px);
 }
 
 .auth-copy {
@@ -2164,19 +2164,25 @@ metric span {
 .dash-page,
 .results-page,
 .review-page {
-  width: min(1320px, calc(100% - 42px));
-  padding-top: 28px;
+  width: calc(100% - 104px);
+  max-width: 1820px;
+  padding-top: 22px;
+}
+
+.dash-page {
+  padding-top: 26px;
 }
 
 .dashboard-title {
-  margin-bottom: 22px;
+  margin-bottom: 12px;
 }
 
 .dashboard-title h1,
 .results-heading h1,
 .review-heading h1,
 .content-page h1 {
-  font-size: 42px;
+  font-size: 34px;
+  line-height: 1.05;
 }
 
 .dashboard-title p,
@@ -2184,24 +2190,28 @@ metric span {
 .review-heading p,
 .content-page .page-title-row p {
   color: var(--muted);
-  margin-top: 7px;
+  margin-top: 6px;
   font-size: 15px;
 }
 
 .dashboard-grid {
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+  gap: 20px 28px;
+  align-items: start;
 }
 
 .dashboard-card {
-  min-height: 190px;
+  min-height: 0;
   align-content: start;
-  gap: 16px;
+  gap: 12px;
   border-radius: 10px;
-  padding: 22px;
+  padding: 20px 22px;
 }
 
-.profile-summary,
+.profile-summary {
+  grid-column: span 6;
+}
+
 .continue-card,
 .start-card {
   grid-column: span 4;
@@ -2209,25 +2219,112 @@ metric span {
 
 .dashboard-grid > .practice-panel,
 .card.wide.practice-panel {
-  grid-column: span 8;
+  grid-column: span 9;
 }
 
 .review-card {
-  grid-column: span 4;
+  grid-column: span 5;
 }
 
 .progress-card,
-.performance-card,
-.recent-card {
+.performance-card {
   grid-column: span 4;
 }
 
+.recent-card {
+  grid-column: span 6;
+}
+
 .profile-summary {
-  align-content: space-between;
+  position: relative;
+  grid-template-rows: auto auto;
+  height: 222px;
+  min-height: 222px;
+  align-content: start;
+  padding: 26px 28px;
+}
+
+.profile-summary .text-button {
+  position: absolute;
+  top: 26px;
+  right: 28px;
+}
+
+.continue-card,
+.start-card {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  height: 222px;
+  min-height: 222px;
+  padding: 24px 26px 20px;
+}
+
+.continue-card.disabled-card {
+  background: #fff;
+}
+
+.continue-card.disabled-card .btn.primary {
+  background: #80beba;
+  opacity: 1;
+}
+
+.continue-card h2,
+.start-card h2,
+.review-card h2,
+.practice-panel h2,
+.progress-card h2,
+.performance-card h2,
+.recent-card h2 {
+  font-size: 19px;
+}
+
+.continue-card > .card-icon,
+.start-card > .card-icon,
+.review-card > .card-icon {
+  grid-column: 1;
+}
+
+.continue-card > div:not(.resume-facts),
+.start-card > .card-head,
+.start-card > .mini-facts,
+.start-card > p,
+.review-card > h2,
+.review-card > p {
+  grid-column: 2;
+}
+
+.continue-card > .resume-facts {
+  grid-column: 2;
+}
+
+.continue-card > .btn,
+.start-card > .btn,
+.review-card > .btn {
+  grid-column: 1 / -1;
+  align-self: end;
 }
 
 .profile-main h2 {
-  font-size: 21px;
+  font-size: 22px;
+}
+
+.profile-summary .profile-main {
+  align-items: start;
+  gap: 28px;
+}
+
+.profile-summary .avatar.large {
+  width: 112px;
+  height: 112px;
+  border-radius: 10px;
+  font-size: 40px;
+}
+
+.profile-summary .profile-main span {
+  margin-top: 10px;
+  background: transparent;
+  color: #15376f;
+  padding: 0;
 }
 
 .profile-main p,
@@ -2242,9 +2339,64 @@ metric span {
 .profile-facts,
 .resume-facts {
   display: grid;
-  gap: 7px;
-  font-size: 13px;
+  gap: 8px;
+  font-size: 14px;
   font-weight: 800;
+}
+
+.profile-facts {
+  margin-left: 140px;
+}
+
+.start-card .card-head {
+  align-items: center;
+}
+
+.start-card .card-head > span {
+  white-space: nowrap;
+}
+
+.start-card .mini-facts span {
+  padding: 6px 10px;
+}
+
+.practice-panel,
+.review-card {
+  min-height: 198px;
+}
+
+.practice-panel {
+  padding: 22px 22px 16px;
+}
+
+.practice-panel .card-head {
+  margin-bottom: 4px;
+}
+
+.practice-panel .category-card-grid.compact {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.review-card {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  align-content: start;
+  padding: 28px 28px 22px;
+}
+
+.review-card .btn {
+  margin-top: auto;
+}
+
+.progress-card,
+.performance-card,
+.recent-card {
+  min-height: 236px;
+}
+
+.progress-card .metric-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .profile-facts span,
@@ -2256,10 +2408,10 @@ metric span {
 
 .card-icon {
   display: grid;
-  width: 46px;
-  height: 46px;
+  width: 56px;
+  height: 56px;
   place-items: center;
-  border-radius: 10px;
+  border-radius: 50%;
 }
 
 .clock-icon {
@@ -2279,8 +2431,14 @@ metric span {
 
 .dashboard-category {
   display: grid;
-  min-height: 164px;
-  gap: 9px;
+  grid-template-columns: 54px minmax(0, 1fr) auto;
+  grid-template-areas:
+    "icon title pct"
+    "icon bar pct"
+    ". action action";
+  min-height: 116px;
+  gap: 8px 14px;
+  align-items: center;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: #fff;
@@ -2295,21 +2453,34 @@ metric span {
 .dashboard-category.general { background: #fff5e8; border-color: #ffd9ad; }
 
 .category-symbol {
+  grid-area: icon;
   display: grid;
-  width: 38px;
-  height: 38px;
+  width: 52px;
+  height: 52px;
   place-items: center;
   border-radius: 9px;
   background: #fff;
   font-weight: 950;
 }
 
+.dashboard-category strong {
+  grid-area: title;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.dashboard-category .progress-line {
+  grid-area: bar;
+}
+
 .dashboard-category small {
+  grid-area: pct;
   color: var(--muted);
   font-weight: 900;
 }
 
 .dashboard-category em {
+  grid-area: action;
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -2886,6 +3057,10 @@ metric span {
     font-size: 44px;
   }
 
+  .practice-panel .category-card-grid.compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .exam-body,
   .exam-body.with-stimulus {
     grid-template-columns: 1fr;
@@ -2929,6 +3104,56 @@ metric span {
   .performance-card,
   .recent-card {
     grid-column: auto;
+  }
+
+  .profile-summary,
+  .continue-card,
+  .start-card,
+  .review-card {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 0;
+  }
+
+  .profile-summary {
+    padding: 18px;
+  }
+
+  .profile-summary .text-button {
+    position: static;
+  }
+
+  .profile-summary .profile-main {
+    gap: 14px;
+  }
+
+  .profile-summary .avatar.large {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    font-size: 24px;
+  }
+
+  .profile-facts {
+    margin-left: 0;
+  }
+
+  .continue-card > div:not(.resume-facts),
+  .start-card > .card-head,
+  .start-card > .mini-facts,
+  .start-card > p,
+  .review-card > h2,
+  .review-card > p,
+  .continue-card > .resume-facts,
+  .continue-card > .btn,
+  .start-card > .btn,
+  .review-card > .btn {
+    grid-column: auto;
+  }
+
+  .practice-panel .category-card-grid.compact {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .dashboard-title h1,
