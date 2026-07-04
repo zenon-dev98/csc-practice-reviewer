@@ -191,3 +191,4 @@ Completion notes:
 - Supabase SQL, RLS policies, authenticated table grants, invite-code Before User Created hook, Auth redirect URLs, and email/password provider settings are applied.
 - GitHub Pages is live at `https://zenon-dev98.github.io/csc-practice-reviewer/`.
 - Live QA verified dashboard load, full exam start, grouped navigation, answer selection, submit modal, results insights, and Supabase attempt/answer persistence.
+- Follow-up UI correction pass replaced the remaining recolor-like surfaces with closer state-image structures for auth, dashboard, exam, results, review, practice, and profile modal.

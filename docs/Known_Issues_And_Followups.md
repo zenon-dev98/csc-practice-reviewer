@@ -8,6 +8,7 @@
 - Stitch was used for the menu/dashboard redesign, but generated code export was not available through `Code to Clipboard`; it copied the prompt instead. Future Stitch iterations may still use Figma, MCP, or other export routes if configured.
 - Supabase email confirmation is intentionally disabled for now because signup is invite-gated and the free email sender hit rate limits during QA. Revisit if using a custom SMTP sender.
 - GitHub Actions reports a Node 20 deprecation warning for current action versions, but deployment succeeds under the forced Node 24 runner.
+- State-image UI fidelity has been corrected substantially, but exact iconography/pixel parity should still receive one final human screenshot comparison pass after deployment.
 
 ## Follow-Up Ticket Ideas
 

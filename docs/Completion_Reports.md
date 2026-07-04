@@ -414,3 +414,40 @@ Follow-ups:
 
 - Add a Supabase backup/export ticket before public use.
 - Run a second manual scoring/content verification pass over generated Filipino, data interpretation, legal/general-information, and symbolic reasoning items.
+
+## 2026-07-04 - T0011 Follow-Up State-Image UI Correction
+
+Summary:
+
+- Reworked the state-image implementation after live feedback that the UI was still too far from the supplied screenshots.
+- Replaced the auth page structure, dashboard card system, signed-in header, exam player header/sidebar/answer rows, results summary, answer review, practice heading, and profile modal layout with closer screenshot-mapped markup and styling.
+- Fixed a dashboard grid specificity bug where the existing `.card.wide` rule caused Practice by Category and Review Mistakes to overlap.
+- Kept source-backed deviations: deployed auth still needs password/invite fields, generated bank remains A-D, and section ranges follow the implemented CSC coverage matrix.
+
+Files changed:
+
+- `app/index.html`
+- `app/app.js`
+- `app/styles.css`
+- `docs/Repo_Current_State.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- `node --check app\app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- Browser QA through `http://127.0.0.1:4173/index.html`
+
+Verification:
+
+- Static data validation passed.
+- JavaScript syntax check passed.
+- Dependency check passed with dependencies outside the Google Drive workspace.
+- Impeccable detector returned no findings for `app/`.
+- Desktop auth screenshot, local visual preview for dashboard/exam/results/review, and mobile auth smoke check showed no console errors or horizontal overflow.
+
+Risks:
+
+- Pixel-level parity still depends on final human comparison against the state images, especially for exact iconography and any screenshot-only controls without defined behavior.
