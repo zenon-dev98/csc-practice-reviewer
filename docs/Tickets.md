@@ -279,7 +279,7 @@ Completion notes:
 
 ## T0016 - Ponytail Auth Screenshot-Parity Repair
 
-Status: open
+Status: done
 
 Repair the public create-profile and continue-profile screens against the supplied mockup using Ponytail discipline: remove wrong layers first, reuse existing markup/helpers, and apply the smallest CSS/asset changes needed for screenshot parity.
 
@@ -293,3 +293,12 @@ Acceptance criteria:
 - Header layout, logo scale, disclaimer pill placement, form-card width, input height, CTA treatment, feature-row width, colors, and copy are tuned against the mockup.
 - Production-only Password and Invite Code fields remain functional but are styled to preserve the mockup's proportions as much as the extra fields allow.
 - Desktop browser screenshots compare the target mockup and the repaired create/continue states before completion.
+
+Completion notes:
+
+- Removed the large `auth-copy` card treatment that boxed the `Review smarter...` copy.
+- Replaced the raster auth background dependency with scalable CSS dots/waves so the background fits desktop widths.
+- Reworked auth-only typography, header/disclaimer placement, form-card sizing, input sizing, CTA styling, and feature-row/icon sizing.
+- Kept the Supabase Password and Invite Code fields functional while compacting the production form to fit the desktop viewport.
+- Cache-busted static assets through `v=20260705-5`.
+- Screenshot QA was saved under `qa/t0016-auth-final` for create/continue at `1904x913` and `1536x816`.

@@ -569,7 +569,7 @@
         <div class="auth-copy">
           <span class="soft-pill">${icon("building")} Civil Service Exam Practice</span>
           <h1>Review smarter. Track your progress clearly.</h1>
-          <p>Save mock exam scores, review answer history, and see progress across every section while preparing with your study group.</p>
+          <p>Create a profile to save your mock exam scores, review history, and progress across practice sessions.</p>
           <div class="auth-chips">
             <span>${icon("clock")} Timed mock exams</span>
             <span>${icon("stats")} Score tracking</span>
@@ -585,7 +585,7 @@
           <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="email" placeholder="Enter your email address" required /></div></label>
           <label class="field-label">Password<div class="field-with-icon">${icon("key")}<input name="password" type="password" autocomplete="new-password" minlength="8" placeholder="Create a password" required /></div></label>
           <label class="field-label">Invite Code<div class="field-with-icon">${icon("shield")}<input name="inviteCode" autocomplete="off" placeholder="Enter invite code" required /></div></label>
-          <button class="btn primary" data-action="signup-submit" type="button">${icon("spark")} Start Reviewing</button>
+          <button class="btn primary" data-action="signup-submit" type="button">Start Reviewing</button>
           <div class="auth-divider"><span>or</span></div>
           <p class="auth-switch-copy">Already have a profile?</p>
           <button class="text-link" data-action="show-signin" type="button">Select existing profile</button>
@@ -612,7 +612,7 @@
           </div>
           <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="email" placeholder="Enter your email address" required /></div></label>
           <label class="field-label">Password<div class="field-with-icon">${icon("key")}<input name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required /></div></label>
-          <button class="btn primary" data-action="signin-submit" type="button">${icon("arrow")} Continue</button>
+          <button class="btn primary" data-action="signin-submit" type="button">Continue</button>
           <button class="text-link" data-action="forgot-password" type="button">Forgot Password?</button>
           <button class="text-link" data-action="show-create" type="button">Back to Create Profile</button>
         </form>

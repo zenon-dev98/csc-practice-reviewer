@@ -683,3 +683,42 @@ Verification:
 Risks:
 
 - This is an asset/background pass only. The older split hero structure for create/continue remains intact unless a separate layout redesign ticket replaces it.
+
+## 2026-07-05 - T0016 Ponytail Auth Screenshot-Parity Repair
+
+Summary:
+
+- Repaired the create-profile and continue-profile screens against the supplied mockup using the newly added Ponytail guardrail.
+- Removed the incorrect large left-side `auth-copy` box instead of layering more styling on top of it.
+- Replaced the visually cropped raster background with native CSS dots and soft wave layers that scale across desktop widths.
+- Enlarged and recolored the auth feature/input/disclaimer icons, tuned the header and form placement, switched away from `Bahnschrift` for auth headings, and compacted the four-field production signup form.
+
+Files changed:
+
+- `app/app.js`
+- `app/index.html`
+- `app/styles.css`
+- `docs/Tickets.md`
+- `docs/Repo_Current_State.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- `node --check app\app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- Edge-channel Playwright screenshot checks for create and continue states at `1904x913` and `1536x816`
+
+Verification:
+
+- Static data validation passed.
+- JavaScript syntax check passed.
+- Dependency check passed with dependencies outside the Google Drive workspace.
+- Impeccable detector exited successfully after replacing the flagged `Inter` font stack.
+- Screenshot metrics confirmed no document/body overflow, transparent/no-border left copy, and create/continue cards fitting in both desktop viewports.
+- QA screenshots were saved under `qa/t0016-auth-final`.
+
+Risks:
+
+- The production signup screen still has four fields while the mockup has two; spacing is tuned to preserve the mockup direction without removing required Supabase signup fields.
