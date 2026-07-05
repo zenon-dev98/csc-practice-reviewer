@@ -760,3 +760,36 @@ Verification:
 Risks:
 
 - The create-profile screen still has two extra production fields compared with the mockup, so exact vertical parity with the two-field mockup is structurally impossible unless signup is redesigned into a multi-step or progressive form.
+
+## 2026-07-05 - T0018 Auth Visual Balance Spacing Repair
+
+Summary:
+
+- Tuned the post-proportional auth layout so the left copy and right card read as one balanced composition.
+- Reduced the center gap, balanced outer margins, moved content slightly upward, tightened feature rows, and softened the auth card shadow.
+
+Files changed:
+
+- `app/index.html`
+- `app/styles.css`
+- `docs/Tickets.md`
+- `docs/Repo_Current_State.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- `node --check app\app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- Edge-channel Playwright screenshot checks for create and continue states at `1904x913`, `1536x816`, and `1904x760`
+
+Verification:
+
+- Static validation, JavaScript syntax, dependency check, and Impeccable detector passed.
+- Screenshot metrics confirmed no overflow at tested sizes, controlled center gaps, nearly balanced outer margins, and softer auth-card shadow.
+- QA screenshots were saved under `qa/t0018-balance-r1`.
+
+Risks:
+
+- The left copy is now centered within its column more than the original mockup. This was accepted for the balance pass; a later exact-parity pass can tune left alignment if needed.

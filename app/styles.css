@@ -8437,3 +8437,70 @@ body {
     font-size: 13px !important;
   }
 }
+
+/* T0018: visual balance after proportional layout. */
+@media (min-width: 1000px) {
+  #app .auth-canvas,
+  #app .fixture-auth {
+    grid-template-columns: minmax(420px, 0.84fr) minmax(500px, 0.86fr) !important;
+    gap: clamp(42px, 4vw, 78px) !important;
+    width: min(1510px, calc(100% - clamp(92px, 9vw, 170px))) !important;
+    align-items: center !important;
+    padding-top: clamp(12px, 2.5vh, 28px) !important;
+    padding-bottom: clamp(24px, 3.8vh, 38px) !important;
+  }
+
+  #app .auth-canvas .auth-card {
+    justify-self: center !important;
+    width: min(100%, 620px) !important;
+    max-width: 620px !important;
+    box-shadow: 0 16px 38px rgba(29, 55, 92, 0.08) !important;
+  }
+
+  #app .profile-picker-card {
+    width: min(100%, 590px) !important;
+    max-width: 590px !important;
+  }
+
+  #app .auth-canvas .auth-copy {
+    justify-self: center !important;
+    width: min(100%, 590px) !important;
+  }
+
+  #app .auth-copy h1 {
+    max-width: 560px !important;
+    font-size: clamp(44px, 3.15vw, 58px) !important;
+    line-height: 1.15 !important;
+    font-weight: 820 !important;
+  }
+
+  #app .auth-copy p {
+    max-width: 520px !important;
+  }
+
+  #app .auth-chips {
+    width: min(340px, 78%) !important;
+  }
+
+  #app .auth-chips span {
+    min-height: clamp(48px, 5.6vh, 56px) !important;
+    gap: clamp(14px, 1.3vw, 20px) !important;
+  }
+
+  #app .auth-chips .icon {
+    width: clamp(28px, 2vw, 34px) !important;
+    height: clamp(28px, 2vw, 34px) !important;
+  }
+}
+
+@media (min-width: 1000px) and (max-height: 850px) {
+  #app .auth-canvas,
+  #app .fixture-auth {
+    padding-top: 10px !important;
+    padding-bottom: 16px !important;
+  }
+
+  #app .auth-copy h1 {
+    font-size: clamp(42px, 3vw, 54px) !important;
+  }
+}

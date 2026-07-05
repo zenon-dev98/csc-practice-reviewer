@@ -325,3 +325,26 @@ Completion notes:
 - Changed auth root overflow from hidden vertical clipping to recoverable vertical overflow while preserving normal no-scroll fit at tested desktop sizes.
 - Cache-busted static assets through `v=20260705-6`.
 - Screenshot QA was saved under `qa/t0017-proportional-r2` for create and continue at `1904x913`, `1536x816`, and `1904x760`.
+
+## T0018 - Auth Visual Balance Spacing Repair
+
+Status: done
+
+Tune the auth create/continue screens after the proportional repair so the page reads as one balanced composition instead of two separated blocks.
+
+Acceptance criteria:
+
+- Center gap is visually balanced against outer margins; the form is not shoved to the far right.
+- Top and bottom whitespace in the content area feel balanced at desktop sizes.
+- Create and Continue cards use a softer, less bottom-right-heavy shadow.
+- Feature rows are slightly tighter and no longer feel stretched.
+- Hero text and left-side rhythm are calmer while preserving readability.
+- Create and continue states are screenshot-checked at wide and smaller desktop viewports.
+
+Completion notes:
+
+- Reduced the center gap and balanced outer margins so the auth page reads as one composed unit.
+- Moved auth content slightly upward through height-aware padding.
+- Replaced the broad bottom-right-heavy auth card shadow with a softer, shorter shadow.
+- Tightened feature-row width and icon scale, and slightly calmed hero sizing.
+- Screenshot QA was saved under `qa/t0018-balance-r1` for create and continue at `1904x913`, `1536x816`, and `1904x760`.

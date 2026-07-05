@@ -82,12 +82,12 @@ Current source item boundaries:
 - Impeccable CLI detection has been run against `app/` and currently returns no findings.
 - Browser fixture QA has been run for `create`, `select`, `dashboard`, `setup`, `exam`, `exam-collapsed`, `graph`, `pause`, `submit`, `results`, `review`, `practice`, `recent`, and `profile-modal` at `1904x913` and `1536x816`; document/body scrollbars and sampled container overflow are clean after T0014.
 - Microsoft Edge-channel desktop QA exposed and repaired the T0013 forced-fit visual regression: dashboard cards now keep proportional row spacing, exam question groups use bounded internal sidebar scrolling, result/fun-fact cards fit without clipping, and the profile modal is compact without giant blank zones. Static assets are cache-busted through `v=20260705-3`.
-- The public create-profile and continue-profile entry states have been repaired with Ponytail discipline: the left copy is no longer boxed, the auth background uses scalable CSS dots/waves, icons and typography are closer to the mockup, the desktop auth layout now uses proportional columns instead of fixed copied widths, and static assets are cache-busted through `v=20260705-6`.
+- The public create-profile and continue-profile entry states have been repaired with Ponytail discipline: the left copy is no longer boxed, the auth background uses scalable CSS dots/waves, icons and typography are closer to the mockup, the desktop auth layout now uses proportional columns instead of fixed copied widths, visual balance/shadow spacing has been tuned, and static assets are cache-busted through `v=20260705-7`.
 - Stitch was used in an authenticated browser session to generate the `Civil Service Exam Cockpit` dashboard direction. Stitch's `Code to Clipboard` export returned the original prompt rather than source code, so the app implementation was manually matched to the generated visual and agent summary.
 
 ## Current Active Ticket
 
-- No active implementation ticket. T0017 is complete.
+- No active implementation ticket. T0018 is complete.
 
 ## Next Ticket
 
