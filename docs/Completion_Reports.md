@@ -722,3 +722,41 @@ Verification:
 Risks:
 
 - The production signup screen still has four fields while the mockup has two; spacing is tuned to preserve the mockup direction without removing required Supabase signup fields.
+
+## 2026-07-05 - T0017 Auth Proportional Desktop Layout Repair
+
+Summary:
+
+- Repaired the remaining auth-screen proportional layout issue visible at browser 100% zoom.
+- Replaced fixed auth canvas width/columns/gap behavior with centered proportional columns and clamped spacing.
+- Right-aligned the form card within its proportional column so wide desktops do not leave a large unused area on the right.
+- Changed auth vertical overflow from hidden clipping to recoverable overflow, while keeping the tested desktop viewports fitting without root scroll.
+
+Files changed:
+
+- `app/index.html`
+- `app/styles.css`
+- `docs/Tickets.md`
+- `docs/Repo_Current_State.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- `node --check app\app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- Edge-channel Playwright screenshot checks for create and continue states at `1904x913`, `1536x816`, and `1904x760`
+
+Verification:
+
+- Static data validation passed.
+- JavaScript syntax check passed.
+- Dependency check passed with dependencies outside the Google Drive workspace.
+- Impeccable detector exited successfully.
+- Screenshot metrics confirmed no horizontal overflow, no document overflow at tested desktop sizes, form/copy fit in viewport, and wide-screen right blank reduced from about `301px` to about `112px` at `1904x913`.
+- QA screenshots were saved under `qa/t0017-proportional-r2`.
+
+Risks:
+
+- The create-profile screen still has two extra production fields compared with the mockup, so exact vertical parity with the two-field mockup is structurally impossible unless signup is redesigned into a multi-step or progressive form.

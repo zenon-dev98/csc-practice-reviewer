@@ -302,3 +302,26 @@ Completion notes:
 - Kept the Supabase Password and Invite Code fields functional while compacting the production form to fit the desktop viewport.
 - Cache-busted static assets through `v=20260705-5`.
 - Screenshot QA was saved under `qa/t0016-auth-final` for create/continue at `1904x913` and `1536x816`.
+
+## T0017 - Auth Proportional Desktop Layout Repair
+
+Status: done
+
+Replace the fixed auth screen column/gap sizing with a proportional desktop layout so create-profile and continue-profile fit at 100% browser zoom and do not leave an obvious dead zone on wide desktops.
+
+Acceptance criteria:
+
+- Create Profile and Continue Profile use centered proportional columns instead of fixed copied mockup widths.
+- The right-side form card does not leave excessive unused space to its right on wide desktop screens.
+- The production four-field signup form fits in the visible desktop viewport at 100% zoom without clipping important actions.
+- The continue/switch profile screen uses the same proportional composition.
+- Auth root no longer hides overflow in a way that cuts off content if a browser viewport is shorter than the QA viewport.
+- Desktop screenshots are captured for create and continue states at wide and smaller desktop viewports.
+
+Completion notes:
+
+- Replaced fixed auth canvas sizing with proportional centered columns, clamped gaps, and height-aware spacing.
+- Aligned the form card to the right side of its proportional column so wide screens no longer show a large dead zone to the right.
+- Changed auth root overflow from hidden vertical clipping to recoverable vertical overflow while preserving normal no-scroll fit at tested desktop sizes.
+- Cache-busted static assets through `v=20260705-6`.
+- Screenshot QA was saved under `qa/t0017-proportional-r2` for create and continue at `1904x913`, `1536x816`, and `1904x760`.
