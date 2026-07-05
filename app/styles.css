@@ -8504,3 +8504,68 @@ body {
     font-size: clamp(42px, 3vw, 54px) !important;
   }
 }
+
+/* T0019: match left/right auth vertical spans and restore card title hierarchy. */
+@media (min-width: 1000px) {
+  #app .auth-canvas .auth-copy {
+    min-height: clamp(610px, 72vh, 690px) !important;
+    align-content: start !important;
+    gap: clamp(30px, 4.2vh, 38px) !important;
+  }
+
+  #app .select-mode .auth-copy,
+  #app .auth-canvas .compact-copy {
+    min-height: clamp(390px, 48vh, 470px) !important;
+  }
+
+  #app .auth-chips {
+    margin-top: clamp(36px, 7.6vh, 74px) !important;
+  }
+
+  #app .compact-copy .btn {
+    margin-top: clamp(62px, 9.2vh, 98px) !important;
+  }
+
+  #app .auth-card-head {
+    margin-bottom: clamp(4px, 1vh, 10px) !important;
+  }
+
+  #app .auth-card-head h2 {
+    color: #061b4d !important;
+    font-size: clamp(42px, 2.9vw, 48px) !important;
+    font-weight: 900 !important;
+    line-height: 1.04 !important;
+  }
+
+  #app .profile-picker-card .auth-card-head h2 {
+    font-size: clamp(40px, 2.7vw, 46px) !important;
+  }
+
+  #app .auth-card-head p {
+    color: #415277 !important;
+    font-weight: 500 !important;
+  }
+}
+
+@media (min-width: 1000px) and (max-height: 850px) {
+  #app .auth-canvas .auth-copy {
+    min-height: clamp(560px, 70vh, 635px) !important;
+  }
+
+  #app .select-mode .auth-copy,
+  #app .auth-canvas .compact-copy {
+    min-height: clamp(360px, 45vh, 430px) !important;
+  }
+
+  #app .auth-card-head h2 {
+    font-size: clamp(36px, 2.6vw, 42px) !important;
+  }
+
+  #app .auth-chips {
+    margin-top: clamp(22px, 5vh, 44px) !important;
+  }
+
+  #app .compact-copy .btn {
+    margin-top: clamp(34px, 6vh, 58px) !important;
+  }
+}

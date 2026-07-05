@@ -348,3 +348,25 @@ Completion notes:
 - Replaced the broad bottom-right-heavy auth card shadow with a softer, shorter shadow.
 - Tightened feature-row width and icon scale, and slightly calmed hero sizing.
 - Screenshot QA was saved under `qa/t0018-balance-r1` for create and continue at `1904x913`, `1536x816`, and `1904x760`.
+
+## T0019 - Auth Vertical Span And Header Hierarchy Repair
+
+Status: done
+
+Repair the remaining create/continue auth imbalance where the left feature stack is visually shorter than the right form card, and strengthen the form-card heading hierarchy.
+
+Acceptance criteria:
+
+- The create screen's left stack from `Civil Service Exam Practice` through `Reviewer history` visually spans close to the right card from `Create Profile` through `Select existing profile`.
+- The continue/select screen uses the same proportional vertical balance.
+- `Create Profile` and `Continue Profile` read clearly as form-card titles, not just ordinary text inside the card.
+- No root/page scrollbar is introduced at the desktop QA viewport.
+- Create and continue states are screenshot-checked after the repair.
+
+Completion notes:
+
+- Matched the create screen's left visual stack height to the right form card at the desktop QA viewport.
+- Applied the same proportional span treatment to the continue/select profile screen.
+- Strengthened form-card title hierarchy with larger, heavier `Create Profile` and `Continue Profile` headings.
+- Kept the change CSS-only; no new markup, assets, or dependencies were added.
+- Screenshot QA was saved under `qa/t0019-span-r2` for create and continue at `1904x913`.

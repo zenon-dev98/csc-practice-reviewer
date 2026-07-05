@@ -793,3 +793,38 @@ Verification:
 Risks:
 
 - The left copy is now centered within its column more than the original mockup. This was accepted for the balance pass; a later exact-parity pass can tune left alignment if needed.
+
+## 2026-07-05 - T0019 Auth Vertical Span And Header Hierarchy Repair
+
+Summary:
+
+- Balanced the auth screen columns so the left feature stack visually spans with the right form card.
+- Strengthened `Create Profile` and `Continue Profile` as true form-card headings.
+
+Files changed:
+
+- `app/index.html`
+- `app/styles.css`
+- `docs/Tickets.md`
+- `docs/Repo_Current_State.md`
+- `docs/Known_Issues_And_Followups.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- `node --check app\app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- Edge-channel Playwright screenshot checks for create and continue states at `1904x913`
+
+Verification:
+
+- Static validation, JavaScript syntax, dependency check, and Impeccable detector passed.
+- Create state metrics showed no root overflow and a left visual span of about `687px` against a form card height of about `701px`.
+- Continue state metrics showed no root overflow and matching left/right visual proportions.
+- QA screenshots were saved under `qa/t0019-span-r2`.
+
+Risks:
+
+- Exact parity with the two-field mockup remains structurally limited because production signup keeps Password and Invite Code visible.
