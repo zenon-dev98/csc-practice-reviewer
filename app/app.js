@@ -505,6 +505,7 @@
   }
 
   function setView(view) {
+    if ((view.name === "create" || view.name === "signin") && app.view.name !== view.name) app.toast = "";
     app.view = view;
     render();
   }
@@ -569,7 +570,7 @@
         <div class="auth-copy">
           <span class="soft-pill">${icon("building")} Civil Service Exam Practice</span>
           <h1>Review smarter. Track your progress clearly.</h1>
-          <p>Create a profile to save your mock exam scores, review history, and progress across practice sessions.</p>
+          <p>Create an account to save your mock exam scores, review history, and progress across practice sessions.</p>
           <div class="auth-chips">
             <span>${icon("clock")} Timed mock exams</span>
             <span>${icon("stats")} Score tracking</span>
@@ -578,17 +579,20 @@
         </div>
         <form class="auth-card" data-form="signup">
           <div class="auth-card-head">
-            <h2>Create Profile</h2>
-            <p>Set up your reviewer profile.</p>
+            <h2>Create Account</h2>
+            <p>Set up your reviewer account.</p>
           </div>
           <label class="field-label">Full Name<div class="field-with-icon">${icon("user")}<input name="name" autocomplete="name" placeholder="Enter your full name" required /></div></label>
           <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="email" placeholder="Enter your email address" required /></div></label>
-          <label class="field-label">Password<div class="field-with-icon">${icon("key")}<input name="password" type="password" autocomplete="new-password" minlength="8" placeholder="Create a password" required /></div></label>
+          <div class="auth-password-grid">
+            <label class="field-label">Password<div class="field-with-icon has-toggle">${icon("key")}<input name="password" type="password" autocomplete="new-password" minlength="8" placeholder="Create a password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
+            <label class="field-label">Confirm Password<div class="field-with-icon has-toggle">${icon("key")}<input name="confirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Confirm" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
+          </div>
           <label class="field-label">Invite Code<div class="field-with-icon">${icon("shield")}<input name="inviteCode" autocomplete="off" placeholder="Enter invite code" required /></div></label>
-          <button class="btn primary" data-action="signup-submit" type="button">Start Reviewing</button>
+          <button class="btn primary" data-action="signup-submit" type="button">Create Account</button>
           <div class="auth-divider"><span>or</span></div>
-          <p class="auth-switch-copy">Already have a profile?</p>
-          <button class="text-link" data-action="show-signin" type="button">Select existing profile</button>
+          <p class="auth-switch-copy">Already have an account?</p>
+          <button class="text-link" data-action="show-signin" type="button">Sign in</button>
         </form>
       </section>
       ${toast()}
@@ -600,21 +604,27 @@
     root.innerHTML = publicShell(`
       <section class="auth-canvas select-mode">
         <div class="auth-copy compact-copy">
-          <span class="soft-pill">Returning reviewer</span>
-          <h1>Select Profile</h1>
-          <p>Sign in with the email and password for your reviewer account.</p>
-          <button class="btn secondary" data-action="show-create" type="button">${icon("plus")} Create New Profile</button>
+          <span class="soft-pill">${icon("building")} Civil Service Exam Practice</span>
+          <h1>Returning reviewer</h1>
+          <p>Sign in to continue your saved exam progress, review history, flagged questions, and results.</p>
+          <div class="auth-chips">
+            <span>${icon("clock")} Resume unfinished exams</span>
+            <span>${icon("stats")} View previous scores</span>
+            <span>${icon("bookmark")} Continue category practice</span>
+          </div>
         </div>
         <form class="auth-card profile-picker-card" data-form="signin">
           <div class="auth-card-head">
-            <h2>Continue Profile</h2>
+            <h2>Sign In</h2>
             <p>Continue your saved exams and review history.</p>
           </div>
           <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="email" placeholder="Enter your email address" required /></div></label>
-          <label class="field-label">Password<div class="field-with-icon">${icon("key")}<input name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required /></div></label>
-          <button class="btn primary" data-action="signin-submit" type="button">Continue</button>
+          <label class="field-label">Password<div class="field-with-icon has-toggle">${icon("lock")}<input name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
+          <button class="btn primary" data-action="signin-submit" type="button">Sign In</button>
           <button class="text-link" data-action="forgot-password" type="button">Forgot Password?</button>
-          <button class="text-link" data-action="show-create" type="button">Back to Create Profile</button>
+          <div class="auth-divider"><span>or</span></div>
+          <p class="auth-switch-copy">New here?</p>
+          <button class="text-link" data-action="show-create" type="button">Create account</button>
         </form>
       </section>
       ${toast()}
@@ -636,15 +646,15 @@
         </div>
         <form class="auth-card fixture-create-card" data-form="signup">
           <div class="auth-card-head">
-            <h2>Create Profile</h2>
-            <p>Set up your reviewer profile.</p>
+            <h2>Create Account</h2>
+            <p>Set up your reviewer account.</p>
           </div>
           <label class="field-label">Full Name<div class="field-with-icon">${icon("user")}<input name="name" autocomplete="name" placeholder="Enter your full name" /></div></label>
           <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="email" placeholder="Enter your email address" /></div></label>
-          <button class="btn primary" data-action="signup-submit" type="button">${icon("spark")} Start Reviewing</button>
+          <button class="btn primary" data-action="signup-submit" type="button">${icon("spark")} Create Account</button>
           <div class="auth-divider"><span>or</span></div>
-          <p class="auth-switch-copy">Already have a profile?</p>
-          <button class="text-link" data-action="show-signin" type="button">Select existing profile</button>
+          <p class="auth-switch-copy">Already have an account?</p>
+          <button class="text-link" data-action="show-signin" type="button">Sign in</button>
         </form>
       </section>
       ${toast()}
@@ -652,33 +662,31 @@
   }
 
   function renderFixtureSelectProfile() {
-    const rows = [
-      { name: "John Smith", email: "john.smith@email.com", detail: "Last reviewed today", progress: "64%", completed: "3 mock exams completed", active: true },
-      { name: "Maria Santos", email: "maria.santos@email.com", detail: "Progress: 64%", progress: "64%", completed: "3 mock exams completed", active: false },
-      { name: "New Reviewer", email: "new.reviewer@email.com", detail: "New profile", progress: "0%", completed: "No mock exams yet", active: false }
-    ];
     root.innerHTML = publicShell(`
-      <section class="fixture-select-page">
-        <div class="select-header-row">
-          <div>
-            <h1>Select Profile</h1>
-            <p>Continue your practice session using an existing profile.</p>
+      <section class="auth-canvas select-mode fixture-auth">
+        <div class="auth-copy compact-copy">
+          <span class="soft-pill">${icon("building")} Civil Service Exam Practice</span>
+          <h1>Returning reviewer</h1>
+          <p>Sign in to continue your saved exam progress, review history, flagged questions, and results.</p>
+          <div class="auth-chips">
+            <span>${icon("clock")} Resume unfinished exams</span>
+            <span>${icon("stats")} View previous scores</span>
+            <span>${icon("bookmark")} Continue category practice</span>
           </div>
-          <button class="btn primary" data-action="show-create" type="button">${icon("plus")} Create New Profile</button>
         </div>
-        <div class="fixture-profile-list">
-          ${rows.map((row) => `
-            <button class="fixture-profile-row" data-action="signin-submit" type="button">
-              ${avatar({ name: row.name, avatar_preset: row.active ? 1 : 2 })}
-              <span><strong>${escapeHtml(row.name)}</strong><small>${escapeHtml(row.email)}</small></span>
-              <em>${icon("clock")} ${escapeHtml(row.detail)}</em>
-              <em>${icon("stats")} ${escapeHtml(row.progress)}</em>
-              <em>${icon("review")} ${escapeHtml(row.completed)}</em>
-              <b>Continue ${icon("arrow")}</b>
-            </button>
-          `).join("")}
-        </div>
-        <button class="text-link fixture-back-create" data-action="show-create" type="button">Back to Create Profile</button>
+        <form class="auth-card profile-picker-card" data-form="signin">
+          <div class="auth-card-head">
+            <h2>Sign In</h2>
+            <p>Continue your saved exams and review history.</p>
+          </div>
+          <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="email" placeholder="Enter your email address" /></div></label>
+          <label class="field-label">Password<div class="field-with-icon has-toggle">${icon("lock")}<input name="password" type="password" autocomplete="current-password" placeholder="Enter your password" /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
+          <button class="btn primary" data-action="signin-submit" type="button">Sign In</button>
+          <button class="text-link" data-action="forgot-password" type="button">Forgot Password?</button>
+          <div class="auth-divider"><span>or</span></div>
+          <p class="auth-switch-copy">New here?</p>
+          <button class="text-link" data-action="show-create" type="button">Create account</button>
+        </form>
       </section>
       ${toast()}
     `);
@@ -1920,6 +1928,7 @@
 
     try {
       if (app.fixtureMode && handleFixtureClick(target, action)) return;
+      if (action === "toggle-password") return togglePasswordVisibility(target);
       if (action === "show-signin") return setView({ name: "signin" });
       if (action === "show-create") return setView({ name: "create" });
       if (action === "signup-submit") return await signUp(formDataFromButton(target));
@@ -2006,6 +2015,9 @@
 
   async function signUp(data) {
     const inviteCode = String(data.inviteCode || "").trim();
+    if (data.confirmPassword !== undefined && data.password !== data.confirmPassword) {
+      throw new Error("Passwords do not match.");
+    }
     const { data: result, error } = await app.client.auth.signUp({
       email: data.email.trim().toLowerCase(),
       password: data.password,
@@ -2035,6 +2047,16 @@
     app.session = result.session;
     await loadUserData();
     setView({ name: "dashboard" });
+  }
+
+  function togglePasswordVisibility(button) {
+    const field = button.closest(".field-with-icon");
+    const input = field?.querySelector("input");
+    if (!input) return;
+    const visible = input.type === "password";
+    input.type = visible ? "text" : "password";
+    button.setAttribute("aria-label", visible ? "Hide password" : "Show password");
+    button.classList.toggle("is-visible", visible);
   }
 
   async function signOut() {
@@ -2837,6 +2859,9 @@
       skip: "M5 5l8 7-8 7V5zm9 0h3v14h-3V5z",
       x: "M6 6l12 12M18 6L6 18",
       key: "M14 10a4 4 0 1 0-3.5 4l-1.5 1.5H7v2H5v2H3v-3.5L8.5 10.5A4 4 0 0 0 14 10z",
+      lock: "M7 11V8a5 5 0 0 1 10 0v3M6 11h12v10H6z",
+      eye: "M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6zm10 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
+      bookmark: "M7 4h10v17l-5-3-5 3V4z",
       chev: "M9 6l6 6-6 6",
       logout: "M10 17l5-5-5-5M15 12H3M21 4v16h-8",
       bell: "M18 16H6l2-3V9a4 4 0 0 1 8 0v4l2 3zM10 19h4",

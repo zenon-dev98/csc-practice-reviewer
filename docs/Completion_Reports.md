@@ -828,3 +828,43 @@ Verification:
 Risks:
 
 - Exact parity with the two-field mockup remains structurally limited because production signup keeps Password and Invite Code visible.
+
+## 2026-07-05 - T0020 Account Auth Rework From V2 Sign-In
+
+Summary:
+
+- Reworked public auth entry from profile language to account language.
+- Added confirm-password validation and password eye toggles.
+- Adapted sign-in and left feature rows to the `states/v2/sign_in.png` direction.
+
+Files changed:
+
+- `app/index.html`
+- `app/app.js`
+- `app/styles.css`
+- `docs/Tickets.md`
+- `docs/Repo_Current_State.md`
+- `docs/Known_Issues_And_Followups.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- `node --check app\app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- Edge-channel Playwright screenshot checks for create account, create password visible, sign-in, sign-in password visible, fixture select, and password mismatch states
+
+Verification:
+
+- Static validation, JavaScript syntax, dependency check, and Impeccable detector passed.
+- Create account and sign-in had no root horizontal or vertical overflow at `1904x913`.
+- Create account left visual span measured about `707px` against a `701px` form card.
+- Sign-in left visual span measured about `539px` against a `551px` form card.
+- Password eye toggles changed password inputs from `password` to `text`.
+- Password mismatch validation showed `Passwords do not match.` before Supabase signup.
+- QA screenshots were saved under `qa/t0020-account-final`.
+
+Risks:
+
+- Only `states/v2/sign_in.png` exists, so create account remains a proportional adaptation rather than a direct v2 create-account copy.

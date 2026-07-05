@@ -370,3 +370,29 @@ Completion notes:
 - Strengthened form-card title hierarchy with larger, heavier `Create Profile` and `Continue Profile` headings.
 - Kept the change CSS-only; no new markup, assets, or dependencies were added.
 - Screenshot QA was saved under `qa/t0019-span-r2` for create and continue at `1904x913`.
+
+## T0020 - Account Auth Rework From V2 Sign-In
+
+Status: done
+
+Rework the public auth entry screens around account language and the `states/v2/sign_in.png` visual direction.
+
+Acceptance criteria:
+
+- Create Profile is renamed to Create Account across the public create screen.
+- The create account form includes Password and Confirm Password side by side on desktop, with validation that both values match.
+- Password fields on create and sign-in screens have an eye icon toggle to show/hide typed passwords.
+- The sign-in screen adapts `states/v2/sign_in.png`: card heading says `Sign In`, primary button says `Sign In`, and the bottom account switch says `Create account`.
+- The left-side feature rows use the v2 icon-circle-plus-label style instead of white rectangular chips.
+- The left visual stack remains proportionally close to the right auth card and does not introduce root/page scrollbars on desktop.
+- Edge screenshot QA is captured for create account, sign in, and password-toggle states.
+
+Completion notes:
+
+- Renamed public auth language from profile to account on the create/sign-in entry screens.
+- Added desktop two-column Password / Confirm Password fields to create account, with password-match validation before Supabase signup.
+- Added password eye toggles for create account and sign-in password inputs.
+- Reworked sign-in to follow `states/v2/sign_in.png`: `Sign In` heading/button, v2 left feature copy, and `New here? Create account` switch.
+- Replaced left feature cards with v2 icon-circle-plus-label rows for create and sign-in.
+- Updated `?fixture=select` to render the v2 sign-in state instead of the stale profile-picker list.
+- Screenshot QA was saved under `qa/t0020-account-final` for create account, sign-in, password-visible, fixture select, and mismatch validation states.
