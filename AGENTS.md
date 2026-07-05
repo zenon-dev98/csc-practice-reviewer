@@ -49,6 +49,7 @@ Use Ponytail discipline for all implementation work in this project. Ponytail me
 Use this mandatory loop for any frontend, UI, styling, layout, state-image, or screenshot-parity work. This is based on the Codex frontend-design workflow discussed in https://www.reddit.com/r/codex/comments/1ujqm5t/any_tips_for_good_codex_frontend_design/: implement from a concrete mockup/reference, take screenshots, compare the screenshots to the target, then iterate until the screenshots match instead of relying on code inspection or subjective claims.
 
 - Start from concrete visual references: `states/` images, Stitch/Impeccable output, generated mockups, or user-provided screenshots. If the reference is missing or ambiguous, state the ambiguity before coding.
+- When versioned mockup folders exist, such as `states/v2/`, identify the active target version before editing. Do not mix old and new state references unless the user explicitly asks for a hybrid.
 - Before editing, map the target state: layout grid, spacing, typography, colors, icons, button positions, scroll behavior, hover/focus/active states, and responsive constraints.
 - After each meaningful UI change, run the app in a browser and capture screenshots of the changed state. Do not declare UI work done from CSS/HTML inspection alone.
 - Compare captured screenshots against the reference and write down specific visual differences: overflow, clipped text, bad spacing, wrong hierarchy, wrong color, bad alignment, missing icons, incorrect scroll position, or mismatched interaction state.
@@ -60,3 +61,23 @@ Use this mandatory loop for any frontend, UI, styling, layout, state-image, or s
 - Store QA screenshots under `qa/<date-or-ticket>-<browser-or-scope>/` and summarize the pass/fail findings. Screenshot artifacts do not need to be committed unless the user asks.
 - If browser control is interrupted or screenshots cannot be captured, mark visual QA incomplete. Do not call the UI finished.
 - If screenshots show an obvious visual defect, repair it before reporting completion, then rerun the affected screenshots.
+
+## Mockup Adaptation Quality Rules
+
+Use these rules whenever adapting generated mockups, Stitch output, screenshots, or `states/` images into the app. These rules come from the create/account auth repair work and are meant to prevent "technically fits, visually bad" implementations.
+
+- Match proportions, not raw pixels. A mockup made for one canvas should be translated into proportional browser layout: balanced left margin, center gap, right margin, top whitespace, and bottom whitespace.
+- Treat browser zoom honestly. The primary desktop target must work at 100% zoom in a maximized PC browser; a layout that only looks correct at 90% zoom is not done.
+- Removing scrollbars is not enough. A no-scroll page can still fail if it creates huge dead zones, stretched cards, cramped controls, tiny text, or buttons hugging card edges.
+- Keep visual spans comparable. If a left hero/info stack pairs with a right form/card, the visible start-to-end height of both sides should be close unless the mockup clearly shows otherwise.
+- Preserve vertical rhythm. Titles, subtitles, labels, fields, primary actions, dividers, and secondary actions need intentional spacing; do not use giant elastic gaps or compressed bottom controls just to force a fit.
+- Keep hierarchy obvious. Page titles, card titles, section labels, body copy, helper text, and button text must have clear size, weight, and color differences. A large heading can still fail if surrounding whitespace makes it read like ordinary card content.
+- Copy the container model. If the mockup shows free-floating hero text, do not put it inside a large visible card. Use boxes only where the mockup uses boxes or where containment is required for real data.
+- Match icon language optically. Icons should share stroke width, size, color, and visual weight. Feature icons can be larger and stronger; input icons should be visible but secondary; disclaimer/status icons should match their label scale.
+- Do not hide production constraints. If real auth or data requirements add fields not present in the mockup, preserve functionality and rebalance the layout. If exact parity becomes impossible, state the structural reason and the cleaner product alternative.
+- Prefer native/simple fixes. Use existing inline icon helpers, CSS, and current markup before adding assets, dependencies, wrappers, or new component systems.
+- Test real data shapes. Check empty states, long names/emails, many attempts, answered/skipped/flagged states, expanded/collapsed groups, and disabled/error/loading states when the screen supports them.
+- Check interaction states, not only default screenshots. Buttons that open, expand, collapse, reveal, submit, pause, skip, flag, clear, or switch views must have the resulting state visually checked.
+- Use subtle internal scrolling for long lists. Page-level scrollbars are wrong for mockup states meant to fit one viewport; long navigators/lists may use bounded internal scrolling if it is visually quiet and does not hide primary actions.
+- Cache-bust every deployed UI change. Live QA is invalid if the deployed page may still be serving stale CSS or JavaScript.
+- Measure and inspect. Use browser metrics for overflow, dimensions, and asset versions, but still open screenshots visually; metrics catch containment problems while screenshots catch poor taste and proportion errors.
