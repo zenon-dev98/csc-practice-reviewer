@@ -276,3 +276,20 @@ Completion notes:
 - Applied the background to create-profile, continue-profile, and fixture select/profile-entry surfaces with translucent readable cards.
 - Cache-busted app assets through `v=20260705-4`.
 - Edge-channel screenshots for create, continue, and fixture select states were saved under `qa/t0015-auth-background`, with no document/body overflow detected.
+
+## T0016 - Ponytail Auth Screenshot-Parity Repair
+
+Status: open
+
+Repair the public create-profile and continue-profile screens against the supplied mockup using Ponytail discipline: remove wrong layers first, reuse existing markup/helpers, and apply the smallest CSS/asset changes needed for screenshot parity.
+
+Acceptance criteria:
+
+- The installed Ponytail skill is reflected in project guardrails, and this ticket avoids new dependencies unless no native/simple option works.
+- The left `Review smarter...` content is no longer inside a large card/container; only the pill and feature rows have small surfaces.
+- The background is replaced or regenerated so the dotted lower-left and soft blue waves fit the full desktop width naturally.
+- Typography changes from the current `Bahnschrift/Aptos` look to a closer mockup-like UI stack, with hero size/line breaks matched to the reference.
+- Icons for profile fields, feature rows, disclaimer, and the green pill are resized/recolored to match the mockup hierarchy.
+- Header layout, logo scale, disclaimer pill placement, form-card width, input height, CTA treatment, feature-row width, colors, and copy are tuned against the mockup.
+- Production-only Password and Invite Code fields remain functional but are styled to preserve the mockup's proportions as much as the extra fields allow.
+- Desktop browser screenshots compare the target mockup and the repaired create/continue states before completion.

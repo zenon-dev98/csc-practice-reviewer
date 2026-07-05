@@ -24,6 +24,7 @@ Path:
 - Project dependencies must not be installed in this Google Drive folder.
 - Optional local server dependencies are installed under `%LOCALAPPDATA%\csc-reviewer\node-deps`.
 - Optional local QA dependencies are installed under `%LOCALAPPDATA%\csc-reviewer\qa-deps`, outside the Google Drive workspace.
+- Ponytail has been installed into `C:\Users\Acer\.codex\skills\ponytail`; restart Codex to load it as a named skill in future sessions. The project `AGENTS.md` now includes a Ponytail guardrail for this repo immediately.
 
 ## Existing Files
 
@@ -90,4 +91,5 @@ Current source item boundaries:
 
 ## Next Ticket
 
+- T0016 - Ponytail Auth Screenshot-Parity Repair.
 - Add a Supabase backup/export workflow before broader public use.

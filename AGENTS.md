@@ -33,6 +33,17 @@ Follow the documentation-first workflow for this project.
 - Support answer selection, skip/revisit, pause/resume, timeout submit, and post-exam statistics.
 - Use small animations only where they support the exam-results experience.
 
+## Ponytail Guardrail
+
+Use Ponytail discipline for all implementation work in this project. Ponytail means the laziest solution that actually works: understand the real flow first, then prefer deletion, reuse, native browser/CSS features, and the smallest root-cause diff over adding new layers.
+
+- Remove wrong styling before adding compensating styling.
+- Reuse existing markup, icon helpers, CSS tokens, fixtures, and QA scripts before creating new structures.
+- Do not add a dependency for fonts, icons, backgrounds, layout, or QA if native CSS/SVG or existing assets cover the need.
+- Fix the shared cause once instead of patching each visible symptom separately.
+- Keep changes scoped to the active ticket and avoid speculative abstractions.
+- For UI repair, Ponytail does not mean low quality. It means the shortest path to screenshot parity: fewer overrides, fewer containers, fewer invented components, and browser screenshots after each meaningful change.
+
 ## Frontend Screenshot Loop Agent
 
 Use this mandatory loop for any frontend, UI, styling, layout, state-image, or screenshot-parity work. This is based on the Codex frontend-design workflow discussed in https://www.reddit.com/r/codex/comments/1ujqm5t/any_tips_for_good_codex_frontend_design/: implement from a concrete mockup/reference, take screenshots, compare the screenshots to the target, then iterate until the screenshots match instead of relying on code inspection or subjective claims.
