@@ -256,3 +256,23 @@ Completion notes:
 - Reworked results layout into a two-column desktop composition with a richer Exam Overview list and compact fun-fact cards for smaller desktop viewports.
 - Added a favicon and cache-busted static assets through `v=20260705-3`.
 - Edge-channel screenshot sweeps passed at `1904x913` and `1536x816`; interaction screenshots covered sidebar expansion/scrolling, answer selection, clear, flag, skip, pause, and submit modal.
+
+## T0015 - Auth Background Asset Pass
+
+Status: done
+
+Use the provided `images/create_profile_background.png` as the background for the public create-profile and continue-profile entry screens.
+
+Acceptance criteria:
+
+- The background image is available from the deployed `app/` asset path.
+- Create Profile and Continue Profile states use the image behind the auth layout without reducing form readability.
+- Fixture create/select QA states keep their existing layout contracts while inheriting the same background treatment where applicable.
+- Static checks pass and local screenshots confirm no root scrollbar or obvious visual regression on the auth entry states.
+
+Completion notes:
+
+- Copied `images/create_profile_background.png` into the deployed `app/assets/` path.
+- Applied the background to create-profile, continue-profile, and fixture select/profile-entry surfaces with translucent readable cards.
+- Cache-busted app assets through `v=20260705-4`.
+- Edge-channel screenshots for create, continue, and fixture select states were saved under `qa/t0015-auth-background`, with no document/body overflow detected.

@@ -11,6 +11,7 @@
 - Exact iconography may still differ from the generated `states/` assets where the app uses the existing inline icon set, but the screenshot-state layout, containment, and interactions now have a fixture QA harness and desktop/mobile browser sweep.
 - T0014 repaired the desktop quality regression at `1904x913` and `1536x816`. Mobile still should get a separate polish pass if it becomes a priority again.
 - At the smaller `1536x816` desktop fixture, the Results fun-fact cards use a compact mode that shows titles and values while hiding the extra descriptive sentence to preserve the one-screen no-scroll contract.
+- T0015 applies the supplied background asset to the auth entry states only; any larger create/continue profile layout redesign should be handled as its own screenshot-parity ticket.
 
 ## Follow-Up Ticket Ideas
 

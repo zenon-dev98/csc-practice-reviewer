@@ -644,3 +644,42 @@ Risks:
 
 - The compact `1536x816` results layout hides the extra descriptive sentence in each fun-fact card to preserve the no-scroll one-screen contract; the wide desktop layout keeps the fuller text.
 - Mobile polish remains a separate follow-up if mobile becomes a priority again.
+
+## 2026-07-05 - T0015 Auth Background Asset Pass
+
+Summary:
+
+- Used the supplied `images/create_profile_background.png` as the background treatment for the public create-profile and continue-profile entry screens.
+- Copied the asset into `app/assets/` so GitHub Pages can serve it from the deployed app artifact.
+- Added a final auth-only CSS layer for the background, translucent readable auth cards, and a cache-bust bump to `v=20260705-4`.
+
+Files changed:
+
+- `app/assets/create_profile_background.png`
+- `app/index.html`
+- `app/styles.css`
+- `docs/Tickets.md`
+- `docs/Repo_Current_State.md`
+- `docs/Known_Issues_And_Followups.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- `node --check app\app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- Edge-channel Playwright screenshot check for create-profile, continue-profile, and fixture select states
+
+Verification:
+
+- Static data validation passed.
+- JavaScript syntax check passed.
+- Dependency check passed with dependencies outside the Google Drive workspace.
+- Impeccable detector exited successfully for `app/`.
+- Local screenshots were saved under `qa/t0015-auth-background`.
+- Browser metrics confirmed `assets/create_profile_background.png?v=20260705-4` is active on create, continue, and fixture select states with no document/body horizontal or vertical overflow.
+
+Risks:
+
+- This is an asset/background pass only. The older split hero structure for create/continue remains intact unless a separate layout redesign ticket replaces it.
