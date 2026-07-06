@@ -64,7 +64,6 @@
     practiceDifficulty: "mixed",
     practiceCategory: "Verbal Ability"
   };
-  const AVATARS = ["AZ", "BR", "CX", "DL", "EV", "FK", "GP", "HM"];
   const app = {
     client: null,
     session: null,
@@ -125,12 +124,17 @@
       const { data, error } = await app.client.auth.getSession();
       if (error) throw error;
       app.session = data.session;
-      app.client.auth.onAuthStateChange(async (_event, session) => {
+      app.client.auth.onAuthStateChange(async (event, session) => {
+        const hadSession = Boolean(app.session);
         app.session = session;
         if (session) {
-          await loadUserData();
-          setView({ name: "dashboard" });
+          if (!hadSession || event === "SIGNED_IN" || app.view.name === "boot" || app.view.name === "create" || app.view.name === "signin") {
+            await loadUserData();
+            app.modal = null;
+            setView({ name: "dashboard" });
+          }
         } else {
+          app.modal = null;
           app.profile = null;
           app.attempts = [];
           setView({ name: "create" });
@@ -707,7 +711,7 @@
         <div class="page-title-row dashboard-title">
           <div>
             <h1>Dashboard</h1>
-            <p>Continue your review journey and choose what to do next.</p>
+            <p>Pick the next review action for this account.</p>
           </div>
         </div>
 
@@ -725,7 +729,6 @@
               <span>${icon("clock")} Last active: Today</span>
               <span>${icon("review")} ${completed.length} mock exams completed</span>
             </div>
-            <button class="btn text-button" data-action="manage-profile" type="button">${icon("edit")} Edit Profile</button>
           </section>
 
           <section class="card continue-card dashboard-card ${activeAttempt ? "" : "disabled-card"}">
@@ -770,8 +773,8 @@
           <section class="card review-card dashboard-card">
             <span class="card-icon flag-icon">${icon("flag")}</span>
             <h2>Review Mistakes</h2>
-            <p>${wrongAnswerCount(completed) || 0} missed items are available for targeted review.</p>
-            <button class="btn secondary" data-action="mistakes-page" type="button">${icon("review")} Review Now</button>
+            <p>${wrongAnswerCount(completed) ? `${wrongAnswerCount(completed)} missed items are ready for targeted review.` : "No mistakes yet. Complete an exam first."}</p>
+            <button class="btn secondary" data-action="mistakes-page" type="button" ${wrongAnswerCount(completed) ? "" : "disabled"}>${icon("review")} Review Mistakes</button>
           </section>
 
           <section class="card progress-card dashboard-card">
@@ -796,7 +799,7 @@
               <h2>Recent Attempts</h2>
               <button class="btn ghost" data-action="recent-page" type="button">View All</button>
             </div>
-            ${dashboardRecentTable(attempts.slice(0, 2), latestCompleted)}
+            ${dashboardRecentTable(attempts.slice(0, 3), latestCompleted)}
           </section>
         </div>
       </section>
@@ -942,7 +945,7 @@
                 <button class="btn ghost" data-action="clear-answer" type="button">${icon("clear")} Clear Answer</button>
                 <button class="btn ghost ${current.flagged ? "active" : ""}" data-action="toggle-flag" type="button">${icon("flag")} Flag for Review</button>
                 <button class="btn secondary" data-action="skip-question" type="button">${icon("skip")} Skip</button>
-                <button class="btn primary" data-action="next-question" type="button" ${current.position >= attempt.total_questions - 1 ? "disabled" : ""}>Next ${icon("arrow")}</button>
+                <button class="btn primary" data-action="next-question" type="button" ${current.position >= attempt.total_questions - 1 || !current.selected_choice ? "disabled" : ""}>Next ${icon("arrow")}</button>
               </div>
             </section>
           </main>
@@ -1146,18 +1149,13 @@
             <h1>Practice by Category</h1>
             <p>Choose a focused drill and strengthen one exam area at a time.</p>
           </div>
-          <div class="header-actions">
-            <button class="icon-only update-bell" data-action="toggle-updates" type="button" title="Updates">${icon("bell")}<span>${app.updates.length || 0}</span></button>
-            <button class="btn ghost" data-action="switch-account" type="button">${icon("switch")} Switch Account</button>
-          </div>
-        </div>
-        <div class="category-card-grid">
-          ${practiceCategoriesForDisplay().map((category) => categoryPracticeCard(category, categoryStats[category.section])).join("")}
+          <button class="btn ghost" data-action="dashboard" type="button">${icon("home")} Dashboard</button>
         </div>
         <form class="card custom-practice" data-form="custom-practice">
           <div>
             <p class="eyebrow">Custom Practice</p>
-            <h2>Build a drill</h2>
+            <h2>Build a focused drill</h2>
+            <small>Choose the section, item count, and difficulty before starting.</small>
           </div>
           <label>Select Category
             <select name="category">${practiceCategoriesForDisplay().map((category) => `<option value="${escapeAttr(category.section)}">${escapeHtml(category.label)}</option>`).join("")}</select>
@@ -1175,14 +1173,22 @@
           </label>
           <button class="btn primary" data-action="custom-practice-submit" type="button">${icon("play")} Start Custom Practice</button>
         </form>
+        <section class="card category-picker">
+          <div class="card-head">
+            <div>
+              <h2>Quick section practice</h2>
+              <p>Start a 20-item mixed drill from one CSC section.</p>
+            </div>
+          </div>
+          <div class="category-card-grid">
+            ${practiceCategoriesForDisplay().map((category) => categoryPracticeCard(category, categoryStats[category.section])).join("")}
+          </div>
+        </section>
         <section class="note-card">
-          <strong>Study Tip</strong>
-          <p>Use practice sessions after every full mock. The app will keep your timing and accuracy separate from full exam attempts.</p>
-          <button class="btn secondary" data-action="manage-profile" type="button">View Settings</button>
+          <strong>No full-exam data yet?</strong>
+          <p>Practice is still available. Weak-area suggestions become more useful after one submitted mock exam.</p>
         </section>
       </section>
-      ${updatesPopover()}
-      ${profileModal()}
     `);
   }
 
@@ -1239,20 +1245,38 @@
 
   function renderMistakePicker() {
     const completed = completedAttempts();
+    const withMistakes = completed.map((attempt) => ({ attempt, mistakes: wrongAnswers(attempt) })).filter((item) => item.mistakes.length);
     root.innerHTML = sideShell("mistakes", `
       <section class="content-page">
         <div class="page-title-row">
-          <div><p class="eyebrow">Review Mistakes</p><h1>Choose an attempt</h1></div>
-          <button class="btn ghost" data-action="dashboard" type="button">Dashboard</button>
+          <div>
+            <p class="eyebrow">Review Mistakes</p>
+            <h1>Target missed questions</h1>
+            <p>Choose a completed attempt with mistakes, then review only the items that need correction.</p>
+          </div>
+          <button class="btn ghost" data-action="dashboard" type="button">${icon("home")} Dashboard</button>
         </div>
-        <section class="card">
-          ${completed.map((attempt) => `
-            <button class="attempt-select-row" data-review-mistakes="${attempt.id}" type="button">
-              <strong>${escapeHtml(examTitle(attempt))}</strong>
-              <span>${formatDate(attempt.submitted_at || attempt.started_at)}</span>
-              <small>${wrongAnswers(attempt).length} mistakes / ${Math.round(resultPercent(attempt))}%</small>
-            </button>
-          `).join("") || `<p class="empty-note">No completed attempts yet.</p>`}
+        <section class="card mistakes-hub">
+          ${withMistakes.length ? `
+            <div class="mistake-summary">
+              <metric><strong>${withMistakes.reduce((sum, item) => sum + item.mistakes.length, 0)}</strong><span>Total missed items</span></metric>
+              <metric><strong>${withMistakes.length}</strong><span>Attempts to review</span></metric>
+              <metric><strong>${completed.length}</strong><span>Completed attempts</span></metric>
+            </div>
+            <div class="mistake-list">
+              ${withMistakes.map(({ attempt, mistakes }) => `
+                <button class="attempt-select-row" data-review-mistakes="${attempt.id}" type="button">
+                  <span>
+                    <strong>${escapeHtml(examTitle(attempt))}</strong>
+                    <small>${formatDate(attempt.submitted_at || attempt.started_at)}</small>
+                  </span>
+                  <em>${mistakes.length} missed</em>
+                  <b>${Math.round(resultPercent(attempt))}% score</b>
+                  ${icon("arrow")}
+                </button>
+              `).join("")}
+            </div>
+          ` : emptyState("No mistakes to review yet", completed.length ? "Your submitted attempts do not have missed items." : "Complete a mock exam or practice drill first, then missed items will appear here.", "open-setup", "Start Mock Exam")}
         </section>
       </section>
     `);
@@ -1294,10 +1318,8 @@
     return `
       <header class="app-header signed-header">
         <div class="brand">${logo()}${brandText()}</div>
-        <span class="disclaimer-pill">${icon("shield")} Not affiliated with the Civil Service Commission</span>
         <div class="header-actions">
-          <button class="btn ghost" data-action="switch-account" type="button">${icon("switch")} Switch Profile</button>
-          <button class="avatar-button" data-action="manage-profile" type="button">${avatar(profile)}</button>
+          <button class="account-button" data-action="account-settings" type="button">${avatar(profile)}<span>${escapeHtml(profile?.name || "Account")}</span>${icon("chev")}</button>
         </div>
       </header>
       ${content}
@@ -1311,7 +1333,7 @@
       <div class="side-layout">
         <aside class="side-nav">
           <div class="side-brand">${logo()}<div><strong>CSC Practice Reviewer</strong><span>Professional Level</span></div></div>
-          <button class="side-profile" data-action="manage-profile" type="button">${avatar(profile)}<span><strong>${escapeHtml(profile?.name || "Reviewer")}</strong><small>${escapeHtml(profile?.email || "")}</small></span>${icon("chev")}</button>
+          <button class="side-profile" data-action="account-settings" type="button">${avatar(profile)}<span><strong>${escapeHtml(profile?.name || "Reviewer")}</strong><small>${escapeHtml(profile?.email || "")}</small></span>${icon("chev")}</button>
           <nav>
             ${sideNavItem("dashboard", "Dashboard", "home", active)}
             ${sideNavItem("setup", "Start Full Mock Exam", "play", active)}
@@ -1348,9 +1370,8 @@
   }
 
   function avatar(profile, size = "") {
-    const preset = Number(profile?.avatar_preset || 0) % AVATARS.length;
-    const label = initials(profile?.name || AVATARS[preset]);
-    return `<span class="avatar ${size} tone-${preset}">${escapeHtml(label)}</span>`;
+    const label = initials(profile?.name || profile?.email || "Reviewer");
+    return `<span class="avatar ${size} tone-account">${escapeHtml(label)}</span>`;
   }
 
   function profileModal() {
@@ -1358,60 +1379,40 @@
     const profile = app.profile;
     return `
       <div class="modal-backdrop">
-        <section class="profile-modal">
+        <section class="profile-modal account-settings-modal">
           <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
           <div class="modal-heading">
-            <h2>Manage Profile</h2>
-            <p>Edit your information or switch profile.</p>
+            <h2>Account Settings</h2>
+            <p>Update your account information.</p>
           </div>
-          <div class="profile-modal-grid">
-            <div class="switch-column">
-              <h3>Switch Profile</h3>
-              <button class="profile-switch-row active" type="button">
-                ${avatar(profile)}
-                <span><strong>${escapeHtml(profile.name)}</strong><small>${escapeHtml(profile.email)}</small></span>
-                <em>Current</em>
-              </button>
-              <button class="profile-switch-row" data-action="signout" type="button">
-                <span class="avatar tone-5">${icon("logout")}</span>
-                <span><strong>Use another account</strong><small>Sign out and choose a different profile.</small></span>
-                ${icon("chev")}
-              </button>
-              <div class="tip-box"><strong>Tip</strong><p>Your progress is tied to this signed-in email account.</p></div>
+          <form class="account-settings-form" data-form="profile">
+            <div class="account-avatar-panel">
+              ${avatar(profile, "large")}
             </div>
-            <form class="edit-profile-form" data-form="profile">
-              <div class="edit-avatar-block">
-                ${avatar(profile, "large")}
-                <button class="btn secondary" type="button">${icon("edit")} Change Photo</button>
-              </div>
-              <div class="avatar-picker">
-                ${AVATARS.map((label, index) => `<label class="avatar-option"><input type="radio" name="avatarPreset" value="${index}" ${Number(profile.avatar_preset || 0) === index ? "checked" : ""}> <span class="avatar tone-${index}">${label}</span></label>`).join("")}
-              </div>
+            <div class="account-field-grid">
               <label>Full Name<input name="name" value="${escapeAttr(profile.name)}" required /></label>
-              <label>Email<input name="email" value="${escapeAttr(profile.email)}" disabled /></label>
-              <label>Level
-                <select name="level">
-                  <option ${profile.level === "Professional" ? "selected" : ""}>Professional</option>
-                  <option ${profile.level === "Subprofessional" ? "selected" : ""}>Subprofessional</option>
-                </select>
-              </label>
-              <label>Birth Date<input name="birthDate" type="date" value="${escapeAttr(profile.birth_date || "")}" /></label>
-              <label>Notes<textarea name="notes">${escapeHtml(profile.notes || "")}</textarea></label>
-              <div class="modal-actions">
-                <button class="btn ghost" data-action="close-modal" type="button">Cancel</button>
-                <button class="btn primary" data-action="profile-submit" type="button">${icon("save")} Save Changes</button>
+              <label>Email Address <small>(used for sign-in)</small><input name="email" value="${escapeAttr(profile.email)}" disabled /></label>
+              <label class="span-2">Study Goal / Notes<textarea name="notes">${escapeHtml(profile.notes || "Pass the Professional Civil Service Exam this year.")}</textarea></label>
+            </div>
+            <details class="account-password-panel">
+              <summary>${icon("lock")} <span>Change Password</span>${icon("chev")}</summary>
+              <div class="account-password-grid" data-form="change-password">
+                <label>Current Password<div class="field-with-icon has-toggle">${icon("key")}<input name="currentPassword" type="password" autocomplete="current-password" /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
+                <label>New Password<div class="field-with-icon has-toggle">${icon("key")}<input name="newPassword" type="password" minlength="8" autocomplete="new-password" /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
+                <label>Confirm New Password<div class="field-with-icon has-toggle">${icon("key")}<input name="confirmNewPassword" type="password" minlength="8" autocomplete="new-password" /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
               </div>
-              <details class="password-details">
-                <summary>Change Password</summary>
-                <div class="mini-form" data-form="change-password">
-                  <label>Current Password<input name="currentPassword" type="password" autocomplete="current-password" /></label>
-                  <label>New Password<input name="newPassword" type="password" minlength="8" autocomplete="new-password" /></label>
-                  <button class="btn secondary" data-action="password-submit" type="button">${icon("key")} Change Password</button>
-                </div>
-              </details>
-              <button class="delete-link" data-action="delete-profile" type="button">Delete This Profile</button>
+              <button class="btn secondary account-password-save" data-action="password-submit" type="button">${icon("key")} Update Password</button>
+            </details>
+            <div class="account-modal-actions">
+              <button class="btn ghost" data-action="signout" type="button">${icon("logout")} Sign Out</button>
+              <span></span>
+              <button class="btn secondary" data-action="close-modal" type="button">Cancel</button>
+              <button class="btn primary" data-action="profile-submit" type="button">${icon("save")} Save Changes</button>
+            </div>
+            <div class="account-danger-row">
+              <button class="btn danger outline" data-action="delete-profile" type="button">${icon("delete")} Delete Account</button>
+            </div>
             </form>
-          </div>
         </section>
       </div>
     `;
@@ -1530,17 +1531,26 @@
     const rows = attempts.length ? attempts : (fallbackAttempt ? [fallbackAttempt] : []);
     if (!rows.length) return `<p class="empty-note">No attempts yet. Start a full mock exam to build your history.</p>`;
     return `
-      <div class="dashboard-table">
-        <div class="dashboard-table-head"><span>Exam/Session</span><span>Date</span><span>Score</span><span>Answered</span><span>Action</span></div>
+      <div class="dashboard-attempt-list">
         ${rows.map((attempt) => `
-          <div class="dashboard-table-row">
-            <span><strong>${escapeHtml(examTitle(attempt))}</strong><small>${attempt.mode === "practice" ? "Category Practice" : "Full Mock Exam"}</small></span>
-            <span>${formatDate(attempt.submitted_at || attempt.started_at)}</span>
-            <span>${attempt.status === "submitted" || attempt.status === "timed_out" ? `${Math.round(resultPercent(attempt))}%` : statusLabel(attempt.status)}</span>
-            <span>${answeredCount(attempt)}/${attempt.total_questions}</span>
-            <span><button class="btn tiny" data-attempt-open="${attempt.id}" type="button">${attempt.status === "submitted" || attempt.status === "timed_out" ? "Review" : "Continue"}</button></span>
-          </div>
+          <button class="dashboard-attempt-row" data-attempt-open="${attempt.id}" type="button">
+            <span><strong>${escapeHtml(examTitle(attempt))}</strong><small>${attempt.mode === "practice" ? "Practice" : "Full Mock"} / ${formatDate(attempt.submitted_at || attempt.started_at)}</small></span>
+            <em>${attempt.status === "submitted" || attempt.status === "timed_out" ? `${Math.round(resultPercent(attempt))}%` : statusLabel(attempt.status)}</em>
+            <b>${answeredCount(attempt)}/${attempt.total_questions}</b>
+            ${icon("arrow")}
+          </button>
         `).join("")}
+      </div>
+    `;
+  }
+
+  function emptyState(title, body, action, label) {
+    return `
+      <div class="empty-state">
+        <span class="card-icon document-icon">${icon("review")}</span>
+        <strong>${escapeHtml(title)}</strong>
+        <p>${escapeHtml(body)}</p>
+        ${action ? `<button class="btn primary" data-action="${escapeAttr(action)}" type="button">${label ? escapeHtml(label) : "Continue"}</button>` : ""}
       </div>
     `;
   }
@@ -1850,15 +1860,19 @@
       app.modal = null;
       return setView({ name: "recent" }) || true;
     }
-    if (action === "mistakes-page" || action === "bookmarks-page") {
+    if (action === "mistakes-page") {
+      app.fixtureState = "mistakes";
+      return setView({ name: "mistakes" }) || true;
+    }
+    if (action === "bookmarks-page") {
       app.fixtureState = "review";
-      app.reviewFilter = "wrong";
+      app.reviewFilter = "flagged";
       return setView({ name: "review", attemptId: submitted.id, index: 0 }) || true;
     }
-    if (action === "manage-profile" || action === "switch-account") {
-      app.fixtureState = "profile-modal";
-      app.modal = "profile";
-      return setView({ name: "dashboard" }) || true;
+      if (action === "manage-profile" || action === "switch-account" || action === "account-settings") {
+        app.fixtureState = "profile-modal";
+        app.modal = "profile";
+        return setView({ name: "dashboard" }) || true;
     }
     if (action === "close-modal") {
       app.modal = null;
@@ -1947,9 +1961,8 @@
       if (action === "mistakes-page") return setView({ name: "mistakes" });
       if (action === "bookmarks-page") return setView({ name: "bookmarks" });
       if (action === "results-history-page") return setView({ name: "recent" });
-      if (action === "manage-profile") return openModal("profile");
+      if (action === "manage-profile" || action === "account-settings") return openModal("profile");
       if (action === "close-modal") return closeModal();
-      if (action === "switch-account") return openModal("profile");
       if (action === "signout") return await signOut();
       if (action === "forgot-password") return await forgotPassword();
       if (action === "save-setup") return await saveSetupDraft();
@@ -2083,6 +2096,9 @@
     const email = app.profile.email;
     const currentPassword = data.currentPassword;
     const newPassword = data.newPassword;
+    if (data.confirmNewPassword !== undefined && newPassword !== data.confirmNewPassword) {
+      throw new Error("New passwords do not match.");
+    }
     const signInResult = await app.client.auth.signInWithPassword({ email, password: currentPassword });
     if (signInResult.error) throw signInResult.error;
     const { error } = await app.client.auth.updateUser({ password: newPassword });
@@ -2095,9 +2111,8 @@
     const updates = {
       user_id: app.session.user.id,
       name: formData.name.trim(),
-      avatar_preset: Number(formData.avatarPreset || 0),
-      level: formData.level,
-      birth_date: formData.birthDate || null,
+      level: app.profile.level || "Professional",
+      birth_date: app.profile.birth_date || null,
       notes: formData.notes || "",
       last_active_at: nowIso()
     };
@@ -2364,6 +2379,11 @@
   function navigateQuestion(delta) {
     const attempt = getAttempt(app.view.attemptId);
     if (!attempt) return;
+    const answer = currentAnswer(attempt);
+    if (delta > 0 && answer && !answer.selected_choice) {
+      showToast("Choose an answer or use Skip.");
+      return;
+    }
     gotoQuestion(Math.min(Math.max(0, attempt.current_question_index + delta), attempt.total_questions - 1));
   }
 

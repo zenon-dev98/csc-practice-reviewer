@@ -396,3 +396,51 @@ Completion notes:
 - Replaced left feature cards with v2 icon-circle-plus-label rows for create and sign-in.
 - Updated `?fixture=select` to render the v2 sign-in state instead of the stale profile-picker list.
 - Screenshot QA was saved under `qa/t0020-account-final` for create account, sign-in, password-visible, fixture select, and mismatch validation states.
+
+## T0021 - Mockup Adaptation Rule Hardening
+
+Status: done
+
+Make the screenshot-parity agent rules explicit about the visual defects found during auth/profile adaptation.
+
+Acceptance criteria:
+
+- `AGENTS.md` explicitly treats icon quality, icon size, icon positioning, proportional spacing, font style, font size, line height, font color, and contrast as required parity checks.
+- The rules distinguish full-page proportional balance from merely fitting elements into the viewport.
+- The current-state docs record the strengthened UI-quality guardrails.
+
+Completion notes:
+
+- Added explicit first-class parity bullets for icon glyph quality, icon sizing/positioning, full-composition spacing proportions, typography style, hierarchy scale, line height, and color/contrast roles.
+- Kept this as a documentation-only change so the next dashboard repair can apply the stricter rules cleanly.
+
+## T0022 - Post-Sign-In Flow Rework And Edge QA
+
+Status: done
+
+Rework the signed-in app states after the auth repair so dashboard, account settings, practice, mistakes, recent attempts, and exam controls behave coherently and meet the hardened screenshot-quality rules.
+
+Acceptance criteria:
+
+- Manage Profile is retired and replaced with Account Settings, opened only from the upper-right account/avatar control.
+- Switch Profile, Edit Profile, visible signed-in header disclaimer pill, preset profile photos, and the old profile-switch modal are removed from signed-in flows.
+- Account Settings follows `states/v2/account_settings.png` direction with account fields, password controls, Sign Out, and Delete Account.
+- The dashboard no longer links to redundant dashboard-like side pages; Practice and Review Mistakes open meaningful customization/selection states with no-data empty states where needed.
+- Recent Attempts can show more than two attempts without broken layout.
+- Time-left and answered trackers remain stable, and Supabase auth/token events do not force the user back to the dashboard while answering.
+- The Next button cannot advance from an unanswered question; Skip is the explicit way to leave an unanswered item.
+- Exam sidebar hover/scroll behavior is visually stable and does not shift the layout.
+- Maximized Microsoft Edge screenshots and interaction checks are captured after implementation, and visible defects are iterated before completion.
+
+Completion notes:
+
+- Retired signed-in Switch Profile, Edit Profile, preset profile photos, and the signed-in header disclaimer pill.
+- Replaced Manage Profile with Account Settings, opened from the upper-right account control and side-nav account row.
+- Reworked dashboard recent attempts into compact rows and added full Recent Attempts handling for more than two attempts.
+- Reworked Practice by Category into a custom-practice setup plus quick section practice, with no-data guidance.
+- Reworked Review Mistakes into a targeted missed-question hub with summary cards, attempt rows, and an empty state.
+- Stabilized Supabase auth refresh handling so token events no longer force a dashboard reset while answering.
+- Changed Next so it is disabled on unanswered questions; Skip is the explicit unanswered navigation action.
+- Hid the exam navigator scrollbar while preserving bounded internal scrolling and stable hover behavior.
+- Cache-busted static assets through `v=20260706-1`.
+- Maximized Microsoft Edge QA screenshots were saved under `qa/t0022-edge-final`, `qa/t0022-edge-r7`, and `qa/t0022-edge-r8`.

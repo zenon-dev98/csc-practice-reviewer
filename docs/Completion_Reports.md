@@ -868,3 +868,69 @@ Verification:
 Risks:
 
 - Only `states/v2/sign_in.png` exists, so create account remains a proportional adaptation rather than a direct v2 create-account copy.
+
+## 2026-07-05 - T0021 Mockup Adaptation Rule Hardening
+
+Summary:
+
+- Hardened the project UI adaptation rules around the concrete defects found during the auth/profile mockup work.
+
+Files changed:
+
+- `AGENTS.md`
+- `docs/Tickets.md`
+- `docs/Repo_Current_State.md`
+- `docs/Known_Issues_And_Followups.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- Documentation-only change; no app build or browser QA was required.
+
+Verification:
+
+- `AGENTS.md` now explicitly requires icon quality, icon sizing, icon positioning, proportional spacing, font style, font sizes, line heights, font colors, and contrast-role checks during screenshot-parity UI work.
+
+Risks:
+
+- The rules still need to be applied screen by screen; dashboard cleanup is the next UI repair target.
+
+## 2026-07-06 - T0022 Post-Sign-In Flow Rework And Edge QA
+
+Summary:
+
+- Reworked signed-in flows after the account-auth repair.
+- Retired Manage Profile/Switch Profile/Edit Profile/preset photos from signed-in surfaces and replaced them with Account Settings.
+- Reworked Practice, Review Mistakes, Recent Attempts, and exam navigation behavior so the states make product sense and fit the maximized Edge viewport.
+
+Files changed:
+
+- `app/index.html`
+- `app/app.js`
+- `app/styles.css`
+- `docs/Tickets.md`
+- `docs/Repo_Current_State.md`
+- `docs/Known_Issues_And_Followups.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- `node --check app\app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- Maximized Microsoft Edge Playwright screenshot and interaction checks for dashboard, account settings, practice, mistakes, recent attempts, exam, pause, submit, graph modal, and Next/Skip behavior
+
+Verification:
+
+- Static data validation, JavaScript syntax, dependency check, and Impeccable detector passed.
+- Maximized Microsoft Edge QA ran at `1528x732` with no document/body scrollbars and no console errors on checked states.
+- Next is disabled on unanswered questions, becomes available after answer selection, and Skip remains the explicit unanswered navigation action.
+- Supabase auth token refresh handling no longer reloads the dashboard for an already signed-in active session.
+- Practice custom controls were rechecked after repair: the button bottom is inside the card bottom, with no page overflow.
+- QA screenshots were saved under `qa/t0022-edge-final`, `qa/t0022-edge-r7`, and `qa/t0022-edge-r8`.
+
+Risks:
+
+- The signed-in side pages are optimized for the current desktop/Edge priority. Mobile remains secondary and should get its own polish pass if it becomes important.
+- The app still uses the existing inline icon set, so exact glyph parity with generated mockups remains limited unless the icon system itself is replaced.

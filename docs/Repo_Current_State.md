@@ -1,6 +1,6 @@
 # Repo Current State
 
-Last updated: 2026-07-05
+Last updated: 2026-07-06
 
 ## Workspace
 
@@ -83,12 +83,16 @@ Current source item boundaries:
 - Browser fixture QA has been run for `create`, `select`, `dashboard`, `setup`, `exam`, `exam-collapsed`, `graph`, `pause`, `submit`, `results`, `review`, `practice`, `recent`, and `profile-modal` at `1904x913` and `1536x816`; document/body scrollbars and sampled container overflow are clean after T0014.
 - Microsoft Edge-channel desktop QA exposed and repaired the T0013 forced-fit visual regression: dashboard cards now keep proportional row spacing, exam question groups use bounded internal sidebar scrolling, result/fun-fact cards fit without clipping, and the profile modal is compact without giant blank zones. Static assets are cache-busted through `v=20260705-3`.
 - The public auth entry states now use account language and the `states/v2/sign_in.png` direction: create account includes two-column password/confirm-password fields with eye toggles and validation, sign-in uses the v2 icon-label left rail and `New here? Create account` switch, and static assets are cache-busted through `v=20260705-9`.
+- The project screenshot-parity rules now explicitly require optical checks for icon glyph quality, icon size, icon positioning, proportional full-page spacing, font family/style, font hierarchy sizes, line heights, font colors, and contrast roles before UI work can be called complete.
+- Signed-in account-era flows have been reworked: the signed-in header now uses only the brand and upper-right account control, Account Settings replaces Manage Profile, Switch/Edit Profile and preset profile photos are retired, Practice and Review Mistakes now open purposeful setup/review hubs, Recent Attempts can display more than two attempts, and exam Next/Skip behavior is explicit.
+- Maximized Microsoft Edge QA for T0022 ran at `1528x732` with no document/body scrollbars or console errors on the checked signed-in states. QA screenshots are saved under `qa/t0022-edge-final`, `qa/t0022-edge-r7`, and `qa/t0022-edge-r8`.
+- Static assets are cache-busted through `v=20260706-1`.
 - Stitch was used in an authenticated browser session to generate the `Civil Service Exam Cockpit` dashboard direction. Stitch's `Code to Clipboard` export returned the original prompt rather than source code, so the app implementation was manually matched to the generated visual and agent summary.
 
 ## Current Active Ticket
 
-- No active implementation ticket. T0020 is complete.
+- No active implementation ticket. T0022 is complete.
 
 ## Next Ticket
 
-- Add a Supabase backup/export workflow before broader public use.
+- Supabase backup/export workflow before broader public use, or a content pedagogy review pass for the generated bank.
