@@ -41,7 +41,10 @@
     "results",
     "review",
     "practice",
+    "mistakes",
+    "flagged",
     "recent",
+    "progress",
     "profile-modal"
   ]);
   const PRACTICE_CATEGORIES = SECTION_GROUPS.map((group) => ({
@@ -83,6 +86,7 @@
     expandedNavGroups: new Set(),
     reviewFilter: "all",
     recentTab: "all",
+    practiceReviewTab: "practice",
     questionVersion: "1",
     fixtureMode: false,
     fixtureState: ""
@@ -128,7 +132,7 @@
         const hadSession = Boolean(app.session);
         app.session = session;
         if (session) {
-          if (!hadSession || event === "SIGNED_IN" || app.view.name === "boot" || app.view.name === "create" || app.view.name === "signin") {
+          if (!hadSession || app.view.name === "boot" || app.view.name === "create" || app.view.name === "signin") {
             await loadUserData();
             app.modal = null;
             setView({ name: "dashboard" });
@@ -174,6 +178,7 @@
     app.modal = null;
     app.reviewFilter = "all";
     app.recentTab = "all";
+    app.practiceReviewTab = "practice";
     app.expandedNavGroups.clear();
 
     const active = getAttempt("fixture-active");
@@ -187,8 +192,11 @@
     if (fixtureState === "create") return setView({ name: "create" });
     if (fixtureState === "select") return setView({ name: "signin" });
     if (fixtureState === "setup") return setView({ name: "setup" });
-    if (fixtureState === "practice") return setView({ name: "practice" });
-    if (fixtureState === "recent") return setView({ name: "recent" });
+    if (fixtureState === "practice" || fixtureState === "mistakes" || fixtureState === "flagged") {
+      app.practiceReviewTab = fixtureState === "mistakes" ? "mistakes" : fixtureState === "flagged" ? "flagged" : "practice";
+      return setView({ name: "practice" });
+    }
+    if (fixtureState === "recent" || fixtureState === "progress") return setView({ name: "recent" });
     if (fixtureState === "results") return setView({ name: "results", attemptId: submitted.id });
     if (fixtureState === "review") return setView({ name: "review", attemptId: submitted.id, index: 42 });
     if (fixtureState === "profile-modal") {
@@ -697,111 +705,69 @@
   }
 
   function renderDashboard() {
-    const profile = app.profile;
     const attempts = app.attempts;
     const completed = completedAttempts();
     const activeAttempt = attempts.find((attempt) => attempt.status === "in_progress" || attempt.status === "paused");
-    const latestCompleted = completed[0];
-    const average = averagePercent(completed);
-    const best = completed.reduce((highest, attempt) => Math.max(highest, resultPercent(attempt)), 0);
     const totalFlagged = attempts.reduce((sum, attempt) => sum + flaggedCount(attempt), 0);
-    const categoryStats = categoryPerformance(completed);
+    const totalMistakes = wrongAnswerCount(completed);
     root.innerHTML = authedShell(`
-      <section class="dash-page screenshot-dashboard">
-        <div class="page-title-row dashboard-title">
+      <section class="dash-page home-page screenshot-dashboard">
+        <div class="page-title-row home-title">
           <div>
-            <h1>Dashboard</h1>
-            <p>Pick the next review action for this account.</p>
+            <h1>Home</h1>
+            <p>Pick your next review action.</p>
           </div>
         </div>
 
-        <div class="dashboard-grid">
-          <section class="card profile-summary dashboard-card">
-            <div class="profile-main">
-              ${avatar(profile, "large")}
-              <div>
-                <h2>Welcome back, ${escapeHtml(profile.name)}</h2>
-                <p>${escapeHtml(profile.email)}</p>
-                <span>${escapeHtml(profile.level || "Professional")} Mock Exam Reviewer</span>
-              </div>
-            </div>
-            <div class="profile-facts">
-              <span>${icon("clock")} Last active: Today</span>
-              <span>${icon("review")} ${completed.length} mock exams completed</span>
-            </div>
-          </section>
-
-          <section class="card continue-card dashboard-card ${activeAttempt ? "" : "disabled-card"}">
+        <div class="home-actions-grid">
+          <section class="card home-action-card home-card-continue ${activeAttempt ? "" : "disabled-card"}">
             <span class="card-icon clock-icon">${icon("clock")}</span>
-            <div>
+            <div class="home-card-copy">
               <h2>Continue Last Exam</h2>
               <p>${activeAttempt ? `Question ${activeAttempt.current_question_index + 1} of ${activeAttempt.total_questions}` : "No active exam yet"}</p>
             </div>
-            <div class="resume-facts">
+            <div class="home-card-facts">
               <span>${activeAttempt ? `${answeredCount(activeAttempt)} answered` : "0 answered"}</span>
               <span>${activeAttempt ? `Time left: ${formatDuration(timeRemaining(activeAttempt))}` : "Time left: 3:10:00"}</span>
             </div>
             <button class="btn primary" data-action="resume-exam" type="button" ${activeAttempt ? "" : "disabled"}>${icon("play")} Resume Exam</button>
           </section>
 
-          <section class="card start-card dashboard-card">
+          <section class="card home-action-card home-card-start">
             <span class="card-icon document-icon">${icon("review")}</span>
-            <div class="card-head">
+            <div class="home-card-copy">
               <h2>Start Full Mock Exam</h2>
-              <span>170 items</span>
+              <p>Simulate the timed Professional practice exam.</p>
             </div>
-            <div class="mini-facts">
+            <div class="home-card-facts">
+              <span>170 items</span>
               <span>3 hours 10 minutes</span>
               <span>20 versions</span>
             </div>
-            <p>Simulates the Professional Civil Service Exam for independent practice.</p>
             <button class="btn primary" data-action="open-setup" type="button">${icon("play")} Start Exam</button>
           </section>
 
-          <section class="card wide practice-panel dashboard-card">
-            <div class="card-head">
-              <div>
-                <h2>Practice by Category</h2>
-                <p>Build speed in one CSC skill area at a time.</p>
-              </div>
+          <section class="card home-action-card home-card-review">
+            <span class="card-icon flag-icon">${icon("bookmark")}</span>
+            <div class="home-card-copy">
+              <h2>Practice & Review</h2>
+              <p>Build drills, revisit missed items, and review flagged questions.</p>
             </div>
-            <div class="category-card-grid compact">
-              ${practiceCategoriesForDisplay().map((category) => dashboardCategoryCard(category, categoryStats[category.section])).join("")}
+            <div class="home-card-facts">
+              <span>${totalMistakes} missed</span>
+              <span>${totalFlagged} flagged</span>
+              <span>${completed.length} completed</span>
             </div>
-          </section>
-
-          <section class="card review-card dashboard-card">
-            <span class="card-icon flag-icon">${icon("flag")}</span>
-            <h2>Review Mistakes</h2>
-            <p>${wrongAnswerCount(completed) ? `${wrongAnswerCount(completed)} missed items are ready for targeted review.` : "No mistakes yet. Complete an exam first."}</p>
-            <button class="btn secondary" data-action="mistakes-page" type="button" ${wrongAnswerCount(completed) ? "" : "disabled"}>${icon("review")} Review Mistakes</button>
-          </section>
-
-          <section class="card progress-card dashboard-card">
-            <div class="card-head"><h2>Progress Summary</h2></div>
-            <div class="metric-grid">
-              <metric><strong>${average == null ? "--" : `${Math.round(average)}%`}</strong><span>Average Score</span></metric>
-              <metric><strong>${completed.length ? `${Math.round(best)}%` : "--"}</strong><span>Best Score</span></metric>
-              <metric><strong>${completed.length}</strong><span>Completed Mock Exams</span></metric>
-              <metric><strong>${totalFlagged}</strong><span>Flagged Questions</span></metric>
-            </div>
-          </section>
-
-          <section class="card performance-card dashboard-card">
-            <div class="card-head"><h2>Category Performance</h2></div>
-            <div class="performance-bars">
-              ${practiceCategoriesForDisplay().map((category) => progressBarRow(category, categoryPercent(categoryStats[category.section], category.section))).join("")}
-            </div>
-          </section>
-
-          <section class="card recent-card dashboard-card">
-            <div class="card-head">
-              <h2>Recent Attempts</h2>
-              <button class="btn ghost" data-action="recent-page" type="button">View All</button>
-            </div>
-            ${dashboardRecentTable(attempts.slice(0, 3), latestCompleted)}
+            <button class="btn secondary" data-action="practice-page" type="button">${icon("review")} Open Practice & Review</button>
           </section>
         </div>
+
+        <section class="home-summary-strip">
+          <span><strong>${completed.length}</strong><small>completed mock exams</small></span>
+          <span><strong>${totalMistakes}</strong><small>missed items ready for review</small></span>
+          <span><strong>${totalFlagged}</strong><small>flagged questions saved</small></span>
+          <button class="btn ghost" data-action="recent-page" type="button">${icon("stats")} Open Progress</button>
+        </section>
       </section>
       ${profileModal()}
       ${toast()}
@@ -819,7 +785,7 @@
             <p class="eyebrow">Professional Mock Exam</p>
             <h1>Exam Setup</h1>
           </div>
-          <button class="btn ghost" data-action="dashboard" type="button">${icon("back")} Back to Dashboard</button>
+          <button class="btn ghost" data-action="dashboard" type="button">${icon("back")} Back to Home</button>
         </div>
 
         <div class="setup-grid">
@@ -978,7 +944,7 @@
             <h1>${isPractice ? "Practice Complete" : "Results Summary"}</h1>
             <p>${isPractice ? "Review your focused drill performance." : "Your mock exam performance and next-step review details."}</p>
           </div>
-          <button class="btn ghost" data-action="dashboard" type="button">${icon("home")} Back to Dashboard</button>
+          <button class="btn ghost" data-action="dashboard" type="button">${icon("home")} Back to Home</button>
         </div>
         <section class="result-summary-grid">
           <div class="card result-message-card">
@@ -1053,7 +1019,7 @@
 
         <div class="bottom-actions">
           <button class="btn primary" data-action="review-answers" type="button">${icon("review")} Review Answers</button>
-          <button class="btn secondary" data-action="dashboard" type="button">${icon("home")} Back to Dashboard</button>
+          <button class="btn secondary" data-action="dashboard" type="button">${icon("home")} Back to Home</button>
           <button class="btn secondary" data-action="retake-setup" type="button">${icon("refresh")} Retake Exam</button>
         </div>
       </section>
@@ -1141,53 +1107,18 @@
   }
 
   function renderPractice() {
-    const categoryStats = categoryPerformance(completedAttempts());
+    const tab = app.practiceReviewTab || "practice";
     root.innerHTML = sideShell("practice", `
-      <section class="content-page">
+      <section class="content-page practice-review-page">
         <div class="page-title-row">
           <div>
-            <h1>Practice by Category</h1>
-            <p>Choose a focused drill and strengthen one exam area at a time.</p>
+            <h1>Practice & Review</h1>
+            <p>Build drills, revisit missed items, and review flagged questions.</p>
           </div>
-          <button class="btn ghost" data-action="dashboard" type="button">${icon("home")} Dashboard</button>
+          <button class="btn ghost" data-action="dashboard" type="button">${icon("home")} Home</button>
         </div>
-        <form class="card custom-practice" data-form="custom-practice">
-          <div>
-            <p class="eyebrow">Custom Practice</p>
-            <h2>Build a focused drill</h2>
-            <small>Choose the section, item count, and difficulty before starting.</small>
-          </div>
-          <label>Select Category
-            <select name="category">${practiceCategoriesForDisplay().map((category) => `<option value="${escapeAttr(category.section)}">${escapeHtml(category.label)}</option>`).join("")}</select>
-          </label>
-          <label>Number of Questions
-            <select name="count">${[10, 20, 30, 40, 60].map((count) => `<option value="${count}" ${count === 10 ? "selected" : ""}>${count}</option>`).join("")}</select>
-          </label>
-          <label>Difficulty
-            <select name="difficulty">
-              <option value="mixed">Mixed</option>
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
-          </label>
-          <button class="btn primary" data-action="custom-practice-submit" type="button">${icon("play")} Start Custom Practice</button>
-        </form>
-        <section class="card category-picker">
-          <div class="card-head">
-            <div>
-              <h2>Quick section practice</h2>
-              <p>Start a 20-item mixed drill from one CSC section.</p>
-            </div>
-          </div>
-          <div class="category-card-grid">
-            ${practiceCategoriesForDisplay().map((category) => categoryPracticeCard(category, categoryStats[category.section])).join("")}
-          </div>
-        </section>
-        <section class="note-card">
-          <strong>No full-exam data yet?</strong>
-          <p>Practice is still available. Weak-area suggestions become more useful after one submitted mock exam.</p>
-        </section>
+        ${practiceReviewTabs(tab)}
+        ${tab === "mistakes" ? mistakesTabContent() : tab === "flagged" ? flaggedTabContent() : practiceTabContent()}
       </section>
     `);
   }
@@ -1198,20 +1129,26 @@
     const average = averagePercent(completed);
     const highest = completed.reduce((best, attempt) => Math.max(best, resultPercent(attempt)), 0);
     root.innerHTML = sideShell("recent", `
-      <section class="content-page">
+      <section class="content-page progress-page">
         <div class="page-title-row">
           <div>
-            <h1>Recent Attempts</h1>
-            <p>Review your exam and practice session history.</p>
+            <h1>Progress</h1>
+            <p>Track scores, section performance, and attempt history.</p>
           </div>
-          <button class="btn ghost" data-action="dashboard" type="button">${icon("home")} Dashboard</button>
+          <button class="btn ghost" data-action="dashboard" type="button">${icon("home")} Home</button>
         </div>
         <div class="summary-cards">
           <metric><strong>${attempts.length}</strong><span>Total Attempts</span></metric>
-          <metric><strong>${average == null ? "--" : Math.round(average)}</strong><span>Average Score</span></metric>
-          <metric><strong>${completed.length ? Math.round(highest) : "--"}</strong><span>Highest</span></metric>
+          <metric><strong>${average == null ? "--" : `${Math.round(average)}%`}</strong><span>Average Score</span></metric>
+          <metric><strong>${completed.length ? `${Math.round(highest)}%` : "--"}</strong><span>Best Score</span></metric>
           <metric><strong>${activeDays(attempts)}</strong><span>Days Active</span></metric>
         </div>
+        <section class="card performance-card">
+          <div class="card-head"><h2>Category Performance</h2></div>
+          <div class="performance-bars">
+            ${practiceCategoriesForDisplay().map((category) => progressBarRow(category, categoryPercent(categoryPerformance(completed)[category.section], category.section))).join("")}
+          </div>
+        </section>
         <section class="card attempts-table-card">
           <div class="tabs">
             ${[
@@ -1223,7 +1160,7 @@
             ].map(([key, label]) => `<button class="${app.recentTab === key ? "active" : ""}" data-recent-tab="${key}" type="button">${label}</button>`).join("")}
           </div>
           <div class="attempt-table">
-            <div class="table-head"><span>Type</span><span>Date</span><span>Score</span><span>Duration</span><span>Actions</span></div>
+            <div class="table-head"><span>Attempt</span><span>Date</span><span>Score</span><span>Duration</span><span>Actions</span></div>
             ${filteredAttemptsByTab(attempts, app.recentTab).map((attempt) => `
               <div class="table-row">
                 <span><strong>${escapeHtml(examTitle(attempt))}</strong><small>${attempt.mode || "full"}</small></span>
@@ -1231,12 +1168,12 @@
                 <span>${attempt.status === "submitted" || attempt.status === "timed_out" ? `${Math.round(resultPercent(attempt))}%` : statusLabel(attempt.status)}</span>
                 <span>${formatDuration(attempt.elapsed_seconds)}</span>
                 <span class="row-actions">
-                  <button class="btn tiny" data-attempt-results="${attempt.id}" type="button">View Results</button>
+                  <button class="btn tiny" data-attempt-open="${attempt.id}" type="button">${attempt.status === "in_progress" || attempt.status === "paused" ? "Continue" : "View Results"}</button>
                   <button class="icon-only" data-overflow="${attempt.id}" type="button" title="More actions">${icon("more")}</button>
                   ${app.modal === `overflow:${attempt.id}` ? overflowMenu(attempt) : ""}
                 </span>
               </div>
-            `).join("") || `<p class="empty-note">No attempts in this tab.</p>`}
+            `).join("") || emptyInline("No attempts in this tab.", "Attempts appear here after you start a mock exam or practice drill.")}
           </div>
         </section>
       </section>
@@ -1244,63 +1181,116 @@
   }
 
   function renderMistakePicker() {
-    const completed = completedAttempts();
-    const withMistakes = completed.map((attempt) => ({ attempt, mistakes: wrongAnswers(attempt) })).filter((item) => item.mistakes.length);
-    root.innerHTML = sideShell("mistakes", `
-      <section class="content-page">
-        <div class="page-title-row">
-          <div>
-            <p class="eyebrow">Review Mistakes</p>
-            <h1>Target missed questions</h1>
-            <p>Choose a completed attempt with mistakes, then review only the items that need correction.</p>
-          </div>
-          <button class="btn ghost" data-action="dashboard" type="button">${icon("home")} Dashboard</button>
-        </div>
-        <section class="card mistakes-hub">
-          ${withMistakes.length ? `
-            <div class="mistake-summary">
-              <metric><strong>${withMistakes.reduce((sum, item) => sum + item.mistakes.length, 0)}</strong><span>Total missed items</span></metric>
-              <metric><strong>${withMistakes.length}</strong><span>Attempts to review</span></metric>
-              <metric><strong>${completed.length}</strong><span>Completed attempts</span></metric>
-            </div>
-            <div class="mistake-list">
-              ${withMistakes.map(({ attempt, mistakes }) => `
-                <button class="attempt-select-row" data-review-mistakes="${attempt.id}" type="button">
-                  <span>
-                    <strong>${escapeHtml(examTitle(attempt))}</strong>
-                    <small>${formatDate(attempt.submitted_at || attempt.started_at)}</small>
-                  </span>
-                  <em>${mistakes.length} missed</em>
-                  <b>${Math.round(resultPercent(attempt))}% score</b>
-                  ${icon("arrow")}
-                </button>
-              `).join("")}
-            </div>
-          ` : emptyState("No mistakes to review yet", completed.length ? "Your submitted attempts do not have missed items." : "Complete a mock exam or practice drill first, then missed items will appear here.", "open-setup", "Start Mock Exam")}
-        </section>
-      </section>
-    `);
+    app.practiceReviewTab = "mistakes";
+    renderPractice();
   }
 
   function renderBookmarks() {
-    const flagged = app.attempts.flatMap((attempt) => Object.values(attempt.answers).filter((answer) => answer.flagged).map((answer) => ({ attempt, answer })));
-    root.innerHTML = sideShell("bookmarks", `
-      <section class="content-page">
-        <div class="page-title-row">
-          <div><p class="eyebrow">Bookmarks</p><h1>Flagged questions</h1></div>
-          <button class="btn ghost" data-action="dashboard" type="button">Dashboard</button>
+    app.practiceReviewTab = "flagged";
+    renderPractice();
+  }
+
+  function practiceReviewTabs(active) {
+    return `
+      <div class="tabs practice-review-tabs">
+        ${[
+          ["practice", "Practice"],
+          ["mistakes", "Mistakes"],
+          ["flagged", "Flagged"]
+        ].map(([key, label]) => `<button class="${active === key ? "active" : ""}" data-practice-review-tab="${key}" type="button">${escapeHtml(label)}</button>`).join("")}
+      </div>
+    `;
+  }
+
+  function practiceTabContent() {
+    const categoryStats = categoryPerformance(completedAttempts());
+    return `
+      <form class="card custom-practice" data-form="custom-practice">
+        <div>
+          <p class="eyebrow">Custom Practice</p>
+          <h2>Build a focused drill</h2>
+          <small>Choose the section, item count, and difficulty before starting.</small>
         </div>
-        <section class="card bookmark-list">
-          ${flagged.map(({ attempt, answer }) => `
-            <button class="attempt-select-row" data-open-review="${attempt.id}" data-review-question="${answer.question_id}" type="button">
-              <strong>Item ${answer.display_number} - ${escapeHtml(answer.section)}</strong>
-              <span>${escapeHtml(examTitle(attempt))}</span>
-              <small>${answer.selected_choice ? `Selected ${answer.selected_choice}` : "Unanswered"} / ${formatDuration(answer.time_spent_seconds)}</small>
-            </button>
-          `).join("") || `<p class="empty-note">Flag questions during an exam or review to bookmark them.</p>`}
-        </section>
+        <label>Select Category
+          <select name="category">${practiceCategoriesForDisplay().map((category) => `<option value="${escapeAttr(category.section)}">${escapeHtml(category.label)}</option>`).join("")}</select>
+        </label>
+        <label>Number of Questions
+          <select name="count">${[10, 20, 30, 40, 60].map((count) => `<option value="${count}" ${count === 20 ? "selected" : ""}>${count}</option>`).join("")}</select>
+        </label>
+        <label>Difficulty
+          <select name="difficulty">
+            <option value="mixed">Mixed</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </label>
+        <button class="btn primary" data-action="custom-practice-submit" type="button">${icon("play")} Start Custom Practice</button>
+      </form>
+      <section class="card category-picker">
+        <div class="card-head">
+          <div>
+            <h2>Quick section practice</h2>
+            <p>Start a 20-item mixed drill from one CSC section.</p>
+          </div>
+        </div>
+        <div class="category-card-grid">
+          ${practiceCategoriesForDisplay().map((category) => categoryPracticeCard(category, categoryStats[category.section])).join("")}
+        </div>
       </section>
-    `);
+    `;
+  }
+
+  function mistakesTabContent() {
+    const completed = completedAttempts();
+    const withMistakes = completed.map((attempt) => ({ attempt, mistakes: wrongAnswers(attempt) })).filter((item) => item.mistakes.length);
+    return `
+      <section class="card mistakes-hub">
+        ${withMistakes.length ? `
+          <div class="mistake-summary">
+            <metric><strong>${withMistakes.reduce((sum, item) => sum + item.mistakes.length, 0)}</strong><span>Total missed items</span></metric>
+            <metric><strong>${withMistakes.length}</strong><span>Attempts to review</span></metric>
+            <metric><strong>${completed.length}</strong><span>Completed attempts</span></metric>
+          </div>
+          <div class="mistake-list">
+            ${withMistakes.map(({ attempt, mistakes }) => `
+              <button class="attempt-select-row" data-review-mistakes="${attempt.id}" type="button">
+                <span>
+                  <strong>${escapeHtml(examTitle(attempt))}</strong>
+                  <small>${formatDate(attempt.submitted_at || attempt.started_at)}</small>
+                </span>
+                <em>${mistakes.length} missed</em>
+                <b>${Math.round(resultPercent(attempt))}% score</b>
+                ${icon("arrow")}
+              </button>
+            `).join("")}
+          </div>
+        ` : emptyState("No mistakes yet", completed.length ? "Your submitted attempts do not have missed items." : "Complete a mock exam or practice drill first, then missed items will appear here.", "open-setup", "Start Full Mock")}
+      </section>
+    `;
+  }
+
+  function flaggedTabContent() {
+    const flagged = app.attempts.flatMap((attempt) => Object.values(attempt.answers).filter((answer) => answer.flagged).map((answer) => ({ attempt, answer })));
+    return `
+      <section class="card bookmark-list review-queue">
+        ${flagged.length ? flagged.map(({ attempt, answer }) => `
+          <button class="attempt-select-row" data-open-review="${attempt.id}" data-review-question="${answer.question_id}" type="button">
+            <span>
+              <strong>Item ${answer.display_number} - ${escapeHtml(answer.section)}</strong>
+              <small>${escapeHtml(examTitle(attempt))}</small>
+            </span>
+            <em>${answer.selected_choice ? `Selected ${answer.selected_choice}` : "Unanswered"}</em>
+            <b>${formatDuration(answer.time_spent_seconds)}</b>
+            ${icon("arrow")}
+          </button>
+        `).join("") : emptyState("No flagged questions yet", "Flag questions during an exam or review and they will appear here.", "open-setup", "Start Full Mock")}
+      </section>
+    `;
+  }
+
+  function emptyInline(title, body) {
+    return `<div class="empty-inline"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(body)}</span></div>`;
   }
 
   function publicShell(content) {
@@ -1333,17 +1323,13 @@
       <div class="side-layout">
         <aside class="side-nav">
           <div class="side-brand">${logo()}<div><strong>CSC Practice Reviewer</strong><span>Professional Level</span></div></div>
-          <button class="side-profile" data-action="account-settings" type="button">${avatar(profile)}<span><strong>${escapeHtml(profile?.name || "Reviewer")}</strong><small>${escapeHtml(profile?.email || "")}</small></span>${icon("chev")}</button>
+          <button class="side-profile" data-action="account-settings" type="button">${avatar(profile)}<span><strong>${escapeHtml(profile?.name || "Reviewer")}</strong><small>Account Settings</small></span>${icon("chev")}</button>
           <nav>
-            ${sideNavItem("dashboard", "Dashboard", "home", active)}
+            ${sideNavItem("dashboard", "Home", "home", active)}
             ${sideNavItem("setup", "Start Full Mock Exam", "play", active)}
-            ${sideNavItem("practice", "Practice by Category", "grid", active)}
-            ${sideNavItem("mistakes", "Review Mistakes", "review", active)}
-            ${sideNavItem("recent", "Recent Attempts", "clock", active)}
-            ${sideNavItem("results-history", "Results History", "stats", active)}
-            ${sideNavItem("bookmarks", "Bookmarks", "flag", active)}
+            ${sideNavItem("practice", "Practice & Review", "review", active)}
+            ${sideNavItem("recent", "Progress", "stats", active)}
           </nav>
-          <div class="study-tip"><strong>Study Tip</strong><p>Review the section that cost the most time before retaking a full mock.</p></div>
           <button class="btn ghost full" data-action="signout" type="button">${icon("logout")} Log Out</button>
         </aside>
         <main class="side-content">${content}</main>
@@ -1365,7 +1351,7 @@
   }
 
   function sideNavItem(route, label, iconName, active) {
-    const action = route === "results-history" ? "recent-page" : `${route}-page`;
+    const action = route === "dashboard" ? "dashboard" : `${route}-page`;
     return `<button class="${active === route ? "active" : ""}" data-action="${action}" type="button">${icon(iconName)} ${escapeHtml(label)}</button>`;
   }
 
@@ -1425,7 +1411,7 @@
         <section class="pause-modal">
           <span class="pause-icon">${icon("pause")}</span>
           <h2>Exam Paused</h2>
-          <p>Your time is stopped. Resume when ready or save and exit to the dashboard.</p>
+          <p>Your time is stopped. Resume when ready or save and exit to Home.</p>
           <button class="btn primary" data-action="resume-paused" type="button">${icon("play")} Resume Exam</button>
           <button class="btn secondary" data-action="save-exit" type="button">${icon("save")} Save and Exit</button>
         </section>
@@ -1752,9 +1738,9 @@
             <h2>${escapeHtml(stimulus.title || "Shared data set")}</h2>
             <p>${escapeHtml(stimulus.description || stimulus.alt || "")}</p>
           </div>
+          ${reviewMode ? "" : `<button class="btn tiny" data-action="open-chart" type="button">${icon("open")} Open Larger</button>`}
         </div>
         ${groupedChart || (chartRows.length ? `<div class="chart-bars">${chartRows.map((row) => `<div><span>${escapeHtml(row.label)}</span><i><b style="width:${Math.max(6, Math.round((row.total / max) * 100))}%"></b></i><strong>${row.total}</strong></div>`).join("")}</div>` : "")}
-        ${reviewMode ? "" : `<div class="stimulus-actions"><button class="btn tiny" data-action="open-chart" type="button">Zoom</button><button class="btn tiny" data-action="open-chart" type="button">Open Larger</button></div>`}
         ${!groupedChart && headers.length && rows.length ? `<div class="data-table-wrap"><table><thead><tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : ""}
         <div class="linked-items">
           <strong>${escapeHtml(linked.label)}</strong>
@@ -1852,6 +1838,7 @@
     }
     if (action === "practice-page") {
       app.fixtureState = "practice";
+      app.practiceReviewTab = "practice";
       app.modal = null;
       return setView({ name: "practice" }) || true;
     }
@@ -1861,13 +1848,14 @@
       return setView({ name: "recent" }) || true;
     }
     if (action === "mistakes-page") {
-      app.fixtureState = "mistakes";
-      return setView({ name: "mistakes" }) || true;
+      app.fixtureState = "practice";
+      app.practiceReviewTab = "mistakes";
+      return setView({ name: "practice" }) || true;
     }
     if (action === "bookmarks-page") {
-      app.fixtureState = "review";
-      app.reviewFilter = "flagged";
-      return setView({ name: "review", attemptId: submitted.id, index: 0 }) || true;
+      app.fixtureState = "practice";
+      app.practiceReviewTab = "flagged";
+      return setView({ name: "practice" }) || true;
     }
       if (action === "manage-profile" || action === "switch-account" || action === "account-settings") {
         app.fixtureState = "profile-modal";
@@ -1910,6 +1898,11 @@
     if (action === "review-answers") {
       app.fixtureState = "review";
       return setView({ name: "review", attemptId: submitted.id, index: 42 }) || true;
+    }
+    if (target.dataset.practiceReviewTab) {
+      app.practiceReviewTab = target.dataset.practiceReviewTab;
+      app.fixtureState = "practice";
+      return setView({ name: "practice" }) || true;
     }
     if (action === "back-results") {
       app.fixtureState = "results";
@@ -1956,10 +1949,19 @@
       }
       if (action === "dashboard") return setView({ name: "dashboard" });
       if (action === "open-setup" || action === "setup-page" || action === "retake-setup") return setView({ name: "setup" });
-      if (action === "practice-page") return setView({ name: "practice" });
+      if (action === "practice-page") {
+        app.practiceReviewTab = "practice";
+        return setView({ name: "practice" });
+      }
       if (action === "recent-page") return setView({ name: "recent" });
-      if (action === "mistakes-page") return setView({ name: "mistakes" });
-      if (action === "bookmarks-page") return setView({ name: "bookmarks" });
+      if (action === "mistakes-page") {
+        app.practiceReviewTab = "mistakes";
+        return setView({ name: "practice" });
+      }
+      if (action === "bookmarks-page") {
+        app.practiceReviewTab = "flagged";
+        return setView({ name: "practice" });
+      }
       if (action === "results-history-page") return setView({ name: "recent" });
       if (action === "manage-profile" || action === "account-settings") return openModal("profile");
       if (action === "close-modal") return closeModal();
@@ -1997,6 +1999,10 @@
       if (target.dataset.goto !== undefined) return gotoQuestion(Number(target.dataset.goto));
       if (target.dataset.reviewFilter) return setReviewFilter(target.dataset.reviewFilter);
       if (target.dataset.reviewIndex !== undefined) return setView({ ...app.view, index: Number(target.dataset.reviewIndex) });
+      if (target.dataset.practiceReviewTab) {
+        app.practiceReviewTab = target.dataset.practiceReviewTab;
+        return render();
+      }
       if (target.dataset.practiceCategory) return await startPractice(target.dataset.practiceCategory, DEFAULT_PRACTICE_COUNT, "mixed");
       if (target.dataset.attemptOpen) return openAttempt(target.dataset.attemptOpen);
       if (target.dataset.attemptResults) return setView({ name: "results", attemptId: target.dataset.attemptResults });
@@ -2014,7 +2020,10 @@
       }
       if (target.dataset.openReview) {
         app.reviewFilter = "flagged";
-        return setView({ name: "review", attemptId: target.dataset.openReview, index: 0 });
+        const attempt = getAttempt(target.dataset.openReview);
+        const flagged = filteredReviewAnswers(attempt, "flagged");
+        const index = Math.max(0, flagged.findIndex((answer) => answer.question_id === target.dataset.reviewQuestion));
+        return setView({ name: "review", attemptId: target.dataset.openReview, index });
       }
     } catch (error) {
       showToast(readableError(error));
@@ -2120,7 +2129,7 @@
     if (error) throw error;
     app.profile = data;
     closeModal();
-    showToast("Profile saved.");
+    showToast("Account settings saved.");
   }
 
   async function deleteProfile() {
@@ -2151,7 +2160,15 @@
   async function saveSetupDraft(notify = true) {
     const form = document.querySelector("[data-form='setup']");
     const options = form ? formOptions(form) : { ...DEFAULT_OPTIONS };
-    const payload = { user_id: app.session.user.id, options, updated_at: nowIso() };
+    const payload = { user_id: app.session?.user?.id || "local-user", options, updated_at: nowIso() };
+    if (app.fixtureMode || !app.client || !app.session?.user?.id) {
+      app.draft = payload;
+      if (notify) {
+        showToast("Setup saved for later.");
+        setView({ name: "dashboard" });
+      }
+      return;
+    }
     const { data, error } = await app.client.from("setup_drafts").upsert(payload, { onConflict: "user_id" }).select("*").single();
     if (error) throw error;
     app.draft = data;
@@ -2408,7 +2425,9 @@
     attempt.status = "paused";
     attempt.paused_at = nowIso();
     touchAttempt(attempt);
-    await app.client.from("pause_events").insert({ attempt_id: attempt.id, user_id: app.session.user.id, paused_at: attempt.paused_at });
+    if (!app.fixtureMode && app.client && app.session?.user?.id) {
+      await app.client.from("pause_events").insert({ attempt_id: attempt.id, user_id: app.session.user.id, paused_at: attempt.paused_at });
+    }
     await flushDirty({ immediate: true });
     renderExam();
   }
@@ -2419,7 +2438,9 @@
     attempt.status = "in_progress";
     attempt.paused_at = null;
     touchAttempt(attempt);
-    await app.client.from("pause_events").update({ resumed_at: nowIso() }).eq("attempt_id", attempt.id).is("resumed_at", null);
+    if (!app.fixtureMode && app.client && app.session?.user?.id) {
+      await app.client.from("pause_events").update({ resumed_at: nowIso() }).eq("attempt_id", attempt.id).is("resumed_at", null);
+    }
     await flushDirty({ immediate: true });
     renderExam();
   }
@@ -2594,6 +2615,7 @@
   }
 
   function currentAnswer(attempt) {
+    if (!attempt?.answers) return null;
     return Object.values(attempt.answers).find((answer) => answer.position === attempt.current_question_index);
   }
 
@@ -2609,6 +2631,7 @@
   }
 
   function filteredReviewAnswers(attempt, filter) {
+    if (!attempt?.answers) return [];
     const answers = Object.values(attempt.answers).sort(byPosition);
     if (filter === "wrong") return answers.filter((answer) => answer.selected_choice !== answer.correct_choice);
     if (filter === "correct") return answers.filter((answer) => answer.selected_choice === answer.correct_choice);
@@ -2889,6 +2912,7 @@
       clock: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 5v5l4 2",
       stats: "M5 19V9M12 19V5M19 19v-7",
       more: "M5 12h.01M12 12h.01M19 12h.01",
+      open: "M14 4h6v6M20 4l-9 9M5 5h6M5 5v14h14v-6",
       refresh: "M20 12a8 8 0 1 1-2.3-5.7M20 4v6h-6",
       building: "M4 21V5h10v16M14 9h6v12M7 8h2M7 12h2M7 16h2M16 12h2M16 16h2",
       user: "M20 21a8 8 0 0 0-16 0M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",

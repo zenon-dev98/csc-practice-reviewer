@@ -8308,6 +8308,362 @@ body {
   }
 }
 
+/* T0024: final signed-in state repair after visual QA. */
+#app .dash-page.screenshot-dashboard {
+  width: min(1380px, calc(100vw - 96px)) !important;
+  min-height: calc(100vh - 82px) !important;
+  margin: 0 auto !important;
+  padding: clamp(54px, 7vh, 88px) 0 44px !important;
+}
+
+#app .screenshot-dashboard .dashboard-title,
+#app .screenshot-dashboard .home-title {
+  margin-bottom: 18px !important;
+}
+
+#app .home-actions-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 28px !important;
+  align-items: stretch !important;
+}
+
+#app .home-action-card {
+  display: flex !important;
+  position: static !important;
+  flex-direction: column !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+  gap: 18px !important;
+  min-width: 0 !important;
+  min-height: 304px !important;
+  max-height: none !important;
+  padding: 28px !important;
+  overflow: hidden !important;
+}
+
+#app .home-action-card > * {
+  position: static !important;
+}
+
+#app .home-card-copy {
+  display: grid !important;
+  gap: 7px !important;
+  min-height: 84px !important;
+}
+
+#app .home-card-copy h2 {
+  margin: 0 !important;
+  color: #08245a !important;
+  font-size: 26px !important;
+  line-height: 1.08 !important;
+}
+
+#app .home-card-copy p {
+  margin: 0 !important;
+  color: #42567a !important;
+  font-size: 15px !important;
+  line-height: 1.35 !important;
+}
+
+#app .home-card-facts {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 9px !important;
+  min-height: 72px !important;
+  align-content: flex-start !important;
+}
+
+#app .home-card-facts span {
+  display: inline-flex !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  align-items: center !important;
+  padding: 8px 12px !important;
+  white-space: normal !important;
+}
+
+#app .home-action-card > .btn {
+  width: 100% !important;
+  min-height: 52px !important;
+  margin-top: auto !important;
+}
+
+#app .side-content {
+  padding: clamp(42px, 5.2vh, 58px) clamp(34px, 5vw, 72px) !important;
+}
+
+#app .content-page {
+  width: min(1260px, 100%) !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+#app .content-page .page-title-row {
+  align-items: start !important;
+  margin-bottom: 26px !important;
+}
+
+#app .progress-page {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.44fr) !important;
+  gap: 20px !important;
+}
+
+#app .progress-page .page-title-row,
+#app .progress-page .attempts-table-card {
+  grid-column: 1 / -1 !important;
+}
+
+#app .progress-page .summary-cards {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  gap: 12px !important;
+  margin: 0 !important;
+  align-self: end !important;
+}
+
+#app .progress-page .performance-card {
+  grid-column: 1 / -1 !important;
+  min-height: 220px !important;
+}
+
+#app .progress-page .attempts-table-card {
+  min-height: 380px !important;
+}
+
+#app .attempt-table {
+  max-height: 430px !important;
+}
+
+#app .table-head,
+#app .table-row {
+  grid-template-columns: minmax(280px, 1.5fr) 150px 120px 130px 180px !important;
+}
+
+#app .exam-question {
+  align-content: start !important;
+}
+
+#app .question-panel {
+  min-height: 0 !important;
+  align-self: start !important;
+}
+
+#app .question-actions {
+  margin-top: 20px !important;
+  padding-top: 16px !important;
+  border-top: 1px solid #d9e3f0 !important;
+}
+
+#app .exam-body:not(.with-stimulus) .question-panel {
+  max-height: calc(100vh - 126px) !important;
+}
+
+#app .stimulus-head {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+}
+
+#app .stimulus-head .btn.tiny {
+  width: auto !important;
+  min-height: 38px !important;
+  padding: 8px 12px !important;
+  border-radius: 10px !important;
+  white-space: nowrap !important;
+}
+
+#app .stimulus-actions {
+  display: none !important;
+}
+
+#app .results-page {
+  display: grid !important;
+  grid-auto-flow: row !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: none !important;
+  gap: 14px !important;
+  width: min(1360px, calc(100vw - 96px)) !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  padding: clamp(38px, 4.5vh, 48px) 0 30px !important;
+  overflow: hidden !important;
+}
+
+html body #app section.results-page {
+  grid-auto-flow: row !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: none !important;
+}
+
+#app .results-page .page-title-row {
+  margin-bottom: 6px !important;
+}
+
+#app .results-page > * {
+  position: static !important;
+  grid-column: 1 / -1 !important;
+  grid-row: auto !important;
+}
+
+html body #app section.results-page > * {
+  position: static !important;
+  grid-column: 1 / -1 !important;
+  grid-row: auto !important;
+}
+
+#app .result-summary-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 220px !important;
+  gap: 14px !important;
+}
+
+#app .result-message-card,
+#app .final-score-card {
+  min-height: 106px !important;
+  padding: 18px 20px !important;
+}
+
+#app .result-stats-strip {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+#app .result-stats-strip metric {
+  min-height: 72px !important;
+  padding: 14px 16px !important;
+}
+
+#app .results-page > section.card:nth-of-type(3),
+#app .results-page > section.card:nth-of-type(4),
+#app .results-page > .overview-card {
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding: 18px !important;
+}
+
+#app .results-page > section.card:nth-of-type(3) .breakdown-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+#app .results-page > section.card:nth-of-type(4) .insight-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+#app .results-page .insight-card {
+  min-height: 70px !important;
+  padding: 12px !important;
+  overflow: hidden !important;
+}
+
+#app .results-page .insight-card strong {
+  font-size: 13px !important;
+}
+
+#app .results-page .insight-card span {
+  font-size: 17px !important;
+  line-height: 1.15 !important;
+}
+
+#app .results-page .insight-card p {
+  margin-top: 4px !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+
+#app .overview-list {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+#app .overview-list div {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+}
+
+#app .overview-list strong {
+  display: inline-flex !important;
+}
+
+#app .bottom-actions {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  margin-top: 0 !important;
+}
+
+#app .bottom-actions .btn {
+  min-height: 52px !important;
+}
+
+#app .account-modal-actions {
+  grid-template-columns: auto minmax(0, 1fr) auto auto !important;
+}
+
+#app .account-danger-row {
+  justify-content: flex-end !important;
+}
+
+/* Results has older desktop grid rules; keep this reset after every result rule. */
+html body #app section.results-page {
+  display: grid !important;
+  grid-auto-flow: row !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: none !important;
+}
+
+html body #app section.results-page > * {
+  position: static !important;
+  grid-column: 1 / -1 !important;
+  grid-row: auto !important;
+}
+
+@media (max-width: 1180px) {
+  #app .home-actions-grid,
+  #app .result-stats-strip,
+  #app .results-page > section.card:nth-of-type(3) .breakdown-grid,
+  #app .results-page > section.card:nth-of-type(4) .insight-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  #app .progress-page {
+    grid-template-columns: 1fr !important;
+  }
+
+  #app .progress-page .summary-cards {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+}
+
+/* T0024-results-final: last-line reset for old result grid placement. */
+html body #app section.results-page {
+  display: grid !important;
+  grid-auto-flow: row !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: none !important;
+}
+
+html body #app section.results-page > * {
+  position: static !important;
+  grid-column: 1 / -1 !important;
+  grid-row: auto !important;
+}
+
 /* T0017: proportional auth desktop layout. */
 @media (min-width: 1000px) {
   #app:has(.auth-canvas),
@@ -9206,5 +9562,1020 @@ body {
 
   #app .account-settings-form {
     grid-template-columns: 1fr;
+  }
+}
+
+/* T0023: signed-in IA overhaul. Keep auth pages as the visual baseline, then simplify every signed-in state. */
+#app .signed-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  min-height: 76px;
+  padding: 14px clamp(28px, 3vw, 58px);
+  border-bottom: 1px solid #d5e0ef;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+#app .signed-header .brand strong {
+  color: #08245a;
+  font-size: 24px;
+  line-height: 1;
+}
+
+#app .signed-header .brand span {
+  color: #20365f;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: none;
+}
+
+#app .account-button,
+#app .side-profile {
+  min-height: 54px;
+  border: 1px solid #c9d8eb;
+  border-radius: 999px;
+  background: #fff;
+  color: #08245a;
+  box-shadow: 0 14px 34px rgba(8, 36, 90, 0.08);
+  font-weight: 900;
+}
+
+#app .account-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 18px 8px 8px;
+}
+
+#app .avatar {
+  border-color: #cbeee8;
+  background: #dff3f0;
+  color: #00877d;
+}
+
+#app .account-button .avatar {
+  width: 42px;
+  height: 42px;
+  background: #08245a;
+  color: #fff;
+}
+
+#app .dash-page.home-page {
+  min-height: calc(100vh - 76px);
+  max-width: 1500px !important;
+  margin: 0 auto;
+  padding: clamp(38px, 5vh, 64px) clamp(32px, 4vw, 64px) 48px !important;
+  background: transparent;
+}
+
+#app .home-title {
+  margin-bottom: 24px;
+}
+
+#app .home-title h1,
+#app .content-page h1,
+#app .setup-page h1,
+#app .results-page h1,
+#app .review-page h1 {
+  color: #08245a;
+  font-size: clamp(38px, 3.3vw, 54px);
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+#app .home-title p,
+#app .content-page .page-title-row p,
+#app .setup-page .page-title-row p,
+#app .results-page .page-title-row p,
+#app .review-page .page-title-row p {
+  margin-top: 10px;
+  color: #42567a;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+#app .home-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(22px, 2vw, 32px);
+  align-items: stretch;
+}
+
+#app .home-action-card {
+  display: grid !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+  grid-template-rows: auto minmax(84px, auto) auto minmax(54px, auto) !important;
+  align-content: start;
+  gap: 22px !important;
+  width: auto !important;
+  max-width: none !important;
+  min-height: 330px !important;
+  overflow: visible !important;
+  padding: 30px !important;
+  border: 1px solid #cfe0f3 !important;
+  border-radius: 18px !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  box-shadow: 0 22px 58px rgba(8, 36, 90, 0.10) !important;
+}
+
+#app .home-action-card > * {
+  position: static !important;
+}
+
+#app .home-action-card .card-icon,
+#app .content-page .card-icon,
+#app .setup-page .card-icon {
+  display: inline-grid;
+  width: 64px !important;
+  height: 64px !important;
+  place-items: center;
+  border-radius: 20px;
+  background: #dff3f0;
+  color: #00877d;
+}
+
+#app .home-action-card .card-icon .icon {
+  width: 30px;
+  height: 30px;
+}
+
+#app .home-card-copy h2 {
+  color: #08245a;
+  font-size: 28px;
+  line-height: 1.08;
+}
+
+#app .home-card-copy p {
+  margin-top: 8px;
+  color: #42567a;
+  font-size: 16px;
+}
+
+#app .home-card-facts {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-content: start;
+  align-items: flex-start;
+  min-height: 44px;
+}
+
+#app .home-card-facts span,
+#app .mini-facts span,
+#app .overview-list strong,
+#app .status-pill {
+  border: 1px solid #d5e0ef;
+  border-radius: 999px;
+  background: #f7fbff;
+  color: #08245a;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+#app .home-action-card > .btn {
+  align-self: end;
+  margin-top: auto !important;
+  width: 100%;
+  min-height: 54px !important;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+#app .btn.primary {
+  border-color: #008d83;
+  background: #0b9188;
+  color: #fff;
+}
+
+#app .btn.secondary {
+  border-color: #b7c8df;
+  background: #fff;
+  color: #08245a;
+}
+
+#app .btn.ghost {
+  border-color: #c9d8eb;
+  background: #fff;
+  color: #3e506e;
+}
+
+#app .btn.danger {
+  border-color: #b42318;
+  background: #b42318;
+  color: #fff;
+}
+
+#app .side-layout {
+  display: grid !important;
+  grid-template-columns: 282px minmax(0, 1fr) !important;
+  min-height: 100vh;
+  background: #eef5fb;
+}
+
+#app .side-nav {
+  display: grid !important;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 20px !important;
+  min-height: 100vh;
+  overflow: hidden !important;
+  border-right: 1px solid #d5e0ef;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 28px 20px !important;
+}
+
+#app .side-brand strong {
+  color: #08245a;
+  font-size: 20px;
+}
+
+#app .side-brand span {
+  color: #42567a;
+  font-size: 12px;
+  text-transform: none;
+}
+
+#app .side-profile {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border-radius: 14px;
+  padding: 12px;
+  text-align: left;
+}
+
+#app .side-profile .avatar {
+  width: 48px;
+  height: 48px;
+}
+
+#app .side-profile span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+#app .side-profile small {
+  color: #53657e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+#app .side-nav nav {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+#app .side-nav nav button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #42567a;
+  padding: 10px 12px;
+  font-weight: 850;
+  text-align: left;
+}
+
+#app .side-nav nav button.active,
+#app .side-nav nav button:hover {
+  background: #dff3f0;
+  color: #00877d;
+}
+
+#app .side-content {
+  min-width: 0;
+  padding: 0;
+}
+
+#app .side-content .content-page,
+#app .setup-page,
+#app .results-page,
+#app .review-page {
+  max-width: 1460px !important;
+  margin: 0 auto;
+  padding: clamp(30px, 4vh, 54px) clamp(28px, 3vw, 54px) !important;
+}
+
+#app .content-page .page-title-row,
+#app .setup-page > .page-title-row,
+#app .results-page .page-title-row,
+#app .review-page .page-title-row {
+  align-items: start;
+  margin-bottom: 22px;
+}
+
+#app .practice-review-tabs,
+#app .tabs {
+  display: inline-flex !important;
+  width: fit-content;
+  gap: 6px;
+  border: 1px solid #d5e0ef;
+  border-radius: 999px;
+  background: #fff;
+  padding: 5px !important;
+}
+
+#app .practice-review-tabs button,
+#app .tabs button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #42567a;
+  padding: 8px 16px;
+  font-weight: 900;
+}
+
+#app .practice-review-tabs button.active,
+#app .tabs button.active {
+  background: #08245a;
+  color: #fff;
+}
+
+#app .custom-practice {
+  display: grid !important;
+  grid-template-columns: minmax(240px, 1.1fr) repeat(3, minmax(140px, 0.75fr)) minmax(210px, auto) !important;
+  gap: 18px !important;
+  align-items: end !important;
+  min-height: 126px !important;
+  margin-top: 16px !important;
+  padding: 24px !important;
+  border-radius: 16px !important;
+  box-shadow: 0 18px 48px rgba(8, 36, 90, 0.08);
+}
+
+#app .category-picker,
+#app .mistakes-hub,
+#app .bookmark-list,
+#app .attempts-table-card,
+#app .performance-card {
+  margin-top: 18px;
+  border-radius: 16px !important;
+  border-color: #cfe0f3 !important;
+  box-shadow: 0 18px 48px rgba(8, 36, 90, 0.08);
+}
+
+#app .category-picker .category-card-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 18px !important;
+}
+
+#app .category-card {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-height: 250px !important;
+  border-radius: 16px !important;
+  padding: 22px !important;
+}
+
+#app .category-card .category-icon,
+#app .category-symbol {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  font-size: 20px;
+}
+
+#app .mistake-summary,
+#app .summary-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+#app .mistake-summary metric,
+#app .summary-cards metric {
+  min-height: 96px;
+  border: 1px solid #d5e0ef;
+  border-radius: 14px;
+  background: #f7fbff;
+  padding: 18px;
+}
+
+#app .mistake-summary metric strong,
+#app .summary-cards metric strong {
+  color: #00877d;
+  font-size: 30px;
+}
+
+#app .mistake-list,
+#app .review-queue {
+  display: grid;
+  gap: 10px;
+  max-height: 56vh;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+#app .attempt-select-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto auto auto !important;
+  min-height: 72px;
+  align-items: center !important;
+  gap: 18px !important;
+  border: 1px solid #d5e0ef;
+  border-radius: 12px;
+  background: #fff;
+  padding: 16px 18px !important;
+  color: #08245a;
+}
+
+#app .empty-state,
+#app .empty-inline {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 42px 20px;
+  color: #42567a;
+  text-align: center;
+}
+
+#app .empty-state strong,
+#app .empty-inline strong {
+  color: #08245a;
+  font-size: 24px;
+}
+
+#app .attempts-table-card {
+  max-height: none !important;
+  overflow: visible !important;
+  padding: 20px !important;
+}
+
+#app .progress-page .summary-cards,
+#app .progress-page .performance-card,
+#app .progress-page .attempts-table-card {
+  position: static !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+#app .progress-page .summary-cards {
+  margin: 18px 0 0;
+}
+
+#app .progress-page .attempts-table-card {
+  min-height: 420px;
+}
+
+#app .attempt-table {
+  max-height: min(520px, 52vh) !important;
+  margin-top: 14px;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+#app .table-head,
+#app .table-row {
+  grid-template-columns: minmax(240px, 1.4fr) 150px 120px 130px 160px !important;
+  min-height: 54px;
+}
+
+#app .exam-shell {
+  min-height: 100vh;
+  background: #eef5fb;
+}
+
+#app .exam-topbar {
+  min-height: 82px !important;
+  padding: 14px clamp(24px, 2.5vw, 42px) !important;
+  border-bottom: 1px solid #d5e0ef;
+  background: rgba(255, 255, 255, 0.97);
+}
+
+#app .exam-body,
+#app .exam-body.with-stimulus {
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr) !important;
+  gap: 22px !important;
+  height: calc(100vh - 82px) !important;
+  min-height: 0;
+  padding: 22px !important;
+  overflow: hidden;
+}
+
+#app .exam-nav {
+  min-height: 0 !important;
+  max-height: 100% !important;
+  border-radius: 18px !important;
+  overflow: auto !important;
+  scrollbar-width: none !important;
+  padding: 22px !important;
+}
+
+#app .exam-nav .legend {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px 12px !important;
+}
+
+#app .exam-nav .legend span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#app .exam-nav:hover {
+  scrollbar-width: none !important;
+}
+
+#app .exam-question,
+#app .question-panel,
+#app .stimulus-panel {
+  min-height: 0;
+}
+
+#app .exam-question {
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+#app .exam-question::-webkit-scrollbar,
+#app .exam-nav::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+}
+
+#app .question-group {
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+#app .question-group summary {
+  min-height: 58px !important;
+  padding: 14px !important;
+}
+
+#app .question-group summary span {
+  min-width: 0;
+}
+
+#app .question-group summary strong {
+  overflow: hidden;
+  color: #08245a;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#app .question-group summary em {
+  color: #00877d;
+  font-size: 12px;
+}
+
+#app .chip-grid {
+  grid-template-columns: repeat(5, minmax(42px, 1fr)) !important;
+  gap: 9px !important;
+}
+
+#app .chip-grid.is-scroll {
+  max-height: 194px;
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+#app .question-chip {
+  min-width: 0 !important;
+  height: 38px !important;
+  border-radius: 8px !important;
+}
+
+#app .question-panel {
+  border-radius: 18px !important;
+  padding: clamp(22px, 2.2vw, 34px) !important;
+}
+
+#app .choice {
+  min-height: 62px !important;
+  border-radius: 10px !important;
+  padding: 12px 18px !important;
+}
+
+#app .question-actions {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  margin-top: 18px !important;
+}
+
+#app .question-actions .btn {
+  min-height: 48px !important;
+  white-space: nowrap;
+}
+
+#app .exam-body.with-stimulus .exam-question {
+  display: grid !important;
+  grid-template-columns: minmax(360px, 0.95fr) minmax(420px, 1.25fr) !important;
+  gap: 20px !important;
+  overflow: hidden;
+}
+
+#app .exam-body.with-stimulus .stimulus-panel,
+#app .exam-body.with-stimulus .question-panel {
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+#app .exam-body.with-stimulus .stimulus-actions .btn {
+  width: auto !important;
+  max-width: max-content !important;
+  min-height: 36px !important;
+  padding: 8px 14px !important;
+  gap: 8px;
+}
+
+#app .pause-modal,
+#app .submit-modal,
+#app .chart-modal,
+#app .account-settings-modal {
+  border-radius: 18px !important;
+  border: 1px solid #d5e0ef;
+  box-shadow: 0 30px 80px rgba(8, 36, 90, 0.22);
+}
+
+#app .results-page,
+#app .review-page {
+  min-height: calc(100vh - 76px);
+}
+
+#app .result-summary-grid,
+#app .review-layout {
+  gap: 18px !important;
+}
+
+#app .review-score-strip,
+#app .result-stats-strip {
+  gap: 12px !important;
+}
+
+#app .review-sidebar,
+#app .review-main,
+#app .results-page .card {
+  border-radius: 16px !important;
+  border-color: #cfe0f3 !important;
+  box-shadow: 0 16px 42px rgba(8, 36, 90, 0.08);
+}
+
+@media (max-width: 1180px) {
+  #app .home-actions-grid,
+  #app .category-picker .category-card-grid,
+  #app .mistake-summary,
+  #app .summary-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  #app .custom-practice,
+  #app .exam-body,
+  #app .exam-body.with-stimulus,
+  #app .exam-body.with-stimulus .exam-question {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  #app .exam-nav {
+    max-height: 460px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  #app .signed-header,
+  #app .app-header {
+    padding-inline: 16px;
+  }
+
+  #app .home-actions-grid,
+  #app .category-picker .category-card-grid,
+  #app .mistake-summary,
+  #app .summary-cards {
+    grid-template-columns: 1fr !important;
+  }
+
+  #app .side-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  #app .side-nav {
+    min-height: auto;
+  }
+
+  #app .table-head,
+  #app .table-row,
+  #app .attempt-select-row,
+  #app .question-actions {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* T0024-final: must remain the last visual QA override block. */
+#app .dash-page.screenshot-dashboard {
+  width: min(1380px, calc(100vw - 96px)) !important;
+  min-height: calc(100vh - 82px) !important;
+  margin: 0 auto !important;
+  padding: clamp(54px, 7vh, 88px) 0 44px !important;
+}
+
+#app .home-actions-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 28px !important;
+  align-items: stretch !important;
+}
+
+#app .home-action-card {
+  display: flex !important;
+  position: static !important;
+  flex-direction: column !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+  gap: 18px !important;
+  min-width: 0 !important;
+  min-height: 304px !important;
+  max-height: none !important;
+  padding: 28px !important;
+  overflow: hidden !important;
+}
+
+#app .home-action-card > * {
+  position: static !important;
+}
+
+#app .home-card-copy {
+  display: grid !important;
+  gap: 7px !important;
+  min-height: 84px !important;
+}
+
+#app .home-card-copy h2 {
+  margin: 0 !important;
+  color: #08245a !important;
+  font-size: 26px !important;
+  line-height: 1.08 !important;
+}
+
+#app .home-card-copy p {
+  margin: 0 !important;
+  color: #42567a !important;
+  font-size: 15px !important;
+  line-height: 1.35 !important;
+}
+
+#app .home-card-facts {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 9px !important;
+  min-height: 72px !important;
+  align-content: flex-start !important;
+}
+
+#app .home-card-facts span {
+  display: inline-flex !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  align-items: center !important;
+  padding: 8px 12px !important;
+  white-space: normal !important;
+}
+
+#app .home-action-card > .btn {
+  width: 100% !important;
+  min-height: 52px !important;
+  margin-top: auto !important;
+}
+
+#app .side-content {
+  padding: clamp(42px, 5.2vh, 58px) clamp(34px, 5vw, 72px) !important;
+}
+
+#app .content-page {
+  width: min(1260px, 100%) !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+#app .content-page .page-title-row {
+  align-items: start !important;
+  margin-bottom: 26px !important;
+}
+
+#app .progress-page {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.44fr) !important;
+  gap: 20px !important;
+}
+
+#app .progress-page .page-title-row,
+#app .progress-page .attempts-table-card {
+  grid-column: 1 / -1 !important;
+}
+
+#app .progress-page .summary-cards {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  gap: 12px !important;
+  margin: 0 !important;
+  align-self: end !important;
+}
+
+#app .progress-page .performance-card {
+  grid-column: 1 / -1 !important;
+  min-height: 220px !important;
+}
+
+#app .progress-page .attempts-table-card {
+  min-height: 380px !important;
+}
+
+#app .attempt-table {
+  max-height: 430px !important;
+}
+
+#app .table-head,
+#app .table-row {
+  grid-template-columns: minmax(280px, 1.5fr) 150px 120px 130px 180px !important;
+}
+
+#app .exam-question {
+  align-content: start !important;
+}
+
+#app .question-panel {
+  min-height: 0 !important;
+  align-self: start !important;
+}
+
+#app .question-actions {
+  margin-top: 20px !important;
+  padding-top: 16px !important;
+  border-top: 1px solid #d9e3f0 !important;
+}
+
+#app .exam-body:not(.with-stimulus) .question-panel {
+  max-height: calc(100vh - 126px) !important;
+}
+
+#app .stimulus-head {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+}
+
+#app .stimulus-head .btn.tiny {
+  width: auto !important;
+  min-height: 38px !important;
+  padding: 8px 12px !important;
+  border-radius: 10px !important;
+  white-space: nowrap !important;
+}
+
+#app .stimulus-actions {
+  display: none !important;
+}
+
+#app .results-page {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 14px !important;
+  width: min(1360px, calc(100vw - 96px)) !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  padding: clamp(38px, 4.5vh, 48px) 0 30px !important;
+  overflow: hidden !important;
+}
+
+#app .results-page .page-title-row {
+  margin-bottom: 6px !important;
+}
+
+#app .results-page > * {
+  position: static !important;
+  grid-column: 1 / -1 !important;
+  grid-row: auto !important;
+}
+
+#app .result-summary-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 220px !important;
+  gap: 14px !important;
+}
+
+#app .result-message-card,
+#app .final-score-card {
+  min-height: 106px !important;
+  padding: 18px 20px !important;
+}
+
+#app .result-stats-strip {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+#app .result-stats-strip metric {
+  min-height: 72px !important;
+  padding: 14px 16px !important;
+}
+
+#app .results-page > section.card:nth-of-type(3),
+#app .results-page > section.card:nth-of-type(4),
+#app .results-page > .overview-card {
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding: 18px !important;
+}
+
+#app .results-page > section.card:nth-of-type(3) .breakdown-grid,
+#app .results-page > section.card:nth-of-type(4) .insight-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+#app .results-page .insight-card {
+  min-height: 70px !important;
+  padding: 12px !important;
+  overflow: hidden !important;
+}
+
+#app .results-page .insight-card strong {
+  font-size: 13px !important;
+}
+
+#app .results-page .insight-card span {
+  font-size: 17px !important;
+  line-height: 1.15 !important;
+}
+
+#app .results-page .insight-card p {
+  margin-top: 4px !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+
+#app .overview-list {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+#app .overview-list div {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+}
+
+#app .overview-list strong {
+  display: inline-flex !important;
+}
+
+#app .bottom-actions {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  margin-top: 0 !important;
+}
+
+#app .bottom-actions .btn {
+  min-height: 52px !important;
+}
+
+#app .account-modal-actions {
+  grid-template-columns: auto minmax(0, 1fr) auto auto !important;
+}
+
+#app .account-danger-row {
+  justify-content: flex-end !important;
+}
+
+@media (max-width: 1180px) {
+  #app .home-actions-grid,
+  #app .result-stats-strip,
+  #app .results-page > section.card:nth-of-type(3) .breakdown-grid,
+  #app .results-page > section.card:nth-of-type(4) .insight-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  #app .progress-page {
+    grid-template-columns: 1fr !important;
+  }
+
+  #app .progress-page .summary-cards {
+    grid-column: 1 !important;
+    grid-row: auto !important;
   }
 }
