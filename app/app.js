@@ -2,6 +2,8 @@
   "use strict";
 
   const TOTAL_TIME_SECONDS = 3 * 60 * 60 + 10 * 60;
+  const COCKPIT_WIDTH = 1672;
+  const COCKPIT_HEIGHT = 942;
   const PASSING_PERCENT = 80;
   const SYNC_INTERVAL_MS = 3500;
   const DEFAULT_PRACTICE_COUNT = 20;
@@ -29,8 +31,16 @@
     { section: "General Information", label: "General Information", tone: "general", range: "141-170", start: 141, end: 170 }
   ];
   const FIXTURE_STATES = new Set([
+    "loading",
+    "config",
+    "fatal",
     "create",
+    "create-loading",
     "select",
+    "signin-loading",
+    "forgot-password",
+    "forgot-error",
+    "forgot-success",
     "dashboard",
     "dashboard-empty",
     "setup",
@@ -39,14 +49,25 @@
     "graph",
     "pause",
     "submit",
+    "timeout",
+    "chart-modal",
     "results",
+    "results-fail",
+    "results-practice",
     "review",
+    "review-empty",
     "practice",
     "mistakes",
+    "mistakes-empty",
     "flagged",
+    "flagged-empty",
     "recent",
     "progress",
-    "profile-modal"
+    "progress-empty",
+    "profile-modal",
+    "password-expanded",
+    "delete-account",
+    "delete-attempt"
   ]);
   const PRACTICE_CATEGORIES = SECTION_GROUPS.map((group) => ({
     ...group,
@@ -77,6 +98,12 @@
     updates: [],
     view: { name: "boot" },
     modal: null,
+    dialogTarget: null,
+    dialogError: "",
+    resetEmail: "",
+    fatal: null,
+    busyAction: "",
+    examNavOpen: false,
     toast: "",
     timerId: null,
     syncTimer: null,
@@ -96,6 +123,8 @@
   const root = document.getElementById("app");
 
   function boot() {
+    syncCockpitScale();
+    window.addEventListener("resize", syncCockpitScale, { passive: true });
     window.addEventListener("beforeunload", () => {
       flushDirty({ immediate: true });
     });
@@ -105,7 +134,21 @@
     document.addEventListener("click", handleClick);
     document.addEventListener("submit", handleSubmit);
     document.addEventListener("change", handleChange);
+    document.addEventListener("keydown", handleKeydown);
+    new MutationObserver(focusActiveDialog).observe(root, { childList: true, subtree: true });
     init();
+  }
+
+  function focusActiveDialog() {
+    const dialog = root.querySelector("[role='dialog'], [role='alertdialog']");
+    if (dialog && !dialog.contains(document.activeElement)) dialog.focus({ preventScroll: true });
+  }
+
+  function syncCockpitScale() {
+    const desktop = window.innerWidth >= 1100;
+    const scale = desktop ? Math.min(window.innerWidth / COCKPIT_WIDTH, window.innerHeight / COCKPIT_HEIGHT) : 1;
+    root.style.setProperty("--cockpit-scale", String(scale));
+    root.classList.toggle("cockpit-desktop", desktop);
   }
 
   async function init() {
@@ -177,6 +220,12 @@
     app.draft = { user_id: "fixture-user", options: { ...DEFAULT_OPTIONS, versionId: examVersions[0]?.id || "fixture-version-1" } };
     app.updates = [{ title: "Two reviewer updates", body: "Visual QA fixture notification." }, { title: "Practice reminders", body: "Continue recent drills." }];
     app.modal = null;
+    app.toast = null;
+    app.dialogTarget = null;
+    app.dialogError = "";
+    app.fatal = null;
+    app.busyAction = fixtureState.endsWith("-loading") ? fixtureState.replace("-loading", "") : "";
+    app.examNavOpen = false;
     app.reviewFilter = "all";
     app.recentTab = "all";
     app.practiceReviewTab = "practice";
@@ -190,27 +239,79 @@
       active.elapsed_seconds = 38;
     }
 
-    if (fixtureState === "dashboard-empty") {
-      app.attempts = [];
-      return setView({ name: "dashboard" });
+    if (fixtureState === "loading") return setView({ name: "boot" });
+    if (fixtureState === "config") return setView({ name: "config" });
+    if (fixtureState === "fatal") {
+      app.fatal = { title: "Synchronization unavailable", message: "Reviewer data could not be loaded. Check the connection and reload the application." };
+      return setView({ name: "fatal" });
     }
-
-    if (fixtureState === "create") return setView({ name: "create" });
-    if (fixtureState === "select") return setView({ name: "signin" });
-    if (fixtureState === "setup") return setView({ name: "setup" });
-    if (fixtureState === "practice" || fixtureState === "mistakes" || fixtureState === "flagged") {
-      app.practiceReviewTab = fixtureState === "mistakes" ? "mistakes" : fixtureState === "flagged" ? "flagged" : "practice";
+    if (fixtureState === "dashboard-empty" || fixtureState === "progress-empty" || fixtureState === "mistakes-empty") {
+      app.attempts = [];
+      if (fixtureState === "dashboard-empty") return setView({ name: "dashboard" });
+      if (fixtureState === "progress-empty") return setView({ name: "recent" });
+      app.practiceReviewTab = "mistakes";
       return setView({ name: "practice" });
     }
-    if (fixtureState === "recent" || fixtureState === "progress") return setView({ name: "recent" });
-    if (fixtureState === "results") return setView({ name: "results", attemptId: submitted.id });
-    if (fixtureState === "review") return setView({ name: "review", attemptId: submitted.id, index: 42 });
-    if (fixtureState === "profile-modal") {
+
+    if (fixtureState === "create" || fixtureState === "create-loading") return setView({ name: "create" });
+    if (["select", "signin-loading", "forgot-password", "forgot-error", "forgot-success"].includes(fixtureState)) {
+      if (fixtureState === "forgot-error") {
+        app.modal = "forgot-password";
+        app.dialogError = "Enter a valid email address.";
+        app.view = { name: "signin" };
+        return render();
+      } else if (fixtureState.startsWith("forgot")) app.modal = fixtureState;
+      return setView({ name: "signin" });
+    }
+    if (fixtureState === "setup") return setView({ name: "setup" });
+    if (fixtureState === "practice" || fixtureState === "mistakes" || fixtureState === "flagged" || fixtureState === "flagged-empty") {
+      if (fixtureState === "flagged-empty") {
+        app.attempts.forEach((attempt) => Object.values(attempt.answers).forEach((answer) => { answer.flagged = false; }));
+      }
+      app.practiceReviewTab = fixtureState === "mistakes" ? "mistakes" : fixtureState === "flagged" ? "flagged" : "practice";
+      if (fixtureState === "flagged-empty") app.practiceReviewTab = "flagged";
+      return setView({ name: "practice" });
+    }
+    if (fixtureState === "recent" || fixtureState === "progress" || fixtureState === "delete-attempt") {
+      if (fixtureState === "delete-attempt") {
+        app.modal = "delete-attempt";
+        app.dialogTarget = submitted.id;
+      }
+      return setView({ name: "recent" });
+    }
+    if (fixtureState === "results" || fixtureState === "results-fail") {
+      if (fixtureState === "results-fail") {
+        Object.values(submitted.answers).forEach((answer, index) => { if (index % 3 !== 0) answer.selected_choice = answer.correct_choice === "A" ? "B" : "A"; });
+      }
+      submitted.score = scoreAttempt(submitted);
+      submitted.percent = resultPercent(submitted);
+      return setView({ name: "results", attemptId: submitted.id });
+    }
+    if (fixtureState === "results-practice") {
+      const practiceAttempt = getAttempt("fixture-practice");
+      practiceAttempt.score = scoreAttempt(practiceAttempt);
+      practiceAttempt.percent = resultPercent(practiceAttempt);
+      return setView({ name: "results", attemptId: practiceAttempt.id });
+    }
+    if (fixtureState === "review" || fixtureState === "review-empty") {
+      if (fixtureState === "review-empty") {
+        Object.values(submitted.answers).forEach((answer) => { answer.flagged = false; });
+        app.reviewFilter = "flagged";
+      }
+      return setView({ name: "review", attemptId: submitted.id, index: fixtureState === "review" ? 42 : 0 });
+    }
+    if (fixtureState === "profile-modal" || fixtureState === "password-expanded" || fixtureState === "delete-account") {
       app.modal = "profile";
+      if (fixtureState === "delete-account") app.modal = "delete-account";
       return setView({ name: "dashboard" });
     }
     if (fixtureState === "graph") {
       active.current_question_index = 81;
+      return setView({ name: "exam", attemptId: active.id });
+    }
+    if (fixtureState === "chart-modal") {
+      active.current_question_index = 81;
+      app.modal = "chart";
       return setView({ name: "exam", attemptId: active.id });
     }
     if (fixtureState === "pause") {
@@ -219,6 +320,11 @@
     }
     if (fixtureState === "submit") {
       app.modal = "submit";
+      return setView({ name: "exam", attemptId: active.id });
+    }
+    if (fixtureState === "timeout") {
+      active.elapsed_seconds = active.total_time_seconds;
+      app.modal = "timeout";
       return setView({ name: "exam", attemptId: active.id });
     }
     if (fixtureState === "exam" || fixtureState === "exam-collapsed") return setView({ name: "exam", attemptId: active.id });
@@ -532,9 +638,11 @@
     clearInterval(app.timerId);
     app.timerId = null;
     root.dataset.fixture = app.fixtureMode ? app.fixtureState : "";
+    root.dataset.view = app.view.name;
     root.classList.toggle("fixture-mode", app.fixtureMode);
 
     if (app.view.name === "boot") return renderLoading();
+    if (app.view.name === "fatal") return renderFatal(app.fatal?.title || "Application unavailable", app.fatal?.message || "The reviewer could not start.");
     if (app.view.name === "config") return renderConfig();
     if (app.view.name === "create") return renderCreateAccount();
     if (app.view.name === "signin") return renderSignIn();
@@ -550,49 +658,66 @@
   }
 
   function renderLoading() {
-    root.innerHTML = `<section class="loading-screen"><div class="spinner"></div><p>Loading reviewer...</p></section>`;
+    root.innerHTML = cockpitFrame(`
+      <section class="system-screen boot-screen" aria-live="polite">
+        <div class="system-grid" aria-hidden="true"></div>
+        <div class="boot-console">
+          <img src="assets/brand-shield.svg" alt="" />
+          <p class="eyebrow">Private reviewer network</p>
+          <h1>Syncing reviewer data</h1>
+          <div class="segmented-loader" aria-label="Loading"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <span>Establishing encrypted session</span>
+        </div>
+      </section>
+    `, "system-frame");
   }
 
   function renderFatal(title, message) {
-    root.innerHTML = `
-      <section class="config-screen">
-        <div class="config-card">
+    root.innerHTML = cockpitFrame(`
+      <section class="system-screen diagnostic-screen">
+        <article class="diagnostic-panel danger-diagnostic" role="alert">
+          <div class="diagnostic-code">ERR / SYNC-01</div>
           ${brandBlock()}
+          <p class="eyebrow">Reviewer diagnostics</p>
           <h1>${escapeHtml(title)}</h1>
           <p>${escapeHtml(message)}</p>
-        </div>
+          <details><summary>Technical details</summary><code>No credentials, account data, or secrets are shown in this diagnostic.</code></details>
+          <button class="btn primary" data-action="reload-app" type="button">${icon("refresh")} Reload App</button>
+        </article>
       </section>
-    `;
+    `, "system-frame");
   }
 
   function renderConfig() {
-    root.innerHTML = `
-      <section class="config-screen">
-        <div class="config-card">
+    root.innerHTML = cockpitFrame(`
+      <section class="system-screen diagnostic-screen">
+        <article class="diagnostic-panel warning-diagnostic">
+          <div class="diagnostic-code">CFG / API-00</div>
           ${brandBlock()}
+          <p class="eyebrow">Developer configuration</p>
           <h1>Supabase setup required</h1>
-          <p>This online build needs <code>app/supabase-config.js</code> with the project URL and publishable key before it can run.</p>
-          <pre>window.CSC_SUPABASE_CONFIG = {
-  url: "https://your-project-ref.supabase.co",
+          <p>This build needs a project URL and publishable browser key in <code>app/supabase-config.js</code>.</p>
+          <details><summary>Configuration shape</summary><pre>window.CSC_SUPABASE_CONFIG = {
+  url: "https://project-ref.supabase.co",
   publishableKey: "sb_publishable_..."
-};</pre>
-        </div>
+};</pre></details>
+          <button class="btn primary" data-action="reload-app" type="button">${icon("refresh")} Reload App</button>
+        </article>
       </section>
-    `;
+    `, "system-frame");
   }
 
   function renderCreateAccount() {
-    if (app.fixtureMode && app.fixtureState === "create") return renderFixtureCreateProfile();
     root.innerHTML = publicShell(`
-      <section class="auth-canvas create-state">
+      <section class="auth-canvas access-console create-state">
         <div class="auth-copy">
-          <span class="soft-pill">${icon("building")} Civil Service Exam Practice</span>
-          <h1>Review smarter. Track your progress clearly.</h1>
-          <p>Create an account to save your mock exam scores, review history, and progress across practice sessions.</p>
+          <span class="soft-pill">${icon("shield")} Private reviewer access</span>
+          <h1>Train with focus.<br /><em>Track every run.</em></h1>
+          <p>Invite-only Civil Service Professional practice with secure progress, timing, and review history.</p>
           <div class="auth-chips">
-            <span>${icon("clock")} Timed mock exams</span>
-            <span>${icon("stats")} Score tracking</span>
-            <span>${icon("review")} Reviewer history</span>
+            <span>${icon("clock")} <b>Exam continuity</b><small>Pause, resume, and recover unfinished runs</small></span>
+            <span>${icon("stats")} <b>Private analytics</b><small>Scores and timing stay tied to your account</small></span>
+            <span>${icon("review")} <b>Targeted review</b><small>Return to mistakes and flagged questions</small></span>
           </div>
         </div>
         <form class="auth-card" data-form="signup">
@@ -607,28 +732,26 @@
             <label class="field-label">Confirm Password<div class="field-with-icon has-toggle">${icon("key")}<input name="confirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Confirm" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
           </div>
           <label class="field-label">Invite Code<div class="field-with-icon">${icon("shield")}<input name="inviteCode" autocomplete="off" placeholder="Enter invite code" required /></div></label>
-          <button class="btn primary" data-action="signup-submit" type="button">Create Account</button>
+          <button class="btn primary" data-action="signup-submit" type="button" ${app.busyAction === "create" ? "disabled" : ""}>${app.busyAction === "create" ? "Creating account..." : "Create Account"}</button>
           <div class="auth-divider"><span>or</span></div>
           <p class="auth-switch-copy">Already have an account?</p>
           <button class="text-link" data-action="show-signin" type="button">Sign in</button>
         </form>
       </section>
-      ${toast()}
     `);
   }
 
   function renderSignIn() {
-    if (app.fixtureMode && app.fixtureState === "select") return renderFixtureSelectProfile();
     root.innerHTML = publicShell(`
-      <section class="auth-canvas select-mode">
+      <section class="auth-canvas access-console select-mode">
         <div class="auth-copy compact-copy">
-          <span class="soft-pill">${icon("building")} Civil Service Exam Practice</span>
-          <h1>Returning reviewer</h1>
-          <p>Sign in to continue your saved exam progress, review history, flagged questions, and results.</p>
+          <span class="soft-pill">${icon("shield")} Returning reviewer</span>
+          <h1>Resume the run.<br /><em>Keep your edge.</em></h1>
+          <p>Continue saved exams, targeted practice, mistakes, flags, and personal performance records.</p>
           <div class="auth-chips">
-            <span>${icon("clock")} Resume unfinished exams</span>
-            <span>${icon("stats")} View previous scores</span>
-            <span>${icon("bookmark")} Continue category practice</span>
+            <span>${icon("clock")} <b>Resume unfinished exams</b><small>Return to the exact saved checkpoint</small></span>
+            <span>${icon("stats")} <b>View previous scores</b><small>Compare section and pacing records</small></span>
+            <span>${icon("bookmark")} <b>Continue focused review</b><small>Practice mistakes and flagged items</small></span>
           </div>
         </div>
         <form class="auth-card profile-picker-card" data-form="signin">
@@ -638,14 +761,13 @@
           </div>
           <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="email" placeholder="Enter your email address" required /></div></label>
           <label class="field-label">Password<div class="field-with-icon has-toggle">${icon("lock")}<input name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
-          <button class="btn primary" data-action="signin-submit" type="button">Sign In</button>
+          <button class="btn primary" data-action="signin-submit" type="button" ${app.busyAction === "signin" ? "disabled" : ""}>${app.busyAction === "signin" ? "Signing in..." : "Sign In"}</button>
           <button class="text-link" data-action="forgot-password" type="button">Forgot Password?</button>
           <div class="auth-divider"><span>or</span></div>
           <p class="auth-switch-copy">New here?</p>
           <button class="text-link" data-action="show-create" type="button">Create account</button>
         </form>
       </section>
-      ${toast()}
     `);
   }
 
@@ -675,7 +797,6 @@
           <button class="text-link" data-action="show-signin" type="button">Sign in</button>
         </form>
       </section>
-      ${toast()}
     `);
   }
 
@@ -706,7 +827,6 @@
           <button class="text-link" data-action="show-create" type="button">Create account</button>
         </form>
       </section>
-      ${toast()}
     `);
   }
 
@@ -875,7 +995,6 @@
           </section>
         </div>
       </section>
-      ${toast()}
     `, "dashboard");
   }
 
@@ -887,17 +1006,17 @@
       <section class="setup-page">
         <div class="page-title-row">
           <div>
-            <p class="eyebrow">Professional Mock Exam</p>
-            <h1>Exam Setup</h1>
+            <p class="eyebrow">Full mock / run protocol</p>
+            <h1>Mission Briefing</h1>
+            <p>Configure one complete Professional-level simulation.</p>
           </div>
-          <button class="btn ghost" data-action="dashboard" type="button">${icon("back")} Back to Home</button>
         </div>
 
         <div class="setup-grid">
-          <section class="card setup-main">
+          <section class="card setup-main mission-briefing">
             <div class="exam-badge-row">
-              <span class="soft-pill">Timed Exam</span>
-              <strong>Professional Mock Exam</strong>
+              <span class="soft-pill"><i></i> Timed simulation</span>
+              <strong>Professional Mock / 170-item protocol</strong>
             </div>
             <div class="setup-facts">
               <div><span>Total Questions</span><strong>170</strong></div>
@@ -908,7 +1027,7 @@
               <div><span>Pause</span><strong>Save and exit supported</strong></div>
             </div>
             <div class="section-list">
-              <h2>Question Groups</h2>
+              <h2>Section Tracks</h2>
               ${setupGroups.map((group) => `
                 <div class="section-row ${group.tone}">
                   <div>
@@ -925,8 +1044,9 @@
             </div>
           </section>
 
-          <form class="card setup-options" data-form="setup">
-            <h2>Exam Options</h2>
+          <form class="card setup-options run-configuration" data-form="setup">
+            <p class="eyebrow">Run controls</p>
+            <h2>Run Configuration</h2>
             <label>Mock Version
               <select name="versionId">
                 ${examVersions.map((version) => `<option value="${escapeAttr(version.id)}" ${version.id === savedVersionId ? "selected" : ""}>Version ${version.number} - ${escapeHtml(version.title)}</option>`).join("")}
@@ -937,17 +1057,16 @@
             ${toggleControl("shuffleQuestions", "Shuffle Questions", draftOptions.shuffleQuestions)}
             ${toggleControl("shuffleAnswers", "Shuffle Answer Choices", draftOptions.shuffleAnswers)}
             <div class="readiness-card">
-              <strong>Readiness Check</strong>
+              <strong>Preflight Check</strong>
               <span>Stable internet connection</span>
               <span>Quiet review space</span>
               <span>At least 3 hours available</span>
             </div>
-            <button class="btn primary" data-action="setup-submit" type="button">${icon("play")} Start Exam</button>
-            <button class="btn secondary" data-action="save-setup" type="button">${icon("save")} Save for Later</button>
+            <button class="btn primary" data-action="setup-submit" type="button">${icon("play")} Start Full Mock</button>
+            <button class="btn secondary" data-action="save-setup" type="button">${icon("save")} Save Configuration</button>
           </form>
         </div>
       </section>
-      ${toast()}
     `, "setup");
   }
 
@@ -960,27 +1079,32 @@
     const linked = linkedStimulusAnswers(attempt, current);
     const isPaused = attempt.status === "paused";
 
-    root.innerHTML = `
+    const version = examVersions.find((candidate) => candidate.id === attempt.exam_version_id);
+    const runLabel = attempt.mode === "practice" ? escapeHtml(attempt.title || "Focused Practice") : `Professional Mock ${version ? String(version.number).padStart(2, "0") : ""}`.trim();
+    root.innerHTML = cockpitFrame(`
       <section class="exam-shell ${app.fixtureMode ? "fixture-exam" : ""} state-${escapeAttr(app.fixtureState || "live")} ${isPaused ? "is-paused" : ""} ${isPaused || app.modal === "submit" ? "exam-dimmed" : ""}">
         <header class="exam-topbar">
           <div class="exam-brand">${logo()}<div><strong>CSC Practice Reviewer</strong><span>Independent mock exam and review tool</span></div></div>
           <div class="exam-status">
-            <strong>${attempt.mode === "practice" ? "Category Practice" : "Professional Mock Exam"}</strong>
+            <strong>${runLabel}</strong>
             <div>
-              <span class="exam-time">${attempt.options?.showTimer === false ? "Timer hidden" : `${isPaused ? "Paused" : "Time Left:"} ${formatDuration(remaining)}`}</span>
+              <span class="exam-time">${attempt.mode === "practice" ? "Untimed Practice" : attempt.options?.showTimer === false ? "Timer hidden" : `${isPaused ? "Paused" : "Time Left:"} ${formatDuration(remaining)}`}</span>
               <span class="exam-answered">Answered: ${answeredCount(attempt)}/${attempt.total_questions}</span>
+              ${attempt.mode === "practice" ? `<span class="exam-difficulty">${escapeHtml(statusLabel(attempt.options?.difficulty || "mixed"))} / ${attempt.total_questions} items</span>` : ""}
             </div>
           </div>
           <div class="exam-actions">
+            <button class="btn secondary mobile-question-toggle" data-action="toggle-exam-nav" type="button">${icon("review")} Questions</button>
             <button class="btn secondary" data-action="pause-exam" type="button" ${attempt.options?.enablePause === false || isPaused ? "disabled" : ""}>${icon("pause")} Pause</button>
-            <button class="btn danger" data-action="open-submit" type="button">${icon("submit")} Submit Exam</button>
+            <button class="btn danger" data-action="open-submit" type="button">${icon("submit")} ${attempt.mode === "practice" ? "Finish Practice" : "Submit Exam"}</button>
           </div>
         </header>
 
         <div class="exam-body ${current.stimulus ? "with-stimulus" : ""}">
-          <aside class="exam-nav">
+          <aside class="exam-nav ${app.examNavOpen ? "mobile-open" : ""}">
             <div class="nav-title">
               <h2>Questions</h2>
+              <button class="icon-only mobile-nav-close" data-action="toggle-exam-nav" type="button" aria-label="Close question navigator">${icon("x")}</button>
               <div class="legend">
                 <span><i class="legend-dot answered"></i>Answered</span>
                 <span><i class="legend-dot unanswered"></i>Unanswered</span>
@@ -996,7 +1120,7 @@
             <section class="question-panel">
               <div class="question-title">
                 <div>
-                  <span class="question-index">Question ${current.position + 1} of ${attempt.total_questions}</span>
+                  <span class="question-index">Item ${current.position + 1} <small>/ ${attempt.total_questions}</small></span>
                   <p class="topic-pill">${escapeHtml(current.section)} - ${escapeHtml(current.subtopic)}</p>
                 </div>
                 <span class="status-pill ${answerStatus(current)}">${statusText(current)}</span>
@@ -1025,10 +1149,11 @@
       ${pauseModal(attempt)}
       ${submitModal(attempt)}
       ${chartModal(attempt, current)}
+      ${timeoutModal(attempt)}
       ${toast()}
-    `;
+    `, "exam-frame");
 
-    if (!app.fixtureMode && attempt.status === "in_progress") {
+    if (!app.fixtureMode && attempt.status === "in_progress" && app.modal !== "timeout") {
       app.timerId = setInterval(() => tickAttempt(attempt.id), 1000);
     }
   }
@@ -1036,7 +1161,7 @@
   function renderResults() {
     const attempt = getAttempt(app.view.attemptId);
     if (!attempt) return setView({ name: "dashboard" });
-    const score = attempt.score ?? scoreAttempt(attempt);
+    const score = scoreAttempt(attempt);
     const pct = resultPercent(attempt);
     const insights = performanceInsights(attempt);
     const stats = sectionStats(attempt);
@@ -1046,10 +1171,10 @@
       <section class="results-page">
         <div class="page-title-row results-heading">
           <div>
-            <h1>${isPractice ? "Practice Complete" : "Results Summary"}</h1>
+            <p class="eyebrow">Run debrief / ${isPractice ? "focused practice" : "full simulation"}</p>
+            <h1>${isPractice ? "Practice Debrief" : "Full Mock Debrief"}</h1>
             <p>${isPractice ? "Review your focused drill performance." : "Your mock exam performance and next-step review details."}</p>
           </div>
-          <button class="btn ghost" data-action="dashboard" type="button">${icon("home")} Back to Home</button>
         </div>
         <section class="result-summary-grid">
           <div class="card result-message-card">
@@ -1071,7 +1196,7 @@
           <metric><strong>${formatDuration(insights.averageTime)}</strong><span>Average / Item</span></metric>
         </section>
 
-        <section class="card">
+        <section class="card debrief-sections">
           <div class="card-head">
             <div>
               <h2>Section performance</h2>
@@ -1089,11 +1214,11 @@
           </div>
         </section>
 
-        <section class="card">
+        <section class="card run-insights-panel">
           <div class="card-head">
             <div>
-              <h2>Useful fun facts</h2>
-              <p>Performance Insights</p>
+              <p class="eyebrow">Behavioral telemetry</p>
+              <h2>Run Insights</h2>
             </div>
           </div>
           <div class="insight-grid">
@@ -1108,8 +1233,8 @@
           </div>
         </section>
 
-        <section class="card overview-card">
-          <h2>Exam Overview</h2>
+        <section class="card overview-card run-meta-rail">
+          <h2>Run Overview</h2>
           <div class="overview-list">
             <div><span>Exam Type</span><strong>${escapeHtml(isPractice ? "Category Practice" : "Professional Mock Exam")}</strong></div>
             <div><span>Total Questions</span><strong>${attempt.total_questions}</strong></div>
@@ -1124,11 +1249,11 @@
 
         <div class="bottom-actions">
           <button class="btn primary" data-action="review-answers" type="button">${icon("review")} Review Answers</button>
-          <button class="btn secondary" data-action="dashboard" type="button">${icon("home")} Back to Home</button>
-          <button class="btn secondary" data-action="retake-setup" type="button">${icon("refresh")} Retake Exam</button>
+          ${isPractice
+            ? `<button class="btn secondary" data-action="repeat-practice" type="button">${icon("refresh")} Repeat Drill</button><button class="btn secondary" data-action="change-practice" type="button">${icon("grid")} Change Practice</button>`
+            : `<button class="btn secondary" data-action="practice-weakest" type="button">${icon("stats")} Practice Weakest Area</button><button class="btn secondary" data-action="retake-same-version" type="button">${icon("refresh")} Retake Same Version</button>`}
         </div>
       </section>
-      ${toast()}
     `, "results");
   }
 
@@ -1166,12 +1291,12 @@
             <h2>Question Navigator</h2>
             <small class="navigator-range">${navWindow.label}</small>
             <div class="review-dots">
-              ${navWindow.items.map(({ item, itemIndex }) => `<button class="${itemIndex === index ? "current" : ""} ${item.selected_choice === item.correct_choice ? "correct" : "wrong"} ${item.flagged ? "flagged" : ""}" data-review-index="${itemIndex}" type="button">${item.display_number}</button>`).join("") || `<span>No items</span>`}
+              ${navWindow.items.map(({ item, itemIndex }) => `<button class="${itemIndex === index ? "current" : ""} ${item.selected_choice === item.correct_choice ? "correct" : "wrong"} ${item.flagged ? "flagged" : ""}" data-review-index="${itemIndex}" type="button">${item.display_number}</button>`).join("")}
             </div>
           </aside>
           <main class="card review-main">
             <div class="review-content-scroll">
-              ${answer ? `
+              ${answer && filtered.length ? `
                 <div class="question-title">
                   <div>
                     <span class="question-index">Question ${answer.position + 1} of ${attempt.total_questions}</span>
@@ -1200,7 +1325,7 @@
                   <span>Answer changes: ${answer.answer_changes || 0}</span>
                   <span>${answer.flagged ? "Flagged" : "Not flagged"}</span>
                 </div>
-              ` : `<p>No review items for this filter.</p>`}
+              ` : `<div class="review-empty-panel"><span>${icon("review")}</span><strong>No matching review items</strong><p>Change the active filter to continue reviewing this attempt.</p></div>`}
             </div>
             <div class="question-actions">
               <button class="btn secondary" data-action="review-prev" type="button" ${index <= 0 ? "disabled" : ""}>Previous Question</button>
@@ -1219,10 +1344,10 @@
       <section class="content-page practice-review-page">
         <div class="page-title-row">
           <div>
+            <p class="eyebrow">Targeted training console</p>
             <h1>Practice & Review</h1>
-            <p>Build drills, revisit missed items, and review flagged questions.</p>
+            <p>Build focused drills, revisit missed items, and inspect flagged questions.</p>
           </div>
-          <button class="btn ghost" data-action="dashboard" type="button">${icon("home")} Home</button>
         </div>
         ${practiceReviewTabs(tab)}
         ${tab === "mistakes" ? mistakesTabContent() : tab === "flagged" ? flaggedTabContent() : practiceTabContent()}
@@ -1239,23 +1364,29 @@
       <section class="content-page progress-page">
         <div class="page-title-row">
           <div>
+            <p class="eyebrow">Private performance telemetry</p>
             <h1>Progress</h1>
             <p>Track scores, section performance, and attempt history.</p>
           </div>
-          <button class="btn ghost" data-action="dashboard" type="button">${icon("home")} Home</button>
         </div>
-        <div class="summary-cards">
+        <div class="summary-cards statistics-rail">
           <metric><strong>${attempts.length}</strong><span>Total Attempts</span></metric>
           <metric><strong>${average == null ? "--" : `${Math.round(average)}%`}</strong><span>Average Score</span></metric>
           <metric><strong>${completed.length ? `${Math.round(highest)}%` : "--"}</strong><span>Best Score</span></metric>
           <metric><strong>${activeDays(attempts)}</strong><span>Days Active</span></metric>
         </div>
+        <div class="progress-analytics-grid">
+        <section class="card trend-panel">
+          <div class="card-head"><div><p class="eyebrow">Score signal</p><h2>Attempt Trend</h2></div><span>${completed.length ? `${completed.length} completed` : "Awaiting first run"}</span></div>
+          ${progressTrendSvg(completed)}
+        </section>
         <section class="card performance-card">
           <div class="card-head"><h2>Category Performance</h2></div>
           <div class="performance-bars">
             ${practiceCategoriesForDisplay().map((category) => progressBarRow(category, categoryPercent(categoryPerformance(completed)[category.section], category.section))).join("")}
           </div>
         </section>
+        </div>
         <section class="card attempts-table-card">
           <div class="tabs">
             ${[
@@ -1280,7 +1411,7 @@
                   ${app.modal === `overflow:${attempt.id}` ? overflowMenu(attempt) : ""}
                 </span>
               </div>
-            `).join("") || emptyInline("No attempts in this tab.", "Attempts appear here after you start a mock exam or practice drill.")}
+            `).join("") || `<div class="progress-empty-state">${emptyInline("No attempts yet", "Start a full mock or focused practice run to create your first record.")}<button class="btn primary" data-action="open-setup" type="button">${icon("play")} Start Full Mock</button></div>`}
           </div>
         </section>
       </section>
@@ -1312,19 +1443,15 @@
   function practiceTabContent() {
     const categoryStats = categoryPerformance(completedAttempts());
     return `
-      <form class="card custom-practice" data-form="custom-practice">
-        <div>
+      <form class="card custom-practice run-builder" data-form="custom-practice">
+        <div class="builder-heading">
           <p class="eyebrow">Custom Practice</p>
-          <h2>Build a focused drill</h2>
-          <small>Choose the section, item count, and difficulty before starting.</small>
+          <h2>Build a focused run</h2>
+          <small>Choose a section, run length, and difficulty profile.</small>
         </div>
-        <label>Select Category
-          <select name="category">${practiceCategoriesForDisplay().map((category) => `<option value="${escapeAttr(category.section)}">${escapeHtml(category.label)}</option>`).join("")}</select>
-        </label>
-        <label>Number of Questions
-          <select name="count">${[10, 20, 30, 40, 60].map((count) => `<option value="${count}" ${count === 20 ? "selected" : ""}>${count}</option>`).join("")}</select>
-        </label>
-        <label>Difficulty
+        <fieldset class="category-plates"><legend>Section</legend>${practiceCategoriesForDisplay().map((category, index) => `<label class="section-plate ${category.tone}"><input type="radio" name="category" value="${escapeAttr(category.section)}" ${index === 0 ? "checked" : ""}/><span class="category-symbol">${categorySymbol(category.section)}</span><strong>${escapeHtml(category.label)}</strong><small>${category.poolSize} item pool</small></label>`).join("")}</fieldset>
+        <fieldset class="count-segments"><legend>Question Count</legend>${[10, 20, 30, 40, 60].map((count) => `<label><input type="radio" name="count" value="${count}" ${count === 20 ? "checked" : ""}/><span>${count}</span></label>`).join("")}</fieldset>
+        <label class="difficulty-control">Difficulty
           <select name="difficulty">
             <option value="mixed">Mixed</option>
             <option value="easy">Easy</option>
@@ -1334,11 +1461,11 @@
         </label>
         <button class="btn primary" data-action="custom-practice-submit" type="button">${icon("play")} Start Custom Practice</button>
       </form>
-      <section class="card category-picker">
+      <section class="card category-picker quick-run-grid">
         <div class="card-head">
           <div>
-            <h2>Quick section practice</h2>
-            <p>Start a 20-item mixed drill from one CSC section.</p>
+            <h2>Quick Practice</h2>
+            <p>Launch a 20-item mixed run from one section.</p>
           </div>
         </div>
         <div class="category-card-grid">
@@ -1379,21 +1506,25 @@
 
   function flaggedTabContent() {
     const flagged = app.attempts.flatMap((attempt) => Object.values(attempt.answers).filter((answer) => answer.flagged).map((answer) => ({ attempt, answer })));
+    const grouped = practiceCategoriesForDisplay().map((category) => ({ category, rows: flagged.filter((item) => item.answer.section === category.section) })).filter((group) => group.rows.length);
     return `
       <section class="card bookmark-list review-queue">
-        ${flagged.length ? flagged.map(({ attempt, answer }) => `
-          <button class="attempt-select-row" data-open-review="${attempt.id}" data-review-question="${answer.question_id}" type="button">
-            <span>
-              <strong>Item ${answer.display_number} - ${escapeHtml(answer.section)}</strong>
-              <small>${escapeHtml(examTitle(attempt))}</small>
-            </span>
-            <em>${answer.selected_choice ? `Selected ${answer.selected_choice}` : "Unanswered"}</em>
-            <b>${formatDuration(answer.time_spent_seconds)}</b>
-            ${icon("arrow")}
-          </button>
-        `).join("") : emptyState("No flagged questions yet", "Flag questions during an exam or review and they will appear here.", "open-setup", "Start Full Mock")}
+        ${flagged.length ? grouped.map(({ category, rows }) => `<section class="flagged-section ${category.tone}"><header><span class="category-symbol">${categorySymbol(category.section)}</span><h2>${escapeHtml(category.label)}</h2><em>${rows.length} flagged</em></header>${rows.map(({ attempt, answer }) => `
+            <button class="attempt-select-row" data-open-review="${attempt.id}" data-review-question="${answer.question_id}" type="button"><span><strong>Item ${answer.display_number}</strong><small>${escapeHtml(examTitle(attempt))}</small></span><em>${answer.selected_choice ? `Selected ${answer.selected_choice}` : "Unanswered"}</em><b>${formatDuration(answer.time_spent_seconds)}</b>${icon("arrow")}</button>
+          `).join("")}</section>`).join("") : emptyState("No flagged questions yet", "Flag an item during an exam or answer review to place it in this queue.", "practice-page", "Start Practice")}
       </section>
     `;
+  }
+
+  function progressTrendSvg(attempts) {
+    const rows = attempts.slice().sort((a, b) => new Date(a.started_at) - new Date(b.started_at)).slice(-12);
+    const points = rows.map((attempt, index) => {
+      const x = rows.length === 1 ? 300 : 24 + (index * 552) / (rows.length - 1);
+      const y = 176 - (Math.max(0, Math.min(100, resultPercent(attempt))) * 1.42);
+      return { x, y, score: Math.round(resultPercent(attempt)) };
+    });
+    const polyline = points.map((point) => `${point.x},${point.y}`).join(" ");
+    return `<div class="trend-chart"><svg viewBox="0 0 600 210" role="img" aria-label="${rows.length ? "Completed-attempt score trend" : "No completed attempts yet"}"><defs><linearGradient id="trend-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#24e8ff" stop-opacity=".34"/><stop offset="1" stop-color="#24e8ff" stop-opacity="0"/></linearGradient></defs><g class="trend-grid"><path d="M24 34H576M24 105H576M24 176H576"/><text x="2" y="39">100</text><text x="8" y="110">50</text><text x="14" y="181">0</text></g>${points.length > 1 ? `<path class="trend-area" d="M${points[0].x} 176 L${polyline.replaceAll(" ", " L")} L${points[points.length - 1].x} 176Z"/><polyline class="trend-line" points="${polyline}"/>` : ""}${points.map((point) => `<g class="trend-point"><circle cx="${point.x}" cy="${point.y}" r="5"/><text x="${point.x}" y="${point.y - 12}">${point.score}%</text></g>`).join("")}${rows.length ? "" : `<text class="trend-empty" x="300" y="108">NO ATTEMPTS YET</text>`}</svg></div>`;
   }
 
   function emptyInline(title, body) {
@@ -1401,13 +1532,20 @@
   }
 
   function publicShell(content) {
-    return `
-      <header class="app-header">
+    return cockpitFrame(`
+      <header class="app-header public-header">
         <div class="brand">${logo()}${brandText()}</div>
-        <span class="disclaimer-pill">${icon("shield")} Not affiliated with the Civil Service Commission</span>
+        <span class="access-status"><i></i> Invite-only access</span>
       </header>
-      ${content}
-    `;
+      <main class="public-main">${content}</main>
+      <footer class="public-status-rail">
+        <span>${icon("shield")} Independent practice reviewer</span>
+        <span>Not affiliated with or endorsed by the Civil Service Commission</span>
+        <span class="status-online"><i></i> Secure account storage</span>
+      </footer>
+      ${forgotPasswordModal()}
+      ${toast()}
+    `, "public-frame");
   }
 
   function signedHeader(active = "dashboard") {
@@ -1436,18 +1574,35 @@
   }
 
   function authedShell(content, active = "dashboard") {
-    return `${signedHeader(active)}${content}${profileModal()}`;
+    return cockpitFrame(`${signedHeader(active)}<main class="signed-main">${content}</main>${profileModal()}${confirmationModal()}${mobileBottomNav(active)}`, `signed-frame view-${active}`);
   }
 
   function sideShell(active, content) {
-    return `
+    return cockpitFrame(`
       ${signedHeader(active)}
       <div class="side-layout top-shell-layout">
         <main class="side-content">${content}</main>
       </div>
       ${profileModal()}
+      ${confirmationModal()}
       ${toast()}
-    `;
+      ${mobileBottomNav(active)}
+    `, `signed-frame view-${active}`);
+  }
+
+  function cockpitFrame(content, className = "") {
+    return `<div class="cockpit-viewport ${escapeAttr(className)}"><div class="cockpit-frame">${content}</div></div>`;
+  }
+
+  function mobileBottomNav(active) {
+    const items = [
+      ["dashboard", "Study Hub", "dashboard", "home"],
+      ["setup", "Full Mock", "setup-page", "play"],
+      ["practice", "Practice", "practice-page", "brain"],
+      ["recent", "Progress", "recent-page", "stats"]
+    ];
+    const route = active === "results" || active === "review" ? "recent" : active;
+    return `<nav class="mobile-bottom-nav" aria-label="Mobile navigation">${items.map(([key, label, action, glyph]) => `<button class="${route === key ? "active" : ""}" data-action="${action}" type="button">${icon(glyph)}<span>${label}</span></button>`).join("")}</nav>`;
   }
 
   function brandBlock() {
@@ -1459,7 +1614,7 @@
   }
 
   function logo() {
-    return `<img class="logo" src="assets/logo.png" alt="CSC Practice Reviewer logo" />`;
+    return `<img class="logo" src="assets/brand-shield.svg" alt="CSC Practice Reviewer logo" />`;
   }
 
   function sideNavItem(route, label, iconName, active) {
@@ -1476,12 +1631,13 @@
     if (app.modal !== "profile") return "";
     const profile = app.profile;
     return `
-      <div class="modal-backdrop">
-        <section class="profile-modal account-settings-modal">
+      <div class="modal-backdrop drawer-backdrop">
+        <section class="profile-modal account-settings-modal command-drawer" role="dialog" aria-modal="true" aria-labelledby="account-settings-title" tabindex="-1">
           <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
           <div class="modal-heading">
-            <h2>Account Settings</h2>
-            <p>Update your account information.</p>
+            <p class="eyebrow">Account command</p>
+            <h2 id="account-settings-title">Account Settings</h2>
+            <p>Identity, security, and session controls.</p>
           </div>
           <form class="account-settings-form" data-form="profile">
             <div class="account-avatar-panel">
@@ -1490,22 +1646,21 @@
             <div class="account-field-grid">
               <label>Full Name<input name="name" value="${escapeAttr(profile.name)}" required /></label>
               <label>Email Address <small>(used for sign-in)</small><input name="email" value="${escapeAttr(profile.email)}" disabled /></label>
-              <label class="span-2">Study Goal / Notes<textarea name="notes">${escapeHtml(profile.notes || "Pass the Professional Civil Service Exam this year.")}</textarea></label>
             </div>
-            <details class="account-password-panel">
+            <details class="account-password-panel" ${app.fixtureState === "password-expanded" ? "open" : ""}>
               <summary>${icon("lock")} <span>Change Password</span>${icon("chev")}</summary>
               <div class="account-password-grid" data-form="change-password">
                 <label>Current Password<div class="field-with-icon has-toggle">${icon("key")}<input name="currentPassword" type="password" autocomplete="current-password" /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
                 <label>New Password<div class="field-with-icon has-toggle">${icon("key")}<input name="newPassword" type="password" minlength="8" autocomplete="new-password" /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
                 <label>Confirm New Password<div class="field-with-icon has-toggle">${icon("key")}<input name="confirmNewPassword" type="password" minlength="8" autocomplete="new-password" /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
               </div>
-              <button class="btn secondary account-password-save" data-action="password-submit" type="button">${icon("key")} Update Password</button>
+              <button class="btn secondary account-password-save" data-action="password-submit" type="button" ${app.busyAction === "password" ? "disabled" : ""}>${icon("key")} ${app.busyAction === "password" ? "Updating..." : "Update Password"}</button>
             </details>
             <div class="account-modal-actions">
               <button class="btn ghost" data-action="signout" type="button">${icon("logout")} Sign Out</button>
               <span></span>
               <button class="btn secondary" data-action="close-modal" type="button">Cancel</button>
-              <button class="btn primary" data-action="profile-submit" type="button">${icon("save")} Save Changes</button>
+              <button class="btn primary" data-action="profile-submit" type="button" ${app.busyAction === "profile" ? "disabled" : ""}>${icon("save")} ${app.busyAction === "profile" ? "Saving..." : "Save Changes"}</button>
             </div>
             <div class="account-danger-row">
               <button class="btn danger outline" data-action="delete-profile" type="button">${icon("delete")} Delete Account</button>
@@ -1519,11 +1674,12 @@
   function pauseModal(attempt) {
     if (attempt.status !== "paused") return "";
     return `
-      <div class="modal-backdrop">
-        <section class="pause-modal">
+      <div class="modal-backdrop static-backdrop" data-static-backdrop="true">
+        <section class="pause-modal" role="dialog" aria-modal="true" aria-labelledby="pause-title" tabindex="-1">
           <span class="pause-icon">${icon("pause")}</span>
-          <h2>Exam Paused</h2>
-          <p>Your time is stopped. Resume when ready or save and exit to Home.</p>
+          <p class="eyebrow">Checkpoint secured</p>
+          <h2 id="pause-title">Exam Paused</h2>
+          <p>Your timer is frozen at <strong>${formatDuration(timeRemaining(attempt))}</strong>. Item ${attempt.current_question_index + 1} and all answers are saved.</p>
           <button class="btn primary" data-action="resume-paused" type="button">${icon("play")} Resume Exam</button>
           <button class="btn secondary" data-action="save-exit" type="button">${icon("save")} Save and Exit</button>
         </section>
@@ -1535,8 +1691,9 @@
     if (app.modal !== "submit") return "";
     return `
       <div class="modal-backdrop">
-        <section class="submit-modal">
-          <h2>Submit Exam?</h2>
+        <section class="submit-modal" role="dialog" aria-modal="true" aria-labelledby="submit-title" tabindex="-1">
+          <p class="eyebrow">Final submission</p>
+          <h2 id="submit-title">Submit Exam?</h2>
           <p>You can still review unanswered or flagged items before submitting.</p>
           <div class="submit-stats">
             <metric><strong>${answeredCount(attempt)}</strong><span>Answered</span></metric>
@@ -1558,10 +1715,63 @@
   function chartModal(attempt, answer) {
     if (app.modal !== "chart" || !answer?.stimulus) return "";
     return `
-      <div class="modal-backdrop">
-        <section class="chart-modal">
+      <div class="modal-backdrop chart-backdrop">
+        <section class="chart-modal" role="dialog" aria-modal="true" aria-label="Expanded chart" tabindex="-1">
           <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
           ${renderStimulusPanel(attempt, answer, linkedStimulusAnswers(attempt, answer), true)}
+        </section>
+      </div>
+    `;
+  }
+
+  function timeoutModal(attempt) {
+    if (app.modal !== "timeout") return "";
+    return `
+      <div class="modal-backdrop static-backdrop timeout-backdrop" data-static-backdrop="true">
+        <section class="timeout-modal" role="alertdialog" aria-modal="true" aria-labelledby="timeout-title" tabindex="-1">
+          <span class="timeout-symbol">${icon("clock")}</span>
+          <p class="eyebrow">Timer threshold reached</p>
+          <h2 id="timeout-title">Time Expired</h2>
+          <p>Your final checkpoint is being synchronized and scored.</p>
+          <div class="segmented-loader compact" aria-label="Submitting"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <small>${answeredCount(attempt)} of ${attempt.total_questions} answered</small>
+        </section>
+      </div>
+    `;
+  }
+
+  function forgotPasswordModal() {
+    if (app.modal !== "forgot-password" && app.modal !== "forgot-success") return "";
+    const value = app.resetEmail || document.querySelector("[data-form='signin'] input[name='email']")?.value || app.profile?.email || "";
+    const success = app.modal === "forgot-success";
+    return `
+      <div class="modal-backdrop auth-dialog-backdrop">
+        <section class="reset-modal" role="dialog" aria-modal="true" aria-labelledby="reset-title" tabindex="-1">
+          <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
+          <span class="reset-symbol">${icon(success ? "check" : "mail")}</span>
+          <p class="eyebrow">Account recovery</p>
+          <h2 id="reset-title">${success ? "Reset link sent" : "Reset your password"}</h2>
+          ${success
+            ? `<p>Check <strong>${escapeHtml(value || "your email")}</strong> for the secure reset link.</p><button class="btn primary" data-action="close-modal" type="button">Return to Sign In</button>`
+            : `<p>Enter the email used for this private reviewer account.</p>${app.dialogError ? `<p class="form-error" role="alert">${escapeHtml(app.dialogError)}</p>` : ""}<form data-form="forgot-password"><label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" value="${escapeAttr(value)}" autocomplete="email" required /></div></label><div class="modal-actions"><button class="btn secondary" data-action="close-modal" type="button">Cancel</button><button class="btn primary" data-action="send-reset" type="button" ${app.busyAction === "reset" ? "disabled" : ""}>${app.busyAction === "reset" ? "Sending..." : "Send Reset Link"}</button></div></form>`}
+        </section>
+      </div>
+    `;
+  }
+
+  function confirmationModal() {
+    if (app.modal !== "delete-account" && app.modal !== "delete-attempt") return "";
+    const deletingAccount = app.modal === "delete-account";
+    const attempt = deletingAccount ? null : getAttempt(app.dialogTarget);
+    const target = deletingAccount ? app.profile?.name || "this account" : examTitle(attempt || {});
+    return `
+      <div class="modal-backdrop danger-backdrop">
+        <section class="confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" tabindex="-1">
+          <span class="danger-symbol">${icon("delete")}</span>
+          <p class="eyebrow">Destructive command</p>
+          <h2 id="confirm-title">${deletingAccount ? "Delete Account?" : "Delete Attempt?"}</h2>
+          <p><strong>${escapeHtml(target)}</strong> ${deletingAccount ? "and every stored attempt" : "and its answer history"} will be permanently removed.</p>
+          <div class="modal-actions"><button class="btn secondary" data-action="close-modal" type="button">Cancel</button><button class="btn danger" data-action="${deletingAccount ? "confirm-delete-account" : "confirm-delete-attempt"}" type="button">${deletingAccount ? "Delete Account" : "Delete Attempt"}</button></div>
         </section>
       </div>
     `;
@@ -1589,12 +1799,7 @@
 
   function categoryPercent(stats, section) {
     if (stats) return Math.round(stats.percent);
-    return {
-      "Verbal Ability": 82,
-      "Numerical Ability": 64,
-      "Analytical Ability": 76,
-      "General Information": 70
-    }[section] || 0;
+    return 0;
   }
 
   function practiceCategoriesForDisplay() {
@@ -1911,13 +2116,18 @@
     const formName = form.dataset.form;
 
     try {
-      if (formName === "signup") await signUp(data);
-      if (formName === "signin") await signIn(data);
+      if (formName === "signup") await runBusy("create", () => signUp(data));
+      if (formName === "signin") await runBusy("signin", () => signIn(data));
       if (formName === "setup") await startFullExam(formOptions(form));
-      if (formName === "profile") await saveProfile(form);
-      if (formName === "change-password") await changePassword(data);
+      if (formName === "profile") await runBusy("profile", () => saveProfile(form));
+      if (formName === "change-password") await runBusy("password", () => changePassword(data));
       if (formName === "custom-practice") await startPractice(data.category, Number(data.count), data.difficulty);
     } catch (error) {
+      if (action === "send-reset") {
+        app.dialogError = readableError(error);
+        render();
+        return;
+      }
       showToast(readableError(error));
     }
   }
@@ -1932,6 +2142,18 @@
     if (action === "show-create") {
       app.fixtureState = "create";
       return setView({ name: "create" }) || true;
+    }
+    if (action === "reload-app") return true;
+    if (action === "forgot-password") {
+      app.resetEmail = "john.smith@email.com";
+      app.modal = "forgot-password";
+      return render() || true;
+    }
+    if (action === "send-reset") {
+      app.resetEmail = formDataFromButton(target).email || "john.smith@email.com";
+      app.fixtureState = "forgot-success";
+      app.modal = "forgot-success";
+      return render() || true;
     }
     if (action === "signup-submit" || action === "signin-submit" || action === "dashboard") {
       app.fixtureState = "dashboard";
@@ -1982,6 +2204,10 @@
       render();
       return true;
     }
+    if (action === "toggle-exam-nav") {
+      app.examNavOpen = !app.examNavOpen;
+      return renderExam() || true;
+    }
     if (action === "pause-exam") {
       active.status = "paused";
       app.fixtureState = "pause";
@@ -2027,7 +2253,36 @@
       app.fixtureState = "results";
       return setView({ name: "results", attemptId: practice.id }) || true;
     }
-    if (action === "delete-profile" || action === "forgot-password" || action === "password-submit" || action === "profile-submit") {
+    if (action === "repeat-practice" || action === "change-practice" || action === "practice-weakest") {
+      if (action === "change-practice" || action === "practice-weakest") {
+        app.practiceReviewTab = "practice";
+        app.fixtureState = "practice";
+        return setView({ name: "practice" }) || true;
+      }
+      app.fixtureState = "exam-collapsed";
+      return setView({ name: "exam", attemptId: active.id }) || true;
+    }
+    if (action === "retake-same-version") {
+      app.fixtureState = "setup";
+      return setView({ name: "setup" }) || true;
+    }
+    if (action === "delete-profile") {
+      app.fixtureState = "delete-account";
+      app.modal = "delete-account";
+      return render() || true;
+    }
+    if (action === "confirm-delete-account") {
+      app.fixtureState = "select";
+      app.modal = null;
+      return setView({ name: "signin" }) || true;
+    }
+    if (action === "confirm-delete-attempt") {
+      app.attempts = app.attempts.filter((attempt) => attempt.id !== app.dialogTarget);
+      app.modal = null;
+      app.fixtureState = "progress";
+      return render() || true;
+    }
+    if (action === "password-submit" || action === "profile-submit") {
       showToast("Fixture mode: no Supabase data is changed.");
       return true;
     }
@@ -2039,6 +2294,12 @@
       app.fixtureState = target.dataset.attemptReview ? "review" : "results";
       return setView({ name: target.dataset.attemptReview ? "review" : "results", attemptId: submitted.id, index: 0 }) || true;
     }
+    if (target.dataset.attemptDelete) {
+      app.dialogTarget = target.dataset.attemptDelete;
+      app.modal = "delete-attempt";
+      app.fixtureState = "delete-attempt";
+      return render() || true;
+    }
     return false;
   }
 
@@ -2049,14 +2310,15 @@
 
     try {
       if (app.fixtureMode && handleFixtureClick(target, action)) return;
+      if (action === "reload-app") return location.reload();
       if (action === "toggle-password") return togglePasswordVisibility(target);
       if (action === "show-signin") return setView({ name: "signin" });
       if (action === "show-create") return setView({ name: "create" });
-      if (action === "signup-submit") return await signUp(formDataFromButton(target));
-      if (action === "signin-submit") return await signIn(formDataFromButton(target));
+      if (action === "signup-submit") return await runBusy("create", () => signUp(formDataFromButton(target)));
+      if (action === "signin-submit") return await runBusy("signin", () => signIn(formDataFromButton(target)));
       if (action === "setup-submit") return await startFullExam(formOptions(target.closest("form")));
-      if (action === "profile-submit") return await saveProfile(target.closest("form"));
-      if (action === "password-submit") return await changePassword(formDataFromButton(target));
+      if (action === "profile-submit") return await runBusy("profile", () => saveProfile(target.closest("form")));
+      if (action === "password-submit") return await runBusy("password", () => changePassword(formDataFromButton(target)));
       if (action === "custom-practice-submit") {
         const values = formDataFromButton(target);
         return await startPractice(values.category, Number(values.count), values.difficulty);
@@ -2081,6 +2343,7 @@
       if (action === "close-modal") return closeModal();
       if (action === "signout") return await signOut();
       if (action === "forgot-password") return await forgotPassword();
+      if (action === "send-reset") return await runBusy("reset", () => sendPasswordReset(formDataFromButton(target)));
       if (action === "save-setup") return await saveSetupDraft();
       if (action === "resume-exam") return resumeActiveAttempt();
       if (action === "pause-exam") return await pauseAttempt();
@@ -2096,12 +2359,25 @@
       if (action === "clear-answer") return clearAnswer();
       if (action === "toggle-flag") return toggleFlag();
       if (action === "open-chart") return openModal("chart");
+      if (action === "toggle-exam-nav") {
+        app.examNavOpen = !app.examNavOpen;
+        return renderExam();
+      }
       if (action === "review-answers") return setView({ name: "review", attemptId: app.view.attemptId, index: 0 });
       if (action === "back-results") return setView({ name: "results", attemptId: app.view.attemptId });
       if (action === "review-prev") return moveReview(-1);
       if (action === "review-next") return moveReview(1);
       if (action === "toggle-updates") return openModal(app.modal === "updates" ? null : "updates");
       if (action === "delete-profile") return await deleteProfile();
+      if (action === "confirm-delete-account") return await confirmDeleteProfile();
+      if (action === "confirm-delete-attempt") return await confirmDeleteAttempt();
+      if (action === "repeat-practice") return await repeatPractice();
+      if (action === "change-practice") {
+        app.practiceReviewTab = "practice";
+        return setView({ name: "practice" });
+      }
+      if (action === "practice-weakest") return await practiceWeakestArea();
+      if (action === "retake-same-version") return await retakeSameVersion();
       if (action === "toggle-nav-full") {
         const group = target.dataset.navGroup;
         if (app.expandedNavGroups.has(group)) app.expandedNavGroups.delete(group);
@@ -2149,6 +2425,35 @@
     if (input.closest("[data-form='setup']")) saveSetupDraft(false);
   }
 
+  function handleKeydown(event) {
+    const dialog = document.querySelector("[role='dialog'], [role='alertdialog']");
+    if (!dialog) return;
+    if (event.key === "Escape") {
+      const staticDialog = dialog.closest(".static-backdrop");
+      if (!staticDialog && app.modal) {
+        event.preventDefault();
+        closeModal();
+      }
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const focusable = Array.from(dialog.querySelectorAll("button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex='-1'])"));
+    if (!focusable.length) {
+      event.preventDefault();
+      dialog.focus();
+      return;
+    }
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
   async function signUp(data) {
     const inviteCode = String(data.inviteCode || "").trim();
     if (data.confirmPassword !== undefined && data.password !== data.confirmPassword) {
@@ -2171,6 +2476,17 @@
       setView({ name: "dashboard" });
     } else {
       await signIn(data);
+    }
+  }
+
+  async function runBusy(action, task) {
+    app.busyAction = action;
+    render();
+    try {
+      return await task();
+    } finally {
+      app.busyAction = "";
+      render();
     }
   }
 
@@ -2205,14 +2521,23 @@
     setView({ name: "signin" });
   }
 
-  async function forgotPassword() {
-    const email = prompt("Enter your account email for password reset:");
-    if (!email) return;
-    const { error } = await app.client.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+  function forgotPassword() {
+    app.resetEmail = document.querySelector("[data-form='signin'] input[name='email']")?.value || app.profile?.email || "";
+    app.dialogError = "";
+    openModal("forgot-password");
+  }
+
+  async function sendPasswordReset(data) {
+    const email = String(data.email || "").trim().toLowerCase();
+    if (!/^\S+@\S+\.\S+$/.test(email)) throw new Error("Enter a valid email address.");
+    app.resetEmail = email;
+    const { error } = await app.client.auth.resetPasswordForEmail(email, {
       redirectTo: `${location.origin}${location.pathname}`
     });
     if (error) throw error;
-    showToast("Password reset email sent.");
+    app.dialogError = "";
+    app.modal = "forgot-success";
+    render();
   }
 
   async function changePassword(data) {
@@ -2236,7 +2561,7 @@
       name: formData.name.trim(),
       level: app.profile.level || "Professional",
       birth_date: app.profile.birth_date || null,
-      notes: formData.notes || "",
+      notes: app.profile.notes || "",
       last_active_at: nowIso()
     };
     const { data, error } = await app.client.from("profiles").update(updates).eq("user_id", app.session.user.id).select("*").single();
@@ -2247,12 +2572,34 @@
   }
 
   async function deleteProfile() {
-    if (!confirm("Delete this profile data and all attempts? This cannot be undone.")) return;
+    app.modal = "delete-account";
+    render();
+  }
+
+  async function confirmDeleteProfile() {
     const { error } = await app.client.from("profiles").delete().eq("user_id", app.session.user.id);
     if (error) throw error;
     await app.client.auth.signOut();
     app.session = null;
     setView({ name: "signin" });
+  }
+
+  async function retakeSameVersion() {
+    const attempt = getAttempt(app.view.attemptId);
+    if (!attempt) return;
+    return startFullExam({ ...DEFAULT_OPTIONS, ...(attempt.options || {}), versionId: attempt.exam_version_id });
+  }
+
+  async function repeatPractice() {
+    const attempt = getAttempt(app.view.attemptId);
+    if (!attempt) return;
+    return startPractice(attempt.practice_category || "Verbal Ability", attempt.options?.count || attempt.total_questions || DEFAULT_PRACTICE_COUNT, attempt.options?.difficulty || "mixed");
+  }
+
+  async function practiceWeakestArea() {
+    const attempt = getAttempt(app.view.attemptId);
+    const weakest = performanceInsights(attempt).weakest?.section || "Verbal Ability";
+    return startPractice(weakest, DEFAULT_PRACTICE_COUNT, "mixed");
   }
 
   function formOptions(form) {
@@ -2445,7 +2792,7 @@
     }
     touchAttempt(attempt);
     if (attempt.total_time_seconds && attempt.elapsed_seconds >= attempt.total_time_seconds) {
-      submitAttempt(attempt, true);
+      beginTimeout(attempt);
       return;
     }
     updateExamTimerDom(attempt);
@@ -2456,6 +2803,13 @@
     const answered = document.querySelector(".exam-answered");
     if (timer && attempt.options?.showTimer !== false) timer.textContent = `Time Left: ${formatDuration(timeRemaining(attempt))}`;
     if (answered) answered.textContent = `Answered: ${answeredCount(attempt)}/${attempt.total_questions}`;
+  }
+
+  function beginTimeout(attempt) {
+    if (app.modal === "timeout") return;
+    app.modal = "timeout";
+    renderExam();
+    setTimeout(() => submitAttempt(attempt, true), 900);
   }
 
   function chooseAnswer(choice) {
@@ -2522,6 +2876,7 @@
     const attempt = getAttempt(app.view.attemptId);
     if (!attempt || index < 0 || index >= attempt.total_questions) return;
     attempt.current_question_index = index;
+    app.examNavOpen = false;
     const answer = currentAnswer(attempt);
     if (answer) {
       answer.visit_count = (answer.visit_count || 0) + 1;
@@ -2622,7 +2977,14 @@
   }
 
   async function deleteAttempt(attemptId) {
-    if (!confirm("Delete this attempt and its answer history?")) return;
+    app.dialogTarget = attemptId;
+    app.modal = "delete-attempt";
+    render();
+  }
+
+  async function confirmDeleteAttempt() {
+    const attemptId = app.dialogTarget;
+    if (!attemptId) return;
     const { error } = await app.client.from("attempts").delete().eq("id", attemptId).eq("user_id", app.session.user.id);
     if (error) throw error;
     app.attempts = app.attempts.filter((attempt) => attempt.id !== attemptId);
@@ -2920,6 +3282,7 @@
 
   function closeModal(rerender = true) {
     app.modal = null;
+    app.dialogError = "";
     if (rerender) render();
   }
 

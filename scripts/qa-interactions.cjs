@@ -1,0 +1,273 @@
+"use strict";
+
+const fs = require("node:fs");
+const path = require("node:path");
+const { chromium } = require(path.join(process.env.LOCALAPPDATA, "csc-reviewer", "qa-deps", "node_modules", "playwright"));
+
+const baseUrl = process.env.CSC_QA_URL || "http://127.0.0.1:4173/";
+const outputDir = path.resolve(process.argv[2] || "qa/t0024-cockpit-interactions");
+fs.mkdirSync(outputDir, { recursive: true });
+
+function safeName(value) {
+  return value.replace(/[^a-z0-9-]+/gi, "-").toLowerCase();
+}
+
+(async () => {
+  const browser = await chromium.launch({ channel: "msedge", headless: true });
+  const context = await browser.newContext({ viewport: { width: 1672, height: 942 }, deviceScaleFactor: 1, reducedMotion: "reduce" });
+  const page = await context.newPage();
+  const report = { baseUrl, createdAt: new Date().toISOString(), browser: "Microsoft Edge", screenshots: [], checks: [], errors: [] };
+  const runtimeErrors = [];
+  page.on("pageerror", (error) => runtimeErrors.push(`pageerror: ${error.message}`));
+  page.on("console", (message) => { if (message.type() === "error") runtimeErrors.push(`console: ${message.text()}`); });
+
+  async function gotoFixture(name) {
+    runtimeErrors.length = 0;
+    await page.goto(`${baseUrl}?fixture=${encodeURIComponent(name)}&qa=interactions`, { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForTimeout(80);
+  }
+
+  async function screenshot(name) {
+    await page.waitForTimeout(70);
+    const file = `${safeName(name)}.png`;
+    const metrics = await page.evaluate(() => {
+      const frame = document.querySelector(".cockpit-frame")?.getBoundingClientRect();
+      return {
+        view: document.getElementById("app")?.dataset.view,
+        modal: document.querySelector("[role='dialog'],[role='alertdialog']")?.className || null,
+        focus: document.activeElement?.outerHTML?.slice(0, 180) || null,
+        body: [document.body.scrollWidth, document.body.scrollHeight],
+        frame: frame ? [frame.x, frame.y, frame.width, frame.height] : null
+      };
+    });
+    await page.screenshot({ path: path.join(outputDir, file), fullPage: false });
+    report.screenshots.push({ name, file, metrics, runtimeErrors: [...runtimeErrors] });
+    if (runtimeErrors.length || metrics.body[0] > 1672 || metrics.body[1] > 942) {
+      report.errors.push({ name, runtimeErrors: [...runtimeErrors], metrics });
+    }
+  }
+
+  async function check(name, condition, details = "") {
+    const passed = Boolean(await condition());
+    report.checks.push({ name, passed, details });
+    if (!passed) report.errors.push({ name, details });
+  }
+
+  async function test(name, callback) {
+    try {
+      await callback();
+    } catch (error) {
+      report.errors.push({ name, error: error.message, stack: error.stack });
+    }
+  }
+
+  await test("auth controls", async () => {
+    await gotoFixture("create");
+    await page.locator("[data-action='signup-submit']").hover();
+    await screenshot("auth-create-primary-hover");
+    await page.locator("input[name='password']").fill("ReviewPass123");
+    await page.locator("input[name='confirmPassword']").fill("ReviewPass123");
+    await page.locator("[data-action='toggle-password']").first().click();
+    await check("create password reveal", async () => await page.locator("input[name='password']").getAttribute("type") === "text");
+    await screenshot("auth-create-password-visible");
+    await page.locator("[data-action='show-signin']").click();
+    await screenshot("auth-create-to-signin");
+    await page.locator("input[name='email']").fill("john.smith@email.com");
+    await page.locator("[data-action='forgot-password']").click();
+    await screenshot("auth-reset-open");
+    await page.keyboard.press("Escape");
+    await check("reset modal escape", async () => await page.locator("[role='dialog']").count() === 0);
+    await screenshot("auth-reset-escape-close");
+    await page.locator("[data-action='forgot-password']").click();
+    await page.locator("[data-action='send-reset']").click();
+    await screenshot("auth-reset-success");
+    await gotoFixture("forgot-error");
+    await screenshot("auth-reset-invalid-email");
+  });
+
+  await test("dashboard and account", async () => {
+    await gotoFixture("dashboard");
+    await page.locator(".hub-mode.practice").hover();
+    await screenshot("dashboard-focused-practice-hover");
+    await page.locator(".account-button").focus();
+    await screenshot("dashboard-account-keyboard-focus");
+    await page.locator(".account-button").click();
+    await screenshot("account-settings-open");
+    await page.locator(".account-password-panel summary").click();
+    await screenshot("account-password-expanded-interaction");
+    await page.locator("input[name='currentPassword']").fill("ReviewPass123");
+    await page.locator(".account-password-panel [data-action='toggle-password']").first().click();
+    await check("account password reveal", async () => await page.locator("input[name='currentPassword']").getAttribute("type") === "text");
+    await screenshot("account-password-visible");
+    await page.locator("[data-action='close-modal']").first().click();
+    await screenshot("account-settings-closed");
+    await page.locator(".account-button").click();
+    await page.locator("[data-action='delete-profile']").click();
+    await screenshot("account-delete-confirmation-open");
+    await page.keyboard.press("Escape");
+    await check("delete account escape", async () => await page.locator("[role='alertdialog']").count() === 0);
+    await screenshot("account-delete-confirmation-cancelled");
+  });
+
+  await test("setup controls", async () => {
+    await gotoFixture("setup");
+    const version = page.locator("select[name='versionId']");
+    if (await version.count()) await version.selectOption({ index: Math.min(1, (await version.locator("option").count()) - 1) });
+    const shuffle = page.locator("input[name='shuffleQuestions']");
+    if (await shuffle.count()) await shuffle.check({ force: true });
+    await screenshot("setup-options-modified");
+    await page.locator("[data-action='setup-submit']").click();
+    await check("setup starts exam", async () => await page.locator(".exam-shell").count() === 1);
+    await screenshot("setup-start-exam");
+  });
+
+  await test("exam answer controls", async () => {
+    await gotoFixture("exam-collapsed");
+    await check("desktop mobile-close hidden", async () => !(await page.locator(".mobile-nav-close").isVisible()));
+    await page.locator("[data-action='clear-answer']").click();
+    await check("next disabled without answer", async () => await page.locator("[data-action='next-question']").isDisabled());
+    await screenshot("exam-cleared-next-disabled");
+    await page.locator("[data-choice='A']").click();
+    await check("next enabled with answer", async () => !(await page.locator("[data-action='next-question']").isDisabled()));
+    await screenshot("exam-answer-selected");
+    await page.locator("[data-action='toggle-flag']").click();
+    await screenshot("exam-answer-flagged");
+    await page.locator("[data-action='next-question']").click();
+    await screenshot("exam-next-question");
+    await page.locator("[data-action='clear-answer']").click();
+    await page.locator("[data-action='skip-question']").click();
+    await screenshot("exam-explicit-skip");
+    const more = page.locator(".more-chip").first();
+    if (await more.count()) {
+      await more.click();
+      await screenshot("exam-group-more");
+      const less = page.locator(".more-chip", { hasText: "Less" }).first();
+      if (await less.count()) {
+        await less.click();
+        await screenshot("exam-group-less");
+      }
+    }
+    await page.locator("[data-action='pause-exam']").click();
+    await screenshot("exam-pause-open");
+    await page.keyboard.press("Escape");
+    await check("pause is static", async () => await page.locator(".pause-modal").count() === 1);
+    await page.locator("[data-action='resume-paused']").click();
+    await screenshot("exam-resumed");
+    await page.locator("[data-action='open-submit']").click();
+    await screenshot("exam-submit-open");
+    await page.keyboard.press("Escape");
+    await check("submit escape closes", async () => await page.locator(".submit-modal").count() === 0);
+    await page.locator("[data-action='open-submit']").click();
+    await page.locator("[data-action='review-unanswered']").click();
+    await screenshot("exam-review-unanswered");
+    await page.locator("[data-action='open-submit']").click();
+    await page.locator("[data-action='review-flagged']").click();
+    await screenshot("exam-review-flagged");
+    await page.locator("[data-action='open-submit']").click();
+    await page.locator("[data-action='confirm-submit']").click();
+    await check("submit reaches results", async () => await page.locator(".results-page").count() === 1);
+    await screenshot("exam-submitted-results");
+  });
+
+  await test("graph modal", async () => {
+    await gotoFixture("graph");
+    await page.locator("[data-action='open-chart']").click();
+    await screenshot("graph-expanded-modal");
+    await page.keyboard.press("Escape");
+    await check("chart escape closes", async () => await page.locator(".chart-modal").count() === 0);
+    await screenshot("graph-modal-closed");
+  });
+
+  await test("practice and review tabs", async () => {
+    await gotoFixture("practice");
+    await page.locator("input[name='category'][value='Numerical Ability']").check({ force: true });
+    await page.locator("input[name='count'][value='30']").evaluate((input) => {
+      input.checked = true;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    await page.locator("select[name='difficulty']").selectOption("hard");
+    await screenshot("practice-customized");
+    await page.locator("[data-action='custom-practice-submit']").click();
+    await screenshot("practice-custom-started");
+    await gotoFixture("practice");
+    await page.locator("[data-practice-review-tab='mistakes']").click();
+    await screenshot("practice-mistakes-tab");
+    await page.locator("[data-review-mistakes]").first().click();
+    await screenshot("practice-mistake-answer-review");
+    await gotoFixture("practice");
+    await page.locator("[data-practice-review-tab='flagged']").click();
+    await screenshot("practice-flagged-tab");
+    await page.locator("[data-open-review]").first().click();
+    await screenshot("practice-flagged-answer-review");
+  });
+
+  await test("progress filters and row menu", async () => {
+    await gotoFixture("progress");
+    for (const filter of ["full", "practice", "quick", "review", "all"]) {
+      await page.locator(`[data-recent-tab='${filter}']`).click();
+      await screenshot(`progress-filter-${filter}`);
+    }
+    await page.locator("[data-overflow]").first().click();
+    await screenshot("progress-row-overflow-open");
+    await page.locator("[data-attempt-delete]").click();
+    await screenshot("progress-delete-attempt-open");
+    await page.keyboard.press("Escape");
+    await check("delete attempt escape", async () => await page.locator("[role='alertdialog']").count() === 0);
+    await screenshot("progress-delete-attempt-cancelled");
+  });
+
+  await test("results actions", async () => {
+    await gotoFixture("results");
+    await page.locator("[data-action='review-answers']").click();
+    await screenshot("results-review-answers");
+    await gotoFixture("results");
+    await page.locator("[data-action='practice-weakest']").click();
+    await screenshot("results-practice-weakest");
+    await gotoFixture("results");
+    await page.locator("[data-action='retake-same-version']").click();
+    await screenshot("results-retake-same-version");
+    await gotoFixture("results-practice");
+    await page.locator("[data-action='repeat-practice']").click();
+    await screenshot("practice-results-repeat-drill");
+    await gotoFixture("results-practice");
+    await page.locator("[data-action='change-practice']").click();
+    await screenshot("practice-results-change-practice");
+  });
+
+  await test("answer review filters", async () => {
+    await gotoFixture("review");
+    for (const filter of ["wrong", "correct", "flagged", "all"]) {
+      await page.locator(`[data-review-filter='${filter}']`).click();
+      await screenshot(`review-filter-${filter}`);
+    }
+    await page.locator(".review-content-scroll").evaluate((node) => { node.scrollTop = node.scrollHeight; });
+    await screenshot("review-explanation-scrolled");
+    const next = page.locator("[data-action='review-next']");
+    if (!(await next.isDisabled())) {
+      await next.click();
+      await screenshot("review-next-question");
+      const previous = page.locator("[data-action='review-prev']");
+      if (!(await previous.isDisabled())) await previous.click();
+      await screenshot("review-previous-question");
+    }
+    await gotoFixture("review-empty");
+    await check("review empty disables previous", async () => await page.locator("[data-action='review-prev']").isDisabled());
+    await check("review empty disables next", async () => await page.locator("[data-action='review-next']").isDisabled());
+    await screenshot("review-filter-no-matches");
+  });
+
+  await browser.close();
+  fs.writeFileSync(path.join(outputDir, "report.json"), JSON.stringify(report, null, 2));
+  const summary = {
+    screenshots: report.screenshots.length,
+    checks: report.checks.length,
+    passedChecks: report.checks.filter((entry) => entry.passed).length,
+    failures: report.errors.length
+  };
+  process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
+  if (report.errors.length) process.exitCode = 1;
+})().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

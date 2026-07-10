@@ -1,6 +1,6 @@
 # Repo Current State
 
-Last updated: 2026-07-10
+Last updated: 2026-07-11
 
 ## Workspace
 
@@ -41,12 +41,12 @@ Path:
 - `app/index.html`
 - `app/app.js`
 - `app/styles.css`
-- `app/final-overrides.css`
-- `app/study-hub.css`
+- `app/cockpit-theme.css`
 - `app/question-data.js`
 - `app/generated-question-bank.js`
 - `app/assets/brand-shield.svg`
 - `app/assets/fonts/barlow-condensed-*.woff2` / `.ttf`
+- `app/assets/fonts/rajdhani-*-latin.ttf`
 - `app/assets/icons/*.svg`
 - `app/assets/create_profile_background.png`
 - `app/images/image_01.jpg` through `app/images/image_29.jpg`
@@ -55,6 +55,8 @@ Path:
 - `scripts/setup-local-deps.ps1`
 - `scripts/start.ps1`
 - `scripts/validate-static-data.mjs`
+- `scripts/qa-cockpit.cjs`
+- `scripts/qa-interactions.cjs`
 - `supabase/schema.sql`
 
 ## Source Images
@@ -97,11 +99,18 @@ Current source item boundaries:
 - The cockpit typography and required icon subset are self-hosted, with no runtime font/icon CDN or frontend framework. Static assets are cache-busted through `v=20260710-15`.
 - Final Edge-channel QA passed at `1904x913` and `1536x816` with no document overflow or console errors. Route, account-modal, answer/clear/next/previous/skip/flag, pause/resume, submit, graph-modal, practice-tab, review-filter, and review-navigation interactions were exercised.
 - Final T0023 evidence is stored under `qa/t0023-parity-final-r2`, `qa/t0023-parity-interactions`, `qa/t0023-parity-state-final`, and `qa/t0023-control-sequence`.
+- T0024 now uses one `cockpit-theme.css` layer for all public, signed-in, exam, result, review, dialog, and mobile states. The retired `study-hub.css` and `final-overrides.css` files are no longer loaded.
+- Desktop viewports at or above `1100px` render a centered uniform `1672x942` logical frame; `1904x913` and `1536x816` preserve the reference ratio with balanced ambient margins and no document scrolling.
+- Mobile uses normal stacked document flow, a compact account header, bottom navigation, a slide-over question navigator, and internally coherent setup/practice/progress/review/account layouts.
+- Password reset, delete-account, and delete-attempt flows are in-app dialogs; no native `prompt()` or `confirm()` calls remain.
+- Final T0024 Edge evidence is stored under `qa/t0024-cockpit-final-desktop`, `qa/t0024-cockpit-final-mobile`, `qa/t0024-cockpit-mobile-full-r2`, `qa/t0024-cockpit-modals-final`, and `qa/t0024-cockpit-interactions-final`.
+- The final fixture sweep covered 36 states at three desktop sizes (`108` screenshots) and two mobile sizes (`72` screenshots), with zero console/document failures and zero sampled element overflows. The interaction harness passed `15/15` checks across `59` screenshots.
+- Static assets are cache-busted through `v=20260711-01`.
 
 ## Current Active Ticket
 
-- None.
+- None. T0024 is complete pending only external follow-up work.
 
 ## Next Ticket
 
-- Supabase backup/export workflow before broader public use, or a content pedagogy review pass for the generated bank after T0023.
+- Supabase backup/export workflow before broader public use, or a content pedagogy review pass for the generated bank after T0024.

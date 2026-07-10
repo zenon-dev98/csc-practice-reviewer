@@ -473,3 +473,30 @@ Completion notes:
 - Repaired Results and Answer Review clipping exposed by the full-state regression sweep.
 - Cache-busted static assets through `v=20260710-15`.
 - Edge-channel screenshots and interaction evidence were saved under `qa/t0023-parity-final-r2`, `qa/t0023-parity-interactions`, `qa/t0023-parity-state-final`, and `qa/t0023-control-sequence`.
+
+## T0024 - Full Cockpit Theme And Page-Parity Rework
+
+Status: done
+
+Make the approved `1672x942` cockpit reference the visual master for every application state while preserving the existing Supabase, exam, timing, scoring, and persistence behavior.
+
+Acceptance criteria:
+
+- Desktop routes render inside one centered, uniformly scaled `1672x942` logical frame at 100% browser zoom without document scrolling or aspect-ratio distortion.
+- Public auth, system states, setup, exam, graph, practice, progress, results, review, and account settings use the shared graphite/cyan cockpit language.
+- Long data, question, navigator, explanation, and modal regions use bounded internal scrolling; mobile below `1100px` uses normal responsive document flow.
+- Native prompt/confirm flows are replaced by accessible in-app dialogs for password reset, account deletion, and attempt deletion.
+- Active-exam behavior remains intact, including persistent accordions, explicit Skip behavior, answer-gated Next, pause/resume, timeout submission, and timing analytics.
+- Fixtures cover default, empty, loading, error, expanded, destructive, timeout, chart, pass/fail, and practice-result states.
+- Maximized Edge screenshot and interaction sweeps pass at `1904x913`, `1536x816`, and the native logical frame before a cache-busted live deployment.
+
+Completion notes:
+
+- Consolidated the signed-in and public visual system into `cockpit-theme.css` and removed the superseded `study-hub.css` / `final-overrides.css` layers.
+- Added a centered, uniformly scaled `1672x942` desktop frame with responsive mobile flow below `1100px`; desktop pages do not distort or use document scrolling.
+- Reworked boot/config/error, account access, Study Hub, setup, full mock/practice players, graph questions, pause/submit/timeout, Practice & Review, Progress, results, Answer Review, and Account Settings into the graphite/cyan cockpit language.
+- Replaced native password-reset and destructive confirmation flows with accessible in-app dialogs, added loading/error states, and kept answer-gated Next plus explicit Skip behavior.
+- Added self-hosted Rajdhani weights and retained local Barlow Condensed / local icon assets without installing project dependencies in Google Drive.
+- Added reusable Edge screenshot and interaction harnesses in `scripts/qa-cockpit.cjs` and `scripts/qa-interactions.cjs`.
+- Final Edge fixture sweeps produced `108` desktop screenshots and `72` mobile screenshots with zero console/document failures and zero sampled element overflows; the final interaction run produced `59` screenshots with `15/15` checks passing.
+- Static assets are cache-busted through `v=20260711-01`.

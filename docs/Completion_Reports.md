@@ -977,3 +977,54 @@ Risks:
 
 - The cockpit is intentionally PC-first. Mobile is functional but does not attempt one-to-one parity with the desktop reference.
 - The reference's public group leaderboard semantics were deliberately replaced with private personal records until consent and aggregation rules exist.
+
+## 2026-07-11 - T0024 Full Cockpit Theme And Page-Parity Rework
+
+Summary:
+
+- Applied the approved cockpit reference across every public, signed-in, exam, analytics, review, and dialog state.
+- Added a uniformly scaled `1672x942` desktop frame and a separate responsive mobile contract.
+- Replaced native recovery/destructive dialogs, expanded fixture coverage, and preserved all Supabase, exam, timing, scoring, and persistence behavior.
+
+Files changed:
+
+- `app/index.html`
+- `app/app.js`
+- `app/cockpit-theme.css`
+- `app/final-overrides.css` (removed)
+- `app/study-hub.css` (removed)
+- `app/assets/fonts/rajdhani-*-latin.ttf`
+- `app/assets/fonts/LICENSE-RAJDHANI.txt`
+- `scripts/qa-cockpit.cjs`
+- `scripts/qa-interactions.cjs`
+- `docs/Tickets.md`
+- `docs/Repo_Current_State.md`
+- `docs/Known_Issues_And_Followups.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- `node --check app/app.js`
+- `node --check scripts/qa-cockpit.cjs`
+- `node --check scripts/qa-interactions.cjs`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- `git diff --check`
+- Microsoft Edge fixture sweeps at `1672x942`, `1904x913`, `1536x816`, `390x844`, and `412x915`
+- Microsoft Edge interaction harness covering auth, account, setup, exam, graph, pause, submit, practice, progress, results, review, and destructive states
+
+Verification:
+
+- JavaScript syntax, static data, local dependency policy, whitespace, and Impeccable checks passed.
+- No native `prompt()` or `confirm()` calls remain.
+- Desktop sweep: `108` screenshots, zero console/document failures, zero sampled element overflows.
+- Mobile sweep: `72` screenshots, zero console/document failures, zero sampled element overflows.
+- Interaction sweep: `59` screenshots, `15/15` checks passed.
+- Full-page mobile screenshots confirmed content-height parity without synthetic blank tails.
+- Static assets are cache-busted through `v=20260711-01`.
+
+Risks:
+
+- Desktop intentionally letterboxes the reference frame on wider or differently proportioned viewports instead of stretching it.
+- Mobile uses normal page scrolling for long workflows and is not a one-to-one scaled version of the desktop cockpit.

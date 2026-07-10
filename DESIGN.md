@@ -33,29 +33,28 @@ Anti-references:
   - Numerical `81-120`
   - Analytical `121-170`
 - Keep question header compact: section/subtopic, item number, version, and status.
-- Keep the independent-practice disclaimer in shell/home areas, not as confusing question metadata.
+- Keep the independent-practice disclaimer on public access and setup surfaces, not in the signed-in header or question metadata.
 - Shared graph/table/logic setups render above the prompt as stimulus panels with clear labels such as `Chart for Items 101-104`.
 
 ## Tokens
 
-- Surfaces: `#ffffff`, `#f8fafc`, `#f4f6f8`, exam sidebar `#111827`
-- Text: `#18202a`, `#5c6675`
-- Lines: `#d8dee7`, `#aeb8c6`
-- Action: `#08756f`
-- Focus/info: `#315fba`
-- Warning: `#9a6400`
-- Danger: `#9a2d25`
-- Radius: `8px`
-- Touch target minimum: `30px` for item chips, `38px` for command buttons
+- Surfaces: graphite `#03080c`, raised ink `#071116`, panel `#09151b`, calm question surface `#101b20`.
+- Text: primary `#eef5f3`, muted `#9bafb2`, dim `#667c83`.
+- Lines: structural `#344850`, recessed `#1c3038`, metallic `#789098`.
+- Primary action / verbal: cyan `#21ded7`; numerical `#3b8dff`; analytical `#5bcf62`; general `#a66af1`.
+- Warning / skipped: `#f2b632`; danger / flagged: `#ef4c4c`.
+- Display: self-hosted Barlow Condensed 800 italic. HUD and forms: self-hosted Rajdhani. Long prompts: readable system sans-serif.
+- Corners: clipped technical polygons for major panels; square or minimally rounded controls.
+- Touch target minimum: `30px` for item chips, `38px` for command buttons.
 
-## Study Hub Cockpit Direction
+## Cockpit Direction
 
-- Base surfaces: graphite `#071014`, raised ink `#0d171c`, line `#2b4047`, text `#f1f5f4`, muted `#9aabaa`.
-- Primary action: electric teal `#10c7c1`; section accents: verbal `#2684ff`, numerical `#56c94f`, analytical `#9a59e8`, general `#f0a51b`; warning `#ff5d52`.
-- Display and cockpit interface typography: locally hosted Barlow Condensed, with weight and scale separating navigation, labels, values, and commands.
-- Use connected panels, clipped corners, progress tracks, and restrained technical linework instead of repeated white cards.
-- The Study Hub may be expressive; exam questions, choices, and controls must remain conventional and distraction-free.
-- Decorative patterns must be locally hosted or native CSS/SVG and must not carry essential information.
+- The generated `1672x942` cockpit is the desktop visual master for every state.
+- Desktop uses one uniformly scaled logical frame centered in the available viewport; it never stretches to fill a different aspect ratio.
+- Use connected panels, clipped corners, progress tracks, inset rails, hatch marks, and restrained technical linework instead of repeated white cards.
+- The Study Hub may be expressive; exam questions, choices, and controls remain calm, readable, and distraction-free.
+- Decorative patterns are locally hosted or native CSS/SVG and never carry essential information.
+- Below `1100px`, use responsive stacking and normal document scrolling rather than scaling the desktop frame.
 
 ## Pre-Ship Audit Checklist
 
