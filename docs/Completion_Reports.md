@@ -934,3 +934,46 @@ Risks:
 
 - The signed-in side pages are optimized for the current desktop/Edge priority. Mobile remains secondary and should get its own polish pass if it becomes important.
 - The app still uses the existing inline icon set, so exact glyph parity with generated mockups remains limited unless the icon system itself is replaced.
+
+## 2026-07-10 - T0023 Gamified Study Hub Cockpit
+
+Summary:
+
+- Rebuilt the signed-in Study Hub against the approved dark cockpit reference using measured desktop geometry, self-hosted typography, and locally vendored icons.
+- Connected active-run progress, timing, checkpoints, private records, commands, and section performance to actual app state while omitting fabricated rankings and game currencies.
+- Added functional top navigation and repaired the exam fixture expansion rule plus Results/Review clipping found during the full-state sweep.
+
+Files changed:
+
+- `DESIGN.md`
+- `app/index.html`
+- `app/app.js`
+- `app/final-overrides.css`
+- `app/study-hub.css`
+- `app/assets/brand-shield.svg`
+- `app/assets/fonts/*`
+- `app/assets/icons/*`
+- `docs/Tickets.md`
+- `docs/Repo_Current_State.md`
+- `docs/Known_Issues_And_Followups.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- `node --check app\app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- Microsoft Edge-channel Playwright screenshot sweeps and interaction sequences at `1904x913` and `1536x816`
+
+Verification:
+
+- JavaScript syntax, static data, local dependency policy, and Impeccable checks passed.
+- No `node_modules` directory exists in the Google Drive repository.
+- Final Study Hub screenshots have no document overflow, console errors, clipped copy, or card containment failures at either desktop target.
+- Account, top-nav, resume, setup, practice, mistakes, progress, answer controls, accordion scrolling, pause, submit, graph enlargement, results, and answer review interactions passed.
+
+Risks:
+
+- The cockpit is intentionally PC-first. Mobile is functional but does not attempt one-to-one parity with the desktop reference.
+- The reference's public group leaderboard semantics were deliberately replaced with private personal records until consent and aggregation rules exist.

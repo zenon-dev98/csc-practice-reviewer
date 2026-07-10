@@ -1,6 +1,6 @@
 # Repo Current State
 
-Last updated: 2026-07-06
+Last updated: 2026-07-10
 
 ## Workspace
 
@@ -41,8 +41,13 @@ Path:
 - `app/index.html`
 - `app/app.js`
 - `app/styles.css`
+- `app/final-overrides.css`
+- `app/study-hub.css`
 - `app/question-data.js`
 - `app/generated-question-bank.js`
+- `app/assets/brand-shield.svg`
+- `app/assets/fonts/barlow-condensed-*.woff2` / `.ttf`
+- `app/assets/icons/*.svg`
 - `app/assets/create_profile_background.png`
 - `app/images/image_01.jpg` through `app/images/image_29.jpg`
 - `scripts/generate-question-bank.mjs`
@@ -88,11 +93,15 @@ Current source item boundaries:
 - Maximized Microsoft Edge QA for T0022 ran at `1528x732` with no document/body scrollbars or console errors on the checked signed-in states. QA screenshots are saved under `qa/t0022-edge-final`, `qa/t0022-edge-r7`, and `qa/t0022-edge-r8`.
 - Static assets are cache-busted through `v=20260706-1`.
 - Stitch was used in an authenticated browser session to generate the `Civil Service Exam Cockpit` dashboard direction. Stitch's `Code to Clipboard` export returned the original prompt rather than source code, so the app implementation was manually matched to the generated visual and agent summary.
+- T0023 replaced the signed-in Home screen with a measured dark training cockpit: active-run ring, section checkpoints, personal records, command panels, and section performance are connected to real attempt data rather than decorative KPI fixtures.
+- The cockpit typography and required icon subset are self-hosted, with no runtime font/icon CDN or frontend framework. Static assets are cache-busted through `v=20260710-15`.
+- Final Edge-channel QA passed at `1904x913` and `1536x816` with no document overflow or console errors. Route, account-modal, answer/clear/next/previous/skip/flag, pause/resume, submit, graph-modal, practice-tab, review-filter, and review-navigation interactions were exercised.
+- Final T0023 evidence is stored under `qa/t0023-parity-final-r2`, `qa/t0023-parity-interactions`, `qa/t0023-parity-state-final`, and `qa/t0023-control-sequence`.
 
 ## Current Active Ticket
 
-- No active implementation ticket. T0022 is complete.
+- None.
 
 ## Next Ticket
 
-- Supabase backup/export workflow before broader public use, or a content pedagogy review pass for the generated bank.
+- Supabase backup/export workflow before broader public use, or a content pedagogy review pass for the generated bank after T0023.

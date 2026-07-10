@@ -32,6 +32,7 @@
     "create",
     "select",
     "dashboard",
+    "dashboard-empty",
     "setup",
     "exam",
     "exam-collapsed",
@@ -187,6 +188,11 @@
       active.status = "in_progress";
       active.current_question_index = 42;
       active.elapsed_seconds = 38;
+    }
+
+    if (fixtureState === "dashboard-empty") {
+      app.attempts = [];
+      return setView({ name: "dashboard" });
     }
 
     if (fixtureState === "create") return setView({ name: "create" });
@@ -710,66 +716,165 @@
     const activeAttempt = attempts.find((attempt) => attempt.status === "in_progress" || attempt.status === "paused");
     const totalFlagged = attempts.reduce((sum, attempt) => sum + flaggedCount(attempt), 0);
     const totalMistakes = wrongAnswerCount(completed);
+    const fullMocks = completed.filter((attempt) => attempt.mode === "full");
+    const bestFull = fullMocks.reduce((best, attempt) => Math.max(best, resultPercent(attempt)), 0);
+    const fastestPass = fullMocks
+      .filter((attempt) => resultPercent(attempt) >= PASSING_PERCENT)
+      .sort((a, b) => a.elapsed_seconds - b.elapsed_seconds)[0];
+    const categoryStats = categoryPerformance(completed);
+    const hubSections = [
+      { section: "Verbal Ability", label: "Verbal", tone: "verbal", icon: "message-square" },
+      { section: "Numerical Ability", label: "Numerical", tone: "numerical", icon: "calculator" },
+      { section: "Analytical Ability", label: "Analytical", tone: "analytical", icon: "brain-circuit" },
+      { section: "General Information", label: "General", tone: "general", icon: "book-open-text" }
+    ];
+    const activeAnswers = activeAttempt ? Object.values(activeAttempt.answers) : [];
+    const activeAnswered = activeAttempt ? answeredCount(activeAttempt) : 0;
+    const activeTotal = activeAttempt?.total_questions || 170;
+    const completion = activeTotal ? Math.round((activeAnswered / activeTotal) * 100) : 0;
+    const sectionRows = hubSections.map((entry) => {
+      const related = activeAnswers.filter((answer) => answer.section === entry.section);
+      const answered = related.filter((answer) => answer.selected_choice).length;
+      return { ...entry, answered, total: related.length, progress: related.length ? Math.round((answered / related.length) * 100) : 0 };
+    });
+    const strongest = hubSections
+      .map((entry) => ({ ...entry, percent: categoryStats[entry.section]?.percent ?? -1 }))
+      .sort((a, b) => b.percent - a.percent)[0];
+    const numericalRecord = categoryStats["Numerical Ability"]?.percent;
+    const totalQuestionsCompleted = attempts.reduce((sum, attempt) => sum + answeredCount(attempt), 0);
+    const firstName = String(app.profile?.name || "Reviewer").trim().split(/\s+/)[0] || "Reviewer";
+    const activeVersion = activeAttempt ? examVersions.find((version) => version.id === activeAttempt.exam_version_id) : null;
+    const activeVersionNumber = app.fixtureMode ? 7 : activeVersion?.number;
+    const runTitle = activeAttempt?.mode === "practice"
+      ? "Focused Practice"
+      : activeAttempt && activeVersionNumber
+        ? `Professional Mock ${String(activeVersionNumber).padStart(2, "0")}`
+        : activeAttempt ? examTitle(activeAttempt) : "Professional Mock";
+    const runAction = activeAttempt ? "resume-exam" : "open-setup";
+    const runActionLabel = activeAttempt ? "Resume Run" : "Start Full Mock";
+    const runTime = activeAttempt
+      ? activeAttempt.total_time_seconds ? formatDuration(timeRemaining(activeAttempt)) : "Untimed"
+      : formatDuration(TOTAL_TIME_SECONDS);
+    const runCheckpoint = activeAttempt ? `Item ${activeAttempt.current_question_index + 1}` : "Ready to begin";
     root.innerHTML = authedShell(`
-      <section class="dash-page home-page screenshot-dashboard">
-        <div class="page-title-row home-title">
-          <div>
-            <h1>Home</h1>
-            <p>Pick your next review action.</p>
+      <section class="study-hub">
+        <div class="hub-grid-pattern" aria-hidden="true"></div>
+        <div class="hub-stage">
+          <header class="hub-hero">
+            <h1><span>Lock in.</span> <em>Keep moving.</em></h1>
+            <p>Welcome back, ${escapeHtml(firstName)}.</p>
+          </header>
+
+          <div class="hub-primary-grid">
+            <section class="hub-panel hub-run-panel">
+              <div class="hub-panel-title">
+                ${localIcon("target")}
+                <h2>${escapeHtml(runTitle)}</h2>
+                <span class="hub-scan-lines" aria-hidden="true"></span>
+              </div>
+              <div class="hub-run-body">
+                <div class="hub-ring" style="--hub-completion:${completion * 3.6}deg" aria-label="${activeAnswered} of ${activeTotal} questions answered">
+                  <span class="hub-ring-progress" aria-hidden="true"></span>
+                  <i class="hub-ring-node node-one" aria-hidden="true"></i>
+                  <i class="hub-ring-node node-two" aria-hidden="true"></i>
+                  <i class="hub-ring-node node-three" aria-hidden="true"></i>
+                  <i class="hub-ring-node node-four" aria-hidden="true"></i>
+                  <div class="hub-ring-core">
+                    <strong>${activeAnswered}</strong>
+                    <span>/ ${activeTotal}</span>
+                    <small>questions<br />completed</small>
+                  </div>
+                </div>
+                <div class="hub-run-details">
+                  <div class="hub-time-row">
+                    ${localIcon("timer")}
+                    <span>${activeAttempt?.total_time_seconds === null ? "Practice mode" : "Time remaining"}</span>
+                    <strong>${escapeHtml(runTime)}</strong>
+                  </div>
+                  <div class="hub-checkpoints">
+                    ${sectionRows.map((entry) => `
+                      <div class="hub-checkpoint ${entry.tone}">
+                        <span class="hub-checkpoint-icon">${localIcon(entry.icon)}</span>
+                        ${entry.answered ? `<i class="hub-checkpoint-check">${localIcon("circle-check")}</i>` : ""}
+                        <strong>${escapeHtml(entry.label)}</strong>
+                        <small>${entry.total ? `${entry.answered}/${entry.total}` : "--"}</small>
+                      </div>
+                    `).join("")}
+                  </div>
+                  <div class="hub-run-status">
+                    <span>Current checkpoint <strong>${escapeHtml(runCheckpoint)}</strong></span>
+                    <span>${localIcon("cloud-check")} ${activeAttempt ? "Saved online" : "20 versions available"}</span>
+                  </div>
+                  <button class="hub-resume-button" data-action="${runAction}" type="button">
+                    <span>${escapeHtml(runActionLabel)}</span>
+                    <span class="hub-chevron-stack" aria-hidden="true">${localIcon("chevron-right")}${localIcon("chevron-right")}${localIcon("chevron-right")}</span>
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <section class="hub-panel hub-records-panel">
+              <div class="hub-panel-title">
+                ${localIcon("target")}
+                <h2>Your Records</h2>
+                <span class="hub-scan-lines" aria-hidden="true"></span>
+              </div>
+              <div class="hub-record-list">
+                <span class="hub-record-rail" aria-hidden="true"></span>
+                <div class="hub-record teal">
+                  <span>${localIcon("trophy")}</span>
+                  <p><strong>Best full mock</strong><small>${fullMocks.length ? "Personal best" : "Complete a mock to set it"}</small></p>
+                  <b>${fullMocks.length ? `${Math.round(bestFull)}%` : "--"}</b>
+                </div>
+                <div class="hub-record blue">
+                  <span>${localIcon("calculator")}</span>
+                  <p><strong>Numerical</strong><small>Across completed attempts</small></p>
+                  <b>${numericalRecord == null ? "--" : `${Math.round(numericalRecord)}%`}</b>
+                </div>
+                <div class="hub-record green">
+                  <span>${localIcon("timer")}</span>
+                  <p><strong>Fastest pass</strong><small>Full mock at 80%+</small></p>
+                  <b>${fastestPass ? formatDuration(fastestPass.elapsed_seconds) : "--"}</b>
+                </div>
+              </div>
+              <button class="hub-record-foot" data-action="recent-page" type="button">${localIcon("history")} Open complete progress ${localIcon("chevron-right")}</button>
+            </section>
           </div>
-        </div>
 
-        <div class="home-actions-grid">
-          <section class="card home-action-card home-card-continue ${activeAttempt ? "" : "disabled-card"}">
-            <span class="card-icon clock-icon">${icon("clock")}</span>
-            <div class="home-card-copy">
-              <h2>Continue Last Exam</h2>
-              <p>${activeAttempt ? `Question ${activeAttempt.current_question_index + 1} of ${activeAttempt.total_questions}` : "No active exam yet"}</p>
-            </div>
-            <div class="home-card-facts">
-              <span>${activeAttempt ? `${answeredCount(activeAttempt)} answered` : "0 answered"}</span>
-              <span>${activeAttempt ? `Time left: ${formatDuration(timeRemaining(activeAttempt))}` : "Time left: 3:10:00"}</span>
-            </div>
-            <button class="btn primary" data-action="resume-exam" type="button" ${activeAttempt ? "" : "disabled"}>${icon("play")} Resume Exam</button>
+          <section class="hub-action-dock" aria-label="Choose your next mode">
+            <button class="hub-mode full" data-action="open-setup" type="button">
+              ${localIcon("target")}
+              <span><strong>Full Mock</strong><small>170 items under exam conditions</small></span>
+              <span class="hub-chevron-stack" aria-hidden="true">${localIcon("chevron-right")}${localIcon("chevron-right")}</span>
+            </button>
+            <button class="hub-mode practice" data-action="practice-page" type="button">
+              ${localIcon("brain-circuit")}
+              <span><strong>Focused Practice</strong><small>Drill by section and difficulty</small></span>
+              <span class="hub-chevron-stack" aria-hidden="true">${localIcon("chevron-right")}${localIcon("chevron-right")}</span>
+            </button>
+            <button class="hub-mode mistakes" data-action="mistakes-page" type="button">
+              ${localIcon("notebook-tabs")}
+              <span><strong>Review Mistakes</strong><small>${totalMistakes} missed items / ${totalFlagged} flagged</small></span>
+              <span class="hub-chevron-stack" aria-hidden="true">${localIcon("chevron-right")}${localIcon("chevron-right")}</span>
+            </button>
           </section>
 
-          <section class="card home-action-card home-card-start">
-            <span class="card-icon document-icon">${icon("review")}</span>
-            <div class="home-card-copy">
-              <h2>Start Full Mock Exam</h2>
-              <p>Simulate the timed Professional practice exam.</p>
-            </div>
-            <div class="home-card-facts">
-              <span>170 items</span>
-              <span>3 hours 10 minutes</span>
-              <span>20 versions</span>
-            </div>
-            <button class="btn primary" data-action="open-setup" type="button">${icon("play")} Start Exam</button>
-          </section>
-
-          <section class="card home-action-card home-card-review">
-            <span class="card-icon flag-icon">${icon("bookmark")}</span>
-            <div class="home-card-copy">
-              <h2>Practice & Review</h2>
-              <p>Build drills, revisit missed items, and review flagged questions.</p>
-            </div>
-            <div class="home-card-facts">
-              <span>${totalMistakes} missed</span>
-              <span>${totalFlagged} flagged</span>
-              <span>${completed.length} completed</span>
-            </div>
-            <button class="btn secondary" data-action="practice-page" type="button">${icon("review")} Open Practice & Review</button>
+          <section class="hub-performance-ribbon">
+            <div class="hub-ribbon-label"><span>Section performance ${localIcon("chevron-right")}</span><small>${totalQuestionsCompleted} questions completed</small></div>
+            ${hubSections.map((entry) => {
+              const percent = categoryStats[entry.section]?.percent;
+              return `
+                <button class="hub-section-score ${entry.tone}" data-action="practice-page" type="button">
+                  ${localIcon(entry.icon)}
+                  <span>${escapeHtml(entry.label)}</span>
+                  <strong>${percent == null ? "--" : `${Math.round(percent)}%`}</strong>
+                </button>
+              `;
+            }).join("")}
+            <span class="sr-only">Strongest recorded section: ${strongest?.percent >= 0 ? escapeHtml(strongest.label) : "No score yet"}</span>
           </section>
         </div>
-
-        <section class="home-summary-strip">
-          <span><strong>${completed.length}</strong><small>completed mock exams</small></span>
-          <span><strong>${totalMistakes}</strong><small>missed items ready for review</small></span>
-          <span><strong>${totalFlagged}</strong><small>flagged questions saved</small></span>
-          <button class="btn ghost" data-action="recent-page" type="button">${icon("stats")} Open Progress</button>
-        </section>
       </section>
-      ${profileModal()}
       ${toast()}
     `, "dashboard");
   }
@@ -1065,36 +1170,38 @@
             </div>
           </aside>
           <main class="card review-main">
-            ${answer ? `
-              <div class="question-title">
-                <div>
-                  <span class="question-index">Question ${answer.position + 1} of ${attempt.total_questions}</span>
-                  <p class="topic-pill">${escapeHtml(answer.section)} - ${escapeHtml(answer.subtopic)}</p>
-                  <small>${formatDuration(answer.time_spent_seconds)} spent</small>
-                </div>
-                <span class="status-pill ${correct ? "answered" : "wrong"}">${correct ? "Correct" : "Incorrect"}</span>
-              </div>
-              ${answer.stimulus ? renderStimulusPanel(attempt, answer, linkedStimulusAnswers(attempt, answer), true) : ""}
-              <p class="prompt">${escapeHtml(answer.prompt)}</p>
-              <div class="review-choices">
-                ${answer.choices.map((choice) => `
-                  <div class="review-choice ${choice.id === answer.correct_choice ? "is-correct" : ""} ${choice.id === answer.selected_choice && choice.id !== answer.correct_choice ? "is-wrong" : ""}">
-                    <span>${choice.id}</span>
-                    <strong>${escapeHtml(choice.text)}</strong>
-                    <em>${choice.id === answer.correct_choice ? "Correct answer" : choice.id === answer.selected_choice ? "Your answer" : ""}</em>
+            <div class="review-content-scroll">
+              ${answer ? `
+                <div class="question-title">
+                  <div>
+                    <span class="question-index">Question ${answer.position + 1} of ${attempt.total_questions}</span>
+                    <p class="topic-pill">${escapeHtml(answer.section)} - ${escapeHtml(answer.subtopic)}</p>
+                    <small>${formatDuration(answer.time_spent_seconds)} spent</small>
                   </div>
-                `).join("")}
-              </div>
-              <div class="explanation-box">
-                <strong>Explanation</strong>
-                <p>${escapeHtml(answer.explanation || "No explanation provided.")}</p>
-              </div>
-              <div class="metadata-strip">
-                <span>Visits: ${answer.visit_count || 0}</span>
-                <span>Answer changes: ${answer.answer_changes || 0}</span>
-                <span>${answer.flagged ? "Flagged" : "Not flagged"}</span>
-              </div>
-            ` : `<p>No review items for this filter.</p>`}
+                  <span class="status-pill ${correct ? "answered" : "wrong"}">${correct ? "Correct" : "Incorrect"}</span>
+                </div>
+                ${answer.stimulus ? renderStimulusPanel(attempt, answer, linkedStimulusAnswers(attempt, answer), true) : ""}
+                <p class="prompt">${escapeHtml(answer.prompt)}</p>
+                <div class="review-choices">
+                  ${answer.choices.map((choice) => `
+                    <div class="review-choice ${choice.id === answer.correct_choice ? "is-correct" : ""} ${choice.id === answer.selected_choice && choice.id !== answer.correct_choice ? "is-wrong" : ""}">
+                      <span>${choice.id}</span>
+                      <strong>${escapeHtml(choice.text)}</strong>
+                      <em>${choice.id === answer.correct_choice ? "Correct answer" : choice.id === answer.selected_choice ? "Your answer" : ""}</em>
+                    </div>
+                  `).join("")}
+                </div>
+                <div class="explanation-box">
+                  <strong>Explanation</strong>
+                  <p>${escapeHtml(answer.explanation || "No explanation provided.")}</p>
+                </div>
+                <div class="metadata-strip">
+                  <span>Visits: ${answer.visit_count || 0}</span>
+                  <span>Answer changes: ${answer.answer_changes || 0}</span>
+                  <span>${answer.flagged ? "Flagged" : "Not flagged"}</span>
+                </div>
+              ` : `<p>No review items for this filter.</p>`}
+            </div>
             <div class="question-actions">
               <button class="btn secondary" data-action="review-prev" type="button" ${index <= 0 ? "disabled" : ""}>Previous Question</button>
               <button class="btn ghost" data-action="back-results" type="button">Return to Results</button>
@@ -1303,37 +1410,42 @@
     `;
   }
 
-  function authedShell(content, active = "dashboard") {
+  function signedHeader(active = "dashboard") {
     const profile = app.profile;
+    const activeRoute = active === "results" || active === "review" ? "recent" : active;
+    const signedLogo = active === "dashboard"
+      ? `<img class="logo hub-logo" src="assets/brand-shield.svg" alt="CSC Practice Reviewer logo" />`
+      : logo();
+    const routes = [
+      ["dashboard", "Study Hub", "dashboard"],
+      ["setup", "Full Mock", "setup-page"],
+      ["practice", "Practice & Review", "practice-page"],
+      ["recent", "Progress", "recent-page"]
+    ];
     return `
-      <header class="app-header signed-header">
-        <div class="brand">${logo()}${brandText()}</div>
+      <header class="app-header signed-header ${active === "dashboard" ? "study-hub-header" : ""}">
+        <div class="brand">${signedLogo}${brandText()}</div>
+        <nav class="signed-primary-nav" aria-label="Primary navigation">
+          ${routes.map(([route, label, action]) => `<button class="${activeRoute === route ? "active" : ""}" data-action="${action}" type="button">${escapeHtml(label)}</button>`).join("")}
+        </nav>
         <div class="header-actions">
           <button class="account-button" data-action="account-settings" type="button">${avatar(profile)}<span>${escapeHtml(profile?.name || "Account")}</span>${icon("chev")}</button>
         </div>
       </header>
-      ${content}
-      ${active !== "practice" ? "" : ""}
     `;
   }
 
+  function authedShell(content, active = "dashboard") {
+    return `${signedHeader(active)}${content}${profileModal()}`;
+  }
+
   function sideShell(active, content) {
-    const profile = app.profile;
     return `
-      <div class="side-layout">
-        <aside class="side-nav">
-          <div class="side-brand">${logo()}<div><strong>CSC Practice Reviewer</strong><span>Professional Level</span></div></div>
-          <button class="side-profile" data-action="account-settings" type="button">${avatar(profile)}<span><strong>${escapeHtml(profile?.name || "Reviewer")}</strong><small>Account Settings</small></span>${icon("chev")}</button>
-          <nav>
-            ${sideNavItem("dashboard", "Home", "home", active)}
-            ${sideNavItem("setup", "Start Full Mock Exam", "play", active)}
-            ${sideNavItem("practice", "Practice & Review", "review", active)}
-            ${sideNavItem("recent", "Progress", "stats", active)}
-          </nav>
-          <button class="btn ghost full" data-action="signout" type="button">${icon("logout")} Log Out</button>
-        </aside>
+      ${signedHeader(active)}
+      <div class="side-layout top-shell-layout">
         <main class="side-content">${content}</main>
       </div>
+      ${profileModal()}
       ${toast()}
     `;
   }
@@ -1648,7 +1760,9 @@
   function navGroupOpen(group, hasCurrent) {
     if (app.fixtureState === "exam") return true;
     if (app.fixtureState === "graph") return group.section === "Numerical Ability";
-    if (app.fixtureState === "exam-collapsed" || app.fixtureState === "pause" || app.fixtureState === "submit") return hasCurrent;
+    if (app.fixtureState === "exam-collapsed" || app.fixtureState === "pause" || app.fixtureState === "submit") {
+      return hasCurrent || app.expandedNavGroups.has(group.section);
+    }
     return hasCurrent || app.expandedNavGroups.has(group.section);
   }
 
@@ -2880,6 +2994,10 @@
 
   function readableError(error) {
     return error?.message || String(error || "Something went wrong.");
+  }
+
+  function localIcon(name, className = "") {
+    return `<span class="local-icon ${escapeAttr(className)}" style="--local-icon:url('assets/icons/${escapeAttr(name)}.svg')" aria-hidden="true"></span>`;
   }
 
   function icon(name) {

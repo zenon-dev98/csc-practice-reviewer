@@ -444,3 +444,32 @@ Completion notes:
 - Hid the exam navigator scrollbar while preserving bounded internal scrolling and stable hover behavior.
 - Cache-busted static assets through `v=20260706-1`.
 - Maximized Microsoft Edge QA screenshots were saved under `qa/t0022-edge-final`, `qa/t0022-edge-r7`, and `qa/t0022-edge-r8`.
+
+## T0023 - Gamified Study Hub Cockpit
+
+Status: done
+
+Replace the signed-in Home page with the approved dark training-cockpit direction while keeping the active exam mechanics and backend unchanged.
+
+Acceptance criteria:
+
+- Study Hub matches the approved dark cockpit reference at a maximized 16:9 Microsoft Edge viewport.
+- The page uses a functional top navigation for Study Hub, Full Mock, Practice & Review, Progress, and Account Settings.
+- Typography is self-hosted; icons are a locally vendored Lucide subset; no new runtime CDN or frontend framework is introduced.
+- Active-attempt progress, timer, section checkpoints, actions, personal records, and section performance use real app data or explicit fixture-safe fallbacks.
+- The page contains no study plan, XP, streak, currency, mission, mascot, or CRUD-style KPI grid.
+- New-account, active-attempt, and completed-attempt states remain usable without overflow or clipped controls.
+- Maximized Edge screenshots and interaction checks pass before deployment.
+- Static validation, dependency checks, JavaScript syntax checks, and Impeccable detection pass.
+
+Completion notes:
+
+- Rebuilt the Study Hub against the approved cockpit image using measured desktop geometry instead of a generic dark dashboard approximation.
+- Added the segmented completion ring, section checkpoint rail, angular resume control, three command panels, personal-record rail, and section-performance ribbon while keeping all values tied to real attempt data or fixture-safe fallbacks.
+- Added functional top navigation for Study Hub, Full Mock, Practice & Review, Progress, and Account Settings.
+- Self-hosted the Barlow Condensed display family and vendored the required Lucide SVG subset; no runtime framework, icon CDN, or font CDN was added.
+- Kept group rankings and fabricated gamification out of the product; the reference's group-record area is implemented as private personal records.
+- Fixed the exam fixture accordion so `More` expansions remain open across rerenders and continue to use bounded, scrollbar-free internal scrolling.
+- Repaired Results and Answer Review clipping exposed by the full-state regression sweep.
+- Cache-busted static assets through `v=20260710-15`.
+- Edge-channel screenshots and interaction evidence were saved under `qa/t0023-parity-final-r2`, `qa/t0023-parity-interactions`, `qa/t0023-parity-state-final`, and `qa/t0023-control-sequence`.

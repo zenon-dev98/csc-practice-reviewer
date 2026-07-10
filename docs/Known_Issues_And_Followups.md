@@ -13,6 +13,8 @@
 - At the smaller `1536x816` desktop fixture, the Results fun-fact cards use a compact mode that shows titles and values while hiding the extra descriptive sentence to preserve the one-screen no-scroll contract.
 - `states/v2/` currently contains `sign_in.png` and `account_settings.png`; create account remains a proportional adaptation from the existing create/auth direction plus the v2 feature-row style until a dedicated v2 create-account mockup exists.
 - T0022 repaired the signed-in dashboard/account/practice/mistakes/recent/exam-control flows at the maximized Microsoft Edge viewport. Any future desktop UI change should rerun the same screenshot loop rather than relying on CSS inspection.
+- The Study Hub intentionally uses private personal records instead of the reference image's group rankings. Group comparisons require explicit user consent, aggregate privacy rules, and enough real participants before they should be added.
+- The T0023 cockpit is PC-first and verified at `1904x913` and `1536x816`. It has a usable stacked mobile fallback, but mobile visual parity remains a separate polish task.
 
 ## Follow-Up Ticket Ideas
 
