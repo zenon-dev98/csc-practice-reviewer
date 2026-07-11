@@ -1030,14 +1030,14 @@ Risks:
 - Mobile uses normal page scrolling for long workflows and is not a one-to-one scaled version of the desktop cockpit.
 # T0025 - Cockpit Visual Parity And Containment Repair
 
-Summary: Repaired Study Hub parity defects and strengthened project-wide visual containment rules while preserving the shared cockpit navigation and all existing behavior.
+Summary: Rebuilt the complete 36-state product surface against the Study Hub and `states/v3/` cockpit references, then repaired every defect exposed by automated and maximized-Edge screenshot loops while preserving Supabase, exam, timing, scoring, and persistence behavior.
 
-Files changed: `AGENTS.md`, `app/app.js`, `app/cockpit-theme.css`, `app/index.html`, project state/ticket documentation, `states/v3/`, and final T0025 QA evidence.
+Files changed: `AGENTS.md`, `app/app.js`, `app/cockpit-theme.css`, `app/index.html`, `scripts/qa-cockpit.cjs`, `scripts/qa-interactions.cjs`, project state/ticket documentation, and final T0025 QA evidence.
 
-Commands: `node --check app/app.js`, `npm run validate:data`, `npm run check`, `npx --yes impeccable detect app`, full `qa-cockpit.cjs` desktop fixture sweep, and `qa-interactions.cjs`.
+Commands: `node --check app/app.js`, `node --check scripts/qa-cockpit.cjs`, `node --check scripts/qa-interactions.cjs`, `npm run validate:data`, `npm run check`, `npx --yes impeccable detect app`, full desktop/mobile `qa-cockpit.cjs` fixture sweeps, external maximized Edge traversal, and `qa-interactions.cjs`.
 
-Verification: 72 fixture screenshots passed with zero console/document failures and zero sampled overflows; 59 interaction screenshots passed all 15 checks.
+Verification: `144` desktop fixture screenshots passed across `1672x942`, `1904x913`, `1536x816`, and the actual `1536x736` maximized-Edge content area with zero console/document failures and zero sampled overflows. The existing final mobile matrix contains `72` clean screenshots across `390x844` and `412x915`. The final interaction run contains `60` screenshots and passes all `20/20` checks. Maximized external Edge at 100% zoom manually traversed all 36 fixture states. Impeccable reports zero anti-patterns.
 
-Risks: Generated state images remain visual references and can contain fictional sample labels; production copy and CSC section semantics remain authoritative.
+Risks: Generated state images remain visual references and can contain fictional sample labels; production copy and CSC section semantics remain authoritative. Desktop intentionally preserves the `1672x942` reference ratio through uniform scaling and ambient side margins.
 
 Follow-ups: None required for this ticket.

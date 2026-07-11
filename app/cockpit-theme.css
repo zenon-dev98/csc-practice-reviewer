@@ -2192,6 +2192,10 @@ body::before {
 
 /* Final cascade: logical-frame geometry and all signed-in workstations. */
 @media (min-width: 1100px) {
+  html body #app header.app-header.signed-header.study-hub-header .signed-primary-nav button::after {
+    bottom: 0 !important;
+  }
+
   #app[data-view] .app-header,
   #app[data-view] .signed-header,
   #app[data-view] .study-hub-header {
@@ -3378,6 +3382,869 @@ body::before {
   #app .submit-modal .modal-actions { grid-template-columns: 1fr 1fr !important; }
 }
 
+/* T0025 V3 parity rebuild ---------------------------------------------------
+   The v3 references are the desktop visual contract. This layer replaces the
+   undersized CRUD compositions while preserving the existing data and flows. */
+@media (min-width: 1100px) {
+  html body #app .signed-frame .cockpit-frame {
+    --signed-header-height: 104px;
+    background:
+      radial-gradient(ellipse at 78% 18%, rgba(25, 92, 101, .13), transparent 35%),
+      repeating-linear-gradient(0deg, transparent 0 5px, rgba(255,255,255,.006) 6px),
+      #03090d !important;
+  }
+
+  html body #app .signed-header,
+  html body #app .study-hub-header {
+    grid-template-columns: 430px minmax(670px, 1fr) 290px !important;
+    height: var(--signed-header-height) !important;
+    padding: 0 28px !important;
+    gap: 20px !important;
+    background:
+      linear-gradient(90deg, rgba(18,47,54,.3), transparent 23%, transparent 78%, rgba(18,47,54,.22)),
+      #040b0f !important;
+  }
+
+  html body #app .signed-header .brand,
+  html body #app .study-hub-header .brand {
+    align-items: center !important;
+    gap: 14px !important;
+  }
+
+  html body #app .signed-header .brand .logo,
+  html body #app .study-hub-header .brand .logo {
+    width: 72px !important;
+    height: 76px !important;
+    object-fit: contain !important;
+  }
+
+  html body #app .signed-header .brand strong,
+  html body #app .study-hub-header .brand strong {
+    color: #eef4f2 !important;
+    font: italic 800 29px/1 var(--display-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .signed-header .brand span,
+  html body #app .study-hub-header .brand span {
+    display: block !important;
+    margin-top: 6px !important;
+    color: #a4b3b5 !important;
+    font: 600 15px/1 var(--hud-font) !important;
+  }
+
+  html body #app .signed-header .signed-primary-nav,
+  html body #app .study-hub-header .signed-primary-nav {
+    width: 100% !important;
+    height: 74px !important;
+    align-self: center !important;
+    border: 1px solid #33474e !important;
+    padding: 0 42px 8px !important;
+    background: linear-gradient(180deg, rgba(19,38,44,.42), rgba(4,11,15,.95)) !important;
+    clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 20px) !important;
+    transform: none !important;
+    gap: 0 !important;
+  }
+
+  html body #app .signed-header .signed-primary-nav::before,
+  html body #app .signed-header .signed-primary-nav::after {
+    display: none !important;
+  }
+
+  html body #app .signed-primary-nav button {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    color: #bac4c5 !important;
+    font: 600 22px/1 var(--hud-font) !important;
+  }
+
+  html body #app .signed-primary-nav button + button {
+    border-left: 1px solid #253a41 !important;
+  }
+
+  html body #app .signed-primary-nav button:hover,
+  html body #app .signed-primary-nav button.active {
+    color: var(--cockpit-cyan) !important;
+  }
+
+  html body #app .signed-primary-nav button::after {
+    right: 26% !important;
+    bottom: -8px !important;
+    left: 26% !important;
+    height: 3px !important;
+    background: var(--cockpit-cyan) !important;
+    box-shadow: 0 0 14px rgba(33,222,215,.46) !important;
+  }
+
+  html body #app .signed-header .account-button,
+  html body #app .study-hub-header .account-button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 70px !important;
+    border: 1px solid #3a4f56 !important;
+    padding: 0 16px 0 10px !important;
+    background: linear-gradient(105deg, rgba(20,52,60,.46), rgba(6,16,21,.94)) !important;
+    clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% calc(100% - 13px), calc(100% - 13px) 100%, 13px 100%, 0 calc(100% - 13px), 0 13px) !important;
+    color: #edf3f2 !important;
+    font: 700 18px/1 var(--hud-font) !important;
+  }
+
+  html body #app .signed-header .account-button .avatar {
+    width: 52px !important;
+    height: 52px !important;
+    border: 1px solid var(--cockpit-cyan) !important;
+    border-radius: 0 !important;
+    background: #07141a !important;
+    clip-path: polygon(25% 0,75% 0,100% 25%,100% 75%,75% 100%,25% 100%,0 75%,0 25%) !important;
+    color: var(--cockpit-cyan) !important;
+    font-size: 20px !important;
+  }
+
+  html body #app .signed-main,
+  html body #app .side-layout.top-shell-layout,
+  html body #app .top-shell-layout .side-content {
+    height: calc(942px - var(--signed-header-height)) !important;
+    min-height: 0 !important;
+  }
+
+  html body #app .side-content .content-page,
+  html body #app .setup-page,
+  html body #app .results-page,
+  html body #app .review-page {
+    position: relative !important;
+    width: 100% !important;
+    height: calc(942px - var(--signed-header-height)) !important;
+    padding: 18px 30px 20px !important;
+    background:
+      linear-gradient(115deg, rgba(22,72,81,.1), transparent 30%),
+      repeating-linear-gradient(90deg, transparent 0 53px, rgba(66,122,132,.025) 54px),
+      #030a0e !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .content-page::before,
+  html body #app .setup-page::before,
+  html body #app .results-page::before,
+  html body #app .review-page::before {
+    position: absolute !important;
+    z-index: 0 !important;
+    inset: 0 !important;
+    display: block !important;
+    background:
+      repeating-radial-gradient(ellipse at 78% 20%, transparent 0 18px, rgba(29,140,146,.05) 19px 20px),
+      linear-gradient(150deg, transparent 58%, rgba(24,124,132,.045) 58.2%, transparent 58.4%) !important;
+    content: "" !important;
+    opacity: .7 !important;
+    pointer-events: none !important;
+  }
+
+  html body #app .content-page > *,
+  html body #app .setup-page > *,
+  html body #app .results-page > *,
+  html body #app .review-page > * {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  html body #app .page-title-row {
+    display: flex !important;
+    min-width: 0 !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    margin: 0 !important;
+  }
+
+  html body #app .page-title-row .eyebrow {
+    margin: 0 0 7px !important;
+    color: var(--cockpit-cyan) !important;
+    font: 700 17px/1 var(--hud-font) !important;
+    letter-spacing: 0 !important;
+  }
+
+  html body #app .page-title-row h1 {
+    margin: 0 !important;
+    color: #edf2f1 !important;
+    font: italic 800 66px/.84 var(--display-font) !important;
+    text-transform: uppercase !important;
+    text-shadow: 0 4px 1px rgba(0,0,0,.44) !important;
+  }
+
+  html body #app .page-title-row > div > p:last-child {
+    margin: 12px 0 0 !important;
+    color: #aab9ba !important;
+    font: 500 19px/1.2 var(--hud-font) !important;
+  }
+
+  html body #app .v3-panel,
+  html body #app .card.v3-panel {
+    position: relative !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    border: 1px solid #3b5057 !important;
+    border-radius: 0 !important;
+    background:
+      linear-gradient(116deg, rgba(23,57,65,.3), transparent 36%),
+      repeating-linear-gradient(0deg, transparent 0 5px, rgba(255,255,255,.006) 6px),
+      rgba(5,15,20,.97) !important;
+    box-shadow: inset 0 0 0 6px #050c10, inset 0 0 0 7px rgba(76,104,112,.26), 0 15px 28px rgba(0,0,0,.22) !important;
+    clip-path: polygon(14px 0, calc(100% - 24px) 0, 100% 24px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 20px 100%, 0 calc(100% - 20px), 0 14px) !important;
+  }
+
+  html body #app .technical-title {
+    display: flex !important;
+    min-width: 0 !important;
+    min-height: 32px !important;
+    align-items: center !important;
+    gap: 14px !important;
+  }
+
+  html body #app .technical-title h2,
+  html body #app .technical-title strong {
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    color: var(--cockpit-cyan) !important;
+    font: 700 21px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .technical-title > span[aria-hidden] {
+    height: 1px !important;
+    flex: 1 1 auto !important;
+    background: linear-gradient(90deg, #36525a, transparent) !important;
+  }
+
+  html body #app .technical-title > span[aria-hidden]::before {
+    display: block !important;
+    width: 54px !important;
+    height: 12px !important;
+    margin-top: -6px !important;
+    margin-left: auto !important;
+    background: repeating-linear-gradient(115deg, rgba(91,127,136,.8) 0 4px, transparent 4px 9px) !important;
+    content: "" !important;
+  }
+
+  html body #app .section-hud-icon,
+  html body #app .instrument-icon,
+  html body #app .telemetry-icon {
+    display: grid !important;
+    flex: 0 0 auto !important;
+    border: 2px solid currentColor !important;
+    place-items: center !important;
+    background: rgba(6,20,25,.96) !important;
+    clip-path: polygon(25% 0,75% 0,100% 25%,100% 75%,75% 100%,25% 100%,0 75%,0 25%) !important;
+    box-shadow: inset 0 0 18px rgba(33,222,215,.09) !important;
+  }
+
+  html body #app .section-hud-icon .local-icon,
+  html body #app .instrument-icon .local-icon,
+  html body #app .telemetry-icon .local-icon {
+    width: 52% !important;
+    height: 52% !important;
+  }
+
+  html body #app .technical-cta {
+    position: relative !important;
+    min-height: 62px !important;
+    border: 2px solid #46f4ed !important;
+    padding: 0 28px !important;
+    background: linear-gradient(100deg, #24d6db, #08aeca) !important;
+    clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% calc(100% - 13px), calc(100% - 13px) 100%, 13px 100%, 0 calc(100% - 13px), 0 13px) !important;
+    color: #031014 !important;
+    box-shadow: inset 0 0 0 4px rgba(4,18,22,.22), 0 0 18px rgba(20,210,217,.2) !important;
+    font: 800 25px/1 var(--display-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .technical-cta > span {
+    display: inline-flex !important;
+    min-width: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+  }
+
+  html body #app .technical-cta > .icon:last-child {
+    position: absolute !important;
+    right: 22px !important;
+  }
+
+  html body #app .technical-cta.secondary-cta {
+    border-color: #18b9da !important;
+    background: rgba(5,18,23,.92) !important;
+    color: #77bfd4 !important;
+    box-shadow: inset 0 0 0 4px #061116 !important;
+  }
+
+  html body #app .local-icon {
+    flex: 0 0 auto !important;
+  }
+
+  /* Full Mock / Mission Briefing */
+  html body #app .setup-page {
+    display: grid !important;
+    grid-template-rows: 122px minmax(0,1fr) !important;
+    gap: 10px !important;
+  }
+
+  html body #app .setup-page .page-title-row {
+    height: 122px !important;
+  }
+
+  html body #app .v3-setup-grid {
+    display: grid !important;
+    height: 100% !important;
+    grid-template-columns: minmax(0, 2.08fr) minmax(390px, 1fr) !important;
+    gap: 14px !important;
+  }
+
+  html body #app .mission-briefing {
+    display: grid !important;
+    height: 100% !important;
+    grid-template-rows: 56px 210px minmax(0,1fr) 54px !important;
+    padding: 16px 20px !important;
+    gap: 10px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .exam-badge-row {
+    display: flex !important;
+    min-width: 0 !important;
+    border: 1px solid #334b52 !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: 0 16px !important;
+    background: rgba(6,18,23,.82) !important;
+    gap: 18px !important;
+  }
+
+  html body #app .exam-badge-row .soft-pill {
+    border: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    color: #69df69 !important;
+    font: 700 20px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .exam-badge-row .soft-pill i {
+    width: 18px !important;
+    height: 18px !important;
+    border: 2px solid #8aff7e !important;
+    border-radius: 50% !important;
+    background: #50d45a !important;
+    box-shadow: 0 0 12px #4ed35a !important;
+  }
+
+  html body #app .exam-badge-row > strong {
+    border-left: 1px solid #718389 !important;
+    padding-left: 18px !important;
+    color: #b4c0c1 !important;
+    font: 500 18px/1 var(--hud-font) !important;
+  }
+
+  html body #app .instrument-grid {
+    display: grid !important;
+    height: 210px !important;
+    grid-template-columns: repeat(3,minmax(0,1fr)) !important;
+    grid-template-rows: repeat(2,minmax(0,1fr)) !important;
+    gap: 1px !important;
+  }
+
+  html body #app .instrument-cell {
+    display: grid !important;
+    min-width: 0 !important;
+    border: 1px solid #344a51 !important;
+    grid-template-columns: 96px minmax(0,1fr) !important;
+    grid-template-rows: 1fr 1fr !important;
+    align-items: center !important;
+    padding: 10px 16px 10px 12px !important;
+    background: linear-gradient(112deg, rgba(20,52,60,.45), rgba(5,14,19,.88)) !important;
+    color: var(--tone, var(--cockpit-cyan)) !important;
+    gap: 0 14px !important;
+  }
+
+  html body #app .instrument-cell.cyan { --tone: var(--cockpit-cyan); }
+  html body #app .instrument-cell.blue { --tone: var(--cockpit-blue); }
+  html body #app .instrument-cell.green { --tone: var(--cockpit-green); }
+  html body #app .instrument-cell.purple { --tone: var(--cockpit-purple); }
+  html body #app .instrument-cell.amber { --tone: var(--cockpit-amber); }
+
+  html body #app .instrument-cell .instrument-icon {
+    width: 76px !important;
+    height: 76px !important;
+    grid-row: 1 / 3 !important;
+  }
+
+  html body #app .instrument-cell > span:not(.instrument-icon) {
+    align-self: end !important;
+    color: #9fb0b2 !important;
+    font: 600 15px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .instrument-cell > strong {
+    align-self: start !important;
+    margin-top: 6px !important;
+    overflow-wrap: anywhere !important;
+    color: var(--tone) !important;
+    font: 700 29px/.95 var(--display-font) !important;
+  }
+
+  html body #app .allocation-console {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+    grid-template-rows: 36px repeat(2,minmax(0,1fr)) !important;
+    gap: 8px !important;
+  }
+
+  html body #app .allocation-console > .technical-title {
+    grid-column: 1 / -1 !important;
+  }
+
+  html body #app .allocation-card {
+    --tone: var(--cockpit-cyan);
+    display: grid !important;
+    min-width: 0 !important;
+    border: 1px solid var(--tone) !important;
+    grid-template-columns: 96px minmax(0,1fr) auto !important;
+    grid-template-rows: 1fr 20px !important;
+    align-items: center !important;
+    padding: 9px 12px !important;
+    background: linear-gradient(105deg, color-mix(in srgb, var(--tone) 8%, #071116), #061016 72%) !important;
+    color: var(--tone) !important;
+    clip-path: polygon(11px 0, calc(100% - 11px) 0, 100% 11px, 100% calc(100% - 11px), calc(100% - 11px) 100%, 11px 100%, 0 calc(100% - 11px), 0 11px) !important;
+    gap: 5px 12px !important;
+  }
+
+  html body #app .verbal { --tone: var(--cockpit-cyan); }
+  html body #app .numerical { --tone: var(--cockpit-blue); }
+  html body #app .analytical { --tone: var(--cockpit-green); }
+  html body #app .general { --tone: var(--cockpit-purple); }
+
+  html body #app .allocation-card .section-hud-icon {
+    width: 76px !important;
+    height: 76px !important;
+    grid-row: 1 / 3 !important;
+  }
+
+  html body #app .allocation-copy strong {
+    display: block !important;
+    color: var(--tone) !important;
+    font: 700 21px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .allocation-copy span {
+    display: block !important;
+    margin-top: 5px !important;
+    color: #a7b5b6 !important;
+    font: 500 15px/1 var(--hud-font) !important;
+  }
+
+  html body #app .allocation-card > b {
+    align-self: center !important;
+    color: var(--tone) !important;
+    font: 700 34px/1 var(--display-font) !important;
+  }
+
+  html body #app .allocation-card > b small {
+    font-size: 15px !important;
+  }
+
+  html body #app .allocation-meter {
+    position: relative !important;
+    height: 13px !important;
+    border: 1px solid #2e4248 !important;
+    grid-column: 2 !important;
+    overflow: hidden !important;
+    background: repeating-linear-gradient(90deg, #152329 0 14px, #071116 14px 17px) !important;
+  }
+
+  html body #app .allocation-meter i {
+    display: block !important;
+    width: var(--allocation) !important;
+    height: 100% !important;
+    background: repeating-linear-gradient(90deg, var(--tone) 0 14px, transparent 14px 17px) !important;
+  }
+
+  html body #app .allocation-card > em {
+    color: #a6b4b5 !important;
+    font: 500 13px/1 var(--hud-font) !important;
+  }
+
+  html body #app .mission-briefing .note-box {
+    display: flex !important;
+    min-height: 0 !important;
+    border: 1px solid #334a52 !important;
+    align-items: center !important;
+    padding: 0 16px !important;
+    background: #071218 !important;
+    gap: 14px !important;
+  }
+
+  html body #app .mission-briefing .note-box strong {
+    color: var(--cockpit-cyan) !important;
+    font-size: 17px !important;
+  }
+
+  html body #app .mission-briefing .note-box p {
+    margin: 0 !important;
+    color: #a5b5b7 !important;
+    font-size: 15px !important;
+  }
+
+  html body #app .run-configuration {
+    display: grid !important;
+    height: 100% !important;
+    grid-template-rows: 42px 84px repeat(4,56px) minmax(0,1fr) 64px 58px !important;
+    padding: 18px 20px !important;
+    gap: 8px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .run-configuration > label:not(.toggle-row) {
+    display: grid !important;
+    grid-template-rows: 22px 1fr !important;
+    color: #a8b7b8 !important;
+    font: 600 15px/1 var(--hud-font) !important;
+  }
+
+  html body #app .run-configuration select {
+    min-height: 46px !important;
+    border: 1px solid #41575e !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 14px !important;
+    background: #08151a !important;
+    color: #edf4f2 !important;
+    font-size: 17px !important;
+  }
+
+  html body #app .run-configuration .toggle-row {
+    display: grid !important;
+    min-height: 0 !important;
+    border: 1px solid #2f454c !important;
+    grid-template-columns: 1fr auto !important;
+    align-items: center !important;
+    padding: 0 15px !important;
+    background: rgba(7,18,23,.86) !important;
+    color: #d6dfde !important;
+    font-size: 17px !important;
+  }
+
+  html body #app .run-configuration .readiness-card {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-rows: 34px repeat(3,1fr) !important;
+    border: 1px solid #324950 !important;
+    padding: 10px 14px !important;
+    background: rgba(5,17,22,.88) !important;
+    gap: 4px !important;
+  }
+
+  html body #app .readiness-card > span {
+    display: grid !important;
+    grid-template-columns: 28px minmax(0,1fr) 24px !important;
+    align-items: center !important;
+    color: #b7c4c4 !important;
+    font-size: 15px !important;
+    gap: 8px !important;
+  }
+
+  html body #app .readiness-card > span .local-icon:first-child { color: var(--cockpit-green) !important; }
+  html body #app .readiness-card > span .local-icon:last-child { color: var(--cockpit-green) !important; }
+
+  /* Practice & Review shared page */
+  html body #app .practice-review-page {
+    display: grid !important;
+    grid-template-rows: 112px 52px minmax(0,1fr) !important;
+    gap: 10px !important;
+  }
+
+  html body #app .practice-review-page:has(.practice-console) {
+    grid-template-rows: 112px 52px 398px minmax(0,1fr) !important;
+  }
+
+  html body #app .practice-review-tabs {
+    display: grid !important;
+    height: 52px !important;
+    grid-template-columns: repeat(3,1fr) !important;
+    border: 1px solid #42555b !important;
+    padding: 6px !important;
+    background: #061116 !important;
+    clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px) !important;
+    gap: 5px !important;
+  }
+
+  html body #app .practice-review-tabs button {
+    position: relative !important;
+    min-height: 0 !important;
+    border: 0 !important;
+    border-right: 1px solid #2f454c !important;
+    background: rgba(8,21,27,.8) !important;
+    color: #a9b6b7 !important;
+    font: 700 20px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .practice-review-tabs button.active {
+    color: var(--cockpit-cyan) !important;
+    box-shadow: inset 0 -3px var(--cockpit-cyan) !important;
+  }
+
+  html body #app .practice-console {
+    display: grid !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    grid-template-columns: 1.08fr .92fr !important;
+    gap: 14px !important;
+  }
+
+  html body #app .practice-section-picker,
+  html body #app .run-profile-panel {
+    display: grid !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 15px 18px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .practice-section-picker {
+    grid-template-rows: 38px minmax(0,1fr) !important;
+  }
+
+  html body #app .category-plates {
+    display: grid !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+    grid-template-rows: repeat(2,minmax(0,1fr)) !important;
+    border: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 8px !important;
+  }
+
+  html body #app .category-plates .section-plate {
+    --tone: var(--cockpit-cyan);
+    position: relative !important;
+    display: grid !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    border: 1px solid #354b52 !important;
+    grid-template-columns: 104px minmax(0,1fr) !important;
+    grid-template-rows: 1fr !important;
+    align-items: center !important;
+    padding: 12px 16px !important;
+    background: linear-gradient(112deg, color-mix(in srgb, var(--tone) 9%, #071116), #061016 68%) !important;
+    color: var(--tone) !important;
+    clip-path: polygon(11px 0, calc(100% - 11px) 0, 100% 11px, 100% calc(100% - 11px), calc(100% - 11px) 100%, 11px 100%, 0 calc(100% - 11px), 0 11px) !important;
+    cursor: pointer !important;
+    gap: 12px !important;
+  }
+
+  html body #app .category-plates .section-plate:has(input:checked) {
+    border-color: var(--tone) !important;
+    box-shadow: inset 0 0 24px color-mix(in srgb, var(--tone) 10%, transparent), 0 0 13px color-mix(in srgb, var(--tone) 18%, transparent) !important;
+  }
+
+  html body #app .category-plates .section-plate input {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+  }
+
+  html body #app .category-plates .section-hud-icon {
+    width: 86px !important;
+    height: 86px !important;
+  }
+
+  html body #app .category-plates .section-copy {
+    display: block !important;
+    min-width: 0 !important;
+  }
+
+  html body #app .category-plates .section-copy strong {
+    display: block !important;
+    color: var(--tone) !important;
+    font: 700 20px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .category-plates .section-copy small {
+    display: block !important;
+    min-height: 48px !important;
+    margin-top: 7px !important;
+    overflow-wrap: anywhere !important;
+    color: #b4c1c1 !important;
+    font: 500 14px/1.12 var(--hud-font) !important;
+  }
+
+  html body #app .category-plates .section-copy em {
+    display: block !important;
+    margin-top: 7px !important;
+    color: var(--tone) !important;
+    font: 600 16px/1 var(--hud-font) !important;
+  }
+
+  html body #app .run-profile-panel {
+    grid-template-rows: 38px 56px 80px 80px 66px 58px 48px !important;
+    gap: 7px !important;
+  }
+
+  html body #app .selected-run-section {
+    --tone: var(--cockpit-cyan);
+    display: flex !important;
+    border: 1px solid #344b52 !important;
+    align-items: center !important;
+    padding: 0 14px !important;
+    background: rgba(6,20,25,.9) !important;
+    color: var(--tone) !important;
+    gap: 12px !important;
+  }
+
+  html body #app .selected-run-section .local-icon { width: 32px !important; height: 32px !important; }
+  html body #app .selected-run-section strong { font: 700 18px/1 var(--hud-font) !important; text-transform: uppercase !important; }
+
+  html body #app .count-segments,
+  html body #app .difficulty-segments {
+    display: grid !important;
+    min-height: 0 !important;
+    border: 0 !important;
+    margin: 0 !important;
+    padding: 24px 0 0 !important;
+    gap: 4px !important;
+  }
+
+  html body #app .count-segments { grid-template-columns: repeat(5,minmax(0,1fr)) !important; }
+  html body #app .difficulty-segments { grid-template-columns: repeat(3,minmax(0,1fr)) !important; }
+
+  html body #app .count-segments legend,
+  html body #app .difficulty-segments legend {
+    position: absolute !important;
+    top: 5px !important;
+    left: 0 !important;
+    color: #9fb0b2 !important;
+    font: 600 14px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .count-segments label,
+  html body #app .difficulty-segments label {
+    min-width: 0 !important;
+  }
+
+  html body #app .count-segments input,
+  html body #app .difficulty-segments input {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+  }
+
+  html body #app .count-segments span,
+  html body #app .difficulty-segments span {
+    display: grid !important;
+    width: 100% !important;
+    height: 100% !important;
+    border: 1px solid #344950 !important;
+    place-items: center !important;
+    background: #08161b !important;
+    color: #bcc7c7 !important;
+    font: 700 19px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .count-segments input:checked + span,
+  html body #app .difficulty-segments input:checked + span {
+    border-color: #55f6ef !important;
+    background: linear-gradient(120deg, #28d8df, #0aa9c3) !important;
+    color: #031116 !important;
+    box-shadow: inset 0 0 0 3px rgba(0,35,41,.18) !important;
+  }
+
+  html body #app .run-profile-facts {
+    display: grid !important;
+    grid-template-columns: repeat(3,minmax(0,1fr)) !important;
+    gap: 6px !important;
+  }
+
+  html body #app .run-profile-facts > span {
+    display: grid !important;
+    border: 1px solid #344a51 !important;
+    grid-template-columns: 42px minmax(0,1fr) !important;
+    grid-template-rows: 1fr 1fr !important;
+    align-items: center !important;
+    padding: 7px 9px !important;
+    background: rgba(6,18,23,.9) !important;
+    gap: 0 8px !important;
+  }
+
+  html body #app .run-profile-facts .local-icon { width: 32px !important; height: 32px !important; grid-row: 1 / 3 !important; color: var(--cockpit-cyan) !important; }
+  html body #app .run-profile-facts strong { align-self: end !important; color: #eaf2f1 !important; font-size: 18px !important; text-transform: uppercase !important; }
+  html body #app .run-profile-facts small { align-self: start !important; color: #80969b !important; font-size: 12px !important; text-transform: uppercase !important; }
+
+  html body #app .quick-run-grid {
+    display: grid !important;
+    height: 100% !important;
+    grid-template-rows: 38px minmax(0,1fr) !important;
+    padding: 13px 18px !important;
+    gap: 8px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .quick-title {
+    justify-content: flex-start !important;
+  }
+
+  html body #app .quick-title p {
+    margin: 0 !important;
+    color: #aab9ba !important;
+    font-size: 15px !important;
+  }
+
+  html body #app .quick-title p::before {
+    margin-right: 14px !important;
+    color: #50646a !important;
+    content: "/" !important;
+  }
+
+  html body #app .quick-run-grid .category-card-grid {
+    display: grid !important;
+    height: 100% !important;
+    grid-template-columns: repeat(4,minmax(0,1fr)) !important;
+    grid-template-rows: 1fr !important;
+    gap: 8px !important;
+  }
+
+  html body #app .quick-practice-module {
+    --tone: var(--cockpit-cyan);
+    display: grid !important;
+    min-width: 0 !important;
+    border: 1px solid var(--tone) !important;
+    grid-template-columns: 64px minmax(0,1fr) auto !important;
+    align-items: center !important;
+    padding: 8px 14px !important;
+    background: linear-gradient(110deg, color-mix(in srgb, var(--tone) 9%, #061116), #061116 72%) !important;
+    color: var(--tone) !important;
+    clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 9px, 100% calc(100% - 9px), calc(100% - 9px) 100%, 9px 100%, 0 calc(100% - 9px), 0 9px) !important;
+    cursor: pointer !important;
+    gap: 10px !important;
+  }
+
+  html body #app .quick-practice-module:hover {
+    box-shadow: inset 0 0 24px color-mix(in srgb, var(--tone) 12%, transparent) !important;
+  }
+
+  html body #app .quick-practice-module .section-hud-icon { width: 52px !important; height: 52px !important; }
+  html body #app .quick-practice-module > span:nth-child(2) { display: block !important; min-width: 0 !important; text-align: left !important; }
+  html body #app .quick-practice-module strong { display: block !important; color: var(--tone) !important; font: 700 17px/1 var(--hud-font) !important; text-transform: uppercase !important; }
+  html body #app .quick-practice-module small { display: block !important; margin-top: 4px !important; overflow: hidden !important; color: #b2c0c1 !important; font-size: 13px !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+  html body #app .quick-practice-module > b { display: inline-flex !important; align-items: center !important; color: var(--tone) !important; font-size: 15px !important; text-transform: uppercase !important; gap: 4px !important; }
+}
+
 /* Desktop cascade reset for retired light-layout rules in styles.css. */
 @media (min-width: 1100px) {
   html body #app[data-view="create"],
@@ -4530,4 +5397,2548 @@ html body #app .count-segments input {
   html body #app[data-view="signin"] .public-header .access-status {
     display: none !important;
   }
+}
+
+/* T0025 V3 queues and telemetry. Kept last so legacy density rules cannot
+   reintroduce the sparse card layouts these workstations replace. */
+@media (min-width: 1100px) {
+  html body #app .signed-main,
+  html body #app .side-layout.top-shell-layout,
+  html body #app .top-shell-layout .side-content,
+  html body #app .side-content .content-page,
+  html body #app .setup-page,
+  html body #app .results-page,
+  html body #app .review-page {
+    height: calc(942px - 104px) !important;
+    min-height: 0 !important;
+  }
+
+  html body #app .side-content .content-page,
+  html body #app .setup-page,
+  html body #app .results-page,
+  html body #app .review-page {
+    padding: 18px 30px 20px !important;
+  }
+
+  html body #app .telemetry-rail {
+    display: grid !important;
+    min-width: 0 !important;
+    border: 1px solid #3b5057 !important;
+    border-radius: 0 !important;
+    background: linear-gradient(108deg, rgba(22,57,65,.36), rgba(5,15,20,.94)) !important;
+    box-shadow: inset 0 0 0 6px #050c10, inset 0 0 0 7px rgba(76,104,112,.24) !important;
+    clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% calc(100% - 13px), calc(100% - 13px) 100%, 13px 100%, 0 calc(100% - 13px), 0 13px) !important;
+    gap: 0 !important;
+  }
+
+  html body #app .telemetry-rail metric {
+    display: grid !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    border: 0 !important;
+    border-right: 1px solid #31474e !important;
+    grid-template-columns: 64px minmax(0,1fr) !important;
+    grid-template-rows: 1fr 1fr !important;
+    align-items: center !important;
+    padding: 10px 18px !important;
+    background: transparent !important;
+    gap: 0 12px !important;
+  }
+
+  html body #app .telemetry-rail metric:last-child { border-right: 0 !important; }
+
+  html body #app .telemetry-icon {
+    width: 56px !important;
+    height: 56px !important;
+    grid-row: 1 / 3 !important;
+    color: var(--cockpit-cyan) !important;
+  }
+
+  html body #app .telemetry-rail metric > span:not(.telemetry-icon) {
+    align-self: end !important;
+    overflow: hidden !important;
+    color: var(--cockpit-cyan) !important;
+    font: 700 14px/1 var(--hud-font) !important;
+    text-overflow: ellipsis !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+  }
+
+  html body #app .telemetry-rail metric > strong {
+    align-self: start !important;
+    margin-top: 5px !important;
+    overflow: hidden !important;
+    color: #e6eceb !important;
+    font: 700 30px/1 var(--display-font) !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* Mistakes */
+  html body #app .practice-review-page:has(.mistakes-hub),
+  html body #app .practice-review-page:has(.review-queue) {
+    grid-template-rows: 112px 52px minmax(0,1fr) !important;
+  }
+
+  html body #app .mistakes-hub {
+    display: grid !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    grid-template-rows: 86px minmax(0,1fr) 44px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    gap: 10px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .mistake-summary {
+    height: 86px !important;
+    grid-template-columns: repeat(4,minmax(0,1fr)) !important;
+  }
+
+  html body #app .mistakes-workspace {
+    display: grid !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    grid-template-columns: 1.36fr .94fr !important;
+    gap: 12px !important;
+  }
+
+  html body #app .mistake-list,
+  html body #app .review-focus-panel {
+    display: grid !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 15px 18px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .mistake-list { grid-template-rows: 38px minmax(0,1fr) !important; }
+
+  html body #app .mistake-attempt-scroll {
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #2b5961 transparent !important;
+  }
+
+  html body #app .mistake-attempt-card {
+    display: grid !important;
+    min-width: 0 !important;
+    min-height: 180px !important;
+    border: 1px solid #334a51 !important;
+    grid-template-columns: 72px minmax(0,1fr) 116px 116px 126px !important;
+    grid-template-rows: 76px 54px 44px !important;
+    align-items: center !important;
+    padding: 9px 12px !important;
+    background: linear-gradient(105deg, rgba(20,53,60,.32), rgba(5,14,19,.9)) !important;
+    gap: 5px 10px !important;
+  }
+
+  html body #app .mistake-attempt-card + .mistake-attempt-card { margin-top: 8px !important; }
+
+  html body #app .attempt-index {
+    display: grid !important;
+    width: 58px !important;
+    height: 58px !important;
+    grid-row: 1 !important;
+    place-items: center !important;
+    border: 2px solid var(--cockpit-cyan) !important;
+    clip-path: polygon(25% 0,75% 0,100% 25%,100% 75%,75% 100%,25% 100%,0 75%,0 25%) !important;
+    color: var(--cockpit-cyan) !important;
+    font: 700 27px/1 var(--display-font) !important;
+  }
+
+  html body #app .mistake-attempt-title { min-width: 0 !important; }
+  html body #app .mistake-attempt-title strong { display: block !important; overflow: hidden !important; color: #edf3f1 !important; font: 700 22px/1 var(--hud-font) !important; text-overflow: ellipsis !important; text-transform: uppercase !important; white-space: nowrap !important; }
+  html body #app .mistake-attempt-title small { display: block !important; margin-top: 6px !important; color: #5ab8d0 !important; font: 600 14px/1 var(--hud-font) !important; text-transform: uppercase !important; }
+
+  html body #app .mistake-attempt-card metric {
+    display: flex !important;
+    min-width: 0 !important;
+    height: 52px !important;
+    border-left: 1px solid #344a51 !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 7px !important;
+    background: transparent !important;
+  }
+
+  html body #app .mistake-attempt-card metric span { color: #9dafb1 !important; font: 600 12px/1 var(--hud-font) !important; text-transform: uppercase !important; }
+  html body #app .mistake-attempt-card metric strong { margin-top: 5px !important; color: var(--cockpit-cyan) !important; font: 700 24px/1 var(--display-font) !important; }
+  html body #app .mistake-attempt-card metric.missed strong { color: var(--cockpit-amber) !important; }
+
+  html body #app .mistake-section-strip {
+    display: grid !important;
+    min-width: 0 !important;
+    grid-column: 1 / -1 !important;
+    grid-template-columns: repeat(4,minmax(0,1fr)) !important;
+    gap: 1px !important;
+  }
+
+  html body #app .mistake-section-strip > span {
+    --tone: var(--cockpit-cyan);
+    display: grid !important;
+    min-width: 0 !important;
+    height: 48px !important;
+    border: 1px solid #2e454c !important;
+    grid-template-columns: 34px minmax(0,1fr) auto !important;
+    align-items: center !important;
+    padding: 0 10px !important;
+    background: #071419 !important;
+    color: var(--tone) !important;
+    gap: 7px !important;
+  }
+
+  html body #app .mistake-section-strip .local-icon { width: 26px !important; height: 26px !important; }
+  html body #app .mistake-section-strip b { overflow: hidden !important; font-size: 13px !important; text-overflow: ellipsis !important; text-transform: uppercase !important; white-space: nowrap !important; }
+  html body #app .mistake-section-strip strong { font-size: 20px !important; }
+
+  html body #app .technical-row-cta {
+    min-height: 40px !important;
+    grid-column: 1 / -1 !important;
+    border-color: var(--cockpit-cyan) !important;
+    background: rgba(6,24,29,.95) !important;
+    color: var(--cockpit-cyan) !important;
+    font-size: 17px !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .review-focus-panel {
+    grid-template-rows: 38px 54px 38px minmax(0,1fr) 56px 48px !important;
+    gap: 7px !important;
+  }
+
+  html body #app .focus-total {
+    display: flex !important;
+    align-items: center !important;
+    color: var(--cockpit-amber) !important;
+    gap: 12px !important;
+  }
+
+  html body #app .focus-total > span {
+    display: grid !important;
+    width: 42px !important;
+    height: 42px !important;
+    border: 2px solid currentColor !important;
+    place-items: center !important;
+    clip-path: polygon(25% 0,75% 0,100% 25%,100% 75%,75% 100%,25% 100%,0 75%,0 25%) !important;
+    font-size: 22px !important;
+  }
+
+  html body #app .focus-total strong { font: 700 38px/1 var(--display-font) !important; }
+  html body #app .focus-total b { color: #d8e1e0 !important; font: 700 20px/1 var(--hud-font) !important; text-transform: uppercase !important; }
+  html body #app .review-focus-panel > p { margin: 0 !important; color: #a6b6b7 !important; font-size: 15px !important; }
+
+  html body #app .focus-section-list { min-height: 0 !important; overflow: hidden !important; }
+  html body #app .focus-section {
+    --tone: var(--cockpit-cyan);
+    display: grid !important;
+    min-width: 0 !important;
+    height: 48px !important;
+    border: 1px solid #2c434a !important;
+    grid-template-columns: 38px 132px 36px minmax(0,1fr) 72px !important;
+    align-items: center !important;
+    padding: 0 10px !important;
+    background: #071419 !important;
+    color: var(--tone) !important;
+    gap: 8px !important;
+  }
+
+  html body #app .focus-section + .focus-section { margin-top: 5px !important; }
+  html body #app .focus-section .local-icon { width: 29px !important; height: 29px !important; }
+  html body #app .focus-section > strong { overflow: hidden !important; font-size: 15px !important; text-overflow: ellipsis !important; text-transform: uppercase !important; white-space: nowrap !important; }
+  html body #app .focus-section > b { font: 700 22px/1 var(--display-font) !important; }
+  html body #app .focus-section > i { height: 10px !important; border: 1px solid #344a50 !important; padding: 2px !important; background: #040c10 !important; }
+  html body #app .focus-section > i span { display: block !important; height: 100% !important; background: var(--tone) !important; }
+  html body #app .focus-section > em { border: 1px solid var(--tone) !important; padding: 4px !important; font-size: 10px !important; line-height: 1 !important; text-align: center !important; text-transform: uppercase !important; }
+
+  html body #app .mistake-note {
+    display: flex !important;
+    min-width: 0 !important;
+    border: 1px solid #334950 !important;
+    align-items: center !important;
+    padding: 0 16px !important;
+    background: rgba(5,17,22,.94) !important;
+    color: #a8b8b9 !important;
+    font-size: 15px !important;
+    gap: 10px !important;
+  }
+
+  html body #app .mistake-note .icon { color: var(--cockpit-cyan) !important; }
+
+  html body #app .mistakes-empty,
+  html body #app .flagged-empty {
+    display: grid !important;
+    height: 100% !important;
+    place-items: center !important;
+  }
+
+  /* Flagged queue */
+  html body #app .review-queue {
+    display: block !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .flagged-workspace {
+    display: grid !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    grid-template-columns: 300px minmax(0,1fr) !important;
+    gap: 12px !important;
+  }
+
+  html body #app .flagged-summary,
+  html body #app .flagged-table-panel {
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .flagged-summary {
+    display: grid !important;
+    grid-template-rows: 40px 74px repeat(4,58px) 62px 62px !important;
+    padding: 16px 18px !important;
+    gap: 4px !important;
+  }
+
+  html body #app .flagged-total,
+  html body #app .flagged-summary-row,
+  html body #app .flagged-date-row {
+    display: grid !important;
+    min-width: 0 !important;
+    border-bottom: 1px solid #30474e !important;
+    grid-template-columns: 50px minmax(0,1fr) !important;
+    align-items: center !important;
+    color: var(--tone, var(--cockpit-cyan)) !important;
+    gap: 10px !important;
+  }
+
+  html body #app .flagged-total > .icon,
+  html body #app .flagged-summary-row > .local-icon,
+  html body #app .flagged-date-row > .local-icon { width: 34px !important; height: 34px !important; justify-self: center !important; }
+  html body #app .flagged-total span,
+  html body #app .flagged-summary-row span,
+  html body #app .flagged-date-row span { min-width: 0 !important; }
+  html body #app .flagged-total b,
+  html body #app .flagged-summary-row b,
+  html body #app .flagged-date-row b { display: block !important; color: #9fb0b2 !important; font-size: 13px !important; text-transform: uppercase !important; }
+  html body #app .flagged-total strong,
+  html body #app .flagged-summary-row strong,
+  html body #app .flagged-date-row strong { display: block !important; margin-top: 4px !important; overflow: hidden !important; color: var(--tone, var(--cockpit-cyan)) !important; font: 700 23px/1 var(--display-font) !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+  html body #app .flagged-total { --tone: var(--cockpit-red); }
+
+  html body #app .flagged-table-panel {
+    display: grid !important;
+    grid-template-rows: 58px 34px minmax(0,1fr) !important;
+    padding: 14px 18px !important;
+  }
+
+  html body #app .flagged-table-toolbar {
+    display: flex !important;
+    min-width: 0 !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+
+  html body #app .flagged-table-toolbar h2 { margin: 0 !important; color: var(--cockpit-cyan) !important; font: 700 25px/1 var(--hud-font) !important; text-transform: uppercase !important; }
+  html body #app .flagged-table-toolbar > div { display: flex !important; align-items: center !important; color: #9fb0b2 !important; gap: 10px !important; }
+  html body #app .flagged-table-toolbar .btn { min-height: 36px !important; }
+
+  html body #app .flagged-table-head,
+  html body #app .flagged-table-row {
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-columns: 1.35fr 1fr .62fr .45fr 96px !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  html body #app .flagged-table-head {
+    border-block: 1px solid #31474e !important;
+    padding: 0 10px !important;
+    color: #90a4a8 !important;
+    font: 600 12px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .flagged-table-scroll {
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #2b5961 transparent !important;
+  }
+
+  html body #app .flagged-section {
+    --tone: var(--cockpit-cyan);
+    border: 1px solid #314850 !important;
+    margin-top: 6px !important;
+    color: var(--tone) !important;
+  }
+
+  html body #app .flagged-section header {
+    display: grid !important;
+    height: 42px !important;
+    grid-template-columns: 38px auto 1fr !important;
+    grid-template-rows: 42px !important;
+    align-items: center !important;
+    border-bottom: 1px solid #314850 !important;
+    padding: 0 10px !important;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--tone) 10%, #071419), #071419) !important;
+    gap: 8px !important;
+  }
+
+  html body #app .flagged-section header .local-icon { width: 28px !important; height: 28px !important; }
+  html body #app .flagged-section header h2 { grid-column: 2 !important; margin: 0 !important; color: var(--tone) !important; font: 700 18px/1 var(--hud-font) !important; text-transform: uppercase !important; }
+  html body #app .flagged-section header em { grid-column: 3 !important; justify-self: start !important; color: #92a7aa !important; font: 600 12px/1 var(--hud-font) !important; text-transform: uppercase !important; }
+
+  html body #app .flagged-table-row {
+    min-height: 38px !important;
+    border-bottom: 1px solid #263d45 !important;
+    padding: 3px 10px !important;
+    color: #c2cdce !important;
+    font-size: 13px !important;
+  }
+
+  html body #app .flagged-table-row > span { min-width: 0 !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+  html body #app .flagged-table-row > span:first-child { display: grid !important; grid-template-columns: 18px 72px minmax(0,1fr) !important; align-items: center !important; gap: 5px !important; }
+  html body #app .flagged-table-row > span:first-child i { color: var(--cockpit-red) !important; }
+  html body #app .flagged-table-row small { display: block !important; overflow: hidden !important; color: #81979c !important; font-size: 11px !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+  html body #app .flagged-table-row .correct { color: var(--cockpit-green) !important; }
+  html body #app .flagged-table-row .wrong { color: var(--cockpit-red) !important; }
+  html body #app .flagged-table-row .unanswered { color: var(--cockpit-amber) !important; }
+  html body #app .flagged-table-row .btn { min-height: 28px !important; padding: 0 12px !important; border-color: var(--cockpit-cyan) !important; color: var(--cockpit-cyan) !important; font-size: 12px !important; }
+
+  /* Progress */
+  html body #app .progress-page {
+    display: grid !important;
+    grid-template-rows: 98px 92px 292px minmax(0,1fr) !important;
+    gap: 10px !important;
+  }
+
+  html body #app .progress-page .statistics-rail {
+    height: 92px !important;
+    grid-template-columns: repeat(5,minmax(0,1fr)) !important;
+  }
+
+  html body #app .progress-page .progress-analytics-grid {
+    display: grid !important;
+    height: 292px !important;
+    min-height: 0 !important;
+    grid-template-columns: 1fr 1.02fr !important;
+    grid-template-rows: 292px !important;
+    gap: 12px !important;
+  }
+
+  html body #app .progress-page .trend-panel,
+  html body #app .progress-page .performance-card {
+    display: grid !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 14px 18px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .progress-page .trend-panel { grid-template-rows: 44px minmax(0,1fr) !important; }
+  html body #app .progress-page .technical-title p { margin: 4px 0 0 !important; color: #93a6a9 !important; font-size: 13px !important; }
+  html body #app .progress-page .technical-title > span:not([aria-hidden]) { margin-left: auto !important; color: var(--cockpit-cyan) !important; font-size: 14px !important; }
+  html body #app .progress-page .trend-chart { height: 100% !important; min-height: 0 !important; }
+  html body #app .progress-page .trend-chart svg { width: 100% !important; height: 100% !important; overflow: visible !important; }
+
+  html body #app .progress-page .performance-card { grid-template-rows: 38px minmax(0,1fr) 44px !important; gap: 6px !important; }
+  html body #app .performance-bars { min-height: 0 !important; }
+  html body #app .performance-row {
+    --tone: var(--cockpit-cyan);
+    display: grid !important;
+    min-width: 0 !important;
+    height: 49px !important;
+    border-bottom: 1px solid #2b4249 !important;
+    grid-template-columns: 170px minmax(0,1fr) 64px 110px !important;
+    align-items: center !important;
+    color: var(--tone) !important;
+    gap: 10px !important;
+  }
+
+  html body #app .performance-row > span { display: grid !important; min-width: 0 !important; grid-template-columns: 34px minmax(0,1fr) !important; align-items: center !important; gap: 8px !important; }
+  html body #app .performance-row > span .local-icon { width: 30px !important; height: 30px !important; }
+  html body #app .performance-row > span b { overflow: hidden !important; font-size: 16px !important; text-overflow: ellipsis !important; text-transform: uppercase !important; white-space: nowrap !important; }
+  html body #app .performance-row > i { height: 12px !important; border: 1px solid #344a51 !important; padding: 2px !important; background: #040c10 !important; }
+  html body #app .performance-row > i b { display: block !important; height: 100% !important; background: var(--tone) !important; box-shadow: 0 0 10px color-mix(in srgb, var(--tone) 28%, transparent) !important; }
+  html body #app .performance-row > strong { color: var(--tone) !important; font: 700 26px/1 var(--display-font) !important; text-align: right !important; }
+  html body #app .performance-row > em { color: #8fa3a7 !important; font-size: 12px !important; text-align: right !important; }
+
+  html body #app .review-focus-cta {
+    display: flex !important;
+    min-width: 0 !important;
+    border: 1px solid var(--cockpit-cyan) !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 14px !important;
+    background: rgba(5,20,25,.9) !important;
+    color: var(--cockpit-cyan) !important;
+    font: 600 14px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+    gap: 9px !important;
+  }
+
+  html body #app .review-focus-cta strong { color: #dce6e5 !important; }
+  html body #app .review-focus-cta .local-icon { width: 24px !important; height: 24px !important; }
+
+  html body #app .progress-page .attempts-table-card {
+    display: grid !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    grid-template-columns: 250px minmax(0,1fr) !important;
+    grid-template-rows: 44px minmax(0,1fr) !important;
+    margin: 0 !important;
+    padding: 12px 18px !important;
+    overflow: hidden !important;
+    gap: 4px 12px !important;
+  }
+
+  html body #app .attempt-table-title { display: flex !important; min-width: 0 !important; align-items: center !important; justify-content: space-between !important; }
+  html body #app .attempt-table-title h2 { margin: 0 !important; color: var(--cockpit-cyan) !important; font: 700 21px/1 var(--hud-font) !important; text-transform: uppercase !important; }
+  html body #app .attempt-table-title span { color: #82999d !important; font-size: 12px !important; }
+
+  html body #app .progress-tabs {
+    display: grid !important;
+    height: 40px !important;
+    grid-template-columns: repeat(4,minmax(0,1fr)) !important;
+    border: 1px solid #30464d !important;
+    padding: 3px !important;
+    background: #061116 !important;
+    gap: 2px !important;
+  }
+
+  html body #app .progress-tabs button { border: 0 !important; border-right: 1px solid #2d4249 !important; background: #08151a !important; color: #9aabad !important; font: 600 14px/1 var(--hud-font) !important; text-transform: uppercase !important; }
+  html body #app .progress-tabs button.active { color: var(--cockpit-cyan) !important; box-shadow: inset 0 -2px var(--cockpit-cyan) !important; }
+
+  html body #app .attempts-table-card .attempt-table {
+    height: 100% !important;
+    min-height: 0 !important;
+    grid-column: 1 / -1 !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #2b5961 transparent !important;
+  }
+
+  html body #app .attempts-table-card .table-head,
+  html body #app .attempts-table-card .table-row {
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-columns: 1.48fr .62fr .74fr .52fr .62fr 180px !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  html body #app .attempts-table-card .table-head {
+    position: sticky !important;
+    z-index: 2 !important;
+    top: 0 !important;
+    height: 30px !important;
+    border-block: 1px solid #31474e !important;
+    padding: 0 12px !important;
+    background: #071218 !important;
+    color: #8da2a6 !important;
+    font: 600 12px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .attempts-table-card .table-row {
+    min-height: 48px !important;
+    border-bottom: 1px solid #263d45 !important;
+    padding: 4px 12px !important;
+    color: #c3cece !important;
+    font-size: 14px !important;
+  }
+
+  html body #app .attempts-table-card .table-row > span { min-width: 0 !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+  html body #app .attempt-name { display: grid !important; grid-template-columns: 46px minmax(0,1fr) !important; align-items: center !important; gap: 9px !important; }
+  html body #app .attempt-name > i { display: grid !important; width: 38px !important; height: 38px !important; border: 1px solid var(--cockpit-cyan) !important; place-items: center !important; clip-path: polygon(25% 0,75% 0,100% 25%,100% 75%,75% 100%,25% 100%,0 75%,0 25%) !important; color: var(--cockpit-cyan) !important; font-style: normal !important; }
+  html body #app .attempt-name strong { display: block !important; overflow: hidden !important; color: #e0e8e7 !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+  html body #app .attempt-name small { display: block !important; color: #7f9599 !important; font-size: 11px !important; }
+  html body #app .attempt-type,
+  html body #app .attempt-score { color: var(--cockpit-cyan) !important; font-weight: 700 !important; }
+  html body #app .attempt-status { display: inline-flex !important; align-items: center !important; color: var(--cockpit-green) !important; gap: 6px !important; }
+  html body #app .attempt-status.in_progress,
+  html body #app .attempt-status.paused { color: var(--cockpit-amber) !important; }
+  html body #app .attempt-status .local-icon { width: 19px !important; height: 19px !important; }
+  html body #app .attempts-table-card .row-actions { display: flex !important; overflow: visible !important; justify-content: flex-end !important; gap: 6px !important; }
+  html body #app .attempts-table-card .row-actions .btn { min-width: 124px !important; min-height: 32px !important; border-color: var(--cockpit-cyan) !important; color: var(--cockpit-cyan) !important; font-size: 12px !important; text-transform: uppercase !important; }
+  html body #app .attempts-table-card .row-actions .icon-only { width: 32px !important; height: 32px !important; }
+}
+
+@media (max-width: 1099px) {
+  html body #app .practice-console,
+  html body #app .mistakes-workspace,
+  html body #app .flagged-workspace {
+    display: grid !important;
+    height: auto !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  html body #app .practice-section-picker,
+  html body #app .run-profile-panel,
+  html body #app .mistake-list,
+  html body #app .review-focus-panel,
+  html body #app .flagged-summary,
+  html body #app .flagged-table-panel {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  html body #app .category-plates,
+  html body #app .mistake-summary,
+  html body #app .telemetry-rail {
+    grid-template-columns: 1fr !important;
+  }
+
+  html body #app .flagged-table-panel { overflow-x: auto !important; }
+  html body #app .flagged-table-head,
+  html body #app .flagged-table-row { min-width: 900px !important; }
+}
+
+@media (min-width: 1100px) {
+  html body #app header.app-header.signed-header.study-hub-header {
+    grid-template-columns: 430px minmax(670px, 1fr) 290px !important;
+    width: 100% !important;
+    height: 104px !important;
+    min-height: 104px !important;
+    padding: 0 28px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #app header.app-header.signed-header.study-hub-header .signed-primary-nav {
+    height: 74px !important;
+    padding: 0 42px 8px !important;
+  }
+
+  html body #app header.app-header.signed-header.study-hub-header .signed-primary-nav button {
+    height: 64px !important;
+    min-height: 64px !important;
+    line-height: 64px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .signed-frame .side-layout.top-shell-layout,
+  html body #app .signed-frame .side-layout.top-shell-layout > main.side-content,
+  html body #app .signed-frame > main.signed-main {
+    height: 838px !important;
+    min-height: 0 !important;
+  }
+
+  html body #app .setup-page,
+  html body #app .side-content > .content-page {
+    height: 838px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #app .mission-briefing > *,
+  html body #app .run-configuration > *,
+  html body #app .practice-console > *,
+  html body #app .run-profile-panel > * {
+    box-sizing: border-box !important;
+  }
+
+  html body #app .allocation-console > .allocation-card.section-row {
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    align-self: stretch !important;
+    margin: 0 !important;
+    padding: 9px 12px !important;
+  }
+
+  html body #app .run-configuration .readiness-card {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 7px 14px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .run-configuration > .technical-cta {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #app form.practice-console.custom-practice {
+    height: 398px !important;
+    min-height: 0 !important;
+    border: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  html body #app form.practice-console.custom-practice > .practice-section-picker,
+  html body #app form.practice-console.custom-practice > .run-profile-panel {
+    width: auto !important;
+    height: 398px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #app form.practice-console.custom-practice > .run-profile-panel {
+    grid-template-rows: 32px 48px 55px 55px 54px 54px 40px !important;
+    padding: 10px 14px !important;
+    gap: 5px !important;
+  }
+
+  html body #app .run-profile-panel .technical-title { min-height: 32px !important; }
+  html body #app .run-profile-panel .selected-run-section { height: 48px !important; }
+  html body #app .run-profile-panel .count-segments,
+  html body #app .run-profile-panel .difficulty-segments { height: 55px !important; padding-top: 20px !important; }
+  html body #app .run-profile-panel .count-segments legend,
+  html body #app .run-profile-panel .difficulty-segments legend { top: 3px !important; }
+  html body #app .run-profile-panel .run-profile-facts { height: 54px !important; }
+  html body #app .run-profile-panel .technical-cta { width: 100% !important; height: 100% !important; min-height: 0 !important; }
+
+  html body #app .review-focus-panel {
+    grid-template-rows: 34px 46px 28px minmax(0,1fr) 52px 44px !important;
+    padding: 12px 14px !important;
+    gap: 4px !important;
+  }
+
+  html body #app .focus-section { height: 38px !important; }
+  html body #app .focus-total > span { width: 36px !important; height: 36px !important; }
+  html body #app .focus-total strong { font-size: 32px !important; }
+  html body #app .review-focus-panel .technical-cta { width: 100% !important; height: 100% !important; min-height: 0 !important; font-size: 20px !important; }
+
+  html body #app .progress-page .performance-row { height: 40px !important; }
+  html body #app .progress-page .performance-row > span,
+  html body #app .progress-page .performance-row > span > b {
+    border: 0 !important;
+    background: transparent !important;
+    color: var(--tone) !important;
+    -webkit-text-fill-color: var(--tone) !important;
+    box-shadow: none !important;
+  }
+
+  html body #app .progress-page .review-focus-cta {
+    position: relative !important;
+    z-index: 2 !important;
+    height: 40px !important;
+    margin: 0 !important;
+    background: #061419 !important;
+  }
+
+  html body #app .run-configuration {
+    grid-template-rows: 42px 76px repeat(4,54px) 110px 62px 56px !important;
+  }
+
+  html body #app .run-configuration .readiness-card {
+    grid-template-rows: 28px repeat(3,1fr) !important;
+    padding-block: 6px !important;
+    gap: 2px !important;
+  }
+
+  html body #app .run-configuration .readiness-card .technical-title { min-height: 28px !important; }
+  html body #app .run-configuration .readiness-card > span { font-size: 14px !important; }
+
+  html body #app .run-profile-panel .count-segments,
+  html body #app .run-profile-panel .difficulty-segments {
+    position: relative !important;
+  }
+
+  html body #app .progress-page .performance-bars {
+    display: grid !important;
+    grid-template-rows: repeat(4,36px) !important;
+    gap: 4px !important;
+  }
+
+  html body #app .progress-page .performance-row { height: 36px !important; }
+}
+
+/* T0025 V3 exam workstation and blocking states. */
+@media (min-width: 1100px) {
+  html body #app .exam-shell {
+    display: grid !important;
+    width: 100% !important;
+    height: 942px !important;
+    grid-template-rows: 92px minmax(0,1fr) !important;
+    background:
+      radial-gradient(ellipse at 75% 18%, rgba(31,92,102,.16), transparent 42%),
+      repeating-linear-gradient(0deg, transparent 0 4px, rgba(255,255,255,.006) 5px),
+      #030a0e !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .exam-topbar {
+    display: grid !important;
+    height: 92px !important;
+    grid-template-columns: 430px minmax(0,1fr) 430px !important;
+    align-items: center !important;
+    border-bottom: 1px solid #3a525a !important;
+    padding: 0 28px !important;
+    background: linear-gradient(90deg, rgba(18,54,62,.32), transparent 24%, transparent 76%, rgba(18,54,62,.24)), #040c10 !important;
+    box-sizing: border-box !important;
+    gap: 18px !important;
+  }
+
+  html body #app .exam-brand {
+    display: flex !important;
+    min-width: 0 !important;
+    align-items: center !important;
+    gap: 14px !important;
+  }
+
+  html body #app .exam-brand .logo { width: 58px !important; height: 64px !important; }
+  html body #app .exam-brand strong { display: block !important; color: #ecf3f1 !important; font: 800 25px/1 var(--display-font) !important; text-transform: uppercase !important; }
+  html body #app .exam-brand span { display: block !important; margin-top: 4px !important; color: #8fa5a8 !important; font: 600 13px/1 var(--hud-font) !important; }
+
+  html body #app .exam-status {
+    display: flex !important;
+    min-width: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 28px !important;
+  }
+
+  html body #app .exam-status > strong {
+    border: 1px solid #2c7681 !important;
+    padding: 9px 16px !important;
+    color: #e6eeee !important;
+    font: 700 18px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px) !important;
+  }
+
+  html body #app .exam-status > div {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0 !important;
+  }
+
+  html body #app .exam-status > div > span {
+    display: flex !important;
+    min-height: 44px !important;
+    border-left: 1px solid #42565d !important;
+    align-items: center !important;
+    padding: 0 24px !important;
+    color: #b6c3c4 !important;
+    font: 600 16px/1 var(--hud-font) !important;
+    white-space: nowrap !important;
+  }
+
+  html body #app .exam-status .exam-time { color: var(--cockpit-cyan) !important; font-size: 20px !important; }
+  html body #app .exam-status .exam-answered { color: #edf3f2 !important; }
+
+  html body #app .exam-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+  }
+
+  html body #app .exam-actions .btn {
+    min-width: 130px !important;
+    min-height: 52px !important;
+    padding: 0 18px !important;
+    font-size: 17px !important;
+  }
+
+  html body #app .exam-actions .btn.danger {
+    min-width: 180px !important;
+    border-color: #ff5a60 !important;
+    background: linear-gradient(120deg, #df3039, #b51f28) !important;
+    color: #fff !important;
+    box-shadow: 0 0 18px rgba(239,76,76,.18) !important;
+  }
+
+  html body #app .exam-body {
+    display: grid !important;
+    width: 100% !important;
+    height: 850px !important;
+    min-height: 0 !important;
+    grid-template-columns: 400px minmax(0,1fr) !important;
+    background: #030a0e !important;
+    overflow: hidden !important;
+  }
+
+  /* The legacy graph selector is more specific than the base exam-body rule. */
+  html body #app .exam-body.with-stimulus {
+    width: 100% !important;
+    height: 850px !important;
+    grid-template-columns: 400px minmax(0, 1fr) !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .exam-nav {
+    display: grid !important;
+    width: 400px !important;
+    height: 850px !important;
+    min-height: 0 !important;
+    grid-template-rows: 134px minmax(0,1fr) !important;
+    border: 1px solid #34515a !important;
+    border-left: 0 !important;
+    padding: 18px 20px 16px !important;
+    background: linear-gradient(135deg, rgba(21,57,65,.35), transparent 38%), #07141a !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .nav-title {
+    min-width: 0 !important;
+    border-bottom: 1px solid #38525a !important;
+    padding: 0 0 16px !important;
+  }
+
+  html body #app .nav-title h2 {
+    margin: 0 0 16px !important;
+    color: #eef4f2 !important;
+    font: italic 800 31px/1 var(--display-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .legend {
+    display: grid !important;
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+    color: #a6b7b8 !important;
+    font-size: 14px !important;
+    gap: 10px 16px !important;
+  }
+
+  html body #app .legend span { display: flex !important; min-width: 0 !important; align-items: center !important; gap: 8px !important; }
+  html body #app .legend-dot { width: 12px !important; height: 12px !important; border-radius: 0 !important; }
+
+  html body #app .exam-nav > .question-group:first-of-type,
+  html body #app .exam-nav > details:first-of-type { margin-top: 12px !important; }
+
+  html body #app .exam-nav {
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(55,123,134,.65) transparent !important;
+  }
+
+  html body #app .question-group {
+    --tone: var(--cockpit-cyan);
+    min-width: 0 !important;
+    border: 1px solid #314b53 !important;
+    box-shadow: inset 2px 0 var(--tone) !important;
+    border-radius: 0 !important;
+    margin: 0 0 10px !important;
+    background: rgba(7,20,26,.92) !important;
+    color: var(--tone) !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .question-group > summary {
+    display: grid !important;
+    min-width: 0 !important;
+    min-height: 64px !important;
+    grid-template-columns: minmax(0,1fr) auto 26px !important;
+    align-items: center !important;
+    padding: 10px 12px !important;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--tone) 8%, #07151a), #07151a) !important;
+    gap: 8px !important;
+  }
+
+  html body #app .question-group > summary strong { display: block !important; overflow: hidden !important; color: var(--tone) !important; font: 700 18px/1 var(--hud-font) !important; text-overflow: ellipsis !important; text-transform: uppercase !important; white-space: nowrap !important; }
+  html body #app .question-group > summary small { display: block !important; margin-top: 6px !important; color: #81979b !important; font-size: 12px !important; }
+  html body #app .question-group > summary em { color: var(--cockpit-cyan) !important; font-size: 13px !important; white-space: nowrap !important; }
+
+  html body #app .group-counts { display: grid !important; grid-template-columns: repeat(2,1fr) !important; padding: 8px 12px 0 !important; color: #779095 !important; font-size: 11px !important; gap: 4px !important; }
+
+  html body #app .chip-grid {
+    display: grid !important;
+    grid-template-columns: repeat(5,minmax(0,1fr)) !important;
+    padding: 10px 10px 12px !important;
+    gap: 7px !important;
+  }
+
+  html body #app .question-chip {
+    position: relative !important;
+    width: 100% !important;
+    height: 42px !important;
+    min-width: 0 !important;
+    border: 1px solid #455c64 !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    background: #0a181e !important;
+    color: #d7e0df !important;
+    font: 700 15px/1 var(--hud-font) !important;
+  }
+
+  html body #app .question-chip.answered { border-color: #27b9a7 !important; background: linear-gradient(135deg, #1ca58f, #127b70) !important; color: #fff !important; }
+  html body #app .question-chip.skipped { border-color: var(--cockpit-amber) !important; color: var(--cockpit-amber) !important; }
+  html body #app .question-chip.current { border: 2px solid var(--cockpit-cyan) !important; box-shadow: inset 0 0 0 2px #061116, 0 0 10px rgba(33,222,215,.24) !important; color: var(--cockpit-cyan) !important; }
+  html body #app .question-chip.flagged::after { position: absolute !important; top: 0 !important; right: 0 !important; width: 0 !important; height: 0 !important; border-top: 13px solid var(--cockpit-red) !important; border-left: 13px solid transparent !important; content: "" !important; }
+  html body #app .question-chip.more-chip { grid-column: 1 / -1 !important; height: 34px !important; color: var(--cockpit-cyan) !important; }
+
+  html body #app .exam-question {
+    display: block !important;
+    height: 850px !important;
+    min-height: 0 !important;
+    padding: 20px 24px !important;
+    background: radial-gradient(ellipse at 70% 20%, rgba(32,83,93,.16), transparent 42%), #040c10 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .question-panel {
+    display: grid !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    grid-template-rows: 86px auto minmax(0,1fr) 74px !important;
+    border: 1px solid #35515a !important;
+    border-radius: 0 !important;
+    padding: 20px 24px 0 !important;
+    background: linear-gradient(120deg, rgba(21,55,63,.22), transparent 35%), #08151b !important;
+    clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% calc(100% - 13px), calc(100% - 13px) 100%, 13px 100%, 0 calc(100% - 13px), 0 13px) !important;
+    box-sizing: border-box !important;
+    gap: 12px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .question-title {
+    display: flex !important;
+    min-width: 0 !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+  }
+
+  html body #app .question-index { color: #ecf2f1 !important; font: 700 29px/1 var(--display-font) !important; text-transform: uppercase !important; }
+  html body #app .question-index small { color: #6f868b !important; font-size: 16px !important; }
+  html body #app .topic-pill { display: inline-block !important; margin: 9px 0 0 !important; border: 1px solid #159f9c !important; border-radius: 0 !important; padding: 6px 10px !important; background: rgba(12,105,104,.24) !important; color: var(--cockpit-cyan) !important; font: 700 14px/1 var(--hud-font) !important; }
+  html body #app .status-pill { border: 1px solid currentColor !important; border-radius: 0 !important; padding: 8px 12px !important; background: #071419 !important; color: var(--cockpit-cyan) !important; font-size: 13px !important; text-transform: uppercase !important; }
+
+  html body #app .question-panel > .prompt {
+    margin: 0 !important;
+    padding: 10px 0 18px !important;
+    border-bottom: 2px solid #2a8d96 !important;
+    color: #edf3f2 !important;
+    font: 600 25px/1.3 var(--reading-font) !important;
+  }
+
+  html body #app .choices {
+    display: grid !important;
+    min-height: 0 !important;
+    align-content: start !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #2b5961 transparent !important;
+    gap: 10px !important;
+  }
+
+  html body #app .choice {
+    display: grid !important;
+    width: 100% !important;
+    min-height: 68px !important;
+    border: 1px solid #38525b !important;
+    border-radius: 0 !important;
+    grid-template-columns: 48px minmax(0,1fr) 26px !important;
+    align-items: center !important;
+    padding: 8px 14px !important;
+    background: rgba(12,28,34,.9) !important;
+    color: #e5eceb !important;
+    box-sizing: border-box !important;
+    gap: 12px !important;
+  }
+
+  html body #app .choice:hover:not(:disabled) { border-color: #63818a !important; background: #10262d !important; }
+  html body #app .choice.selected { border: 2px solid var(--cockpit-cyan) !important; padding: 7px 13px !important; background: rgba(17,91,94,.3) !important; box-shadow: inset 4px 0 var(--cockpit-cyan) !important; }
+  html body #app .choice-letter { display: grid !important; width: 38px !important; height: 38px !important; border: 1px solid #8fa6aa !important; border-radius: 50% !important; place-items: center !important; background: #071319 !important; color: var(--cockpit-cyan) !important; font: 700 18px/1 var(--hud-font) !important; }
+  html body #app .choice strong { color: #e7efed !important; font: 600 18px/1.3 var(--reading-font) !important; }
+  html body #app .choice-radio { width: 20px !important; height: 20px !important; border: 2px solid #6d858b !important; border-radius: 50% !important; }
+  html body #app .choice.selected .choice-radio { border: 5px solid var(--cockpit-cyan) !important; }
+
+  html body #app .question-actions {
+    display: grid !important;
+    min-width: 0 !important;
+    height: 74px !important;
+    grid-template-columns: 1fr 1fr 1.2fr .82fr 1fr !important;
+    border-top: 1px solid #466069 !important;
+    padding: 12px 0 !important;
+    background: #08151b !important;
+    box-sizing: border-box !important;
+    gap: 9px !important;
+  }
+
+  html body #app .question-actions .btn { min-width: 0 !important; min-height: 48px !important; padding: 0 12px !important; font-size: 16px !important; }
+  html body #app .question-actions .btn.primary { border-color: #57f1eb !important; background: linear-gradient(105deg, #23d3d8, #0aa9c3) !important; color: #031116 !important; }
+
+  html body #app .exam-body.with-stimulus .exam-question {
+    display: grid !important;
+    grid-template-columns: minmax(0,1.08fr) minmax(0,.92fr) !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+  }
+
+  html body #app .exam-body.with-stimulus .stimulus-panel,
+  html body #app .exam-body.with-stimulus .question-panel {
+    width: auto !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+  }
+
+  html body #app .exam-body.with-stimulus .stimulus-panel {
+    display: grid !important;
+    grid-template-rows: 94px minmax(0,1fr) 108px !important;
+    border: 1px solid #3a5962 !important;
+    border-radius: 0 !important;
+    padding: 18px 22px !important;
+    background: linear-gradient(120deg, rgba(19,63,72,.25), transparent 36%), #07151b !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .exam-body.with-stimulus .question-panel {
+    grid-template-rows: 86px auto minmax(0,1fr) 74px !important;
+  }
+
+  html body #app .stimulus-head h2 { margin: 6px 0 4px !important; color: #eef4f2 !important; font: 700 22px/1 var(--hud-font) !important; }
+  html body #app .stimulus-head p { margin: 0 !important; color: #8da3a7 !important; font-size: 13px !important; }
+  html body #app .stimulus-head > div > span { color: var(--cockpit-cyan) !important; font-size: 13px !important; text-transform: uppercase !important; }
+  html body #app .stimulus-head .btn { min-height: 40px !important; }
+}
+
+@media (min-width: 1100px) {
+  html body #app .modal-backdrop {
+    background: rgba(1,7,10,.73) !important;
+    backdrop-filter: blur(5px) saturate(.72) !important;
+  }
+
+  html body #app .pause-modal,
+  html body #app .submit-modal,
+  html body #app .timeout-modal {
+    position: relative !important;
+    border: 2px solid var(--modal-tone, var(--cockpit-cyan)) !important;
+    border-radius: 0 !important;
+    background:
+      linear-gradient(120deg, color-mix(in srgb, var(--modal-tone) 7%, #071116), #050d12 62%),
+      #050d12 !important;
+    box-shadow: inset 0 0 0 7px #050b0f, inset 0 0 0 8px color-mix(in srgb, var(--modal-tone) 32%, transparent), 0 30px 80px rgba(0,0,0,.64), 0 0 30px color-mix(in srgb, var(--modal-tone) 13%, transparent) !important;
+    clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px) !important;
+  }
+
+  html body #app .pause-modal {
+    --modal-tone: var(--cockpit-amber);
+    display: grid !important;
+    width: 620px !important;
+    min-height: 460px !important;
+    grid-template-rows: 50px 18px 48px 160px 62px 58px !important;
+    padding: 30px 40px !important;
+    box-sizing: border-box !important;
+    gap: 8px !important;
+  }
+
+  html body #app .pause-icon {
+    position: absolute !important;
+    top: -25px !important;
+    left: calc(50% - 25px) !important;
+    display: grid !important;
+    width: 50px !important;
+    height: 50px !important;
+    border: 2px solid var(--cockpit-amber) !important;
+    place-items: center !important;
+    background: #10130f !important;
+    color: var(--cockpit-amber) !important;
+    clip-path: polygon(25% 0,75% 0,100% 25%,100% 75%,75% 100%,25% 100%,0 75%,0 25%) !important;
+  }
+
+  html body #app .pause-modal .eyebrow { align-self: end !important; margin: 0 !important; color: var(--cockpit-amber) !important; text-align: center !important; }
+  html body #app .pause-modal h2 { margin: 0 !important; color: var(--cockpit-amber) !important; font: 800 38px/1 var(--display-font) !important; text-align: center !important; text-transform: uppercase !important; }
+  html body #app .pause-facts { border-block: 1px solid #6b5824 !important; }
+  html body #app .pause-facts > span { display: grid !important; height: 52px !important; grid-template-columns: 34px minmax(0,1fr) auto !important; align-items: center !important; border-bottom: 1px solid #3b3823 !important; color: #aebabb !important; gap: 10px !important; }
+  html body #app .pause-facts .local-icon,
+  html body #app .pause-facts .icon { width: 25px !important; height: 25px !important; color: var(--cockpit-amber) !important; }
+  html body #app .pause-facts b { font-size: 14px !important; text-transform: uppercase !important; }
+  html body #app .pause-facts strong { color: var(--cockpit-amber) !important; font: 700 21px/1 var(--hud-font) !important; text-transform: uppercase !important; }
+  html body #app .pause-facts > span:last-child strong { color: var(--cockpit-green) !important; }
+  html body #app .pause-modal > p:not(.eyebrow) { margin: 0 !important; align-self: center !important; color: #aebabb !important; font-size: 16px !important; line-height: 1.35 !important; text-align: center !important; }
+  html body #app .pause-actions { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+  html body #app .pause-actions .btn { min-height: 52px !important; font-size: 17px !important; }
+
+  html body #app .submit-modal {
+    --modal-tone: var(--cockpit-red);
+    display: grid !important;
+    width: 920px !important;
+    min-height: 590px !important;
+    grid-template-rows: 62px 20px 58px 176px 74px 62px !important;
+    padding: 34px 40px !important;
+    box-sizing: border-box !important;
+    gap: 10px !important;
+  }
+
+  html body #app .submit-danger-symbol {
+    position: absolute !important;
+    top: 30px !important;
+    left: 218px !important;
+    display: grid !important;
+    width: 54px !important;
+    height: 54px !important;
+    border: 4px solid var(--cockpit-red) !important;
+    place-items: center !important;
+    color: var(--cockpit-red) !important;
+    clip-path: polygon(50% 0,100% 100%,0 100%) !important;
+    font: 800 31px/1 var(--display-font) !important;
+  }
+
+  html body #app .submit-modal .eyebrow { display: none !important; }
+  html body #app .submit-modal h2 { margin: 8px 0 0 !important; color: var(--cockpit-red) !important; font: 800 48px/1 var(--display-font) !important; text-align: center !important; text-transform: uppercase !important; }
+  html body #app .submit-modal > p { margin: 0 !important; color: #c0cbcb !important; font: 500 19px/1.35 var(--hud-font) !important; text-align: center !important; }
+  html body #app .submit-modal > p strong { display: block !important; margin-top: 4px !important; color: var(--cockpit-red) !important; }
+
+  html body #app .submit-stats {
+    display: grid !important;
+    grid-template-columns: repeat(4,minmax(0,1fr)) !important;
+    gap: 12px !important;
+  }
+
+  html body #app .submit-stats metric {
+    --tone: var(--cockpit-cyan);
+    display: grid !important;
+    min-width: 0 !important;
+    border: 1px solid var(--tone) !important;
+    grid-template-rows: 44px 26px 1fr !important;
+    place-items: center !important;
+    padding: 16px 12px !important;
+    background: linear-gradient(120deg, color-mix(in srgb, var(--tone) 9%, #071116), #071116) !important;
+    color: var(--tone) !important;
+    clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px) !important;
+  }
+
+  html body #app .submit-stats metric.unanswered { --tone: var(--cockpit-amber); }
+  html body #app .submit-stats metric.skipped { --tone: var(--cockpit-purple); }
+  html body #app .submit-stats metric.flagged { --tone: var(--cockpit-red); }
+  html body #app .submit-stats .local-icon,
+  html body #app .submit-stats .icon { width: 38px !important; height: 38px !important; }
+  html body #app .submit-stats metric span { color: var(--tone) !important; font-size: 14px !important; text-transform: uppercase !important; }
+  html body #app .submit-stats metric strong { color: var(--tone) !important; font: 700 38px/1 var(--display-font) !important; }
+  html body #app .submit-warning { display: flex !important; border: 1px solid var(--cockpit-red) !important; align-items: center !important; justify-content: center !important; background: rgba(111,21,27,.22) !important; color: #e1c9ca !important; font-size: 17px !important; gap: 10px !important; }
+  html body #app .submit-warning .icon { color: var(--cockpit-red) !important; }
+  html body #app .submit-modal .modal-actions { display: grid !important; grid-template-columns: 1.2fr 1.05fr .8fr 1fr !important; gap: 10px !important; }
+  html body #app .submit-modal .modal-actions .btn { min-width: 0 !important; min-height: 54px !important; padding: 0 12px !important; font-size: 16px !important; }
+
+  html body #app .timeout-modal {
+    --modal-tone: var(--cockpit-red);
+    display: grid !important;
+    width: 780px !important;
+    min-height: 610px !important;
+    grid-template-rows: 58px 94px 90px 26px 42px 88px !important;
+    padding: 38px 48px !important;
+    box-sizing: border-box !important;
+    gap: 12px !important;
+  }
+
+  html body #app .timeout-symbol { display: none !important; }
+  html body #app .timeout-modal h2 { margin: 0 !important; color: var(--cockpit-red) !important; font: 800 54px/1 var(--display-font) !important; text-align: center !important; text-transform: uppercase !important; }
+  html body #app .timeout-clock { display: grid !important; grid-template-rows: 24px 1fr !important; border-block: 1px solid #793238 !important; place-items: center !important; color: var(--cockpit-red) !important; }
+  html body #app .timeout-clock span { font-size: 15px !important; text-transform: uppercase !important; }
+  html body #app .timeout-clock strong { font: 700 58px/1 var(--display-font) !important; }
+  html body #app .timeout-modal > p { margin: 0 !important; color: var(--cockpit-amber) !important; font-size: 19px !important; line-height: 1.4 !important; text-align: center !important; text-transform: uppercase !important; }
+  html body #app .timeout-modal > p b { font-size: 23px !important; }
+  html body #app .timeout-modal .segmented-loader { width: 100% !important; height: 18px !important; }
+  html body #app .timeout-modal > small { color: #bcc8c8 !important; font-size: 19px !important; text-align: center !important; text-transform: uppercase !important; }
+  html body #app .timeout-modal > small strong { color: var(--cockpit-red) !important; font-size: 30px !important; }
+  html body #app .timeout-note { display: flex !important; border: 1px solid var(--cockpit-red) !important; align-items: center !important; justify-content: center !important; padding: 12px !important; background: rgba(103,18,24,.2) !important; color: #d9c2c3 !important; font-size: 16px !important; gap: 12px !important; }
+}
+
+/* T0025 V3 debrief and answer-review workstations. */
+@media (min-width: 1100px) {
+  html body #app section.v3-results-page {
+    display: grid !important;
+    width: 100% !important;
+    height: 838px !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: 66px 202px 176px minmax(0,1fr) !important;
+    padding: 16px 24px 18px !important;
+    box-sizing: border-box !important;
+    gap: 10px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .results-command-title {
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-columns: auto minmax(0,1fr) auto !important;
+    align-items: center !important;
+    border-bottom: 1px solid #34505a !important;
+    gap: 22px !important;
+  }
+
+  html body #app .results-command-title > span {
+    border-right: 1px solid #40575e !important;
+    padding-right: 22px !important;
+    color: #eef3f2 !important;
+    font: italic 800 42px/1 var(--display-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .results-command-title > strong {
+    color: var(--cockpit-cyan) !important;
+    font: 700 24px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .results-command-title > small {
+    max-width: 420px !important;
+    overflow: hidden !important;
+    color: #8da2a6 !important;
+    font-size: 14px !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  html body #app .results-overview-console {
+    display: grid !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    grid-template-columns: 430px minmax(0,1fr) 400px !important;
+    gap: 12px !important;
+  }
+
+  html body #app .score-gauge-panel,
+  html body #app .timing-console,
+  html body #app .result-status-panel {
+    height: 202px !important;
+    min-height: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #app .score-gauge-panel {
+    display: grid !important;
+    place-items: center !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .score-gauge {
+    position: relative !important;
+    display: grid !important;
+    width: 184px !important;
+    height: 184px !important;
+    grid-template-rows: 28px 68px 28px 20px !important;
+    place-items: center !important;
+    border-radius: 50% !important;
+    background: conic-gradient(from -90deg, #23d8e4 0 var(--score), #183344 var(--score) 360deg) !important;
+    color: #e9f2f1 !important;
+    box-shadow: 0 0 24px rgba(35,216,228,.18) !important;
+  }
+
+  html body #app .score-gauge::before {
+    position: absolute !important;
+    inset: 14px !important;
+    border: 1px solid #38535c !important;
+    border-radius: 50% !important;
+    background: radial-gradient(circle, #0b1b21 0 64%, #061116 100%) !important;
+    content: "" !important;
+  }
+
+  html body #app .score-gauge > * { position: relative !important; z-index: 1 !important; }
+  html body #app .score-gauge span { align-self: end !important; color: #8ea4a8 !important; font-size: 13px !important; text-transform: uppercase !important; }
+  html body #app .score-gauge strong { color: #2bd4ed !important; font: 700 60px/.95 var(--display-font) !important; }
+  html body #app .score-gauge b { color: #e9f2f1 !important; font: 700 21px/1 var(--hud-font) !important; }
+  html body #app .score-gauge small { align-self: start !important; color: #8da0a4 !important; font-size: 12px !important; text-transform: uppercase !important; }
+
+  html body #app .timing-console {
+    display: grid !important;
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+    gap: 12px !important;
+  }
+
+  html body #app .timing-console metric {
+    display: grid !important;
+    min-width: 0 !important;
+    border: 1px solid #35505a !important;
+    grid-template-columns: 72px minmax(0,1fr) !important;
+    grid-template-rows: 44px 72px 28px !important;
+    align-content: center !important;
+    padding: 22px 24px !important;
+    background: linear-gradient(120deg, rgba(22,57,65,.36), transparent 42%), #07141a !important;
+    clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px) !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #app .timing-console metric .local-icon { width: 52px !important; height: 52px !important; grid-row: 1 / 3 !important; color: var(--cockpit-cyan) !important; }
+  html body #app .timing-console metric span { align-self: end !important; color: #b6c3c4 !important; font-size: 16px !important; text-transform: uppercase !important; }
+  html body #app .timing-console metric strong { align-self: center !important; overflow: hidden !important; color: #e9f1f0 !important; font: 700 44px/1 var(--display-font) !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+  html body #app .timing-console metric small { grid-column: 2 !important; align-self: start !important; color: #82979b !important; font-size: 13px !important; text-transform: uppercase !important; }
+
+  html body #app .result-status-panel {
+    display: grid !important;
+    border: 1px solid var(--status-tone, var(--cockpit-green)) !important;
+    grid-template-columns: 72px minmax(0,1fr) !important;
+    grid-template-rows: 1fr 38px !important;
+    align-items: center !important;
+    padding: 24px 20px !important;
+    background: linear-gradient(120deg, color-mix(in srgb, var(--status-tone) 10%, #071116), #071116) !important;
+    color: var(--status-tone, var(--cockpit-green)) !important;
+    clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px) !important;
+    box-sizing: border-box !important;
+    gap: 0 12px !important;
+  }
+
+  html body #app .result-status-panel.failed { --status-tone: var(--cockpit-red); }
+  html body #app .result-status-panel > .icon { width: 58px !important; height: 58px !important; border: 4px solid currentColor !important; padding: 9px !important; box-sizing: border-box !important; }
+  html body #app .result-status-panel > strong { overflow: hidden !important; color: var(--status-tone) !important; font: 800 40px/1 var(--display-font) !important; text-overflow: clip !important; text-transform: uppercase !important; white-space: nowrap !important; }
+  html body #app .result-status-panel > small { grid-column: 1 / -1 !important; border-top: 1px solid color-mix(in srgb, var(--status-tone) 45%, transparent) !important; padding-top: 10px !important; color: #aebdbd !important; font-size: 14px !important; text-align: center !important; }
+
+  html body #app .results-section-console {
+    display: grid !important;
+    height: 176px !important;
+    min-height: 0 !important;
+    grid-template-rows: 36px minmax(0,1fr) !important;
+    padding: 13px 16px !important;
+    box-sizing: border-box !important;
+    gap: 6px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .results-section-grid {
+    display: grid !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    grid-template-columns: repeat(4,minmax(0,1fr)) !important;
+    gap: 10px !important;
+  }
+
+  html body #app .results-section-grid:has(.result-section-card:only-child) { grid-template-columns: minmax(0,520px) !important; }
+
+  html body #app .result-section-card {
+    --tone: var(--cockpit-cyan);
+    display: grid !important;
+    min-width: 0 !important;
+    border: 1px solid var(--tone) !important;
+    grid-template-columns: 82px minmax(0,1fr) !important;
+    align-items: center !important;
+    padding: 12px 14px !important;
+    background: linear-gradient(115deg, color-mix(in srgb, var(--tone) 9%, #071116), #071116) !important;
+    clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px) !important;
+    gap: 12px !important;
+  }
+
+  html body #app .result-section-card .section-hud-icon { width: 66px !important; height: 66px !important; color: var(--tone) !important; }
+  html body #app .result-section-card > div { display: grid !important; min-width: 0 !important; grid-template-columns: minmax(0,1fr) auto !important; grid-template-rows: 28px 14px 20px !important; align-items: center !important; gap: 3px 8px !important; }
+  html body #app .result-section-card strong { overflow: hidden !important; color: var(--tone) !important; font: 700 18px/1 var(--hud-font) !important; text-overflow: ellipsis !important; text-transform: uppercase !important; white-space: nowrap !important; }
+  html body #app .result-section-card b { color: var(--tone) !important; font: 700 31px/1 var(--display-font) !important; }
+  html body #app .result-section-card i { height: 11px !important; border: 1px solid #33494f !important; grid-column: 1 / -1 !important; padding: 2px !important; background: #040c10 !important; }
+  html body #app .result-section-card i em { display: block !important; height: 100% !important; background: var(--tone) !important; }
+  html body #app .result-section-card small { grid-column: 1 / -1 !important; color: #9eafb1 !important; font-size: 13px !important; }
+
+  html body #app .results-lower-grid {
+    display: grid !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    grid-template-columns: minmax(0,1fr) 360px !important;
+    gap: 12px !important;
+  }
+
+  html body #app .results-lower-grid .run-insights-panel,
+  html body #app .results-action-rail {
+    display: grid !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 14px 16px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .results-lower-grid .run-insights-panel { grid-template-rows: 38px minmax(0,1fr) !important; }
+  html body #app .results-lower-grid .insight-grid { display: grid !important; min-height: 0 !important; grid-template-columns: repeat(4,minmax(0,1fr)) !important; grid-template-rows: repeat(2,minmax(0,1fr)) !important; gap: 7px !important; }
+  html body #app .result-insight { --tone: var(--cockpit-cyan); display: grid !important; min-width: 0 !important; min-height: 0 !important; border: 1px solid #344a51 !important; grid-template-columns: 58px minmax(0,1fr) !important; align-items: center !important; padding: 8px 10px !important; background: linear-gradient(110deg, color-mix(in srgb, var(--tone) 8%, #071116), #071116) !important; color: var(--tone) !important; gap: 8px !important; }
+  html body #app .result-insight.blue { --tone: var(--cockpit-blue); }
+  html body #app .result-insight.green { --tone: var(--cockpit-green); }
+  html body #app .result-insight.purple { --tone: var(--cockpit-purple); }
+  html body #app .result-insight.amber { --tone: var(--cockpit-amber); }
+  html body #app .result-insight.red { --tone: var(--cockpit-red); }
+  html body #app .result-insight > span { display: grid !important; width: 50px !important; height: 50px !important; border: 1px solid var(--tone) !important; place-items: center !important; clip-path: polygon(25% 0,75% 0,100% 25%,100% 75%,75% 100%,25% 100%,0 75%,0 25%) !important; }
+  html body #app .result-insight > span .local-icon { width: 30px !important; height: 30px !important; }
+  html body #app .result-insight > div { min-width: 0 !important; }
+  html body #app .result-insight small { display: block !important; overflow: hidden !important; color: var(--tone) !important; font-size: 12px !important; text-overflow: ellipsis !important; text-transform: uppercase !important; white-space: nowrap !important; }
+  html body #app .result-insight strong { display: block !important; margin-top: 4px !important; overflow: hidden !important; color: #e4ecea !important; font: 700 21px/1 var(--display-font) !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+  html body #app .result-insight p { margin: 4px 0 0 !important; overflow: hidden !important; color: #879ca0 !important; font-size: 11px !important; line-height: 1.1 !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+
+  html body #app .results-action-rail { grid-template-rows: 38px repeat(3,minmax(0,1fr)) !important; gap: 8px !important; }
+  html body #app .result-action { --tone: var(--cockpit-cyan); display: grid !important; min-width: 0 !important; border: 1px solid var(--tone) !important; grid-template-columns: 54px minmax(0,1fr) 24px !important; align-items: center !important; padding: 10px 14px !important; background: linear-gradient(110deg, color-mix(in srgb, var(--tone) 10%, #071116), #071116) !important; color: var(--tone) !important; clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 9px, 100% calc(100% - 9px), calc(100% - 9px) 100%, 9px 100%, 0 calc(100% - 9px), 0 9px) !important; cursor: pointer !important; gap: 10px !important; }
+  html body #app .result-action.purple { --tone: var(--cockpit-purple); }
+  html body #app .result-action.green { --tone: var(--cockpit-green); }
+  html body #app .result-action .local-icon { width: 42px !important; height: 42px !important; }
+  html body #app .result-action span { min-width: 0 !important; text-align: left !important; }
+  html body #app .result-action strong { display: block !important; overflow: hidden !important; color: var(--tone) !important; font: 700 17px/1 var(--hud-font) !important; text-overflow: ellipsis !important; text-transform: uppercase !important; white-space: nowrap !important; }
+  html body #app .result-action small { display: block !important; margin-top: 4px !important; overflow: hidden !important; color: #95a7aa !important; font-size: 12px !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+
+  /* Answer Review */
+  html body #app section.v3-review-page {
+    display: grid !important;
+    width: 100% !important;
+    height: 838px !important;
+    grid-template-rows: 88px minmax(0,1fr) 66px !important;
+    padding: 14px 20px 16px !important;
+    box-sizing: border-box !important;
+    gap: 10px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .review-command-head {
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-columns: 320px minmax(0,1fr) 170px !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+
+  html body #app .review-command-head > div:first-child { min-width: 0 !important; }
+  html body #app .review-command-head .eyebrow { margin: 0 0 4px !important; }
+  html body #app .review-command-head h1 { margin: 0 !important; color: #edf3f2 !important; font: italic 800 41px/.9 var(--display-font) !important; text-transform: uppercase !important; }
+  html body #app .review-command-head > div:first-child small { display: block !important; margin-top: 6px !important; overflow: hidden !important; color: #91a6a9 !important; font-size: 13px !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+  html body #app .review-command-head .review-score-strip { height: 74px !important; grid-template-columns: repeat(4,minmax(0,1fr)) !important; }
+  html body #app .review-command-head .review-score-strip metric { grid-template-columns: 42px minmax(0,1fr) !important; padding: 7px 12px !important; gap: 0 8px !important; }
+  html body #app .review-command-head .telemetry-icon { width: 38px !important; height: 38px !important; }
+  html body #app .review-command-head .telemetry-rail metric > span:not(.telemetry-icon) { font-size: 11px !important; }
+  html body #app .review-command-head .telemetry-rail metric > strong { font-size: 25px !important; }
+  html body #app .review-command-head > .btn { width: 170px !important; min-height: 48px !important; }
+
+  html body #app .review-workstation {
+    display: grid !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    grid-template-columns: 210px 156px minmax(0,1fr) 372px !important;
+    gap: 10px !important;
+  }
+
+  html body #app .review-filter-panel,
+  html body #app .review-item-panel,
+  html body #app .review-question-panel,
+  html body #app .review-explanation-panel {
+    height: 100% !important;
+    min-height: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .review-filter-panel { display: grid !important; grid-template-rows: 38px 24px 196px minmax(0,1fr) !important; padding: 14px !important; }
+  html body #app .review-filter-panel > p { margin: 0 !important; color: #8da2a6 !important; font-size: 12px !important; text-transform: uppercase !important; }
+  html body #app .review-filter-panel .filter-list { display: grid !important; grid-template-columns: 1fr !important; grid-template-rows: repeat(4,44px) !important; gap: 5px !important; }
+  html body #app .review-filter-panel .filter-list button { display: flex !important; min-height: 0 !important; border: 1px solid #344c54 !important; align-items: center !important; justify-content: space-between !important; padding: 0 12px !important; background: #07151a !important; color: #aab9ba !important; font: 600 14px/1 var(--hud-font) !important; text-transform: uppercase !important; }
+  html body #app .review-filter-panel .filter-list button.active { border-color: var(--cockpit-cyan) !important; background: rgba(17,93,95,.27) !important; color: var(--cockpit-cyan) !important; }
+  html body #app .review-filter-panel .filter-list button small { color: inherit !important; }
+  html body #app .review-filter-note { align-self: end !important; display: grid !important; grid-template-columns: 38px minmax(0,1fr) !important; align-items: center !important; border-top: 1px solid #30474e !important; padding-top: 12px !important; color: var(--cockpit-cyan) !important; gap: 8px !important; }
+  html body #app .review-filter-note .local-icon { width: 32px !important; height: 32px !important; }
+  html body #app .review-filter-note strong { display: block !important; color: #dce6e4 !important; font-size: 13px !important; }
+  html body #app .review-filter-note small { display: block !important; margin-top: 3px !important; color: #81979b !important; font-size: 11px !important; }
+
+  html body #app .review-item-panel { display: grid !important; grid-template-rows: 42px 28px minmax(0,1fr) !important; padding: 12px !important; }
+  html body #app .review-item-head { display: flex !important; align-items: center !important; justify-content: space-between !important; border-bottom: 1px solid #314a52 !important; color: #a8b8b9 !important; font-size: 13px !important; text-transform: uppercase !important; }
+  html body #app .review-item-head span { color: var(--cockpit-cyan) !important; }
+  html body #app .review-item-panel .navigator-range { align-self: center !important; overflow: hidden !important; color: #708a8f !important; font-size: 10px !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+  html body #app .review-item-panel .review-dots { display: block !important; min-height: 0 !important; overflow-y: auto !important; scrollbar-width: thin !important; scrollbar-color: #2b5961 transparent !important; }
+  html body #app .review-item-panel .review-dots button { display: grid !important; width: 100% !important; height: 44px !important; border: 0 !important; border-bottom: 1px solid #2b4249 !important; grid-template-columns: minmax(0,1fr) 24px !important; align-items: center !important; padding: 0 10px !important; background: #071419 !important; color: #aab9ba !important; font: 600 17px/1 var(--hud-font) !important; text-align: left !important; }
+  html body #app .review-item-panel .review-dots button.current { background: rgba(79,25,28,.7) !important; box-shadow: inset 2px 0 var(--cockpit-cyan) !important; color: #fff !important; }
+  html body #app .review-item-panel .review-dots button.correct { color: var(--cockpit-green) !important; }
+  html body #app .review-item-panel .review-dots button.wrong { color: var(--cockpit-red) !important; }
+  html body #app .review-item-panel .review-dots button.unanswered { color: var(--cockpit-amber) !important; }
+  html body #app .review-item-panel .review-dots .local-icon,
+  html body #app .review-item-panel .review-dots .icon { width: 20px !important; height: 20px !important; justify-self: end !important; }
+
+  html body #app .review-question-panel { display: grid !important; grid-template-rows: 62px minmax(0,1fr) !important; padding: 16px 18px !important; }
+  html body #app .review-question-head { display: flex !important; align-items: center !important; justify-content: space-between !important; border-bottom: 1px solid #304a52 !important; }
+  html body #app .review-question-head .question-index { font-size: 27px !important; }
+  html body #app .review-question-head .question-index b { color: var(--cockpit-cyan) !important; }
+  html body #app .review-question-scroll { min-height: 0 !important; padding-top: 12px !important; overflow-y: auto !important; scrollbar-width: thin !important; scrollbar-color: #2b5961 transparent !important; }
+  html body #app .review-question-scroll > .topic-pill { margin: 0 0 12px !important; }
+  html body #app .review-question-scroll > .prompt { margin: 0 0 18px !important; color: #e9f1ef !important; font: 500 20px/1.45 var(--reading-font) !important; }
+  html body #app .review-question-panel .review-choices { display: grid !important; gap: 8px !important; }
+  html body #app .review-question-panel .review-choice { display: grid !important; min-height: 58px !important; border: 1px solid #38515a !important; border-radius: 0 !important; grid-template-columns: 44px minmax(0,1fr) auto !important; align-items: center !important; padding: 8px 12px !important; background: #0a181e !important; color: #dfe8e6 !important; gap: 10px !important; }
+  html body #app .review-question-panel .review-choice > span { display: grid !important; width: 34px !important; height: 34px !important; border: 1px solid currentColor !important; border-radius: 50% !important; place-items: center !important; }
+  html body #app .review-question-panel .review-choice strong { color: inherit !important; font: 600 15px/1.25 var(--reading-font) !important; }
+  html body #app .review-question-panel .review-choice em { color: inherit !important; font-size: 11px !important; text-transform: uppercase !important; }
+  html body #app .review-question-panel .review-choice.is-correct { border-color: var(--cockpit-green) !important; background: rgba(20,91,51,.34) !important; color: #7be17f !important; }
+  html body #app .review-question-panel .review-choice.is-wrong { border-color: var(--cockpit-red) !important; background: rgba(107,28,32,.36) !important; color: #ff777d !important; }
+
+  html body #app .review-explanation-panel { display: grid !important; grid-template-rows: 40px minmax(0,1fr) 194px !important; padding: 16px 18px !important; border-color: var(--cockpit-purple) !important; }
+  html body #app .review-explanation-panel .technical-title h2 { color: var(--cockpit-purple) !important; }
+  html body #app .explanation-copy { min-height: 0 !important; border-bottom: 1px solid #584269 !important; padding: 14px 4px !important; overflow-y: auto !important; scrollbar-width: thin !important; }
+  html body #app .explanation-copy p { margin: 0 !important; color: #d5dddd !important; font: 500 17px/1.6 var(--reading-font) !important; }
+  html body #app .review-metadata { display: grid !important; grid-template-rows: repeat(4,1fr) !important; }
+  html body #app .review-metadata > span { display: grid !important; min-width: 0 !important; border-bottom: 1px solid #30464d !important; grid-template-columns: 36px minmax(0,1fr) auto !important; align-items: center !important; color: var(--cockpit-purple) !important; gap: 8px !important; }
+  html body #app .review-metadata .local-icon,
+  html body #app .review-metadata .icon { width: 27px !important; height: 27px !important; }
+  html body #app .review-metadata b { color: #9fb0b2 !important; font-size: 13px !important; text-transform: uppercase !important; }
+  html body #app .review-metadata strong { color: #e0e8e7 !important; font: 700 21px/1 var(--display-font) !important; }
+  html body #app .review-metadata > span:last-child strong { color: var(--cockpit-amber) !important; }
+
+  html body #app .review-footer { display: grid !important; grid-template-columns: 220px minmax(0,1fr) 220px !important; align-items: center !important; border: 1px solid #334c54 !important; padding: 7px 10px !important; background: #071318 !important; gap: 28px !important; }
+  html body #app .review-footer .btn { min-height: 48px !important; font-size: 17px !important; text-transform: uppercase !important; }
+  html body #app .review-footer .btn:nth-child(2) { max-width: 390px !important; justify-self: center !important; width: 100% !important; }
+}
+
+/* T0025 V3 system states, account drawer, and restrained motion. */
+@media (min-width: 1100px) {
+  html body #app .system-screen {
+    width: 100% !important;
+    height: 942px !important;
+    background:
+      repeating-radial-gradient(ellipse at center, transparent 0 18px, rgba(36,124,134,.055) 19px 20px),
+      linear-gradient(90deg, rgba(14,47,54,.2), transparent 20%, transparent 80%, rgba(14,47,54,.2)),
+      #02090d !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .boot-screen::before {
+    position: absolute !important;
+    inset: 90px 80px !important;
+    border: 1px solid rgba(31,187,200,.35) !important;
+    background:
+      radial-gradient(ellipse at 27% 43%, rgba(19,185,196,.08) 0 2px, transparent 3px) 0 0/9px 9px,
+      radial-gradient(ellipse at 73% 43%, rgba(19,185,196,.08) 0 2px, transparent 3px) 0 0/9px 9px !important;
+    clip-path: polygon(32px 0, calc(100% - 32px) 0, 100% 32px, 100% calc(100% - 32px), calc(100% - 32px) 100%, 32px 100%, 0 calc(100% - 32px), 0 32px) !important;
+    content: "" !important;
+    opacity: .55 !important;
+  }
+
+  html body #app .system-corner {
+    position: absolute !important;
+    z-index: 2 !important;
+    width: 330px !important;
+    height: 160px !important;
+    border-color: var(--cockpit-cyan) !important;
+    opacity: .7 !important;
+    pointer-events: none !important;
+  }
+
+  html body #app .system-corner.top-left { top: 18px !important; left: 18px !important; border-top: 2px solid !important; border-left: 2px solid !important; clip-path: polygon(0 0,100% 0,78% 18%,18% 18%,18% 100%,0 78%) !important; }
+  html body #app .system-corner.top-right { top: 18px !important; right: 18px !important; border-top: 2px solid !important; border-right: 2px solid !important; }
+  html body #app .system-corner.bottom-left { bottom: 18px !important; left: 18px !important; border-bottom: 2px solid !important; border-left: 2px solid !important; }
+  html body #app .system-corner.bottom-right { right: 18px !important; bottom: 18px !important; border-right: 2px solid !important; border-bottom: 2px solid !important; }
+
+  html body #app .boot-console {
+    position: relative !important;
+    z-index: 4 !important;
+    display: grid !important;
+    width: 1040px !important;
+    min-height: 650px !important;
+    grid-template-rows: 210px 22px 54px 28px 70px 26px 46px 98px !important;
+    place-items: center !important;
+    padding: 22px 50px !important;
+    box-sizing: border-box !important;
+    background: transparent !important;
+    gap: 6px !important;
+  }
+
+  html body #app .boot-console > img { width: 190px !important; height: 210px !important; filter: drop-shadow(0 0 24px rgba(33,222,215,.34)) !important; }
+  html body #app .boot-console .eyebrow { display: none !important; }
+  html body #app .boot-brand { color: #2dd6e9 !important; font: 700 52px/1 var(--display-font) !important; text-transform: uppercase !important; text-shadow: 0 0 18px rgba(33,222,215,.34) !important; }
+  html body #app .boot-product-line { color: #26b9ca !important; font: 600 16px/1 var(--hud-font) !important; text-transform: uppercase !important; }
+  html body #app .boot-console h1 { margin: 0 !important; color: #e7f1f0 !important; font: 700 40px/1 var(--hud-font) !important; text-transform: uppercase !important; }
+  html body #app .boot-console .segmented-loader { width: 100% !important; height: 46px !important; border: 2px solid #1cc2d7 !important; padding: 8px !important; background: #061318 !important; clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px) !important; gap: 6px !important; }
+  html body #app .boot-console .segmented-loader i { background: linear-gradient(105deg, #36e4ee, #13b8d1) !important; transform: skewX(-16deg) !important; box-shadow: 0 0 12px rgba(33,222,215,.32) !important; }
+  html body #app .boot-progress { color: #2dd7e9 !important; font: 700 42px/1 var(--display-font) !important; }
+  html body #app .boot-console > span { color: #6fb7c1 !important; font-size: 14px !important; text-transform: uppercase !important; }
+  html body #app .boot-security { display: grid !important; width: 720px !important; height: 88px !important; grid-template-columns: 1fr 1fr !important; border-top: 1px solid #26545c !important; padding-top: 14px !important; gap: 50px !important; }
+  html body #app .boot-security > span { display: grid !important; grid-template-columns: 52px minmax(0,1fr) !important; grid-template-rows: 1fr 1fr !important; align-items: center !important; color: #56d59a !important; gap: 0 12px !important; }
+  html body #app .boot-security .icon { width: 42px !important; height: 42px !important; grid-row: 1 / 3 !important; }
+  html body #app .boot-security b { align-self: end !important; font-size: 15px !important; text-transform: uppercase !important; }
+  html body #app .boot-security small { align-self: start !important; color: #77aab1 !important; font-size: 13px !important; }
+
+  html body #app .diagnostic-screen {
+    display: grid !important;
+    grid-template-columns: 260px minmax(0,1fr) 240px !important;
+    align-items: center !important;
+    padding: 90px 64px 70px !important;
+    box-sizing: border-box !important;
+    gap: 46px !important;
+  }
+
+  html body #app .diagnostic-rail {
+    display: grid !important;
+    height: 670px !important;
+    min-height: 0 !important;
+    border: 1px solid #3a5057 !important;
+    align-content: start !important;
+    padding: 24px 22px !important;
+    background: linear-gradient(120deg, rgba(20,55,63,.34), transparent 38%), #061116 !important;
+    clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px) !important;
+    box-sizing: border-box !important;
+    gap: 0 !important;
+  }
+
+  html body #app .diagnostic-rail > strong { border-bottom: 1px solid #344a51 !important; padding-bottom: 16px !important; color: var(--cockpit-cyan) !important; font: 700 20px/1 var(--hud-font) !important; text-transform: uppercase !important; }
+  html body #app .diagnostic-rail > span { display: flex !important; min-height: 100px !important; border-bottom: 1px solid #2b4249 !important; flex-direction: column !important; justify-content: center !important; color: #92a7aa !important; font-size: 13px !important; text-transform: uppercase !important; }
+  html body #app .diagnostic-rail > span b { display: block !important; margin-top: 9px !important; color: var(--cockpit-red) !important; font: 700 22px/1 var(--display-font) !important; }
+  html body #app .metrics-rail > span b { color: var(--cockpit-amber) !important; }
+
+  html body #app .diagnostic-panel {
+    display: grid !important;
+    width: 100% !important;
+    max-width: 860px !important;
+    min-height: 620px !important;
+    border: 2px solid var(--cockpit-cyan) !important;
+    align-content: center !important;
+    justify-self: center !important;
+    padding: 48px 74px !important;
+    background: linear-gradient(120deg, rgba(24,65,74,.32), transparent 38%), #071217 !important;
+    clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px) !important;
+    box-sizing: border-box !important;
+    gap: 16px !important;
+  }
+
+  html body #app .danger-diagnostic { border-color: var(--cockpit-red) !important; }
+  html body #app .diagnostic-panel .brand { justify-content: center !important; }
+  html body #app .diagnostic-panel .brand .logo { width: 76px !important; height: 84px !important; }
+  html body #app .diagnostic-panel .brand > div { display: none !important; }
+  html body #app .diagnostic-panel .diagnostic-code { justify-self: center !important; border: 1px solid currentColor !important; padding: 8px 14px !important; color: var(--cockpit-red) !important; font: 700 18px/1 var(--hud-font) !important; }
+  html body #app .diagnostic-panel .eyebrow { text-align: center !important; }
+  html body #app .diagnostic-panel h1 { margin: 0 !important; color: var(--cockpit-red) !important; font: 800 40px/1 var(--display-font) !important; text-align: center !important; text-transform: uppercase !important; }
+  html body #app .warning-diagnostic h1 { color: var(--cockpit-amber) !important; }
+  html body #app .diagnostic-panel > p:not(.eyebrow) { margin: 0 !important; color: #b0bfc0 !important; font: 500 17px/1.45 var(--hud-font) !important; text-align: center !important; }
+  html body #app .diagnostic-panel details { border: 1px solid #35515a !important; padding: 12px 16px !important; background: #061116 !important; color: #7cb8c1 !important; }
+  html body #app .diagnostic-panel .btn { width: 70% !important; min-height: 58px !important; justify-self: center !important; font-size: 19px !important; text-transform: uppercase !important; }
+
+  html body #app .command-drawer.account-settings-modal {
+    width: 580px !important;
+    min-width: 580px !important;
+    height: 942px !important;
+    padding: 36px 40px 28px !important;
+    background: linear-gradient(120deg, rgba(21,61,69,.38), transparent 34%), #061116 !important;
+    box-shadow: -24px 0 70px rgba(0,0,0,.6), inset 8px 0 0 rgba(33,222,215,.04) !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #app .account-settings-modal .modal-heading { border-bottom: 1px solid #344b52 !important; padding-bottom: 22px !important; }
+  html body #app .account-settings-modal .modal-heading h2 { margin: 7px 0 0 !important; color: #eef4f2 !important; font: italic 800 46px/1 var(--display-font) !important; text-transform: uppercase !important; }
+  html body #app .account-settings-modal .modal-heading p:not(.eyebrow) { margin-top: 8px !important; color: #8da2a6 !important; font-size: 15px !important; }
+  html body #app .account-settings-form {
+    display: grid !important;
+    height: calc(100% - 130px) !important;
+    min-height: 0 !important;
+    grid-template-columns: 150px minmax(0,1fr) !important;
+    grid-template-rows: 200px auto minmax(0,1fr) 56px 64px !important;
+    gap: 14px !important;
+    overflow: hidden !important;
+  }
+  html body #app .account-avatar-panel {
+    display: flex !important;
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    align-items: start !important;
+    padding-top: 18px !important;
+  }
+  html body #app .account-avatar-panel .avatar.large { width: 68px !important; height: 68px !important; border: 1px solid var(--cockpit-cyan) !important; border-radius: 0 !important; clip-path: polygon(25% 0,75% 0,100% 25%,100% 75%,75% 100%,25% 100%,0 75%,0 25%) !important; color: var(--cockpit-cyan) !important; font-size: 23px !important; }
+  html body #app .account-field-grid {
+    display: grid !important;
+    min-width: 0 !important;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: repeat(2,minmax(0,1fr)) !important;
+    gap: 12px !important;
+  }
+  html body #app .account-field-grid label { color: #a9b7b8 !important; font-size: 14px !important; }
+  html body #app .account-field-grid input { height: 56px !important; border: 1px solid #3b525a !important; border-radius: 0 !important; margin-top: 6px !important; padding: 0 14px !important; background: #071419 !important; font-size: 16px !important; }
+  html body #app .account-password-panel {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    align-self: start !important;
+    border: 1px solid #344c54 !important;
+    background: #071419 !important;
+    overflow: hidden !important;
+  }
+  html body #app .account-password-panel summary { min-height: 58px !important; padding: 0 16px !important; color: var(--cockpit-cyan) !important; font-size: 16px !important; text-transform: uppercase !important; }
+  html body #app .account-password-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+    grid-template-rows: repeat(2,79px) !important;
+  }
+  html body #app .account-password-grid > label:first-child { grid-column: 1 / -1 !important; }
+  html body #app .account-password-save { min-height: 48px !important; }
+  html body #app .account-modal-actions {
+    align-self: stretch !important;
+    display: grid !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 4 !important;
+    grid-template-columns: 116px minmax(0,1fr) 144px !important;
+    margin: 0 !important;
+    gap: 8px !important;
+  }
+  html body #app .account-modal-actions > span { display: none !important; }
+  html body #app .account-modal-actions .btn { min-width: 0 !important; min-height: 54px !important; padding: 0 10px !important; }
+  html body #app .account-danger-row {
+    grid-column: 1 / -1 !important;
+    grid-row: 5 !important;
+    padding-top: 9px !important;
+  }
+  html body #app .account-danger-row .btn { width: 100% !important; min-height: 54px !important; }
+
+  html body #app .account-settings-form:has(.account-password-panel:not([open])) {
+    grid-template-rows: 200px 60px 56px 64px minmax(0,1fr) !important;
+  }
+  html body #app .account-settings-form:has(.account-password-panel:not([open])) .account-modal-actions { grid-row: 3 !important; }
+  html body #app .account-settings-form:has(.account-password-panel:not([open])) .account-danger-row { grid-row: 4 !important; }
+
+  html body #app .confirm-modal.account-delete-confirm {
+    display: grid !important;
+    width: 720px !important;
+    height: 590px !important;
+    grid-template-rows: 72px 18px 54px 58px 108px 92px 62px !important;
+    align-content: center !important;
+    padding: 30px 44px !important;
+    border-color: var(--cockpit-red) !important;
+    background: linear-gradient(135deg, rgba(126,24,31,.16), transparent 42%), #071116 !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+  }
+  html body #app .account-delete-confirm .danger-symbol { width: 66px !important; height: 66px !important; margin: 0 auto !important; }
+  html body #app .account-delete-confirm .eyebrow { margin: 0 !important; text-align: center !important; }
+  html body #app .account-delete-confirm h2 { margin: 0 !important; color: var(--cockpit-red) !important; font-size: 46px !important; }
+  html body #app .account-delete-confirm > p:not(.eyebrow) { margin: 0 !important; font-size: 16px !important; }
+  html body #app .delete-impact {
+    display: grid !important;
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+    border-block: 1px solid #69363b !important;
+    padding: 12px 0 !important;
+    gap: 10px !important;
+  }
+  html body #app .delete-impact span { display: grid !important; min-width: 0 !important; border-right: 1px solid #533238 !important; color: #ff686f !important; font: 600 13px/1.2 var(--hud-font) !important; text-transform: uppercase !important; }
+  html body #app .delete-impact span:last-child { border-right: 0 !important; }
+  html body #app .delete-impact b { margin-top: 7px !important; overflow: hidden !important; color: #d8e1df !important; font-size: 16px !important; text-overflow: ellipsis !important; text-transform: none !important; white-space: nowrap !important; }
+  html body #app .delete-confirm-field { display: grid !important; grid-template-columns: auto 1fr !important; grid-template-rows: 22px 54px !important; color: #ff686f !important; font: 700 14px/1 var(--hud-font) !important; text-align: left !important; gap: 4px 12px !important; }
+  html body #app .delete-confirm-field small { justify-self: end !important; color: #94a5a7 !important; font-size: 13px !important; }
+  html body #app .delete-confirm-field input { width: 100% !important; height: 54px !important; border: 1px solid var(--cockpit-red) !important; border-radius: 0 !important; grid-column: 1 / -1 !important; padding: 0 16px !important; background: #090f13 !important; color: #eef3f1 !important; font: 700 18px/1 var(--hud-font) !important; box-sizing: border-box !important; }
+  html body #app .account-delete-confirm .modal-actions { display: grid !important; grid-template-columns: 1fr 1.18fr !important; margin: 0 !important; gap: 10px !important; }
+  html body #app .account-delete-confirm .modal-actions .btn { min-height: 58px !important; font-size: 16px !important; text-transform: uppercase !important; }
+}
+
+@keyframes cockpit-pulse {
+  0%, 100% { opacity: .72; filter: brightness(.9); }
+  50% { opacity: 1; filter: brightness(1.18); }
+}
+
+@keyframes cockpit-scan {
+  from { transform: translateX(-8%); }
+  to { transform: translateX(8%); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html body #app .boot-console .segmented-loader i:nth-child(n+6),
+  html body #app .hub-checkpoint-check,
+  html body #app .status-online i { animation: cockpit-pulse 1.8s ease-in-out infinite; }
+  html body #app .technical-title > span[aria-hidden]::before { animation: cockpit-scan 2.8s ease-in-out infinite alternate; }
+  html body #app .technical-cta:hover:not(:disabled),
+  html body #app .result-action:hover,
+  html body #app .quick-practice-module:hover { transform: translateY(-2px); }
+}
+
+@media (min-width: 1100px) {
+  html body #app section.v3-review-page {
+    grid-template-columns: minmax(0,1fr) !important;
+  }
+
+  html body #app section.v3-review-page > .review-command-head,
+  html body #app section.v3-review-page > .review-workstation,
+  html body #app section.v3-review-page > .review-footer {
+    width: 100% !important;
+    grid-column: 1 !important;
+  }
+
+  html body #app section.v3-review-page > .review-command-head { grid-row: 1 !important; }
+  html body #app section.v3-review-page > .review-workstation { grid-row: 2 !important; }
+  html body #app section.v3-review-page > .review-footer { grid-row: 3 !important; }
+
+  html body #app .exam-nav {
+    display: block !important;
+    overflow-y: auto !important;
+  }
+
+  html body #app .exam-nav > .nav-title {
+    position: sticky !important;
+    z-index: 6 !important;
+    top: -18px !important;
+    height: 134px !important;
+    box-sizing: border-box !important;
+    background: #07141a !important;
+  }
+
+  html body #app .exam-nav > details.question-group,
+  html body #app .exam-nav > .question-group {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 66px !important;
+    margin-top: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #app .exam-nav > details.question-group:not([open]) {
+    height: 66px !important;
+    min-height: 66px !important;
+  }
+
+  html body #app .exam-body.with-stimulus .question-actions {
+    grid-template-columns: repeat(5,minmax(0,1fr)) !important;
+    gap: 4px !important;
+  }
+
+  html body #app .exam-body.with-stimulus .question-actions .btn,
+  html body #app .exam-body.with-stimulus .question-actions .btn:first-child {
+    display: inline-flex !important;
+    min-width: 0 !important;
+    min-height: 44px !important;
+    padding: 0 4px !important;
+    font-size: 11px !important;
+    white-space: nowrap !important;
+    gap: 4px !important;
+  }
+
+  html body #app .exam-body.with-stimulus .question-actions .btn .icon {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  html body #app .pause-modal {
+    height: 500px !important;
+  }
+
+  html body #app .pause-modal h2 {
+    display: flex !important;
+    height: 48px !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  html body #app .pause-modal .pause-facts {
+    display: block !important;
+    width: 100% !important;
+    height: 160px !important;
+    min-height: 160px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .pause-modal > p:not(.eyebrow) {
+    position: relative !important;
+    z-index: 2 !important;
+    height: 62px !important;
+    background: #050d12 !important;
+  }
+
+  html body #app .submit-modal {
+    height: 590px !important;
+    grid-template-rows: 72px 58px 176px 74px 62px !important;
+  }
+
+  html body #app .submit-modal h2 {
+    display: flex !important;
+    height: 72px !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  html body #app .submit-modal > p:not(.eyebrow) {
+    display: block !important;
+    width: 100% !important;
+    height: 58px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #app .submit-modal .submit-stats {
+    width: 100% !important;
+    height: 176px !important;
+    min-height: 176px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #app .submit-modal .submit-stats metric {
+    width: auto !important;
+    height: 176px !important;
+    min-height: 176px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #app .submit-modal .submit-warning {
+    width: 100% !important;
+    height: 74px !important;
+    min-height: 74px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body #app .submit-modal .modal-actions {
+    width: 100% !important;
+    height: 62px !important;
+    min-height: 62px !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Final desktop composition pass: use the reference canvas instead of leaving
+   the upper-right quadrant empty on setup, practice, mistakes, and progress. */
+@media (min-width: 1100px) {
+  html body #app header.app-header.signed-header.study-hub-header .signed-primary-nav button::after {
+    bottom: 0 !important;
+  }
+
+  html body #app .setup-page {
+    grid-template-columns: minmax(0,2.08fr) minmax(390px,1fr) !important;
+    grid-template-rows: 122px minmax(0,1fr) !important;
+    gap: 10px 14px !important;
+  }
+  html body #app .setup-page > .page-title-row { grid-column: 1 !important; grid-row: 1 !important; }
+  html body #app .setup-page > .v3-setup-grid { display: contents !important; }
+  html body #app .setup-page .mission-briefing { grid-column: 1 !important; grid-row: 2 !important; }
+  html body #app .setup-page .run-configuration {
+    grid-column: 2 !important;
+    grid-row: 1 / 3 !important;
+    grid-template-rows: 42px 84px repeat(4,58px) minmax(150px,1fr) 66px 60px !important;
+  }
+
+  html body #app .practice-review-page:has(.practice-console) {
+    grid-template-columns: minmax(0,1.08fr) minmax(540px,.92fr) !important;
+    grid-template-rows: 112px 52px minmax(0,1fr) 180px !important;
+    gap: 10px 14px !important;
+  }
+  html body #app .practice-review-page:has(.practice-console) > .page-title-row { grid-column: 1 !important; grid-row: 1 !important; }
+  html body #app .practice-review-page:has(.practice-console) > .practice-review-tabs {
+    width: 100% !important;
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+  }
+  html body #app .practice-review-page:has(.practice-console) > .practice-console { display: contents !important; }
+  html body #app .practice-review-page:has(.practice-console) .practice-section-picker {
+    width: auto !important;
+    height: auto !important;
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+  }
+  html body #app .practice-review-page:has(.practice-console) form.practice-console.custom-practice > .run-profile-panel {
+    width: auto !important;
+    height: auto !important;
+    grid-column: 2 !important;
+    grid-row: 1 / 4 !important;
+    grid-template-rows: 42px 64px 84px 84px 88px 64px 54px !important;
+    align-content: space-between !important;
+    padding: 18px !important;
+    gap: 8px !important;
+    align-self: stretch !important;
+  }
+  html body #app .practice-review-page:has(.practice-console) > .quick-run-grid {
+    width: auto !important;
+    height: auto !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 4 !important;
+  }
+
+  html body #app .practice-review-page:has(.mistakes-hub) {
+    grid-template-columns: minmax(0,.86fr) minmax(680px,1.14fr) !important;
+    grid-template-rows: 112px 52px minmax(0,1fr) 44px !important;
+    gap: 10px 14px !important;
+  }
+  html body #app .practice-review-page:has(.mistakes-hub) > .page-title-row { grid-column: 1 !important; grid-row: 1 !important; }
+  html body #app .practice-review-page:has(.mistakes-hub) > .practice-review-tabs {
+    width: 100% !important;
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+  }
+  html body #app .practice-review-page:has(.mistakes-hub) > .mistakes-hub { display: contents !important; }
+  html body #app .practice-review-page:has(.mistakes-hub) .mistake-summary {
+    width: auto !important;
+    height: auto !important;
+    grid-column: 2 !important;
+    grid-row: 1 / 3 !important;
+  }
+  html body #app .practice-review-page:has(.mistakes-hub) .mistake-summary metric {
+    grid-template-columns: 52px minmax(0,1fr) !important;
+    padding-inline: 9px !important;
+  }
+  html body #app .practice-review-page:has(.mistakes-hub) .mistake-summary .telemetry-icon {
+    width: 46px !important;
+    height: 46px !important;
+  }
+  html body #app .practice-review-page:has(.mistakes-hub) .mistake-summary metric > span:not(.telemetry-icon) {
+    font-size: 12px !important;
+  }
+  html body #app .practice-review-page:has(.mistakes-hub) .mistake-summary metric > strong {
+    font-size: 27px !important;
+  }
+  html body #app .practice-review-page:has(.mistakes-hub) .mistakes-workspace,
+  html body #app .practice-review-page:has(.mistakes-hub) .mistakes-empty {
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 3 !important;
+    align-self: stretch !important;
+  }
+  html body #app .practice-review-page:has(.mistakes-hub) .mistake-note {
+    grid-column: 1 / -1 !important;
+    grid-row: 4 !important;
+  }
+
+  html body #app .progress-page {
+    grid-template-columns: 390px minmax(0,1fr) !important;
+    grid-template-rows: 112px 292px minmax(0,1fr) !important;
+    gap: 10px 12px !important;
+  }
+  html body #app .progress-page > .page-title-row { grid-column: 1 !important; grid-row: 1 !important; }
+  html body #app .progress-page > .page-title-row p:not(.eyebrow) {
+    max-width: 380px !important;
+    font-size: 18px !important;
+    white-space: nowrap !important;
+  }
+  html body #app .progress-page > .statistics-rail {
+    width: auto !important;
+    height: auto !important;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+  }
+  html body #app .progress-page > .progress-analytics-grid { grid-column: 1 / -1 !important; grid-row: 2 !important; }
+  html body #app .progress-page > .attempts-table-card { grid-column: 1 / -1 !important; grid-row: 3 !important; }
+
+  html body #app .mistakes-empty .empty-state,
+  html body #app .flagged-empty .empty-state {
+    display: grid !important;
+    width: min(640px,90%) !important;
+    grid-template-rows: 86px 34px auto 58px !important;
+    align-content: center !important;
+    place-items: center !important;
+    gap: 10px !important;
+  }
+  html body #app .mistakes-empty .card-icon,
+  html body #app .flagged-empty .card-icon {
+    display: grid !important;
+    width: 76px !important;
+    height: 76px !important;
+    border: 1px solid var(--cockpit-cyan) !important;
+    place-items: center !important;
+    color: var(--cockpit-cyan) !important;
+    clip-path: polygon(25% 0,75% 0,100% 25%,100% 75%,75% 100%,25% 100%,0 75%,0 25%) !important;
+    background: rgba(20,65,74,.26) !important;
+  }
+  html body #app .mistakes-empty .card-icon .icon,
+  html body #app .flagged-empty .card-icon .icon { width: 38px !important; height: 38px !important; }
+  html body #app .mistakes-empty .empty-state > strong,
+  html body #app .flagged-empty .empty-state > strong { font-size: 24px !important; }
+  html body #app .mistakes-empty .empty-state > p,
+  html body #app .flagged-empty .empty-state > p { max-width: 580px !important; margin: 0 !important; font-size: 16px !important; text-align: center !important; }
+  html body #app .empty-state-actions { display: grid !important; width: min(520px,100%) !important; grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap: 10px !important; }
+  html body #app .empty-state-actions .btn { min-height: 54px !important; text-transform: uppercase !important; }
+
+  html body #app .exam-nav > details.question-group:not([open]) {
+    height: 74px !important;
+    min-height: 74px !important;
+  }
+}
+
+/* Release-quality optical pass for the uniformly scaled desktop frame. */
+@media (min-width: 1100px) {
+  html body #app .hub-ring-legend {
+    padding-top: 8px !important;
+    font-size: 14px !important;
+    gap: 7px 14px !important;
+  }
+  html body #app .hub-mode small {
+    color: #c5d0cf !important;
+    font-size: 16px !important;
+    line-height: 1.12 !important;
+  }
+  html body #app .hub-record p small,
+  html body #app .hub-record.green p small {
+    color: #afbcbb !important;
+    font-size: 14px !important;
+    line-height: 1.1 !important;
+  }
+  html body #app .hub-run-telemetry {
+    font-size: 14px !important;
+  }
+  html body #app .hub-run-telemetry b {
+    font-size: 17px !important;
+  }
+  html body #app .hub-checkpoint small {
+    font-size: 13px !important;
+  }
+  html body #app .hub-run-status {
+    font-size: 15px !important;
+  }
+  html body #app .hub-ribbon-label small {
+    font-size: 13px !important;
+  }
+
+  html body #app .flagged-table-head {
+    font-size: 13px !important;
+  }
+  html body #app .flagged-table-row {
+    min-height: 44px !important;
+    font-size: 16px !important;
+  }
+  html body #app .flagged-table-row small {
+    font-size: 14px !important;
+  }
+  html body #app .flagged-table-row .btn {
+    min-height: 32px !important;
+    font-size: 14px !important;
+  }
+
+  html body #app .pause-modal {
+    grid-template-rows: 42px 54px 160px 62px 58px !important;
+    align-content: center !important;
+  }
+  html body #app .pause-modal h2 {
+    height: 54px !important;
+  }
+
+  html body #app .review-question-head .question-index {
+    display: inline-flex !important;
+    align-items: baseline !important;
+    white-space: nowrap !important;
+    gap: 7px !important;
+  }
+
+  html body #app .account-settings-form,
+  html body #app .account-settings-form:has(.account-password-panel:not([open])) {
+    grid-template-rows: 200px 60px minmax(36px,1fr) 124px 64px !important;
+  }
+  html body #app .account-modal-actions,
+  html body #app .account-settings-form:has(.account-password-panel:not([open])) .account-modal-actions {
+    display: grid !important;
+    grid-row: 4 !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: repeat(2,56px) !important;
+    gap: 8px !important;
+  }
+  html body #app .account-modal-actions .btn {
+    width: 100% !important;
+    min-height: 56px !important;
+    text-transform: uppercase !important;
+  }
+  html body #app .account-danger-row,
+  html body #app .account-settings-form:has(.account-password-panel:not([open])) .account-danger-row {
+    grid-row: 5 !important;
+  }
+
+  html body #app .attempts-table-card .table-row:has(.overflow-menu) {
+    z-index: 4 !important;
+    min-height: 150px !important;
+  }
+  html body #app .attempts-table-card .row-actions:has(.overflow-menu) {
+    align-content: center !important;
+    flex-wrap: wrap !important;
+  }
+  html body #app .attempts-table-card .row-actions .overflow-menu {
+    position: static !important;
+    order: 3 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Mobile is a stacked cockpit, not a compressed desktop workstation. */
+@media (max-width: 1099px) {
+  html body #app .verbal { --tone: var(--cockpit-cyan); }
+  html body #app .numerical { --tone: var(--cockpit-blue); }
+  html body #app .analytical { --tone: var(--cockpit-green); }
+  html body #app .general { --tone: var(--cockpit-purple); }
+
+  html body #app .hub-time-row {
+    position: relative !important;
+    grid-template-rows: auto auto auto !important;
+  }
+  html body #app .hub-run-telemetry {
+    position: static !important;
+    width: 100% !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 3 !important;
+    margin-top: 14px !important;
+    padding: 10px 0 !important;
+    font-size: 12px !important;
+  }
+  html body #app .hub-run-telemetry b { font-size: 15px !important; }
+  html body #app .hub-run-details { grid-template-rows: auto 240px auto 58px !important; }
+
+  html body #app .exam-topbar {
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) auto !important;
+    grid-template-rows: 52px 50px !important;
+    min-height: 118px !important;
+    padding: 8px 10px !important;
+  }
+  html body #app .exam-status {
+    display: grid !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 46px !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    grid-template-columns: 104px minmax(0,1fr) !important;
+    align-items: center !important;
+    padding: 0 !important;
+    gap: 8px !important;
+  }
+  html body #app .exam-status > strong {
+    overflow: hidden !important;
+    font-size: 11px !important;
+    line-height: 1.05 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+  html body #app .exam-status > div {
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+    gap: 0 !important;
+  }
+  html body #app .exam-status span {
+    display: flex !important;
+    min-width: 0 !important;
+    min-height: 38px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-left: 1px solid #45616a !important;
+    padding: 0 5px !important;
+    font-size: 11px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+
+  html body #app .flagged-table-panel { overflow: hidden !important; }
+  html body #app .flagged-summary {
+    display: grid !important;
+    padding: 14px !important;
+    gap: 4px !important;
+  }
+  html body #app .flagged-total,
+  html body #app .flagged-summary-row,
+  html body #app .flagged-date-row {
+    display: grid !important;
+    min-height: 58px !important;
+    border-bottom: 1px solid #30474e !important;
+    grid-template-columns: 38px minmax(0,1fr) !important;
+    align-items: center !important;
+    color: var(--tone,var(--cockpit-cyan)) !important;
+    gap: 10px !important;
+  }
+  html body #app .flagged-total { --tone: var(--cockpit-red); }
+  html body #app .flagged-total > .icon,
+  html body #app .flagged-summary-row > .local-icon,
+  html body #app .flagged-date-row > .local-icon { width: 28px !important; height: 28px !important; }
+  html body #app .flagged-total b,
+  html body #app .flagged-summary-row b,
+  html body #app .flagged-date-row b { display: block !important; color: #9fb0b2 !important; font-size: 11px !important; text-transform: uppercase !important; }
+  html body #app .flagged-total strong,
+  html body #app .flagged-summary-row strong,
+  html body #app .flagged-date-row strong { display: block !important; margin-top: 3px !important; color: var(--tone,var(--cockpit-cyan)) !important; font: 700 20px/1 var(--display-font) !important; }
+  html body #app .flagged-table-head { display: none !important; }
+  html body #app .flagged-table-scroll {
+    overflow: visible !important;
+  }
+  html body #app .flagged-section-group { margin-bottom: 12px !important; }
+  html body #app .flagged-table-row {
+    display: grid !important;
+    min-width: 0 !important;
+    min-height: 132px !important;
+    grid-template-columns: minmax(0,1fr) auto !important;
+    grid-template-rows: auto auto auto !important;
+    align-items: center !important;
+    border: 1px solid #304a52 !important;
+    margin-top: 7px !important;
+    padding: 10px !important;
+    background: #07151a !important;
+    gap: 8px 12px !important;
+  }
+  html body #app .flagged-table-row > span:first-child {
+    grid-column: 1 / -1 !important;
+    grid-template-columns: 18px 62px minmax(0,1fr) !important;
+  }
+  html body #app .flagged-table-row > span:nth-child(2) { grid-column: 1 !important; }
+  html body #app .flagged-table-row > span:nth-child(3) { grid-column: 2 !important; justify-self: end !important; }
+  html body #app .flagged-table-row > span:nth-child(4) { grid-column: 1 !important; }
+  html body #app .flagged-table-row > .btn { grid-column: 2 !important; justify-self: end !important; }
+
+  html body #app section.v3-results-page,
+  html body #app section.v3-review-page {
+    display: block !important;
+    padding: 20px 14px 88px !important;
+    color: #e7efed !important;
+  }
+  html body #app .v3-panel,
+  html body #app .score-gauge-panel,
+  html body #app .timing-console metric,
+  html body #app .result-status-panel {
+    border: 1px solid #35505a !important;
+    background: linear-gradient(120deg, rgba(19,58,66,.24), transparent 42%), #071419 !important;
+    box-sizing: border-box !important;
+    clip-path: polygon(9px 0,calc(100% - 9px) 0,100% 9px,100% calc(100% - 9px),calc(100% - 9px) 100%,9px 100%,0 calc(100% - 9px),0 9px) !important;
+  }
+  html body #app .technical-title {
+    display: flex !important;
+    align-items: center !important;
+    color: var(--cockpit-cyan) !important;
+    gap: 10px !important;
+  }
+  html body #app .technical-title h2 {
+    margin: 0 !important;
+    font: 700 22px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app .results-command-title {
+    display: grid !important;
+    border-bottom: 1px solid #34505a !important;
+    margin-bottom: 12px !important;
+    padding-bottom: 12px !important;
+    gap: 5px !important;
+  }
+  html body #app .results-command-title > span {
+    color: #eef3f2 !important;
+    font: italic 800 38px/.95 var(--display-font) !important;
+    text-transform: uppercase !important;
+  }
+  html body #app .results-command-title > strong {
+    color: var(--cockpit-cyan) !important;
+    font: 700 19px/1.1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+  html body #app .results-command-title > small { color: #8da2a6 !important; font-size: 13px !important; }
+  html body #app .results-overview-console { display: grid !important; margin-bottom: 12px !important; gap: 10px !important; }
+  html body #app .score-gauge-panel { display: grid !important; min-height: 226px !important; place-items: center !important; }
+  html body #app .score-gauge {
+    position: relative !important;
+    display: grid !important;
+    width: 190px !important;
+    height: 190px !important;
+    border-radius: 50% !important;
+    place-content: center !important;
+    place-items: center !important;
+    background: conic-gradient(from -90deg,#23d8e4 0 var(--score),#183344 var(--score) 360deg) !important;
+    gap: 3px !important;
+  }
+  html body #app .score-gauge::before { position: absolute !important; inset: 14px !important; border-radius: 50% !important; background: #08171d !important; content: "" !important; }
+  html body #app .score-gauge > * { position: relative !important; z-index: 1 !important; }
+  html body #app .score-gauge span,
+  html body #app .score-gauge small { color: #8ea4a8 !important; font-size: 12px !important; text-transform: uppercase !important; }
+  html body #app .score-gauge strong { color: #2bd4ed !important; font: 700 58px/.9 var(--display-font) !important; }
+  html body #app .score-gauge b { font-size: 18px !important; }
+  html body #app .timing-console { display: grid !important; grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap: 8px !important; }
+  html body #app .timing-console metric {
+    display: grid !important;
+    min-height: 128px !important;
+    grid-template-columns: 36px minmax(0,1fr) !important;
+    padding: 14px 12px !important;
+    gap: 4px 8px !important;
+  }
+  html body #app .timing-console metric .local-icon { width: 30px !important; height: 30px !important; color: var(--cockpit-cyan) !important; }
+  html body #app .timing-console metric span { align-self: center !important; color: #b6c3c4 !important; font-size: 12px !important; text-transform: uppercase !important; }
+  html body #app .timing-console metric strong { grid-column: 1 / -1 !important; color: #eef4f2 !important; font: 700 33px/1 var(--display-font) !important; }
+  html body #app .timing-console metric small { grid-column: 1 / -1 !important; color: #82979b !important; font-size: 11px !important; }
+  html body #app .result-status-panel {
+    --status-tone: var(--cockpit-green);
+    display: grid !important;
+    min-height: 116px !important;
+    grid-template-columns: 54px minmax(0,1fr) !important;
+    align-items: center !important;
+    border-color: var(--status-tone) !important;
+    padding: 16px !important;
+    color: var(--status-tone) !important;
+    gap: 8px 12px !important;
+  }
+  html body #app .result-status-panel.failed { --status-tone: var(--cockpit-red); }
+  html body #app .result-status-panel > .icon { width: 45px !important; height: 45px !important; }
+  html body #app .result-status-panel > strong { color: var(--status-tone) !important; font: 800 34px/1 var(--display-font) !important; text-transform: uppercase !important; }
+  html body #app .result-status-panel > small { grid-column: 1 / -1 !important; color: #aebdbd !important; font-size: 13px !important; text-align: center !important; }
+  html body #app .results-section-console,
+  html body #app .run-insights-panel,
+  html body #app .results-action-rail { margin-bottom: 12px !important; padding: 14px !important; }
+  html body #app .results-section-grid,
+  html body #app .insight-grid { display: grid !important; margin-top: 12px !important; gap: 8px !important; }
+  html body #app .result-section-card,
+  html body #app .result-insight,
+  html body #app .result-action {
+    --tone: var(--cockpit-cyan);
+    display: grid !important;
+    min-width: 0 !important;
+    border: 1px solid var(--tone) !important;
+    align-items: center !important;
+    padding: 12px !important;
+    background: color-mix(in srgb,var(--tone) 7%,#071419) !important;
+    color: var(--tone) !important;
+    gap: 10px !important;
+  }
+  html body #app .result-section-card { grid-template-columns: 52px minmax(0,1fr) !important; }
+  html body #app .result-section-card .section-hud-icon { width: 44px !important; height: 44px !important; }
+  html body #app .result-section-card > div { display: grid !important; grid-template-columns: 1fr auto !important; gap: 5px 8px !important; }
+  html body #app .result-section-card strong,
+  html body #app .result-section-card b { color: var(--tone) !important; font-size: 17px !important; }
+  html body #app .result-section-card i { height: 8px !important; border: 1px solid #344b52 !important; grid-column: 1 / -1 !important; }
+  html body #app .result-section-card i em { display: block !important; height: 100% !important; background: var(--tone) !important; }
+  html body #app .result-section-card small { grid-column: 1 / -1 !important; color: #9eafb1 !important; font-size: 12px !important; }
+  html body #app .results-lower-grid { display: block !important; }
+  html body #app .insight-grid { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+  html body #app .result-insight { min-height: 108px !important; grid-template-columns: 34px minmax(0,1fr) !important; border-color: #344a51 !important; }
+  html body #app .result-insight > span { width: 30px !important; height: 30px !important; }
+  html body #app .result-insight > span .local-icon { width: 22px !important; height: 22px !important; }
+  html body #app .result-insight small { color: var(--tone) !important; font-size: 10px !important; text-transform: uppercase !important; }
+  html body #app .result-insight strong { display: block !important; margin-top: 4px !important; color: #e4ecea !important; font-size: 17px !important; }
+  html body #app .result-insight p { margin: 4px 0 0 !important; color: #879ca0 !important; font-size: 11px !important; }
+  html body #app .results-action-rail { display: grid !important; gap: 8px !important; }
+  html body #app .result-action { grid-template-columns: 42px minmax(0,1fr) 20px !important; min-height: 76px !important; }
+  html body #app .result-action.purple { --tone: var(--cockpit-purple); }
+  html body #app .result-action.green { --tone: var(--cockpit-green); }
+  html body #app .result-action .local-icon { width: 34px !important; height: 34px !important; }
+  html body #app .result-action strong { display: block !important; color: var(--tone) !important; font-size: 15px !important; text-transform: uppercase !important; }
+  html body #app .result-action small { display: block !important; margin-top: 3px !important; color: #95a7aa !important; font-size: 11px !important; }
+
+  html body #app .review-command-head { display: block !important; margin-bottom: 12px !important; }
+  html body #app .review-command-head h1 { margin: 3px 0 !important; color: #edf3f2 !important; font: italic 800 38px/.95 var(--display-font) !important; text-transform: uppercase !important; }
+  html body #app .review-command-head > div:first-child small { color: #91a6a9 !important; font-size: 13px !important; }
+  html body #app .review-score-strip { display: grid !important; grid-template-columns: repeat(2,minmax(0,1fr)) !important; margin: 12px 0 !important; gap: 7px !important; }
+  html body #app .review-score-strip metric { display: grid !important; min-height: 84px !important; border: 1px solid #35505a !important; grid-template-columns: 34px minmax(0,1fr) !important; padding: 10px !important; background: #071419 !important; }
+  html body #app .review-score-strip .telemetry-icon { width: 30px !important; height: 30px !important; color: var(--cockpit-cyan) !important; }
+  html body #app .review-score-strip metric > span:not(.telemetry-icon) { color: #89a0a4 !important; font-size: 10px !important; text-transform: uppercase !important; }
+  html body #app .review-score-strip metric > strong { grid-column: 2 !important; color: #edf3f2 !important; font: 700 25px/1 var(--display-font) !important; }
+  html body #app .review-command-head > .btn { width: 100% !important; min-height: 48px !important; }
+  html body #app .review-workstation { display: grid !important; gap: 10px !important; }
+  html body #app .review-filter-panel,
+  html body #app .review-item-panel,
+  html body #app .review-question-panel,
+  html body #app .review-explanation-panel { padding: 14px !important; }
+  html body #app .review-filter-panel > p { color: #8da2a6 !important; font-size: 12px !important; text-transform: uppercase !important; }
+  html body #app .filter-list { display: grid !important; grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap: 6px !important; }
+  html body #app .filter-list button { display: flex !important; min-height: 42px !important; border: 1px solid #344c54 !important; align-items: center !important; justify-content: space-between !important; padding: 0 10px !important; background: #07151a !important; color: #aab9ba !important; text-transform: uppercase !important; }
+  html body #app .filter-list button.active { border-color: var(--cockpit-cyan) !important; color: var(--cockpit-cyan) !important; }
+  html body #app .review-filter-note { display: none !important; }
+  html body #app .review-item-panel { max-height: 260px !important; }
+  html body #app .review-item-head { display: flex !important; justify-content: space-between !important; color: #a8b8b9 !important; }
+  html body #app .review-item-panel .review-dots { display: grid !important; max-height: 170px !important; grid-template-columns: repeat(5,minmax(0,1fr)) !important; overflow-y: auto !important; gap: 5px !important; }
+  html body #app .review-item-panel .review-dots button { min-height: 42px !important; border: 1px solid #314a52 !important; background: #071419 !important; color: #9fb0b2 !important; }
+  html body #app .review-item-panel .review-dots button.current { border-color: var(--cockpit-red) !important; background: rgba(91,25,29,.65) !important; color: #fff !important; }
+  html body #app .review-question-head { display: flex !important; align-items: center !important; justify-content: space-between !important; border-bottom: 1px solid #304a52 !important; padding-bottom: 12px !important; }
+  html body #app .review-question-head .question-index { display: inline-flex !important; font-size: 20px !important; gap: 5px !important; }
+  html body #app .review-question-head .question-index b { color: var(--cockpit-cyan) !important; }
+  html body #app .review-question-scroll { padding-top: 12px !important; }
+  html body #app .review-question-scroll > .prompt { color: #e9f1ef !important; font: 500 18px/1.4 var(--reading-font) !important; }
+  html body #app .review-choices { display: grid !important; gap: 7px !important; }
+  html body #app .review-choice { display: grid !important; min-height: 58px !important; border: 1px solid #38515a !important; grid-template-columns: 34px minmax(0,1fr) !important; align-items: center !important; padding: 9px !important; background: #0a181e !important; gap: 8px !important; }
+  html body #app .review-choice.is-correct { border-color: var(--cockpit-green) !important; background: rgba(20,91,51,.34) !important; }
+  html body #app .review-choice.is-wrong { border-color: var(--cockpit-red) !important; background: rgba(107,28,32,.36) !important; }
+  html body #app .review-choice em { grid-column: 2 !important; font-size: 10px !important; text-transform: uppercase !important; }
+  html body #app .explanation-copy { color: #e8eeec !important; line-height: 1.5 !important; }
+  html body #app .review-metadata { display: grid !important; grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap: 7px !important; }
+  html body #app .review-metadata > span { display: grid !important; border: 1px solid #344b52 !important; padding: 9px !important; color: var(--cockpit-purple) !important; }
+  html body #app .review-metadata b { color: #aab8b8 !important; font-size: 10px !important; text-transform: uppercase !important; }
+  html body #app .review-metadata strong { color: #eef3f2 !important; }
+  html body #app .review-footer { display: grid !important; grid-template-columns: repeat(2,minmax(0,1fr)) !important; margin-top: 10px !important; gap: 7px !important; }
+  html body #app .review-footer .btn:nth-child(2) { grid-column: 1 / -1 !important; grid-row: 1 !important; }
+  html body #app .review-footer .btn { min-height: 48px !important; }
+
+  html body #app .account-modal-actions {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  html body #app .account-modal-actions .btn { width: 100% !important; }
 }

@@ -15,6 +15,7 @@
 - The Study Hub intentionally uses private personal records instead of the reference image's group rankings. Group comparisons require explicit user consent, aggregate privacy rules, and enough real participants before they should be added.
 - T0024 is PC-first and uses a fixed logical desktop frame. Wider or differently proportioned desktop viewports intentionally show balanced ambient margins instead of stretching the cockpit.
 - Mobile is fully responsive and screenshot-checked at `390x844` and `412x915`; long setup, practice, analytics, results, and review pages scroll normally by design rather than reproducing the fixed desktop frame.
+- T0025 adds the actual maximized Edge content viewport (`1536x736`) to permanent fixture QA. Future cockpit changes must pass that target in addition to the logical, `1904x913`, and `1536x816` desktop canvases.
 
 ## Follow-Up Ticket Ideas
 

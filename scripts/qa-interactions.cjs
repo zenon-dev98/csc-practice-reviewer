@@ -16,6 +16,7 @@ function safeName(value) {
   const browser = await chromium.launch({ channel: "msedge", headless: true });
   const context = await browser.newContext({ viewport: { width: 1672, height: 942 }, deviceScaleFactor: 1, reducedMotion: "reduce" });
   const page = await context.newPage();
+  page.setDefaultTimeout(6000);
   const report = { baseUrl, createdAt: new Date().toISOString(), browser: "Microsoft Edge", screenshots: [], checks: [], errors: [] };
   const runtimeErrors = [];
   page.on("pageerror", (error) => runtimeErrors.push(`pageerror: ${error.message}`));
@@ -84,6 +85,14 @@ function safeName(value) {
     await screenshot("auth-reset-success");
     await gotoFixture("forgot-error");
     await screenshot("auth-reset-invalid-email");
+    await gotoFixture("select");
+    await check("sign-in fields do not retain credentials", async () =>
+      await page.locator("input[name='email']").inputValue() === "" && await page.locator("input[name='password']").inputValue() === "");
+    await page.locator("input[name='email']").fill("john.smith@email.com");
+    await page.locator("input[name='password']").fill("ReviewPass123");
+    await page.locator("input[name='password']").press("Enter");
+    await check("enter submits sign-in", async () => await page.locator(".study-hub").count() === 1);
+    await screenshot("auth-signin-enter-submit");
   });
 
   await test("dashboard and account", async () => {
@@ -105,6 +114,10 @@ function safeName(value) {
     await page.locator(".account-button").click();
     await page.locator("[data-action='delete-profile']").click();
     await screenshot("account-delete-confirmation-open");
+    await check("account deletion requires confirmation text", async () => await page.locator("[data-action='confirm-delete-account']").isDisabled());
+    await page.locator("[data-delete-confirm]").fill("DELETE");
+    await check("account deletion enables after exact confirmation", async () => !(await page.locator("[data-action='confirm-delete-account']").isDisabled()));
+    await screenshot("account-delete-confirmation-armed");
     await page.keyboard.press("Escape");
     await check("delete account escape", async () => await page.locator("[role='alertdialog']").count() === 0);
     await screenshot("account-delete-confirmation-cancelled");
@@ -186,7 +199,7 @@ function safeName(value) {
       input.checked = true;
       input.dispatchEvent(new Event("change", { bubbles: true }));
     });
-    await page.locator("select[name='difficulty']").selectOption("hard");
+    await page.locator("input[name='difficulty'][value='hard']").check({ force: true });
     await screenshot("practice-customized");
     await page.locator("[data-action='custom-practice-submit']").click();
     await screenshot("practice-custom-started");
@@ -204,11 +217,12 @@ function safeName(value) {
 
   await test("progress filters and row menu", async () => {
     await gotoFixture("progress");
-    for (const filter of ["full", "practice", "quick", "review", "all"]) {
+    for (const filter of ["full", "practice", "review", "all"]) {
       await page.locator(`[data-recent-tab='${filter}']`).click();
       await screenshot(`progress-filter-${filter}`);
     }
     await page.locator("[data-overflow]").first().click();
+    await check("progress overflow menu visible", async () => await page.locator(".overflow-menu").isVisible());
     await screenshot("progress-row-overflow-open");
     await page.locator("[data-attempt-delete]").click();
     await screenshot("progress-delete-attempt-open");
@@ -241,7 +255,7 @@ function safeName(value) {
       await page.locator(`[data-review-filter='${filter}']`).click();
       await screenshot(`review-filter-${filter}`);
     }
-    await page.locator(".review-content-scroll").evaluate((node) => { node.scrollTop = node.scrollHeight; });
+    await page.locator(".review-question-scroll").evaluate((node) => { node.scrollTop = node.scrollHeight; });
     await screenshot("review-explanation-scrolled");
     const next = page.locator("[data-action='review-next']");
     if (!(await next.isDisabled())) {

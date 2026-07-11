@@ -109,16 +109,17 @@ Current source item boundaries:
 
 ## Current Active Ticket
 
-- None. T0025 is complete.
+- None. T0025 is complete and verified.
 
 ## T0025 Outcome
 
-- Added explicit visual-agent release gates for text containment, decorative safe areas, edge clearance, ambiguous data-like decoration, and shared header consistency.
-- Restored the Study Hub two-line product lockup, replaced malformed overlapping command polygons with bounded technical plates, clarified progress-ring semantics with an accessible legend, added useful run telemetry, rebuilt Resume Run as a layered framed control, and increased undersized supporting labels.
-- Final desktop fixture sweep produced 72 screenshots across 36 states at `1904x913` and `1536x816` with zero console/document failures and zero sampled element overflows.
-- Final interaction QA produced 59 screenshots and passed all 15 checks.
-- Static assets are cache-busted through `v=20260711-02`.
+- Added explicit visual-agent release gates for text containment, decorative safe areas, edge clearance, final physical-scale readability, line-to-text collisions, ambiguous data-like decoration, and shared header consistency.
+- Rebuilt all 36 fixture states against the original Study Hub and `states/v3/` cockpit references, including auth/system, setup, exam/graph, blocking dialogs, Practice & Review, Progress, results, Answer Review, and Account Settings.
+- Restored the Study Hub two-line product lockup, replaced malformed command polygons with bounded technical plates, clarified progress-ring semantics with an accessible legend, added run telemetry, rebuilt Resume Run as a layered framed control, and increased undersized supporting labels.
+- Maximized external Edge at 100% zoom was exercised across all 36 states. The final automated desktop matrix produced `144` screenshots at `1672x942`, `1904x913`, `1536x816`, and the actual `1536x736` Edge content viewport with zero console/document failures and zero sampled overflows.
+- Final mobile evidence contains `72` screenshots at `390x844` and `412x915`; final interaction QA contains `60` screenshots and passes `20/20` checks.
+- Impeccable detection, JavaScript syntax, data validation, and local-only dependency checks pass. Static assets are cache-busted through `v=20260711-03`.
 
 ## Next Ticket
 
-- Supabase backup/export workflow before broader public use, or a content pedagogy review pass for the generated bank after T0024.
+- Supabase backup/export workflow before broader public use, or a content pedagogy review pass for the generated bank after T0025.

@@ -133,6 +133,7 @@
     });
     document.addEventListener("click", handleClick);
     document.addEventListener("submit", handleSubmit);
+    document.addEventListener("input", handleInput);
     document.addEventListener("change", handleChange);
     document.addEventListener("keydown", handleKeydown);
     new MutationObserver(focusActiveDialog).observe(root, { childList: true, subtree: true });
@@ -661,12 +662,17 @@
     root.innerHTML = cockpitFrame(`
       <section class="system-screen boot-screen" aria-live="polite">
         <div class="system-grid" aria-hidden="true"></div>
+        <div class="system-corner top-left" aria-hidden="true"></div><div class="system-corner top-right" aria-hidden="true"></div><div class="system-corner bottom-left" aria-hidden="true"></div><div class="system-corner bottom-right" aria-hidden="true"></div>
         <div class="boot-console">
           <img src="assets/brand-shield.svg" alt="" />
           <p class="eyebrow">Private reviewer network</p>
+          <strong class="boot-brand">CSC Practice Reviewer</strong>
+          <small class="boot-product-line">Independent mock exam and review tool</small>
           <h1>Syncing reviewer data</h1>
           <div class="segmented-loader" aria-label="Loading"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <span>Establishing encrypted session</span>
+          <b class="boot-progress">68%</b>
+          <span>Initializing secure synchronization</span>
+          <div class="boot-security"><span>${icon("lock")}<b>Encrypted connection</b><small>AES-256</small></span><span>${icon("shield")}<b>Secure channel</b><small>TLS 1.3</small></span></div>
         </div>
       </section>
     `, "system-frame");
@@ -675,6 +681,7 @@
   function renderFatal(title, message) {
     root.innerHTML = cockpitFrame(`
       <section class="system-screen diagnostic-screen">
+        <aside class="diagnostic-rail status-rail"><strong>System Status</strong><span>Connection <b>Failed</b></span><span>Services <b>Unavailable</b></span><span>Data Access <b>Pending</b></span><span>Security <b>Standby</b></span></aside>
         <article class="diagnostic-panel danger-diagnostic" role="alert">
           <div class="diagnostic-code">ERR / SYNC-01</div>
           ${brandBlock()}
@@ -684,6 +691,7 @@
           <details><summary>Technical details</summary><code>No credentials, account data, or secrets are shown in this diagnostic.</code></details>
           <button class="btn primary" data-action="reload-app" type="button">${icon("refresh")} Reload App</button>
         </article>
+        <aside class="diagnostic-rail metrics-rail"><strong>System Metrics</strong><span>Service availability <b>0%</b></span><span>Error rate <b>100%</b></span><span>Connections <b>0</b></span></aside>
       </section>
     `, "system-frame");
   }
@@ -691,6 +699,7 @@
   function renderConfig() {
     root.innerHTML = cockpitFrame(`
       <section class="system-screen diagnostic-screen">
+        <aside class="diagnostic-rail status-rail"><strong>System Status</strong><span>Connection <b>Missing</b></span><span>Services <b>Waiting</b></span><span>Data Access <b>Pending</b></span><span>Security <b>Standby</b></span></aside>
         <article class="diagnostic-panel warning-diagnostic">
           <div class="diagnostic-code">CFG / API-00</div>
           ${brandBlock()}
@@ -703,6 +712,7 @@
 };</pre></details>
           <button class="btn primary" data-action="reload-app" type="button">${icon("refresh")} Reload App</button>
         </article>
+        <aside class="diagnostic-rail metrics-rail"><strong>Configuration</strong><span>Project URL <b>Required</b></span><span>Browser key <b>Required</b></span><span>Secrets exposed <b>No</b></span></aside>
       </section>
     `, "system-frame");
   }
@@ -754,13 +764,13 @@
             <span>${icon("bookmark")} <b>Continue focused review</b><small>Practice mistakes and flagged items</small></span>
           </div>
         </div>
-        <form class="auth-card profile-picker-card" data-form="signin">
+        <form class="auth-card profile-picker-card" data-form="signin" autocomplete="off">
           <div class="auth-card-head">
             <h2>Sign In</h2>
             <p>Continue your saved exams and review history.</p>
           </div>
-          <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="email" placeholder="Enter your email address" required /></div></label>
-          <label class="field-label">Password<div class="field-with-icon has-toggle">${icon("lock")}<input name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
+          <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="off" placeholder="Enter your email address" required /></div></label>
+          <label class="field-label">Password<div class="field-with-icon has-toggle">${icon("lock")}<input name="password" type="password" autocomplete="off" placeholder="Enter your password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
           <button class="btn primary" data-action="signin-submit" type="button" ${app.busyAction === "signin" ? "disabled" : ""}>${app.busyAction === "signin" ? "Signing in..." : "Sign In"}</button>
           <button class="text-link" data-action="forgot-password" type="button">Forgot Password?</button>
           <div class="auth-divider"><span>or</span></div>
@@ -813,13 +823,13 @@
             <span>${icon("bookmark")} Continue category practice</span>
           </div>
         </div>
-        <form class="auth-card profile-picker-card" data-form="signin">
+        <form class="auth-card profile-picker-card" data-form="signin" autocomplete="off">
           <div class="auth-card-head">
             <h2>Sign In</h2>
             <p>Continue your saved exams and review history.</p>
           </div>
-          <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="email" placeholder="Enter your email address" /></div></label>
-          <label class="field-label">Password<div class="field-with-icon has-toggle">${icon("lock")}<input name="password" type="password" autocomplete="current-password" placeholder="Enter your password" /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
+          <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="off" placeholder="Enter your email address" /></div></label>
+          <label class="field-label">Password<div class="field-with-icon has-toggle">${icon("lock")}<input name="password" type="password" autocomplete="off" placeholder="Enter your password" /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
           <button class="btn primary" data-action="signin-submit" type="button">Sign In</button>
           <button class="text-link" data-action="forgot-password" type="button">Forgot Password?</button>
           <div class="auth-divider"><span>or</span></div>
@@ -1022,29 +1032,32 @@
           </div>
         </div>
 
-        <div class="setup-grid">
-          <section class="card setup-main mission-briefing">
+        <div class="setup-grid v3-setup-grid">
+          <section class="card setup-main mission-briefing v3-panel">
             <div class="exam-badge-row">
               <span class="soft-pill"><i></i> Timed simulation</span>
               <strong>Professional Mock / 170-item protocol</strong>
             </div>
-            <div class="setup-facts">
-              <div><span>Total Questions</span><strong>170</strong></div>
-              <div><span>Time Limit</span><strong>3h 10m</strong></div>
-              <div><span>Exam Type</span><strong>Professional</strong></div>
-              <div><span>Navigation</span><strong>Free movement</strong></div>
-              <div><span>Review Tools</span><strong>Flag, skip, revisit</strong></div>
-              <div><span>Pause</span><strong>Save and exit supported</strong></div>
+            <div class="setup-facts instrument-grid">
+              ${setupFact("target", "cyan", "Total Questions", "170")}
+              ${setupFact("timer", "blue", "Time Limit", "3h 10m")}
+              ${setupFact("notebook-tabs", "green", "Exam Type", "Professional")}
+              ${setupFact("brain-circuit", "purple", "Navigation", "Free movement")}
+              ${setupFact("target", "amber", "Review Tools", "Flag, skip, revisit")}
+              ${setupFact("timer", "blue", "Pause", "Save and exit")}
             </div>
-            <div class="section-list">
-              <h2>Section Tracks</h2>
+            <div class="section-list allocation-console">
+              <div class="technical-title"><h2>Section Allocation</h2><span aria-hidden="true"></span></div>
               ${setupGroups.map((group) => `
-                <div class="section-row ${group.tone}">
-                  <div>
+                <div class="section-row allocation-card ${group.tone}">
+                  <span class="section-hud-icon">${localIcon(sectionIconName(group.section))}</span>
+                  <div class="allocation-copy">
                     <strong>${escapeHtml(group.section)}</strong>
                     <span>Items ${group.range}</span>
                   </div>
-                  <small>${group.end - group.start + 1} items</small>
+                  <b>${group.end - group.start + 1}<small> items</small></b>
+                  <div class="allocation-meter" aria-label="${Math.round(((group.end - group.start + 1) / 170) * 100)} percent of the exam"><i style="--allocation:${((group.end - group.start + 1) / 170) * 100}%"></i></div>
+                  <em>${Math.round(((group.end - group.start + 1) / 170) * 1000) / 10}%</em>
                 </div>
               `).join("")}
             </div>
@@ -1054,9 +1067,8 @@
             </div>
           </section>
 
-          <form class="card setup-options run-configuration" data-form="setup">
-            <p class="eyebrow">Run controls</p>
-            <h2>Run Configuration</h2>
+          <form class="card setup-options run-configuration v3-panel" data-form="setup">
+            <div class="technical-title"><h2>Run Configuration</h2><span aria-hidden="true"></span></div>
             <label>Mock Version
               <select name="versionId">
                 ${examVersions.map((version) => `<option value="${escapeAttr(version.id)}" ${version.id === savedVersionId ? "selected" : ""}>Version ${version.number} - ${escapeHtml(version.title)}</option>`).join("")}
@@ -1067,13 +1079,13 @@
             ${toggleControl("shuffleQuestions", "Shuffle Questions", draftOptions.shuffleQuestions)}
             ${toggleControl("shuffleAnswers", "Shuffle Answer Choices", draftOptions.shuffleAnswers)}
             <div class="readiness-card">
-              <strong>Preflight Check</strong>
-              <span>Stable internet connection</span>
-              <span>Quiet review space</span>
-              <span>At least 3 hours available</span>
+              <div class="technical-title"><strong>Preflight Check</strong><span aria-hidden="true"></span></div>
+              <span>${localIcon("cloud-check")} Stable internet connection ${localIcon("circle-check")}</span>
+              <span>${localIcon("brain-circuit")} Quiet review space ${localIcon("circle-check")}</span>
+              <span>${localIcon("timer")} At least 3 hours available ${localIcon("circle-check")}</span>
             </div>
-            <button class="btn primary" data-action="setup-submit" type="button">${icon("play")} Start Full Mock</button>
-            <button class="btn secondary" data-action="save-setup" type="button">${icon("save")} Save Configuration</button>
+            <button class="btn primary technical-cta" data-action="setup-submit" type="button"><span>${icon("play")} Start Full Mock</span>${icon("arrow")}</button>
+            <button class="btn secondary technical-cta secondary-cta" data-action="save-setup" type="button"><span>${icon("save")} Save Configuration</span></button>
           </form>
         </div>
       </section>
@@ -1177,91 +1189,63 @@
     const stats = sectionStats(attempt);
     const isPractice = attempt.mode === "practice";
 
+    const passed = pct >= PASSING_PERCENT;
     root.innerHTML = authedShell(`
-      <section class="results-page">
-        <div class="page-title-row results-heading">
-          <div>
-            <p class="eyebrow">Run debrief / ${isPractice ? "focused practice" : "full simulation"}</p>
-            <h1>${isPractice ? "Practice Debrief" : "Full Mock Debrief"}</h1>
-            <p>${isPractice ? "Review your focused drill performance." : "Your mock exam performance and next-step review details."}</p>
-          </div>
+      <section class="results-page v3-results-page ${passed ? "passed" : "needs-work"} ${isPractice ? "practice-result" : ""}">
+        <div class="results-command-title">
+          <span>Results</span>
+          <strong>${isPractice ? "Focused Practice Debrief" : "Professional Mock Debrief"}</strong>
+          <small>${escapeHtml(examTitle(attempt))} / ${formatDate(attempt.submitted_at || attempt.started_at)}</small>
         </div>
-        <section class="result-summary-grid">
-          <div class="card result-message-card">
-            <span class="result-trophy">${icon("trophy")}</span>
-            <h2>${isPractice ? "Practice session finished." : pct >= PASSING_PERCENT ? "You passed this mock exam." : "Keep reviewing targeted sections."}</h2>
-            <p>${score} correct out of ${attempt.total_questions}. Submitted ${formatDate(attempt.submitted_at || attempt.started_at)}.</p>
-          </div>
-          <div class="card final-score-card ${pct >= PASSING_PERCENT ? "passed" : "needs-work"}">
-            <span>Final Score</span>
-            <strong>${Math.round(pct)}%</strong>
-            <em>${score}/${attempt.total_questions} correct</em>
-          </div>
-        </section>
 
-        <section class="result-stats-strip">
-          <metric><strong>${score}</strong><span>Correct</span></metric>
-          <metric><strong>${attempt.total_questions - score}</strong><span>Wrong</span></metric>
-          <metric><strong>${formatDuration(attempt.elapsed_seconds)}</strong><span>Total Time</span></metric>
-          <metric><strong>${formatDuration(insights.averageTime)}</strong><span>Average / Item</span></metric>
-        </section>
-
-        <section class="card debrief-sections">
-          <div class="card-head">
-            <div>
-              <h2>Section performance</h2>
-              <p>Category Breakdown</p>
+        <section class="results-overview-console">
+          <div class="score-gauge-panel v3-panel">
+            <div class="score-gauge" style="--score:${Math.max(0, Math.min(100, pct)) * 3.6}deg">
+              <span>Score</span><strong>${Math.round(pct)}%</strong><b>${score} / ${attempt.total_questions}</b><small>correct</small>
             </div>
           </div>
-          <div class="breakdown-grid">
-            ${stats.map((stat) => `
-              <div class="breakdown-card ${toneForSection(stat.section)}">
-                <div><strong>${escapeHtml(stat.section)}</strong><span>${stat.correct}/${stat.total}</span></div>
-                <div class="bar"><i style="width:${Math.round((stat.correct / stat.total) * 100)}%"></i></div>
-                <small>${Math.round((stat.correct / stat.total) * 100)}% accuracy / ${formatDuration(stat.averageTime)} avg</small>
-              </div>
-            `).join("")}
+          <div class="timing-console">
+            <metric>${localIcon("timer")}<span>Total Time</span><strong>${formatDuration(attempt.elapsed_seconds)}</strong><small>HH:MM:SS</small></metric>
+            <metric>${localIcon("target")}<span>Average / Item</span><strong>${formatDuration(insights.averageTime)}</strong><small>per question</small></metric>
+          </div>
+          <div class="result-status-panel ${passed ? "passed" : "failed"}">
+            ${icon(passed ? "check" : "stats")}
+            <strong>${isPractice ? "Complete" : passed ? "Passed" : "Needs Work"}</strong>
+            <small>${isPractice ? `${score} correct answers recorded` : passed ? "Passing target reached" : `${Math.max(0, Math.ceil((PASSING_PERCENT / 100) * attempt.total_questions) - score)} more correct answers needed`}</small>
           </div>
         </section>
 
-        <section class="card run-insights-panel">
-          <div class="card-head">
-            <div>
-              <p class="eyebrow">Behavioral telemetry</p>
-              <h2>Run Insights</h2>
+        <section class="results-section-console v3-panel">
+          <div class="technical-title"><h2>Section Performance</h2><span aria-hidden="true"></span></div>
+          <div class="results-section-grid">
+            ${stats.map((stat) => {
+              const percent = Math.round((stat.correct / Math.max(1, stat.total)) * 100);
+              return `<article class="result-section-card ${toneForSection(stat.section)}"><span class="section-hud-icon">${localIcon(sectionIconName(stat.section))}</span><div><strong>${escapeHtml(stat.section)}</strong><b>${percent}%</b><i><em style="width:${percent}%"></em></i><small>${stat.correct} / ${stat.total} correct</small></div></article>`;
+            }).join("")}
+          </div>
+        </section>
+
+        <div class="results-lower-grid">
+          <section class="run-insights-panel v3-panel">
+            <div class="technical-title"><h2>Run Insights</h2><span aria-hidden="true"></span></div>
+            <div class="insight-grid">
+              ${resultInsight("timer", "Fastest Question", insights.fastest ? formatDuration(insights.fastest.time_spent_seconds) : "--", insights.fastest ? `Item ${insights.fastest.display_number}` : "No timing yet", "cyan")}
+              ${resultInsight("timer", "Longest Question", insights.slowest ? formatDuration(insights.slowest.time_spent_seconds) : "--", insights.slowest ? `Item ${insights.slowest.display_number}` : "No timing yet", "amber")}
+              ${resultInsight("trophy", "Strongest Area", insights.strongest?.section || "--", insights.strongest ? `${Math.round(insights.strongest.percent)}% accuracy` : "No data yet", "green")}
+              ${resultInsight("target", "Weakest Area", insights.weakest?.section || "--", insights.weakest ? `${Math.round(insights.weakest.percent)}% accuracy` : "No data yet", "red")}
+              ${resultInsight("brain-circuit", "Changed Answers", String(insights.changed), `${insights.wrongToCorrect} improved / ${insights.correctToWrong} lost`, "purple")}
+              ${resultInsight("notebook-tabs", "Flagged Questions", String(flaggedCount(attempt)), `${Math.round((flaggedCount(attempt) / Math.max(1, attempt.total_questions)) * 100)}% of run`, "amber")}
+              ${resultInsight("target", "Skipped Questions", String(skippedCount(attempt)), `${unansweredCount(attempt)} unanswered`, "blue")}
+              ${resultInsight("circle-check", "Overall Accuracy", `${Math.round(pct)}%`, `${score} / ${attempt.total_questions} correct`, "green")}
             </div>
-          </div>
-          <div class="insight-grid">
-            ${insightCard("Average answer time", formatDuration(insights.averageTime), "Your pacing per visited question.")}
-            ${insightCard("Fastest question", insights.fastest ? `Item ${insights.fastest.display_number}` : "--", insights.fastest ? formatDuration(insights.fastest.time_spent_seconds) : "No timing yet.")}
-            ${insightCard("Longest question", insights.slowest ? `Item ${insights.slowest.display_number}` : "--", insights.slowest ? formatDuration(insights.slowest.time_spent_seconds) : "No timing yet.")}
-            ${insightCard("Fastest group", insights.fastestSection?.section || "--", insights.fastestSection ? `${formatDuration(insights.fastestSection.averageTime)} avg` : "No data yet.")}
-            ${insightCard("Weakest area", insights.weakest?.section || "--", insights.weakest ? `${Math.round(insights.weakest.percent)}% accuracy` : "No data yet.")}
-            ${insightCard("Strongest area", insights.strongest?.section || "--", insights.strongest ? `${Math.round(insights.strongest.percent)}% accuracy` : "No data yet.")}
-            ${insightCard("Changed answers", String(insights.changed), `${insights.wrongToCorrect} improved, ${insights.correctToWrong} lost.`)}
-            ${insightCard("Retry focus", insights.recommendation, "Use this to choose your next drill.")}
-          </div>
-        </section>
-
-        <section class="card overview-card run-meta-rail">
-          <h2>Run Overview</h2>
-          <div class="overview-list">
-            <div><span>Exam Type</span><strong>${escapeHtml(isPractice ? "Category Practice" : "Professional Mock Exam")}</strong></div>
-            <div><span>Total Questions</span><strong>${attempt.total_questions}</strong></div>
-            <div><span>Answered</span><strong>${answeredCount(attempt)} / ${attempt.total_questions}</strong></div>
-            <div><span>Skipped</span><strong>${skippedCount(attempt)}</strong></div>
-            <div><span>Unanswered</span><strong>${unansweredCount(attempt)}</strong></div>
-            <div><span>Visited</span><strong>${visitedCount(attempt)}</strong></div>
-            <div><span>Duration</span><strong>${formatDuration(attempt.elapsed_seconds)}</strong></div>
-            <div><span>Question Order</span><strong>${attempt.options?.shuffleQuestions ? "Shuffled" : "Bank order"}</strong></div>
-          </div>
-        </section>
-
-        <div class="bottom-actions">
-          <button class="btn primary" data-action="review-answers" type="button">${icon("review")} Review Answers</button>
-          ${isPractice
-            ? `<button class="btn secondary" data-action="repeat-practice" type="button">${icon("refresh")} Repeat Drill</button><button class="btn secondary" data-action="change-practice" type="button">${icon("grid")} Change Practice</button>`
-            : `<button class="btn secondary" data-action="practice-weakest" type="button">${icon("stats")} Practice Weakest Area</button><button class="btn secondary" data-action="retake-same-version" type="button">${icon("refresh")} Retake Same Version</button>`}
+          </section>
+          <aside class="results-action-rail v3-panel">
+            <div class="technical-title"><h2>Actions</h2><span aria-hidden="true"></span></div>
+            <button class="result-action primary" data-action="review-answers" type="button">${localIcon("notebook-tabs")}<span><strong>Review Answers</strong><small>Inspect every item and explanation</small></span>${icon("arrow")}</button>
+            ${isPractice
+              ? `<button class="result-action purple" data-action="repeat-practice" type="button">${localIcon("target")}<span><strong>Repeat Drill</strong><small>Run the same practice profile</small></span>${icon("arrow")}</button><button class="result-action green" data-action="change-practice" type="button">${localIcon("brain-circuit")}<span><strong>Change Practice</strong><small>Choose another section or difficulty</small></span>${icon("arrow")}</button>`
+              : `<button class="result-action purple" data-action="practice-weakest" type="button">${localIcon("target")}<span><strong>Practice Weakest Area</strong><small>${escapeHtml(insights.weakest?.section || "Targeted review")}</small></span>${icon("arrow")}</button><button class="result-action green" data-action="retake-same-version" type="button">${localIcon("history")}<span><strong>Retake Same Version</strong><small>Restart this 170-item mock</small></span>${icon("arrow")}</button>`}
+          </aside>
         </div>
       </section>
     `, "results");
@@ -1278,72 +1262,60 @@
     const pct = resultPercent(attempt);
     const navWindow = reviewNavigatorWindow(filtered, index);
     root.innerHTML = authedShell(`
-      <section class="review-page">
-        <div class="page-title-row review-heading">
-          <div>
-            <h1>Answer Review</h1>
-            <p>${escapeHtml(examTitle(attempt))}</p>
+      <section class="review-page v3-review-page">
+        <header class="review-command-head">
+          <div><p class="eyebrow">Attempt inspection</p><h1>Answer Review</h1><small>${escapeHtml(examTitle(attempt))}</small></div>
+          <div class="review-score-strip telemetry-rail">
+            ${telemetryMetric("target", "Score", `${Math.round(pct)}%`)}
+            ${telemetryMetric("circle-check", "Correct", score)}
+            ${telemetryMetric("notebook-tabs", "Needs Review", attempt.total_questions - score)}
+            ${telemetryMetric("target", "Flagged", flaggedCount(attempt))}
           </div>
-          <button class="btn ghost" data-action="back-results" type="button">${icon("back")} Back to Results</button>
-        </div>
-        <section class="review-score-strip">
-          <metric><strong>${Math.round(pct)}%</strong><span>Score</span></metric>
-          <metric><strong>${score}</strong><span>Correct</span></metric>
-          <metric><strong>${attempt.total_questions - score}</strong><span>Needs Review</span></metric>
-          <metric><strong>${flaggedCount(attempt)}</strong><span>Flagged</span></metric>
-        </section>
-        <div class="review-layout">
-          <aside class="card review-sidebar">
-            <h2>Review Filters</h2>
+          <button class="btn secondary" data-action="back-results" type="button">${icon("back")} Back to Results</button>
+        </header>
+
+        <div class="review-workstation">
+          <aside class="review-filter-panel v3-panel">
+            <div class="technical-title"><h2>Filters</h2><span aria-hidden="true"></span></div>
+            <p>Answer State</p>
             <div class="filter-list">
-              ${["all", "wrong", "correct", "flagged"].map((filter) => `<button class="${app.reviewFilter === filter ? "active" : ""}" data-review-filter="${filter}" type="button">${filterLabel(filter)}</button>`).join("")}
+              ${["all", "wrong", "correct", "flagged"].map((filter) => `<button class="${app.reviewFilter === filter ? "active" : ""}" data-review-filter="${filter}" type="button">${filterLabel(filter)}<small>${filteredReviewAnswers(attempt, filter).length}</small></button>`).join("")}
             </div>
-            <h2>Question Navigator</h2>
+            <div class="review-filter-note">${localIcon("target")}<span><strong>Current scope</strong><small>${escapeHtml(filterLabel(app.reviewFilter))} questions</small></span></div>
+          </aside>
+
+          <aside class="review-item-panel v3-panel">
+            <div class="review-item-head"><strong>Question</strong><span>${filtered.length}</span></div>
             <small class="navigator-range">${navWindow.label}</small>
             <div class="review-dots">
-              ${navWindow.items.map(({ item, itemIndex }) => `<button class="${itemIndex === index ? "current" : ""} ${item.selected_choice === item.correct_choice ? "correct" : "wrong"} ${item.flagged ? "flagged" : ""}" data-review-index="${itemIndex}" type="button">${item.display_number}</button>`).join("")}
+              ${navWindow.items.map(({ item, itemIndex }) => `<button class="${itemIndex === index ? "current" : ""} ${item.selected_choice === item.correct_choice ? "correct" : item.selected_choice ? "wrong" : "unanswered"} ${item.flagged ? "flagged" : ""}" data-review-index="${itemIndex}" type="button"><span>${item.display_number}</span>${item.flagged ? icon("flag") : item.selected_choice === item.correct_choice ? localIcon("circle-check") : icon("x")}</button>`).join("")}
             </div>
           </aside>
-          <main class="card review-main">
-            <div class="review-content-scroll">
-              ${answer && filtered.length ? `
-                <div class="question-title">
-                  <div>
-                    <span class="question-index">Question ${answer.position + 1} of ${attempt.total_questions}</span>
-                    <p class="topic-pill">${escapeHtml(answer.section)} - ${escapeHtml(answer.subtopic)}</p>
-                    <small>${formatDuration(answer.time_spent_seconds)} spent</small>
-                  </div>
-                  <span class="status-pill ${correct ? "answered" : "wrong"}">${correct ? "Correct" : "Incorrect"}</span>
-                </div>
+
+          <main class="review-question-panel v3-panel">
+            ${answer && filtered.length ? `
+              <div class="review-question-head"><span class="question-index"><span>Question</span><b>${answer.position + 1}</b><span>of ${attempt.total_questions}</span></span><span class="status-pill ${correct ? "answered" : "wrong"}">${correct ? "Correct" : "Incorrect"}</span></div>
+              <div class="review-question-scroll">
+                <p class="topic-pill">${escapeHtml(answer.section)} / ${escapeHtml(answer.subtopic)}</p>
                 ${answer.stimulus ? renderStimulusPanel(attempt, answer, linkedStimulusAnswers(attempt, answer), true) : ""}
                 <p class="prompt">${escapeHtml(answer.prompt)}</p>
                 <div class="review-choices">
-                  ${answer.choices.map((choice) => `
-                    <div class="review-choice ${choice.id === answer.correct_choice ? "is-correct" : ""} ${choice.id === answer.selected_choice && choice.id !== answer.correct_choice ? "is-wrong" : ""}">
-                      <span>${choice.id}</span>
-                      <strong>${escapeHtml(choice.text)}</strong>
-                      <em>${choice.id === answer.correct_choice ? "Correct answer" : choice.id === answer.selected_choice ? "Your answer" : ""}</em>
-                    </div>
-                  `).join("")}
-                </div>
-                <div class="explanation-box">
-                  <strong>Explanation</strong>
-                  <p>${escapeHtml(answer.explanation || "No explanation provided.")}</p>
-                </div>
-                <div class="metadata-strip">
-                  <span>Visits: ${answer.visit_count || 0}</span>
-                  <span>Answer changes: ${answer.answer_changes || 0}</span>
-                  <span>${answer.flagged ? "Flagged" : "Not flagged"}</span>
-                </div>
-              ` : `<div class="review-empty-panel"><span>${icon("review")}</span><strong>No matching review items</strong><p>Change the active filter to continue reviewing this attempt.</p></div>`}
-            </div>
-            <div class="question-actions">
-              <button class="btn secondary" data-action="review-prev" type="button" ${index <= 0 ? "disabled" : ""}>Previous Question</button>
-              <button class="btn ghost" data-action="back-results" type="button">Return to Results</button>
-              <button class="btn primary" data-action="review-next" type="button" ${index >= filtered.length - 1 ? "disabled" : ""}>Next Question</button>
-            </div>
+                  ${answer.choices.map((choice) => `<div class="review-choice ${choice.id === answer.correct_choice ? "is-correct" : ""} ${choice.id === answer.selected_choice && choice.id !== answer.correct_choice ? "is-wrong" : ""}"><span>${choice.id}</span><strong>${escapeHtml(choice.text)}</strong><em>${choice.id === answer.correct_choice ? "Correct answer" : choice.id === answer.selected_choice ? "Your answer" : ""}</em></div>`).join("")}
+              </div>
+            ` : `<div class="review-empty-panel"><span>${icon("review")}</span><strong>No matching review items</strong><p>Change the active filter to continue reviewing this attempt.</p></div>`}
           </main>
+
+          <aside class="review-explanation-panel v3-panel">
+            <div class="technical-title"><h2>Explanation</h2><span aria-hidden="true"></span></div>
+            ${answer && filtered.length ? `<div class="explanation-copy"><p>${escapeHtml(answer.explanation || "No explanation provided.")}</p></div><div class="review-metadata"><span>${localIcon("timer")}<b>Time Spent</b><strong>${formatDuration(answer.time_spent_seconds)}</strong></span><span>${localIcon("target")}<b>Visits</b><strong>${answer.visit_count || 0}</strong></span><span>${localIcon("history")}<b>Answer Changes</b><strong>${answer.answer_changes || 0}</strong></span><span>${icon("flag")}<b>Flagged</b><strong>${answer.flagged ? "Yes" : "No"}</strong></span></div>` : `<p class="explanation-empty">Select another filter to restore the explanation panel.</p>`}
+          </aside>
         </div>
+
+        <footer class="review-footer">
+          <button class="btn secondary" data-action="review-prev" type="button" ${index <= 0 ? "disabled" : ""}>${icon("back")} Previous</button>
+          <button class="btn secondary" data-action="back-results" type="button">${icon("review")} Return to Results</button>
+          <button class="btn primary" data-action="review-next" type="button" ${index >= filtered.length - 1 ? "disabled" : ""}>Next ${icon("arrow")}</button>
+        </footer>
       </section>
     `, "review");
   }
@@ -1370,6 +1342,12 @@
     const completed = completedAttempts();
     const average = averagePercent(completed);
     const highest = completed.reduce((best, attempt) => Math.max(best, resultPercent(attempt)), 0);
+    const fullMocks = attempts.filter((attempt) => attempt.mode === "full");
+    const practiceRuns = attempts.filter((attempt) => attempt.mode === "practice");
+    const categoryStats = categoryPerformance(completed);
+    const weakest = practiceCategoriesForDisplay()
+      .map((category) => ({ category, percent: categoryPercent(categoryStats[category.section], category.section) }))
+      .sort((left, right) => left.percent - right.percent)[0];
     root.innerHTML = sideShell("recent", `
       <section class="content-page progress-page">
         <div class="page-title-row">
@@ -1379,42 +1357,45 @@
             <p>Track scores, section performance, and attempt history.</p>
           </div>
         </div>
-        <div class="summary-cards statistics-rail">
-          <metric><strong>${attempts.length}</strong><span>Total Attempts</span></metric>
-          <metric><strong>${average == null ? "--" : `${Math.round(average)}%`}</strong><span>Average Score</span></metric>
-          <metric><strong>${completed.length ? `${Math.round(highest)}%` : "--"}</strong><span>Best Score</span></metric>
-          <metric><strong>${activeDays(attempts)}</strong><span>Days Active</span></metric>
+        <div class="summary-cards statistics-rail telemetry-rail">
+          ${telemetryMetric("target", "Total Attempts", attempts.length)}
+          ${telemetryMetric("notebook-tabs", "Full Mocks", fullMocks.length)}
+          ${telemetryMetric("brain-circuit", "Practice Runs", practiceRuns.length)}
+          ${telemetryMetric("calculator", "Average Score", average == null ? "--" : `${Math.round(average)}%`)}
+          ${telemetryMetric("trophy", "Best Score", completed.length ? `${Math.round(highest)}%` : "--")}
         </div>
         <div class="progress-analytics-grid">
-        <section class="card trend-panel">
-          <div class="card-head"><div><p class="eyebrow">Score signal</p><h2>Attempt Trend</h2></div><span>${completed.length ? `${completed.length} completed` : "Awaiting first run"}</span></div>
+        <section class="card trend-panel v3-panel">
+          <div class="technical-title"><div><h2>Attempt Performance</h2><p>Score across completed runs</p></div><span>${completed.length ? `${completed.length} completed` : "Awaiting first run"}</span></div>
           ${progressTrendSvg(completed)}
         </section>
-        <section class="card performance-card">
-          <div class="card-head"><h2>Category Performance</h2></div>
+        <section class="card performance-card v3-panel">
+          <div class="technical-title"><h2>Section Performance</h2><span aria-hidden="true"></span></div>
           <div class="performance-bars">
-            ${practiceCategoriesForDisplay().map((category) => progressBarRow(category, categoryPercent(categoryPerformance(completed)[category.section], category.section))).join("")}
+            ${practiceCategoriesForDisplay().map((category) => progressBarRow(category, categoryPercent(categoryStats[category.section], category.section))).join("")}
           </div>
+          <button class="review-focus-cta" data-action="practice-weakest" type="button">${localIcon("target")} Review Focus <strong>${weakest && completed.length ? escapeHtml(weakest.category.label) : "Awaiting results"}</strong>${icon("arrow")}</button>
         </section>
         </div>
-        <section class="card attempts-table-card">
-          <div class="tabs">
+        <section class="card attempts-table-card v3-panel">
+          <div class="attempt-table-title"><h2>Attempt Records</h2><span>${attempts.length} stored runs</span></div>
+          <div class="tabs progress-tabs">
             ${[
               ["all", "All Attempts"],
-              ["full", "Full Mock Exams"],
-              ["practice", "Category Practice"],
-              ["quick", "Quick Practice"],
-              ["review", "Review Sessions"]
+              ["full", "Full Mocks"],
+              ["practice", "Practice"],
+              ["review", "Review"]
             ].map(([key, label]) => `<button class="${app.recentTab === key ? "active" : ""}" data-recent-tab="${key}" type="button">${label}</button>`).join("")}
           </div>
           <div class="attempt-table">
-            <div class="table-head"><span>Attempt</span><span>Date</span><span>Score</span><span>Duration</span><span>Actions</span></div>
-            ${filteredAttemptsByTab(attempts, app.recentTab).map((attempt) => `
+            <div class="table-head"><span>Attempt</span><span>Type</span><span>Status</span><span>Score</span><span>Answered</span><span>Action</span></div>
+            ${filteredAttemptsByTab(attempts, app.recentTab).map((attempt, index) => `
               <div class="table-row">
-                <span><strong>${escapeHtml(examTitle(attempt))}</strong><small>${attempt.mode || "full"}</small></span>
-                <span>${formatDate(attempt.started_at)}</span>
-                <span>${attempt.status === "submitted" || attempt.status === "timed_out" ? `${Math.round(resultPercent(attempt))}%` : statusLabel(attempt.status)}</span>
-                <span>${formatDuration(attempt.elapsed_seconds)}</span>
+                <span class="attempt-name"><i>${String(index + 1).padStart(2, "0")}</i><span><strong>${escapeHtml(examTitle(attempt))}</strong><small>${formatDate(attempt.started_at)}</small></span></span>
+                <span class="attempt-type">${attempt.mode === "practice" ? "Practice" : "Full Mock"}</span>
+                <span class="attempt-status ${escapeAttr(attempt.status)}">${attempt.status === "submitted" || attempt.status === "timed_out" ? localIcon("circle-check") : localIcon("timer")} ${statusLabel(attempt.status)}</span>
+                <span class="attempt-score">${attempt.status === "submitted" || attempt.status === "timed_out" ? `${Math.round(resultPercent(attempt))}%` : "--"}</span>
+                <span class="attempt-answered">${answeredCount(attempt)} / ${attempt.total_questions}</span>
                 <span class="row-actions">
                   <button class="btn tiny" data-attempt-open="${attempt.id}" type="button">${attempt.status === "in_progress" || attempt.status === "paused" ? "Continue" : "View Results"}</button>
                   <button class="icon-only" data-overflow="${attempt.id}" type="button" title="More actions">${icon("more")}</button>
@@ -1452,34 +1433,35 @@
 
   function practiceTabContent() {
     const categoryStats = categoryPerformance(completedAttempts());
+    const categories = practiceCategoriesForDisplay();
+    const selected = categories[0];
     return `
-      <form class="card custom-practice run-builder" data-form="custom-practice">
-        <div class="builder-heading">
-          <p class="eyebrow">Custom Practice</p>
-          <h2>Build a focused run</h2>
-          <small>Choose a section, run length, and difficulty profile.</small>
-        </div>
-        <fieldset class="category-plates"><legend>Section</legend>${practiceCategoriesForDisplay().map((category, index) => `<label class="section-plate ${category.tone}"><input type="radio" name="category" value="${escapeAttr(category.section)}" ${index === 0 ? "checked" : ""}/><span class="category-symbol">${categorySymbol(category.section)}</span><strong>${escapeHtml(category.label)}</strong><small>${category.poolSize} item pool</small></label>`).join("")}</fieldset>
-        <fieldset class="count-segments"><legend>Question Count</legend>${[10, 20, 30, 40, 60].map((count) => `<label><input type="radio" name="count" value="${count}" ${count === 20 ? "checked" : ""}/><span>${count}</span></label>`).join("")}</fieldset>
-        <label class="difficulty-control">Difficulty
-          <select name="difficulty">
-            <option value="mixed">Mixed</option>
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-          </select>
-        </label>
-        <button class="btn primary" data-action="custom-practice-submit" type="button">${icon("play")} Start Custom Practice</button>
-      </form>
-      <section class="card category-picker quick-run-grid">
-        <div class="card-head">
-          <div>
-            <h2>Quick Practice</h2>
-            <p>Launch a 20-item mixed run from one section.</p>
+      <form class="custom-practice practice-console" data-form="custom-practice">
+        <section class="card practice-section-picker v3-panel">
+          <div class="technical-title"><h2>Choose a Section</h2><span aria-hidden="true"></span></div>
+          <fieldset class="category-plates"><legend class="sr-only">Section</legend>${categories.map((category, index) => `<label class="section-plate ${category.tone}"><input type="radio" name="category" value="${escapeAttr(category.section)}" ${index === 0 ? "checked" : ""}/><span class="section-hud-icon">${localIcon(sectionIconName(category.section))}</span><span class="section-copy"><strong>${escapeHtml(category.label)}</strong><small>${escapeHtml(category.description)}</small><em>${category.poolSize} questions</em></span></label>`).join("")}</fieldset>
+        </section>
+        <section class="card run-profile-panel v3-panel">
+          <div class="technical-title"><h2>Run Profile</h2><span aria-hidden="true"></span></div>
+          <div class="selected-run-section ${selected.tone}" data-practice-profile-section>${localIcon(sectionIconName(selected.section))}<strong>${escapeHtml(selected.label)} selected</strong></div>
+          <fieldset class="count-segments"><legend>Question Count</legend>${[10, 20, 30, 40, 60].map((count) => `<label><input type="radio" name="count" value="${count}" ${count === 20 ? "checked" : ""}/><span>${count}</span></label>`).join("")}</fieldset>
+          <fieldset class="difficulty-segments"><legend>Difficulty</legend>${[["mixed", "Mixed"], ["medium", "Standard"], ["hard", "Challenge"]].map(([value, label], index) => `<label><input type="radio" name="difficulty" value="${value}" ${index === 0 ? "checked" : ""}/><span>${label}</span></label>`).join("")}</fieldset>
+          <div class="run-profile-facts">
+            <span>${localIcon("notebook-tabs")}<strong data-practice-count>20</strong><small>Questions</small></span>
+            <span>${localIcon("brain-circuit")}<strong data-practice-difficulty>Mixed</strong><small>Difficulty</small></span>
+            <span>${localIcon("timer")}<strong>Untimed</strong><small>Practice</small></span>
           </div>
+          <button class="btn primary technical-cta" data-action="custom-practice-submit" type="button"><span>${icon("play")} Start Custom Practice</span>${icon("arrow")}</button>
+          <button class="btn secondary technical-cta secondary-cta" data-action="reset-practice" type="button"><span>${icon("refresh")} Reset Options</span></button>
+        </section>
+      </form>
+      <section class="card category-picker quick-run-grid v3-panel">
+        <div class="technical-title quick-title">
+          <h2>Quick Practice</h2>
+          <p>Launch a 20-item mixed drill from one section.</p>
         </div>
         <div class="category-card-grid">
-          ${practiceCategoriesForDisplay().map((category) => categoryPracticeCard(category, categoryStats[category.section])).join("")}
+          ${categories.map((category) => quickPracticeModule(category, categoryStats[category.section])).join("")}
         </div>
       </section>
     `;
@@ -1488,28 +1470,61 @@
   function mistakesTabContent() {
     const completed = completedAttempts();
     const withMistakes = completed.map((attempt) => ({ attempt, mistakes: wrongAnswers(attempt) })).filter((item) => item.mistakes.length);
+    const categories = practiceCategoriesForDisplay();
+    const totalMissed = withMistakes.reduce((sum, item) => sum + item.mistakes.length, 0);
+    const sectionCounts = categories.map((category) => ({
+      category,
+      count: withMistakes.reduce((sum, item) => sum + item.mistakes.filter((answer) => answer.section === category.section).length, 0)
+    }));
+    const affected = sectionCounts.filter((entry) => entry.count > 0);
+    const priority = affected.slice().sort((left, right) => right.count - left.count)[0];
     return `
-      <section class="card mistakes-hub">
+      <section class="mistakes-hub">
         ${withMistakes.length ? `
-          <div class="mistake-summary">
-            <metric><strong>${withMistakes.reduce((sum, item) => sum + item.mistakes.length, 0)}</strong><span>Total missed items</span></metric>
-            <metric><strong>${withMistakes.length}</strong><span>Attempts to review</span></metric>
-            <metric><strong>${completed.length}</strong><span>Completed attempts</span></metric>
+          <div class="mistake-summary telemetry-rail">
+            ${telemetryMetric("target", "Total Missed", totalMissed)}
+            ${telemetryMetric("notebook-tabs", "Attempts Ready", withMistakes.length)}
+            ${telemetryMetric("brain-circuit", "Sections Affected", affected.length)}
+            ${telemetryMetric(sectionIconName(priority?.category.section || "Numerical Ability"), "Highest Priority", priority ? priority.category.label : "--")}
           </div>
-          <div class="mistake-list">
-            ${withMistakes.map(({ attempt, mistakes }) => `
-              <button class="attempt-select-row" data-review-mistakes="${attempt.id}" type="button">
-                <span>
-                  <strong>${escapeHtml(examTitle(attempt))}</strong>
-                  <small>${formatDate(attempt.submitted_at || attempt.started_at)}</small>
-                </span>
-                <em>${mistakes.length} missed</em>
-                <b>${Math.round(resultPercent(attempt))}% score</b>
-                ${icon("arrow")}
-              </button>
-            `).join("")}
+          <div class="mistakes-workspace">
+            <section class="card mistake-list v3-panel">
+              <div class="technical-title"><h2>Choose an Attempt</h2><span aria-hidden="true"></span></div>
+              <div class="mistake-attempt-scroll">
+                ${withMistakes.map(({ attempt, mistakes }, index) => {
+                  const perSection = categories.map((category) => ({ category, count: mistakes.filter((answer) => answer.section === category.section).length })).filter((entry) => entry.count);
+                  return `<article class="mistake-attempt-card">
+                    <div class="attempt-index">${String(index + 1).padStart(2, "0")}</div>
+                    <div class="mistake-attempt-title"><strong>${escapeHtml(examTitle(attempt))}</strong><small>${attempt.mode === "practice" ? "Type: Practice" : "Type: Full Mock"} / ${formatDate(attempt.submitted_at || attempt.started_at)}</small></div>
+                    <metric><span>Score</span><strong>${Math.round(resultPercent(attempt))}%</strong></metric>
+                    <metric class="missed"><span>Missed</span><strong>${mistakes.length}</strong></metric>
+                    <metric><span>Answered</span><strong>${answeredCount(attempt)} / ${attempt.total_questions}</strong></metric>
+                    <div class="mistake-section-strip">${perSection.map((entry) => `<span class="${entry.category.tone}">${localIcon(sectionIconName(entry.category.section))}<b>${entry.category.label}</b><strong>${entry.count}</strong></span>`).join("")}</div>
+                    <button class="btn technical-row-cta" data-review-mistakes="${attempt.id}" type="button">Review Mistakes ${icon("arrow")}</button>
+                  </article>`;
+                }).join("")}
+              </div>
+            </section>
+            <section class="card review-focus-panel v3-panel">
+              <div class="technical-title"><h2>Review Focus</h2><span aria-hidden="true"></span></div>
+              <div class="focus-total"><span>!</span><strong>${totalMissed}</strong><b>questions ready</b></div>
+              <p>Review missed questions by section or open the largest attempt queue.</p>
+              <div class="focus-section-list">
+                ${sectionCounts.map(({ category, count }) => `<div class="focus-section ${category.tone}">${localIcon(sectionIconName(category.section))}<strong>${category.label}</strong><b>${count}</b><i><span style="width:${totalMissed ? Math.max(4, (count / totalMissed) * 100) : 0}%"></span></i>${priority?.category.section === category.section ? "<em>Top priority</em>" : ""}</div>`).join("")}
+              </div>
+              <button class="btn primary technical-cta" data-review-mistakes="${withMistakes[0].attempt.id}" type="button"><span>Review Largest Mistake Set</span>${icon("arrow")}</button>
+              ${priority ? `<button class="btn secondary technical-cta secondary-cta" data-practice-category="${escapeAttr(priority.category.section)}" type="button"><span>Start ${escapeHtml(priority.category.label)} Practice</span></button>` : ""}
+            </section>
           </div>
-        ` : emptyState("No mistakes yet", completed.length ? "Your submitted attempts do not have missed items." : "Complete a mock exam or practice drill first, then missed items will appear here.", "open-setup", "Start Full Mock")}
+          <div class="mistake-note">${icon("info")} Correctly answered items stay out of this queue. New mistakes are added after each completed run.</div>
+        ` : `<div class="mistake-summary telemetry-rail empty-mistake-summary">
+              ${telemetryMetric("target", "Total Missed", "0")}
+              ${telemetryMetric("notebook-tabs", "Attempts Ready", "0")}
+              ${telemetryMetric("brain-circuit", "Sections Affected", "0")}
+              ${telemetryMetric("calculator", "Highest Priority", "--")}
+            </div>
+            <section class="card mistakes-empty v3-panel">${emptyState("No mistakes yet", completed.length ? "Your submitted attempts do not have missed items." : "Complete a mock exam or practice drill first, then missed items will appear here.", "open-setup", "Start Full Mock", "practice-page", "Start Practice")}</section>
+            <div class="mistake-note">${icon("info")} Missed questions appear here after a submitted mock exam or practice run.</div>`}
       </section>
     `;
   }
@@ -1517,11 +1532,31 @@
   function flaggedTabContent() {
     const flagged = app.attempts.flatMap((attempt) => Object.values(attempt.answers).filter((answer) => answer.flagged).map((answer) => ({ attempt, answer })));
     const grouped = practiceCategoriesForDisplay().map((category) => ({ category, rows: flagged.filter((item) => item.answer.section === category.section) })).filter((group) => group.rows.length);
+    const totalTime = flagged.reduce((sum, item) => sum + (item.answer.time_spent_seconds || 0), 0);
+    const dated = flagged.map((item) => item.answer.last_seen_at || item.attempt.started_at).filter(Boolean).sort();
     return `
-      <section class="card bookmark-list review-queue">
-        ${flagged.length ? grouped.map(({ category, rows }) => `<section class="flagged-section ${category.tone}"><header><span class="category-symbol">${categorySymbol(category.section)}</span><h2>${escapeHtml(category.label)}</h2><em>${rows.length} flagged</em></header>${rows.map(({ attempt, answer }) => `
-            <button class="attempt-select-row" data-open-review="${attempt.id}" data-review-question="${answer.question_id}" type="button"><span><strong>Item ${answer.display_number}</strong><small>${escapeHtml(examTitle(attempt))}</small></span><em>${answer.selected_choice ? `Selected ${answer.selected_choice}` : "Unanswered"}</em><b>${formatDuration(answer.time_spent_seconds)}</b>${icon("arrow")}</button>
-          `).join("")}</section>`).join("") : emptyState("No flagged questions yet", "Flag an item during an exam or answer review to place it in this queue.", "practice-page", "Start Practice")}
+      <section class="review-queue">
+        ${flagged.length ? `<div class="flagged-workspace">
+          <aside class="card flagged-summary v3-panel">
+            <div class="technical-title"><h2>Summary</h2><span aria-hidden="true"></span></div>
+            <div class="flagged-total">${icon("flag")}<span><b>Flagged Items</b><strong>${flagged.length}</strong></span></div>
+            ${practiceCategoriesForDisplay().map((category) => {
+              const count = flagged.filter((item) => item.answer.section === category.section).length;
+              return `<div class="flagged-summary-row ${category.tone}">${localIcon(sectionIconName(category.section))}<span><b>${category.label}</b><strong>${count}</strong></span></div>`;
+            }).join("")}
+            <div class="flagged-date-row">${localIcon("history")}<span><b>Oldest Flagged</b><strong>${formatDate(dated[0])}</strong></span></div>
+            <div class="flagged-date-row">${localIcon("timer")}<span><b>Average Time / Item</b><strong>${formatDuration(totalTime / Math.max(1, flagged.length))}</strong></span></div>
+          </aside>
+          <section class="card flagged-table-panel v3-panel">
+            <div class="flagged-table-toolbar"><h2>Flagged Review Queue</h2><div><button class="btn tiny" type="button">${icon("filter")} Filters</button><span>Sorted by section</span></div></div>
+            <div class="flagged-table-head"><span>Item / Topic</span><span>Source Attempt</span><span>Answer State</span><span>Time Spent</span><span>Review</span></div>
+            <div class="flagged-table-scroll">
+              ${grouped.map(({ category, rows }) => `<section class="flagged-section ${category.tone}"><header>${localIcon(sectionIconName(category.section))}<h2>${escapeHtml(category.label)}</h2><em>${rows.length} items</em></header>${rows.map(({ attempt, answer }) => `
+                <div class="flagged-table-row"><span><i>${icon("flag")}</i><strong>Item ${answer.display_number}</strong><small>${escapeHtml(answer.subtopic || answer.topic || "Review item")}</small></span><span>${escapeHtml(examTitle(attempt))}<small>${formatDate(attempt.started_at)}</small></span><span class="${answer.selected_choice === answer.correct_choice ? "correct" : answer.selected_choice ? "wrong" : "unanswered"}">${answer.selected_choice ? answer.selected_choice === answer.correct_choice ? "Correct" : "Incorrect" : "Unanswered"}</span><span>${formatDuration(answer.time_spent_seconds)}</span><button class="btn tiny" data-open-review="${attempt.id}" data-review-question="${answer.question_id}" type="button">Review</button></div>
+              `).join("")}</section>`).join("")}
+            </div>
+          </section>
+        </div>` : `<section class="card flagged-empty v3-panel">${emptyState("No flagged questions yet", "Flag an item during an exam or answer review to place it in this queue.", "open-setup", "Start Full Mock", "practice-page", "Start Practice")}</section>`}
       </section>
     `;
   }
@@ -1571,7 +1606,7 @@
       ["recent", "Progress", "recent-page"]
     ];
     return `
-      <header class="app-header signed-header ${active === "dashboard" ? "study-hub-header" : ""}">
+      <header class="app-header signed-header study-hub-header">
         <div class="brand">${signedLogo}${brandText()}</div>
         <nav class="signed-primary-nav" aria-label="Primary navigation">
           ${routes.map(([route, label, action]) => `<button class="${activeRoute === route ? "active" : ""}" data-action="${action}" type="button">${escapeHtml(label)}</button>`).join("")}
@@ -1667,10 +1702,8 @@
               <button class="btn secondary account-password-save" data-action="password-submit" type="button" ${app.busyAction === "password" ? "disabled" : ""}>${icon("key")} ${app.busyAction === "password" ? "Updating..." : "Update Password"}</button>
             </details>
             <div class="account-modal-actions">
-              <button class="btn ghost" data-action="signout" type="button">${icon("logout")} Sign Out</button>
-              <span></span>
-              <button class="btn secondary" data-action="close-modal" type="button">Cancel</button>
               <button class="btn primary" data-action="profile-submit" type="button" ${app.busyAction === "profile" ? "disabled" : ""}>${icon("save")} ${app.busyAction === "profile" ? "Saving..." : "Save Changes"}</button>
+              <button class="btn secondary" data-action="signout" type="button">${icon("logout")} Sign Out</button>
             </div>
             <div class="account-danger-row">
               <button class="btn danger outline" data-action="delete-profile" type="button">${icon("delete")} Delete Account</button>
@@ -1689,9 +1722,9 @@
           <span class="pause-icon">${icon("pause")}</span>
           <p class="eyebrow">Checkpoint secured</p>
           <h2 id="pause-title">Exam Paused</h2>
-          <p>Your timer is frozen at <strong>${formatDuration(timeRemaining(attempt))}</strong>. Item ${attempt.current_question_index + 1} and all answers are saved.</p>
-          <button class="btn primary" data-action="resume-paused" type="button">${icon("play")} Resume Exam</button>
-          <button class="btn secondary" data-action="save-exit" type="button">${icon("save")} Save and Exit</button>
+          <div class="pause-facts"><span>${localIcon("timer")}<b>Time Remaining (Frozen)</b><strong>${formatDuration(timeRemaining(attempt))}</strong></span><span>${icon("flag")}<b>Current Checkpoint</b><strong>Item ${attempt.current_question_index + 1}</strong></span><span>${localIcon("cloud-check")}<b>Sync Status</b><strong>Saved Online</strong></span></div>
+          <p>Your progress has been saved.<br />Resume now or save and return to the Study Hub.</p>
+          <div class="pause-actions"><button class="btn primary" data-action="resume-paused" type="button">${icon("play")} Resume Exam</button><button class="btn secondary" data-action="save-exit" type="button">${icon("save")} Save and Exit</button></div>
         </section>
       </div>
     `;
@@ -1702,15 +1735,17 @@
     return `
       <div class="modal-backdrop">
         <section class="submit-modal" role="dialog" aria-modal="true" aria-labelledby="submit-title" tabindex="-1">
+          <span class="submit-danger-symbol">!</span>
           <p class="eyebrow">Final submission</p>
           <h2 id="submit-title">Submit Exam?</h2>
-          <p>You can still review unanswered or flagged items before submitting.</p>
+          <p>You are about to submit this run. <strong>This action cannot be undone.</strong></p>
           <div class="submit-stats">
-            <metric><strong>${answeredCount(attempt)}</strong><span>Answered</span></metric>
-            <metric><strong>${unansweredCount(attempt)}</strong><span>Unanswered</span></metric>
-            <metric><strong>${skippedCount(attempt)}</strong><span>Skipped</span></metric>
-            <metric><strong>${flaggedCount(attempt)}</strong><span>Flagged</span></metric>
+            <metric class="answered">${localIcon("circle-check")}<span>Answered</span><strong>${answeredCount(attempt)}</strong></metric>
+            <metric class="unanswered">${icon("clear")}<span>Unanswered</span><strong>${unansweredCount(attempt)}</strong></metric>
+            <metric class="skipped">${icon("skip")}<span>Skipped</span><strong>${skippedCount(attempt)}</strong></metric>
+            <metric class="flagged">${icon("flag")}<span>Flagged</span><strong>${flaggedCount(attempt)}</strong></metric>
           </div>
+          <div class="submit-warning">${icon("shield")} Review unanswered and flagged questions before submitting.</div>
           <div class="modal-actions">
             <button class="btn secondary" data-action="review-unanswered" type="button">Review Unanswered</button>
             <button class="btn secondary" data-action="review-flagged" type="button">Review Flagged</button>
@@ -1740,11 +1775,12 @@
       <div class="modal-backdrop static-backdrop timeout-backdrop" data-static-backdrop="true">
         <section class="timeout-modal" role="alertdialog" aria-modal="true" aria-labelledby="timeout-title" tabindex="-1">
           <span class="timeout-symbol">${icon("clock")}</span>
-          <p class="eyebrow">Timer threshold reached</p>
           <h2 id="timeout-title">Time Expired</h2>
-          <p>Your final checkpoint is being synchronized and scored.</p>
+          <div class="timeout-clock"><span>Time Remaining</span><strong>0:00</strong></div>
+          <p><b>Finalizing your attempt</b><br />Synchronizing your answers. Your submission is automatic.</p>
           <div class="segmented-loader compact" aria-label="Submitting"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <small>${answeredCount(attempt)} of ${attempt.total_questions} answered</small>
+          <small>Answered <strong>${answeredCount(attempt)}</strong> of ${attempt.total_questions}</small>
+          <div class="timeout-note">${icon("refresh")} Please keep this page open while the final checkpoint is stored.</div>
         </section>
       </div>
     `;
@@ -1776,12 +1812,13 @@
     const target = deletingAccount ? app.profile?.name || "this account" : examTitle(attempt || {});
     return `
       <div class="modal-backdrop danger-backdrop">
-        <section class="confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" tabindex="-1">
+        <section class="confirm-modal ${deletingAccount ? "account-delete-confirm" : "attempt-delete-confirm"}" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" tabindex="-1">
           <span class="danger-symbol">${icon("delete")}</span>
           <p class="eyebrow">Destructive command</p>
           <h2 id="confirm-title">${deletingAccount ? "Delete Account?" : "Delete Attempt?"}</h2>
           <p><strong>${escapeHtml(target)}</strong> ${deletingAccount ? "and every stored attempt" : "and its answer history"} will be permanently removed.</p>
-          <div class="modal-actions"><button class="btn secondary" data-action="close-modal" type="button">Cancel</button><button class="btn danger" data-action="${deletingAccount ? "confirm-delete-account" : "confirm-delete-attempt"}" type="button">${deletingAccount ? "Delete Account" : "Delete Attempt"}</button></div>
+          ${deletingAccount ? `<div class="delete-impact"><span>Account identity<b>${escapeHtml(target)}</b></span><span>Stored reviewer data<b>Attempts, answers, and results</b></span></div><label class="delete-confirm-field"><span>Confirmation</span><small>Type <b>DELETE</b> exactly to continue.</small><input data-delete-confirm name="deleteConfirmation" autocomplete="off" spellcheck="false" placeholder="Type DELETE" /></label>` : ""}
+          <div class="modal-actions"><button class="btn secondary" data-action="close-modal" type="button">Cancel</button><button class="btn danger" data-action="${deletingAccount ? "confirm-delete-account" : "confirm-delete-attempt"}" type="button" ${deletingAccount ? "disabled" : ""}>${deletingAccount ? "Delete Account" : "Delete Attempt"}</button></div>
         </section>
       </div>
     `;
@@ -1833,11 +1870,33 @@
   function progressBarRow(category, percent) {
     return `
       <div class="performance-row ${category.tone}">
-        <span>${escapeHtml(category.label)}</span>
+        <span>${localIcon(sectionIconName(category.section))}<b>${escapeHtml(category.label)}</b></span>
         <i><b style="width:${percent}%"></b></i>
         <strong>${percent}%</strong>
+        <em>${percent ? "Recorded accuracy" : "No result yet"}</em>
       </div>
     `;
+  }
+
+  function setupFact(iconName, tone, label, value) {
+    return `<div class="instrument-cell ${escapeAttr(tone)}"><span class="instrument-icon">${localIcon(iconName)}</span><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`;
+  }
+
+  function telemetryMetric(iconName, label, value) {
+    return `<metric><span class="telemetry-icon">${localIcon(iconName)}</span><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></metric>`;
+  }
+
+  function sectionIconName(section) {
+    return {
+      "Verbal Ability": "book-open-text",
+      "Numerical Ability": "calculator",
+      "Analytical Ability": "brain-circuit",
+      "General Information": "notebook-tabs"
+    }[section] || "target";
+  }
+
+  function quickPracticeModule(category, stats) {
+    return `<button class="quick-practice-module ${category.tone}" data-practice-category="${escapeAttr(category.section)}" type="button"><span class="section-hud-icon">${localIcon(sectionIconName(category.section))}</span><span><strong>${escapeHtml(category.label)}</strong><small>20-item mixed drill${stats ? ` / ${Math.round(stats.percent)}% average` : ""}</small></span><b>Start ${icon("arrow")}</b></button>`;
   }
 
   function dashboardRecentTable(attempts, fallbackAttempt) {
@@ -1857,13 +1916,13 @@
     `;
   }
 
-  function emptyState(title, body, action, label) {
+  function emptyState(title, body, action, label, secondaryAction = "", secondaryLabel = "") {
     return `
       <div class="empty-state">
         <span class="card-icon document-icon">${icon("review")}</span>
         <strong>${escapeHtml(title)}</strong>
         <p>${escapeHtml(body)}</p>
-        ${action ? `<button class="btn primary" data-action="${escapeAttr(action)}" type="button">${label ? escapeHtml(label) : "Continue"}</button>` : ""}
+        ${action ? `<div class="empty-state-actions"><button class="btn primary" data-action="${escapeAttr(action)}" type="button">${label ? escapeHtml(label) : "Continue"}</button>${secondaryAction ? `<button class="btn secondary" data-action="${escapeAttr(secondaryAction)}" type="button">${escapeHtml(secondaryLabel || "Continue")}</button>` : ""}</div>` : ""}
       </div>
     `;
   }
@@ -2114,6 +2173,10 @@
     return `<div class="insight-card"><span>${escapeHtml(title)}</span><strong>${escapeHtml(value)}</strong><p>${escapeHtml(detail)}</p></div>`;
   }
 
+  function resultInsight(iconName, title, value, detail, tone) {
+    return `<article class="result-insight ${escapeAttr(tone)}"><span>${localIcon(iconName)}</span><div><small>${escapeHtml(title)}</small><strong>${escapeHtml(value)}</strong><p>${escapeHtml(detail)}</p></div></article>`;
+  }
+
   function toast() {
     return app.toast ? `<div class="toast">${escapeHtml(app.toast)}</div>` : "";
   }
@@ -2132,8 +2195,9 @@
       if (formName === "profile") await runBusy("profile", () => saveProfile(form));
       if (formName === "change-password") await runBusy("password", () => changePassword(data));
       if (formName === "custom-practice") await startPractice(data.category, Number(data.count), data.difficulty);
+      if (formName === "forgot-password") await runBusy("reset", () => sendPasswordReset(data));
     } catch (error) {
-      if (action === "send-reset") {
+      if (formName === "forgot-password") {
         app.dialogError = readableError(error);
         render();
         return;
@@ -2333,6 +2397,11 @@
         const values = formDataFromButton(target);
         return await startPractice(values.category, Number(values.count), values.difficulty);
       }
+      if (action === "reset-practice") {
+        const form = target.closest("form");
+        form?.reset();
+        return syncPracticeProfile(form);
+      }
       if (action === "dashboard") return setView({ name: "dashboard" });
       if (action === "open-setup" || action === "setup-page" || action === "retake-setup") return setView({ name: "setup" });
       if (action === "practice-page") {
@@ -2433,9 +2502,51 @@
   function handleChange(event) {
     const input = event.target;
     if (input.closest("[data-form='setup']")) saveSetupDraft(false);
+    const practiceForm = input.closest("[data-form='custom-practice']");
+    if (practiceForm) syncPracticeProfile(practiceForm);
+  }
+
+  function handleInput(event) {
+    const input = event.target.closest("[data-delete-confirm]");
+    if (!input) return;
+    const button = input.closest("[role='alertdialog']")?.querySelector("[data-action='confirm-delete-account']");
+    if (button) button.disabled = input.value.trim() !== "DELETE";
+  }
+
+  function syncPracticeProfile(form) {
+    if (!form) return;
+    const selectedCategory = form.querySelector("input[name='category']:checked")?.value || "Verbal Ability";
+    const selectedCount = form.querySelector("input[name='count']:checked")?.value || "20";
+    const selectedDifficulty = form.querySelector("input[name='difficulty']:checked")?.closest("label")?.textContent.trim() || "Mixed";
+    const category = practiceCategoriesForDisplay().find((entry) => entry.section === selectedCategory) || practiceCategoriesForDisplay()[0];
+    const section = form.querySelector("[data-practice-profile-section]");
+    if (section) {
+      section.className = `selected-run-section ${category.tone}`;
+      section.innerHTML = `${localIcon(sectionIconName(category.section))}<strong>${escapeHtml(category.label)} selected</strong>`;
+    }
+    const count = form.querySelector("[data-practice-count]");
+    const difficulty = form.querySelector("[data-practice-difficulty]");
+    if (count) count.textContent = selectedCount;
+    if (difficulty) difficulty.textContent = selectedDifficulty;
   }
 
   function handleKeydown(event) {
+    if (event.key === "Enter" && !event.shiftKey && event.target instanceof HTMLInputElement) {
+      const form = event.target.closest("form");
+      const action = form?.dataset.form === "signin"
+        ? "signin-submit"
+        : form?.dataset.form === "signup"
+          ? "signup-submit"
+          : form?.dataset.form === "forgot-password"
+            ? "send-reset"
+            : "";
+      const submitter = action ? form.querySelector(`[data-action='${action}']`) : null;
+      if (submitter && !submitter.disabled) {
+        event.preventDefault();
+        submitter.click();
+        return;
+      }
+    }
     const dialog = document.querySelector("[role='dialog'], [role='alertdialog']");
     if (!dialog) return;
     if (event.key === "Escape") {
@@ -2587,6 +2698,8 @@
   }
 
   async function confirmDeleteProfile() {
+    const confirmation = document.querySelector("[data-delete-confirm]")?.value.trim();
+    if (confirmation !== "DELETE") return;
     const { error } = await app.client.from("profiles").delete().eq("user_id", app.session.user.id);
     if (error) throw error;
     await app.client.auth.signOut();
@@ -3402,6 +3515,10 @@
       grid: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
       clock: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 5v5l4 2",
       stats: "M5 19V9M12 19V5M19 19v-7",
+      check: "M5 12l4 4L19 6",
+      delete: "M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6",
+      filter: "M4 5h16l-6 7v6l-4 2v-8L4 5z",
+      info: "M12 8h.01M11 12h1v5h1",
       more: "M5 12h.01M12 12h.01M19 12h.01",
       open: "M14 4h6v6M20 4l-9 9M5 5h6M5 5v14h14v-6",
       refresh: "M20 12a8 8 0 1 1-2.3-5.7M20 4v6h-6",

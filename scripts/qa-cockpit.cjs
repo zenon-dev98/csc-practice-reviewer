@@ -17,7 +17,8 @@ const states = [
 const desktopViewports = [
   { width: 1672, height: 942, label: "logical" },
   { width: 1904, height: 913, label: "1904x913" },
-  { width: 1536, height: 816, label: "1536x816" }
+  { width: 1536, height: 816, label: "1536x816" },
+  { width: 1536, height: 736, label: "edge-1536x736" }
 ];
 const mobileViewports = [
   { width: 390, height: 844, label: "390x844" },

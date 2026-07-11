@@ -22,6 +22,19 @@ Acceptance criteria:
 - Maximized external Microsoft Edge screenshots are saved for final comparison.
 - Cache-busted build is deployed and verified live.
 
+Reopened 2026-07-11: the first T0025 pass repaired only the Study Hub and reused existing page implementations. It did not satisfy page-by-page visual parity with all `states/v3/` references.
+
+Completion notes:
+
+- Rebuilt the complete 36-state fixture surface against the original Study Hub and `states/v3/` cockpit references instead of limiting the repair to Study Hub overrides.
+- Added explicit ring semantics, run telemetry, readable support labels, framed command controls, shared two-line product lockups, and consistent signed-in navigation.
+- Reworked setup, exam and graph players, blocking dialogs, Practice & Review tabs, Progress, pass/fail/practice results, Answer Review, account settings, auth, loading, and failure states with bounded desktop geometry and responsive mobile flow.
+- Repaired defects found only in maximized Edge: graph-player actions missing at the actual browser content height, an undersized flagged queue, and a clipped `Needs Work` result title.
+- Expanded the interaction harness to 20 checks, including Enter-to-sign-in, no retained credentials, delete-account arming, and visible attempt menus.
+- Final desktop evidence contains `144` screenshots across four PC viewports, including the real `1536x736` maximized-Edge content area, with zero console/document failures and zero sampled overflows.
+- Final mobile evidence contains `72` screenshots across `390x844` and `412x915`; final interaction evidence contains `60` screenshots with `20/20` checks passing.
+- Impeccable detection, JavaScript syntax, static-data validation, and the local-only dependency policy all pass. Static assets are cache-busted through `v=20260711-03`.
+
 ## T0000 - Documentation Pack
 
 Status: done
