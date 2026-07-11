@@ -991,7 +991,11 @@ body::before {
 }
 
 #app .study-hub-header .brand span {
-  display: none;
+  display: block;
+  margin-top: 4px;
+  color: #8fa3a5 !important;
+  font: 600 13px/1 "Rajdhani Local", sans-serif !important;
+  letter-spacing: 0;
 }
 
 #app .study-hub-header .logo {
@@ -1318,6 +1322,31 @@ body::before {
   box-shadow: 0 0 0 1px #405259, 0 0 34px rgba(16, 199, 193, 0.08);
 }
 
+#app .hub-ring-legend {
+  position: absolute;
+  z-index: 5;
+  bottom: 3.5%;
+  left: 3.2%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 36.5%;
+  border-top: 1px solid var(--hub-line-soft);
+  padding: 9px 8px 0;
+  color: #aebbbb;
+  font: 600 12px/1 "Rajdhani Local", sans-serif;
+  gap: 7px 12px;
+}
+
+#app .hub-ring-legend span { display: flex; align-items: center; min-width: 0; gap: 7px; }
+#app .hub-ring-legend i { width: 9px; height: 9px; border-radius: 50%; background: currentColor; box-shadow: 0 0 7px currentColor; }
+#app .hub-ring-legend .verbal { color: var(--hub-teal); }
+#app .hub-ring-legend .numerical { color: var(--hub-blue); }
+#app .hub-ring-legend .analytical { color: var(--hub-green); }
+#app .hub-ring-legend .general { color: var(--hub-purple); }
+#app .hub-ring-legend .ring-progress-key { color: #edf4f3; }
+#app .hub-ring:focus-visible + .hub-ring-legend,
+#app .hub-ring:hover ~ .hub-ring-legend { border-color: var(--hub-teal); color: #edf4f3; }
+
 #app .hub-ring::before {
   position: absolute;
   inset: 18px;
@@ -1427,6 +1456,23 @@ body::before {
   color: #c4cecd;
   column-gap: 13px;
 }
+
+#app .hub-run-telemetry {
+  position: absolute;
+  top: 4.8%;
+  right: 4.4%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 46%;
+  border-top: 1px solid var(--hub-line-soft);
+  border-bottom: 1px solid var(--hub-line-soft);
+  padding: 8px 0;
+  color: #829596;
+  font: 600 12px/1 "Rajdhani Local", sans-serif;
+  gap: 8px;
+}
+#app .hub-run-telemetry span { display: grid; gap: 3px; }
+#app .hub-run-telemetry b { color: #dce6e5; font-size: 15px; }
 
 #app .hub-time-row .local-icon {
   grid-row: 1 / 3;
@@ -1557,22 +1603,41 @@ body::before {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   min-height: 0;
-  border: 0;
-  padding: 0 clamp(32px, 4vw, 76px);
-  background: linear-gradient(90deg, #20cac4, #20d4cd);
-  color: #031013;
-  clip-path: polygon(5% 0, 94% 0, 100% 50%, 94% 100%, 0 100%, 5% 50%, 0 0);
+  border: 1px solid #22d7d0;
+  padding: 0 clamp(46px, 4vw, 78px);
+  background: linear-gradient(180deg, rgba(16, 48, 55, 0.98), rgba(4, 19, 24, 0.99));
+  color: #e9f4f3;
+  clip-path: polygon(4% 0, 91% 0, 100% 28%, 100% 72%, 91% 100%, 4% 100%, 0 72%, 0 28%);
   font: 800 clamp(22px, 1.8vw, 31px)/1 "Barlow Condensed Local", sans-serif;
   text-transform: uppercase;
   cursor: pointer;
   transition: filter 150ms ease, transform 150ms ease;
 }
 
+#app .hub-resume-button::before {
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgba(31, 213, 206, 0.58);
+  background: linear-gradient(90deg, rgba(31, 213, 206, 0.08), transparent 45%);
+  clip-path: inherit;
+  content: "";
+}
+
+#app .hub-resume-button > i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 4%;
+  width: 5px;
+  background: #20d4cd;
+  box-shadow: 0 0 14px rgba(32, 212, 205, 0.72);
+}
+
 #app .hub-resume-button::after {
   position: absolute;
   top: 0;
-  right: 4.5%;
-  width: 58px;
+  right: 2.5%;
+  width: 72px;
   height: 100%;
   background: repeating-linear-gradient(130deg, rgba(1, 22, 25, 0.72) 0 6px, transparent 6px 12px);
   content: "";
@@ -1707,7 +1772,7 @@ body::before {
 #app .hub-record p small {
   overflow: hidden;
   color: #9caaaa;
-  font-size: clamp(10px, 0.74vw, 12px);
+  font: 600 clamp(12px, 0.82vw, 14px)/1.05 "Rajdhani Local", sans-serif;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1728,7 +1793,7 @@ body::before {
 }
 
 #app .hub-record.green p small {
-  font-size: 10px;
+  font-size: 12px;
 }
 
 #app .hub-record-foot {
@@ -1778,8 +1843,9 @@ body::before {
   min-width: 0;
   height: 100%;
   border: 0;
-  padding: 7% 5.5%;
-  background: var(--mode-color);
+  border: 1px solid var(--mode-color);
+  padding: 6% 6.5%;
+  background: #071116;
   color: var(--mode-color);
   text-align: left;
   cursor: pointer;
@@ -1792,7 +1858,7 @@ body::before {
 #app .hub-mode::before {
   position: absolute;
   z-index: -1;
-  inset: 1px;
+  inset: 7px;
   background:
     linear-gradient(120deg, color-mix(in srgb, var(--mode-color) 8%, transparent), transparent 45%),
     #071116;
@@ -1801,7 +1867,7 @@ body::before {
 
 #app .hub-mode.full,
 #app .hub-mode.full::before {
-  clip-path: polygon(7% 0, 86% 0, 100% 31%, 100% 100%, 0 100%, 0 17%);
+  clip-path: polygon(6% 0, 92% 0, 100% 25%, 100% 75%, 92% 100%, 6% 100%, 0 78%, 0 22%);
 }
 
 #app .hub-mode.practice {
@@ -1815,7 +1881,7 @@ body::before {
 
 #app .hub-mode.practice,
 #app .hub-mode.practice::before {
-  clip-path: polygon(0 0, 86% 0, 100% 100%, 0 100%, 10% 50%);
+  clip-path: polygon(7% 0, 93% 0, 100% 22%, 100% 78%, 93% 100%, 7% 100%, 0 78%, 0 22%);
 }
 
 #app .hub-mode.mistakes {
@@ -1825,7 +1891,7 @@ body::before {
 
 #app .hub-mode.mistakes,
 #app .hub-mode.mistakes::before {
-  clip-path: polygon(0 0, 90% 0, 100% 100%, 0 100%, 9% 0);
+  clip-path: polygon(8% 0, 94% 0, 100% 22%, 100% 78%, 94% 100%, 8% 100%, 0 75%, 0 25%);
 }
 
 #app .hub-mode:hover {
@@ -1854,11 +1920,10 @@ body::before {
 }
 
 #app .hub-mode small {
-  overflow: hidden;
+  overflow: visible;
   color: #b1bcbc;
-  font-size: clamp(11px, 0.78vw, 14px);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font: 600 clamp(13px, 0.9vw, 16px)/1.1 "Rajdhani Local", sans-serif;
+  white-space: normal;
 }
 
 /* Slanted section-performance rail. */
@@ -1916,7 +1981,7 @@ body::before {
 
 #app .hub-ribbon-label small {
   color: #799091;
-  font-size: clamp(8px, 0.55vw, 10px);
+  font: 600 clamp(11px, 0.7vw, 13px)/1 "Rajdhani Local", sans-serif;
 }
 
 #app .hub-section-score {

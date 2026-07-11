@@ -1,0 +1,1265 @@
+{
+  "baseUrl": "http://127.0.0.1:4173/",
+  "createdAt": "2026-07-11T05:00:08.955Z",
+  "browser": "Microsoft Edge",
+  "screenshots": [
+    {
+      "name": "auth-create-primary-hover",
+      "file": "auth-create-primary-hover.png",
+      "metrics": {
+        "view": "create",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"create\" data-view=\"create\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport public-fr",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "auth-create-password-visible",
+      "file": "auth-create-password-visible.png",
+      "metrics": {
+        "view": "create",
+        "modal": null,
+        "focus": "<button class=\"password-toggle is-visible\" data-action=\"toggle-password\" type=\"button\" aria-label=\"Hide password\"><svg class=\"icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "auth-create-to-signin",
+      "file": "auth-create-to-signin.png",
+      "metrics": {
+        "view": "signin",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"select\" data-view=\"signin\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport public-fr",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "auth-reset-open",
+      "file": "auth-reset-open.png",
+      "metrics": {
+        "view": "signin",
+        "modal": "reset-modal",
+        "focus": "<section class=\"reset-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"reset-title\" tabindex=\"-1\">\n          <button class=\"modal-close\" data-action=\"close-modal\" type=\"butt",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "auth-reset-escape-close",
+      "file": "auth-reset-escape-close.png",
+      "metrics": {
+        "view": "signin",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"select\" data-view=\"signin\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport public-fr",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "auth-reset-success",
+      "file": "auth-reset-success.png",
+      "metrics": {
+        "view": "signin",
+        "modal": "reset-modal",
+        "focus": "<section class=\"reset-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"reset-title\" tabindex=\"-1\">\n          <button class=\"modal-close\" data-action=\"close-modal\" type=\"butt",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "auth-reset-invalid-email",
+      "file": "auth-reset-invalid-email.png",
+      "metrics": {
+        "view": "signin",
+        "modal": "reset-modal",
+        "focus": "<section class=\"reset-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"reset-title\" tabindex=\"-1\">\n          <button class=\"modal-close\" data-action=\"close-modal\" type=\"butt",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "dashboard-focused-practice-hover",
+      "file": "dashboard-focused-practice-hover.png",
+      "metrics": {
+        "view": "dashboard",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"dashboard\" data-view=\"dashboard\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport sig",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "dashboard-account-keyboard-focus",
+      "file": "dashboard-account-keyboard-focus.png",
+      "metrics": {
+        "view": "dashboard",
+        "modal": null,
+        "focus": "<button class=\"account-button\" data-action=\"account-settings\" type=\"button\"><span class=\"avatar  tone-account\">JS</span><span>John Smith</span><svg class=\"icon\" viewBox=\"0 0 24 24\"",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "account-settings-open",
+      "file": "account-settings-open.png",
+      "metrics": {
+        "view": "dashboard",
+        "modal": "profile-modal account-settings-modal command-drawer",
+        "focus": "<section class=\"profile-modal account-settings-modal command-drawer\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"account-settings-title\" tabindex=\"-1\">\n          <button class",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "account-password-expanded-interaction",
+      "file": "account-password-expanded-interaction.png",
+      "metrics": {
+        "view": "dashboard",
+        "modal": "profile-modal account-settings-modal command-drawer",
+        "focus": "<summary><svg class=\"icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M7 11V8a5 5 0 0 1 10 0v3M6 11h12v10H6z\"></path></svg> <span>Change Password</span><svg class=\"icon\" viewB",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "account-password-visible",
+      "file": "account-password-visible.png",
+      "metrics": {
+        "view": "dashboard",
+        "modal": "profile-modal account-settings-modal command-drawer",
+        "focus": "<button class=\"password-toggle is-visible\" data-action=\"toggle-password\" type=\"button\" aria-label=\"Hide password\"><svg class=\"icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "account-settings-closed",
+      "file": "account-settings-closed.png",
+      "metrics": {
+        "view": "dashboard",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"dashboard\" data-view=\"dashboard\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport sig",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "account-delete-confirmation-open",
+      "file": "account-delete-confirmation-open.png",
+      "metrics": {
+        "view": "dashboard",
+        "modal": "confirm-modal",
+        "focus": "<section class=\"confirm-modal\" role=\"alertdialog\" aria-modal=\"true\" aria-labelledby=\"confirm-title\" tabindex=\"-1\">\n          <span class=\"danger-symbol\"><svg class=\"icon\" viewBox=\"",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "account-delete-confirmation-cancelled",
+      "file": "account-delete-confirmation-cancelled.png",
+      "metrics": {
+        "view": "dashboard",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"delete-account\" data-view=\"dashboard\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewpor",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "setup-options-modified",
+      "file": "setup-options-modified.png",
+      "metrics": {
+        "view": "setup",
+        "modal": null,
+        "focus": "<input type=\"checkbox\" name=\"shuffleQuestions\">",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "setup-start-exam",
+      "file": "setup-start-exam.png",
+      "metrics": {
+        "view": "exam",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"exam\" data-view=\"exam\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport exam-frame\"><",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "exam-cleared-next-disabled",
+      "file": "exam-cleared-next-disabled.png",
+      "metrics": {
+        "view": "exam",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"exam-collapsed\" data-view=\"exam\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport exa",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "exam-answer-selected",
+      "file": "exam-answer-selected.png",
+      "metrics": {
+        "view": "exam",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"exam-collapsed\" data-view=\"exam\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport exa",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "exam-answer-flagged",
+      "file": "exam-answer-flagged.png",
+      "metrics": {
+        "view": "exam",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"exam-collapsed\" data-view=\"exam\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport exa",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "exam-next-question",
+      "file": "exam-next-question.png",
+      "metrics": {
+        "view": "exam",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"exam-collapsed\" data-view=\"exam\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport exa",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "exam-explicit-skip",
+      "file": "exam-explicit-skip.png",
+      "metrics": {
+        "view": "exam",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"exam-collapsed\" data-view=\"exam\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport exa",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "exam-group-more",
+      "file": "exam-group-more.png",
+      "metrics": {
+        "view": "exam",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"exam-collapsed\" data-view=\"exam\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport exa",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "exam-group-less",
+      "file": "exam-group-less.png",
+      "metrics": {
+        "view": "exam",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"exam-collapsed\" data-view=\"exam\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport exa",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "exam-pause-open",
+      "file": "exam-pause-open.png",
+      "metrics": {
+        "view": "exam",
+        "modal": "pause-modal",
+        "focus": "<section class=\"pause-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"pause-title\" tabindex=\"-1\">\n          <span class=\"pause-icon\"><svg class=\"icon\" viewBox=\"0 0 24 24\" a",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "exam-resumed",
+      "file": "exam-resumed.png",
+      "metrics": {
+        "view": "exam",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"exam-collapsed\" data-view=\"exam\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport exa",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "exam-submit-open",
+      "file": "exam-submit-open.png",
+      "metrics": {
+        "view": "exam",
+        "modal": "submit-modal",
+        "focus": "<section class=\"submit-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"submit-title\" tabindex=\"-1\">\n          <p class=\"eyebrow\">Final submission</p>\n          <h2 id=\"subm",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "exam-review-unanswered",
+      "file": "exam-review-unanswered.png",
+      "metrics": {
+        "view": "exam",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"submit\" data-view=\"exam\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport exam-frame\"",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "exam-review-flagged",
+      "file": "exam-review-flagged.png",
+      "metrics": {
+        "view": "exam",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"submit\" data-view=\"exam\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport exam-frame\"",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "exam-submitted-results",
+      "file": "exam-submitted-results.png",
+      "metrics": {
+        "view": "results",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"results\" data-view=\"results\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "graph-expanded-modal",
+      "file": "graph-expanded-modal.png",
+      "metrics": {
+        "view": "exam",
+        "modal": "chart-modal",
+        "focus": "<section class=\"chart-modal\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Expanded chart\" tabindex=\"-1\">\n          <button class=\"modal-close\" data-action=\"close-modal\" type=\"button",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "graph-modal-closed",
+      "file": "graph-modal-closed.png",
+      "metrics": {
+        "view": "exam",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"graph\" data-view=\"exam\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport exam-frame\">",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "practice-customized",
+      "file": "practice-customized.png",
+      "metrics": {
+        "view": "practice",
+        "modal": null,
+        "focus": "<input type=\"radio\" name=\"category\" value=\"Numerical Ability\">",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "practice-custom-started",
+      "file": "practice-custom-started.png",
+      "metrics": {
+        "view": "results",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"results\" data-view=\"results\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "practice-mistakes-tab",
+      "file": "practice-mistakes-tab.png",
+      "metrics": {
+        "view": "practice",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"practice\" data-view=\"practice\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signe",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "practice-mistake-answer-review",
+      "file": "practice-mistake-answer-review.png",
+      "metrics": {
+        "view": "review",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"practice\" data-view=\"review\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "practice-flagged-tab",
+      "file": "practice-flagged-tab.png",
+      "metrics": {
+        "view": "practice",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"practice\" data-view=\"practice\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signe",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "practice-flagged-answer-review",
+      "file": "practice-flagged-answer-review.png",
+      "metrics": {
+        "view": "review",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"practice\" data-view=\"review\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "progress-filter-full",
+      "file": "progress-filter-full.png",
+      "metrics": {
+        "view": "recent",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"progress\" data-view=\"recent\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "progress-filter-practice",
+      "file": "progress-filter-practice.png",
+      "metrics": {
+        "view": "recent",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"progress\" data-view=\"recent\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "progress-filter-quick",
+      "file": "progress-filter-quick.png",
+      "metrics": {
+        "view": "recent",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"progress\" data-view=\"recent\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "progress-filter-review",
+      "file": "progress-filter-review.png",
+      "metrics": {
+        "view": "recent",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"progress\" data-view=\"recent\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "progress-filter-all",
+      "file": "progress-filter-all.png",
+      "metrics": {
+        "view": "recent",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"progress\" data-view=\"recent\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "progress-row-overflow-open",
+      "file": "progress-row-overflow-open.png",
+      "metrics": {
+        "view": "recent",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"progress\" data-view=\"recent\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "progress-delete-attempt-open",
+      "file": "progress-delete-attempt-open.png",
+      "metrics": {
+        "view": "recent",
+        "modal": "confirm-modal",
+        "focus": "<section class=\"confirm-modal\" role=\"alertdialog\" aria-modal=\"true\" aria-labelledby=\"confirm-title\" tabindex=\"-1\">\n          <span class=\"danger-symbol\"><svg class=\"icon\" viewBox=\"",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "progress-delete-attempt-cancelled",
+      "file": "progress-delete-attempt-cancelled.png",
+      "metrics": {
+        "view": "recent",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"delete-attempt\" data-view=\"recent\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport s",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "results-review-answers",
+      "file": "results-review-answers.png",
+      "metrics": {
+        "view": "review",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"review\" data-view=\"review\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-fr",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "results-practice-weakest",
+      "file": "results-practice-weakest.png",
+      "metrics": {
+        "view": "practice",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"practice\" data-view=\"practice\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signe",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "results-retake-same-version",
+      "file": "results-retake-same-version.png",
+      "metrics": {
+        "view": "setup",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"setup\" data-view=\"setup\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-fram",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "practice-results-repeat-drill",
+      "file": "practice-results-repeat-drill.png",
+      "metrics": {
+        "view": "exam",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"exam-collapsed\" data-view=\"exam\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport exa",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "practice-results-change-practice",
+      "file": "practice-results-change-practice.png",
+      "metrics": {
+        "view": "practice",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"practice\" data-view=\"practice\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signe",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "review-filter-wrong",
+      "file": "review-filter-wrong.png",
+      "metrics": {
+        "view": "review",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"review\" data-view=\"review\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-fr",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "review-filter-correct",
+      "file": "review-filter-correct.png",
+      "metrics": {
+        "view": "review",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"review\" data-view=\"review\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-fr",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "review-filter-flagged",
+      "file": "review-filter-flagged.png",
+      "metrics": {
+        "view": "review",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"review\" data-view=\"review\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-fr",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "review-filter-all",
+      "file": "review-filter-all.png",
+      "metrics": {
+        "view": "review",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"review\" data-view=\"review\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-fr",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "review-explanation-scrolled",
+      "file": "review-explanation-scrolled.png",
+      "metrics": {
+        "view": "review",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"review\" data-view=\"review\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-fr",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "review-next-question",
+      "file": "review-next-question.png",
+      "metrics": {
+        "view": "review",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"review\" data-view=\"review\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-fr",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "review-previous-question",
+      "file": "review-previous-question.png",
+      "metrics": {
+        "view": "review",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"review\" data-view=\"review\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport signed-fr",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    },
+    {
+      "name": "review-filter-no-matches",
+      "file": "review-filter-no-matches.png",
+      "metrics": {
+        "view": "review",
+        "modal": null,
+        "focus": "<body>\n    <main id=\"app\" class=\"app-shell cockpit-desktop fixture-mode\" data-fixture=\"review-empty\" data-view=\"review\" style=\"--cockpit-scale: 1;\"><div class=\"cockpit-viewport sig",
+        "body": [
+          1672,
+          942
+        ],
+        "frame": [
+          0,
+          0,
+          1672,
+          942
+        ]
+      },
+      "runtimeErrors": []
+    }
+  ],
+  "checks": [
+    {
+      "name": "create password reveal",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "reset modal escape",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "account password reveal",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "delete account escape",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "setup starts exam",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "desktop mobile-close hidden",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "next disabled without answer",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "next enabled with answer",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "pause is static",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "submit escape closes",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "submit reaches results",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "chart escape closes",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "delete attempt escape",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "review empty disables previous",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "review empty disables next",
+      "passed": true,
+      "details": ""
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,140 @@
+{
+  "baseUrl": "http://127.0.0.1:4173/",
+  "createdAt": "2026-07-11T04:54:56.269Z",
+  "browser": "Microsoft Edge",
+  "entries": [
+    {
+      "state": "dashboard",
+      "viewport": {
+        "width": 1904,
+        "height": 913,
+        "label": "1904x913"
+      },
+      "file": "dashboard-1904x913.png",
+      "metrics": {
+        "viewport": [
+          1904,
+          913
+        ],
+        "body": [
+          1904,
+          913
+        ],
+        "document": [
+          1904,
+          913
+        ],
+        "frame": {
+          "x": 141.73675537109375,
+          "y": 0,
+          "width": 1620.5263671875,
+          "height": 913
+        },
+        "scale": "0.9692144373673036",
+        "view": "dashboard",
+        "overflow": []
+      },
+      "errors": []
+    },
+    {
+      "state": "dashboard-empty",
+      "viewport": {
+        "width": 1904,
+        "height": 913,
+        "label": "1904x913"
+      },
+      "file": "dashboard-empty-1904x913.png",
+      "metrics": {
+        "viewport": [
+          1904,
+          913
+        ],
+        "body": [
+          1904,
+          913
+        ],
+        "document": [
+          1904,
+          913
+        ],
+        "frame": {
+          "x": 141.73675537109375,
+          "y": 0,
+          "width": 1620.5263671875,
+          "height": 913
+        },
+        "scale": "0.9692144373673036",
+        "view": "dashboard",
+        "overflow": []
+      },
+      "errors": []
+    },
+    {
+      "state": "dashboard",
+      "viewport": {
+        "width": 1536,
+        "height": 816,
+        "label": "1536x816"
+      },
+      "file": "dashboard-1536x816.png",
+      "metrics": {
+        "viewport": [
+          1536,
+          816
+        ],
+        "body": [
+          1536,
+          816
+        ],
+        "document": [
+          1536,
+          816
+        ],
+        "frame": {
+          "x": 43.8216552734375,
+          "y": 0,
+          "width": 1448.356689453125,
+          "height": 816
+        },
+        "scale": "0.8662420382165605",
+        "view": "dashboard",
+        "overflow": []
+      },
+      "errors": []
+    },
+    {
+      "state": "dashboard-empty",
+      "viewport": {
+        "width": 1536,
+        "height": 816,
+        "label": "1536x816"
+      },
+      "file": "dashboard-empty-1536x816.png",
+      "metrics": {
+        "viewport": [
+          1536,
+          816
+        ],
+        "body": [
+          1536,
+          816
+        ],
+        "document": [
+          1536,
+          816
+        ],
+        "frame": {
+          "x": 43.8216552734375,
+          "y": 0,
+          "width": 1448.356689453125,
+          "height": 816
+        },
+        "scale": "0.8662420382165605",
+        "view": "dashboard",
+        "overflow": []
+      },
+      "errors": []
+    }
+  ],
+  "errors": []
+}

@@ -7,6 +7,21 @@
 - `done`: completed and verified
 - `blocked`: cannot continue without input or external setup
 
+## T0025 - Cockpit Visual Parity And Containment Repair
+
+Status: done
+
+Use the original Study Hub cockpit and `states/v3/` as hard visual references, repair shared header and typography inconsistencies, clarify ambiguous progress visualization, replace malformed command geometry, enforce text/icon safe areas, run all fixture and interaction checks in Microsoft Edge at 100% desktop zoom, and deploy the verified build.
+
+Acceptance criteria:
+
+- Study Hub uses the shared two-line brand lockup and readable secondary labels.
+- Run ring semantics are explained accessibly; command and resume controls match technical-panel geometry without deformation.
+- All 36 fixtures pass desktop containment, document overflow, and console checks.
+- Every interaction harness state is captured and passes.
+- Maximized external Microsoft Edge screenshots are saved for final comparison.
+- Cache-busted build is deployed and verified live.
+
 ## T0000 - Documentation Pack
 
 Status: done

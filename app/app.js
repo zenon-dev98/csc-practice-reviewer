@@ -893,7 +893,7 @@
                 <span class="hub-scan-lines" aria-hidden="true"></span>
               </div>
               <div class="hub-run-body">
-                <div class="hub-ring" style="--hub-completion:${completion * 3.6}deg" aria-label="${activeAnswered} of ${activeTotal} questions answered">
+                <div class="hub-ring" style="--hub-completion:${completion * 3.6}deg" aria-label="${activeAnswered} of ${activeTotal} questions answered. Ring colors identify Verbal, Numerical, Analytical, General, and skipped items." tabindex="0">
                   <span class="hub-ring-progress" aria-hidden="true"></span>
                   <i class="hub-ring-node node-one" aria-hidden="true"></i>
                   <i class="hub-ring-node node-two" aria-hidden="true"></i>
@@ -910,6 +910,11 @@
                     ${localIcon("timer")}
                     <span>${activeAttempt?.total_time_seconds === null ? "Practice mode" : "Time remaining"}</span>
                     <strong>${escapeHtml(runTime)}</strong>
+                    <div class="hub-run-telemetry" aria-label="Run status">
+                      <span><b>${completion}%</b> complete</span>
+                      <span><b>${activeTotal - activeAnswered}</b> remaining</span>
+                      <span><b>${activeAttempt ? "Live" : "Ready"}</b> status</span>
+                    </div>
                   </div>
                   <div class="hub-checkpoints">
                     ${sectionRows.map((entry) => `
@@ -926,9 +931,14 @@
                     <span>${localIcon("cloud-check")} ${activeAttempt ? "Saved online" : "20 versions available"}</span>
                   </div>
                   <button class="hub-resume-button" data-action="${runAction}" type="button">
+                    <i aria-hidden="true"></i>
                     <span>${escapeHtml(runActionLabel)}</span>
                     <span class="hub-chevron-stack" aria-hidden="true">${localIcon("chevron-right")}${localIcon("chevron-right")}${localIcon("chevron-right")}</span>
                   </button>
+                </div>
+                <div class="hub-ring-legend" role="note" aria-label="Progress ring legend">
+                  ${sectionRows.map((entry) => `<span class="${entry.tone}"><i></i>${escapeHtml(entry.label)}</span>`).join("")}
+                  <span class="ring-progress-key"><i></i>Overall progress</span>
                 </div>
               </div>
             </section>

@@ -109,7 +109,15 @@ Current source item boundaries:
 
 ## Current Active Ticket
 
-- None. T0024 is complete pending only external follow-up work.
+- None. T0025 is complete.
+
+## T0025 Outcome
+
+- Added explicit visual-agent release gates for text containment, decorative safe areas, edge clearance, ambiguous data-like decoration, and shared header consistency.
+- Restored the Study Hub two-line product lockup, replaced malformed overlapping command polygons with bounded technical plates, clarified progress-ring semantics with an accessible legend, added useful run telemetry, rebuilt Resume Run as a layered framed control, and increased undersized supporting labels.
+- Final desktop fixture sweep produced 72 screenshots across 36 states at `1904x913` and `1536x816` with zero console/document failures and zero sampled element overflows.
+- Final interaction QA produced 59 screenshots and passed all 15 checks.
+- Static assets are cache-busted through `v=20260711-02`.
 
 ## Next Ticket
 

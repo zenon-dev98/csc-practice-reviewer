@@ -1028,3 +1028,16 @@ Risks:
 
 - Desktop intentionally letterboxes the reference frame on wider or differently proportioned viewports instead of stretching it.
 - Mobile uses normal page scrolling for long workflows and is not a one-to-one scaled version of the desktop cockpit.
+# T0025 - Cockpit Visual Parity And Containment Repair
+
+Summary: Repaired Study Hub parity defects and strengthened project-wide visual containment rules while preserving the shared cockpit navigation and all existing behavior.
+
+Files changed: `AGENTS.md`, `app/app.js`, `app/cockpit-theme.css`, `app/index.html`, project state/ticket documentation, `states/v3/`, and final T0025 QA evidence.
+
+Commands: `node --check app/app.js`, `npm run validate:data`, `npm run check`, `npx --yes impeccable detect app`, full `qa-cockpit.cjs` desktop fixture sweep, and `qa-interactions.cjs`.
+
+Verification: 72 fixture screenshots passed with zero console/document failures and zero sampled overflows; 59 interaction screenshots passed all 15 checks.
+
+Risks: Generated state images remain visual references and can contain fictional sample labels; production copy and CSC section semantics remain authoritative.
+
+Follow-ups: None required for this ticket.
