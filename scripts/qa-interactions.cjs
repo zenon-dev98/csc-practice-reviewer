@@ -17,6 +17,7 @@ function safeName(value) {
   const context = await browser.newContext({ viewport: { width: 1672, height: 942 }, deviceScaleFactor: 1, reducedMotion: "reduce" });
   const page = await context.newPage();
   page.setDefaultTimeout(6000);
+  page.setDefaultNavigationTimeout(30000);
   const report = { baseUrl, createdAt: new Date().toISOString(), browser: "Microsoft Edge", screenshots: [], checks: [], errors: [] };
   const runtimeErrors = [];
   page.on("pageerror", (error) => runtimeErrors.push(`pageerror: ${error.message}`));
