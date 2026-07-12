@@ -6,7 +6,6 @@
   font-display: swap;
 }
 
-/* T0024: shared cockpit system ------------------------------------------------ */
 @font-face {
   font-family: "Rajdhani Local";
   src: url("assets/fonts/rajdhani-400-latin.ttf") format("truetype");
@@ -7941,4 +7940,487 @@ html body #app .count-segments input {
     gap: 8px !important;
   }
   html body #app .account-modal-actions .btn { width: 100% !important; }
+}
+
+/* T0028: simplified cockpit composition.
+   This final layer replaces the retired dashboard telemetry and multi-panel
+   page grids. It intentionally reuses the existing cockpit tokens and panels. */
+#app .header-actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+#app .audio-control-wrap { position: relative; }
+#app .audio-control-button {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  border: 1px solid #38545c;
+  place-items: center;
+  padding: 0;
+  background: #07151a;
+  color: #84999d;
+  clip-path: polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);
+  cursor: pointer;
+}
+#app .audio-control-button.is-enabled,
+#app .audio-control-button:hover,
+#app .audio-control-button:focus-visible {
+  border-color: var(--cockpit-cyan);
+  color: var(--cockpit-cyan);
+  box-shadow: inset 0 0 18px rgba(33,222,215,.1);
+}
+#app .audio-control-button .icon { width: 22px; height: 22px; }
+#app .audio-popover {
+  position: absolute;
+  z-index: 180;
+  top: 56px;
+  right: 0;
+  display: grid;
+  width: 310px;
+  border: 1px solid #3b5961;
+  padding: 15px;
+  background: linear-gradient(135deg,rgba(21,70,77,.24),transparent 44%),#061217;
+  box-shadow: 0 22px 50px rgba(0,0,0,.55), inset 3px 0 0 var(--cockpit-cyan);
+  clip-path: polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);
+  gap: 9px;
+}
+#app .audio-popover-head { display:flex; align-items:center; border-bottom:1px solid #304950; padding:0 2px 11px; color:var(--cockpit-cyan); gap:10px; }
+#app .audio-popover-head .icon { width:25px; height:25px; }
+#app .audio-popover-head span { display:grid; gap:2px; }
+#app .audio-popover-head strong { font:700 18px/1 var(--hud-font); text-transform:uppercase; }
+#app .audio-popover-head small { color:#81969a; font-size:11px; }
+#app .audio-toggle { display:flex; min-height:48px; border:1px solid #304950; align-items:center; justify-content:space-between; padding:7px 10px; background:#09191f; color:#c8d4d3; text-align:left; cursor:pointer; }
+#app .audio-toggle span { display:grid; gap:3px; font:700 14px/1 var(--hud-font); }
+#app .audio-toggle small { color:#71878c; font-size:10px; }
+#app .audio-toggle b { color:#778d91; font:700 13px/1 var(--hud-font); text-transform:uppercase; }
+#app .audio-toggle.active { border-color:var(--cockpit-cyan); background:rgba(17,77,81,.36); }
+#app .audio-toggle.active b { color:var(--cockpit-cyan); }
+#app .audio-popover label { display:grid; grid-template-columns:92px minmax(0,1fr); align-items:center; color:#81969a; font:700 11px/1 var(--hud-font); text-transform:uppercase; gap:9px; }
+#app .audio-popover input[type="range"] { width:100%; accent-color:var(--cockpit-cyan); }
+
+@media (min-width: 1100px) {
+  /* Home: three readable rows and no overlapping absolute panels. */
+  html body #app .simplified-hub .hub-stage {
+    display: grid !important;
+    width: calc(100% - 56px) !important;
+    height: 100% !important;
+    grid-template-rows: 122px minmax(0,1fr) 136px !important;
+    padding: 0 0 24px !important;
+    gap: 12px !important;
+  }
+  html body #app .simplified-hub .hub-hero {
+    position: relative !important;
+    inset: auto !important;
+    display: grid !important;
+    width: auto !important;
+    height: auto !important;
+    align-content: center !important;
+    padding: 5px 18px 0 !important;
+  }
+  html body #app .simplified-hub .hub-hero h1 { font-size: 76px !important; line-height:.82 !important; gap:28px !important; }
+  html body #app .simplified-hub .hub-hero p { margin-top:12px !important; font-size:20px !important; }
+  html body #app .hub-primary-grid {
+    display:grid !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    grid-template-columns:minmax(0,1fr) 390px !important;
+    gap:14px !important;
+  }
+  html body #app .simplified-hub .hub-panel { position:relative !important; inset:auto !important; width:auto !important; height:auto !important; }
+  html body #app .simplified-hub .hub-run-panel,
+  html body #app .simplified-hub .hub-records-panel { min-height:0 !important; }
+  html body #app .simplified-hub .hub-run-panel .hub-panel-title {
+    top:0 !important; left:0 !important; width:36% !important; height:72px !important; padding:0 28px !important;
+  }
+  html body #app .simplified-hub .hub-run-body { grid-template-columns:36% minmax(0,1fr) !important; }
+  html body #app .simplified-hub .hub-ring {
+    width:280px !important; min-width:0 !important; max-width:none !important; margin:54px 0 0 !important;
+    background:conic-gradient(from -90deg,var(--hub-teal) 0 var(--hub-completion),#17282e var(--hub-completion) 360deg) !important;
+  }
+  html body #app .simplified-hub .hub-ring-progress,
+  html body #app .simplified-hub .hub-ring-node,
+  html body #app .simplified-hub .hub-ring-legend,
+  html body #app .simplified-hub .hub-run-telemetry,
+  html body #app .simplified-hub .hub-performance-ribbon { display:none !important; }
+  html body #app .simplified-hub .hub-ring-core strong { font-size:78px !important; }
+  html body #app .simplified-hub .hub-ring-core > span { font-size:32px !important; }
+  html body #app .simplified-hub .hub-ring-core small { font-size:16px !important; }
+  html body #app .simplified-hub .hub-run-details {
+    grid-template-rows:122px minmax(0,1fr) 48px 68px !important;
+    padding:26px 28px 22px 26px !important;
+  }
+  html body #app .simplified-hub .hub-time-row { grid-template-columns:38px minmax(0,1fr) !important; align-content:center !important; }
+  html body #app .simplified-hub .hub-time-row strong { font-size:56px !important; }
+  html body #app .simplified-hub .hub-checkpoints { min-height:0 !important; }
+  html body #app .simplified-hub .hub-checkpoint-icon { width:64px !important; height:64px !important; }
+  html body #app .simplified-hub .hub-checkpoint-icon .local-icon { width:31px !important; height:31px !important; }
+  html body #app .simplified-hub .hub-checkpoint strong { font-size:17px !important; }
+  html body #app .simplified-hub .hub-checkpoint small { font-size:13px !important; }
+  html body #app .simplified-hub .hub-resume-button {
+    min-height:58px !important; padding:0 44px !important;
+    clip-path:polygon(12px 0,calc(100% - 58px) 0,100% 50%,calc(100% - 58px) 100%,12px 100%,0 calc(100% - 12px),0 12px) !important;
+  }
+  html body #app .simplified-hub .hub-resume-button::before { clip-path:polygon(8px 0,calc(100% - 48px) 0,100% 50%,calc(100% - 48px) 100%,8px 100%,0 calc(100% - 8px),0 8px) !important; }
+  html body #app .simplified-hub .hub-records-panel {
+    display:grid !important; grid-template-rows:70px minmax(0,1fr) 54px !important;
+    clip-path:polygon(22px 0,calc(100% - 18px) 0,100% 18px,100% calc(100% - 16px),calc(100% - 16px) 100%,16px 100%,0 calc(100% - 16px),0 22px) !important;
+  }
+  html body #app .simplified-hub .hub-records-panel .hub-panel-title { padding:0 24px !important; }
+  html body #app .simplified-hub .hub-record-list { padding:0 18px 0 36px !important; }
+  html body #app .simplified-hub .hub-record { grid-template-columns:54px minmax(0,1fr) auto !important; gap:12px !important; }
+  html body #app .simplified-hub .hub-record > span { width:48px !important; height:48px !important; }
+  html body #app .simplified-hub .hub-record > span .local-icon { width:27px !important; height:27px !important; }
+  html body #app .simplified-hub .hub-record p strong { font-size:19px !important; }
+  html body #app .simplified-hub .hub-record p small { font-size:13px !important; }
+  html body #app .simplified-hub .hub-record > b { font-size:38px !important; }
+  html body #app .simplified-hub .hub-record-foot { font-size:15px !important; }
+  html body #app .simplified-hub .hub-action-dock {
+    position:relative !important; inset:auto !important; display:grid !important; width:auto !important; height:auto !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:12px !important;
+  }
+  html body #app .simplified-hub .hub-mode,
+  html body #app .simplified-hub .hub-mode.practice,
+  html body #app .simplified-hub .hub-mode.mistakes {
+    height:100% !important; min-height:0 !important; margin:0 !important;
+    grid-template-columns:58px minmax(0,1fr) 34px !important; padding:16px 20px !important; gap:14px !important;
+    clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 14px,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 14px),0 14px) !important;
+  }
+  html body #app .simplified-hub .hub-mode::before { inset:5px !important; clip-path:inherit !important; }
+  html body #app .simplified-hub .hub-mode > .local-icon:first-child { width:48px !important; height:48px !important; }
+  html body #app .simplified-hub .hub-mode strong,
+  html body #app .simplified-hub .hub-mode.practice strong { font-size:25px !important; line-height:1 !important; }
+  html body #app .simplified-hub .hub-mode small { font-size:15px !important; line-height:1.18 !important; white-space:normal !important; }
+
+  /* Mock Exam setup: content-sized facts and a quiet options rail. */
+  html body #app .setup-page {
+    display:grid !important; grid-template-columns:minmax(0,1.72fr) 410px !important; grid-template-rows:86px minmax(0,1fr) !important;
+    padding:25px 34px 24px !important; gap:12px 16px !important;
+  }
+  html body #app .setup-page > .page-title-row { grid-column:1 !important; grid-row:1 !important; height:86px !important; min-height:0 !important; align-items:center !important; }
+  html body #app .setup-page .page-title-row h1 { font-size:54px !important; }
+  html body #app .setup-page .page-title-row p { font-size:17px !important; }
+  html body #app .setup-page > .v3-setup-grid { display:contents !important; }
+  html body #app .setup-page .mission-briefing {
+    grid-column:1 !important; grid-row:2 !important; display:grid !important; height:auto !important;
+    grid-template-rows:48px 116px minmax(0,1fr) 74px !important; padding:18px 20px !important; gap:12px !important;
+  }
+  html body #app .setup-page .instrument-grid { grid-template-columns:repeat(4,minmax(0,1fr)) !important; height:auto !important; }
+  html body #app .setup-page .instrument-cell { min-height:114px !important; }
+  html body #app .setup-page .allocation-console { display:grid !important; min-height:0 !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; grid-template-rows:40px repeat(2,minmax(0,1fr)) !important; gap:8px !important; }
+  html body #app .setup-page .allocation-console > .technical-title { grid-column:1 / -1 !important; }
+  html body #app .setup-page .allocation-card { height:auto !important; min-height:0 !important; margin:0 !important; padding:10px 14px !important; }
+  html body #app .setup-page .allocation-card .section-hud-icon { width:48px !important; height:48px !important; }
+  html body #app .setup-page .allocation-card strong { font-size:18px !important; }
+  html body #app .setup-page .allocation-card b { font-size:28px !important; }
+  html body #app .setup-page .run-configuration {
+    grid-column:2 !important; grid-row:1 / 3 !important; display:grid !important; height:auto !important;
+    grid-template-rows:54px 84px 66px 66px minmax(66px,1fr) 58px 62px !important;
+    align-content:stretch !important; padding:22px !important; gap:10px !important;
+  }
+  html body #app .setup-auto-save,
+  html body #app .setup-tools-note { display:flex !important; align-items:center !important; margin:0 !important; border:1px solid #304950 !important; padding:10px 12px !important; background:#09191f !important; color:#9fb0b2 !important; font-size:13px !important; line-height:1.3 !important; gap:9px !important; }
+  html body #app .setup-auto-save { color:#b5d3d1 !important; }
+
+  /* Practice & Review keeps all three modes visible while the workspace changes. */
+  html body #app .practice-review-page {
+    display:grid !important; grid-template-columns:1fr !important; grid-template-rows:84px 106px minmax(0,1fr) !important;
+    padding:24px 34px !important; gap:12px !important;
+  }
+  html body #app .practice-review-page > .page-title-row { grid-column:1 !important; grid-row:1 !important; height:84px !important; min-height:0 !important; align-items:center !important; }
+  html body #app .practice-review-page > .practice-mode-cards {
+    display:grid !important; width:100% !important; height:auto !important; grid-column:1 !important; grid-row:2 !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:10px !important;
+  }
+  html body #app .practice-mode-card {
+    --mode-tone:var(--cockpit-cyan); display:grid !important; min-width:0 !important; border:1px solid #38545c !important;
+    grid-template-columns:48px minmax(0,1fr) 24px !important; align-items:center !important; padding:12px 16px !important;
+    background:linear-gradient(120deg,color-mix(in srgb,var(--mode-tone) 10%,transparent),transparent 45%),#07151a !important;
+    color:var(--mode-tone) !important; text-align:left !important; clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px) !important; gap:12px !important; cursor:pointer !important;
+  }
+  html body #app .practice-mode-card.mistakes { --mode-tone:var(--cockpit-amber); }
+  html body #app .practice-mode-card.flagged { --mode-tone:var(--cockpit-purple); }
+  html body #app .practice-mode-card.active { border-color:var(--mode-tone) !important; box-shadow:inset 4px 0 0 var(--mode-tone),0 0 18px color-mix(in srgb,var(--mode-tone) 16%,transparent) !important; }
+  html body #app .practice-mode-card > .local-icon:first-child { width:40px !important; height:40px !important; }
+  html body #app .practice-mode-card > .local-icon:last-child { width:20px !important; height:20px !important; }
+  html body #app .practice-mode-card span { display:grid !important; min-width:0 !important; gap:5px !important; }
+  html body #app .practice-mode-card strong { color:var(--mode-tone) !important; font:700 24px/1 var(--display-font) !important; text-transform:uppercase !important; }
+  html body #app .practice-mode-card small { color:#9fb0b2 !important; font-size:14px !important; }
+  html body #app .practice-review-page > .practice-console,
+  html body #app .practice-review-page > .mistakes-hub,
+  html body #app .practice-review-page > .review-queue {
+    display:block !important; width:100% !important; height:100% !important; min-height:0 !important; grid-column:1 !important; grid-row:3 !important;
+  }
+  html body #app form.practice-console.custom-practice {
+    display:grid !important; grid-template-columns:minmax(0,1.55fr) minmax(390px,.65fr) !important; gap:12px !important;
+  }
+  html body #app form.practice-console.custom-practice > .practice-section-picker,
+  html body #app form.practice-console.custom-practice > .run-profile-panel { width:auto !important; height:100% !important; min-height:0 !important; padding:18px !important; }
+  html body #app .practice-section-picker { display:grid !important; grid-template-rows:56px minmax(0,1fr) !important; }
+  html body #app .category-plates { display:grid !important; min-height:0 !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; grid-template-rows:repeat(2,minmax(0,1fr)) !important; gap:9px !important; }
+  html body #app .section-plate { min-height:0 !important; }
+  html body #app .run-profile-panel { display:grid !important; grid-template-rows:58px 90px 90px minmax(60px,1fr) 62px !important; align-content:stretch !important; gap:10px !important; }
+  html body #app .practice-option-note { display:flex !important; align-items:center !important; margin:0 !important; border:1px solid #304950 !important; padding:11px !important; color:#a8b8ba !important; gap:9px !important; }
+  html body #app .mistakes-hub > .mistake-list,
+  html body #app .review-queue .flagged-table-panel,
+  html body #app .mistakes-hub > .mistakes-empty,
+  html body #app .review-queue > .flagged-empty {
+    width:100% !important; height:100% !important; min-height:0 !important; padding:18px !important;
+  }
+  html body #app .mistakes-list-only { display:grid !important; grid-template-rows:56px minmax(0,1fr) 68px !important; gap:10px !important; }
+  html body #app .mistake-attempt-scroll { min-height:0 !important; overflow-y:auto !important; scrollbar-width:thin !important; }
+  html body #app .mistake-attempt-card { grid-template-columns:48px minmax(250px,1fr) 110px 110px minmax(280px,1.2fr) 120px !important; }
+  html body #app .flagged-workspace { height:100% !important; min-height:0 !important; }
+  html body #app .flagged-table-only { display:grid !important; grid-template-rows:56px 40px minmax(0,1fr) !important; }
+  html body #app .flagged-table-head,
+  html body #app .flagged-table-row { grid-template-columns:minmax(300px,1.3fr) minmax(210px,.8fr) 150px 104px !important; }
+
+  /* Progress: three useful headline metrics, analytics, then bounded history. */
+  html body #app .progress-page {
+    display:grid !important; grid-template-columns:430px minmax(0,1fr) !important; grid-template-rows:96px 286px minmax(0,1fr) !important;
+    padding:24px 34px !important; gap:12px 14px !important;
+  }
+  html body #app .progress-page > .page-title-row { grid-column:1 !important; grid-row:1 !important; height:96px !important; min-height:0 !important; align-items:center !important; }
+  html body #app .progress-page > .statistics-rail {
+    grid-column:2 !important; grid-row:1 !important; display:grid !important; width:auto !important; height:auto !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+  html body #app .progress-page > .progress-analytics-grid { grid-column:1 / -1 !important; grid-row:2 !important; height:auto !important; grid-template-columns:minmax(0,1.45fr) minmax(390px,.55fr) !important; }
+  html body #app .progress-page .trend-panel,
+  html body #app .progress-page .performance-card { height:100% !important; min-height:0 !important; }
+  html body #app .progress-page .performance-card { display:grid !important; grid-template-rows:42px minmax(0,1fr) 52px !important; }
+  html body #app .progress-page .performance-bars { align-content:center !important; margin:0 !important; }
+  html body #app .progress-page > .attempts-table-card { grid-column:1 / -1 !important; grid-row:3 !important; height:auto !important; min-height:0 !important; }
+  html body #app .progress-page .statistics-rail metric { grid-template-columns:46px minmax(0,1fr) !important; }
+  html body #app .progress-page .table-head,
+  html body #app .progress-page .table-row { grid-template-columns:minmax(260px,1.4fr) 130px 150px 110px 130px 176px !important; }
+
+  /* Results: six dense highlights with no empty lower half. */
+  html body #app section.v3-results-page {
+    display:grid !important; grid-template-rows:70px 232px 158px minmax(0,1fr) !important;
+    padding:22px 34px 24px !important; gap:10px !important;
+  }
+  html body #app .results-command-title { display:flex !important; height:auto !important; align-items:baseline !important; justify-content:space-between !important; border-bottom:1px solid #35505a !important; padding:0 8px 12px !important; }
+  html body #app .results-command-title > strong { color:#eff5f3 !important; font:italic 800 50px/.9 var(--display-font) !important; text-transform:uppercase !important; }
+  html body #app .results-command-title > small { color:#8ea2a6 !important; font-size:14px !important; }
+  html body #app .results-overview-console { display:grid !important; min-height:0 !important; grid-template-columns:310px minmax(0,1fr) 310px !important; gap:10px !important; }
+  html body #app .score-gauge-panel { display:grid !important; min-height:0 !important; place-items:center !important; padding:14px !important; }
+  html body #app .score-gauge { width:190px !important; height:190px !important; padding:26px !important; box-sizing:border-box !important; }
+  html body #app .score-gauge span { margin-bottom:3px !important; }
+  html body #app .score-gauge strong { font-size:54px !important; line-height:.88 !important; }
+  html body #app .score-gauge b { margin-top:4px !important; }
+  html body #app .timing-console { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:10px !important; }
+  html body #app .timing-console metric { min-height:0 !important; }
+  html body #app .result-status-panel { min-height:0 !important; }
+  html body #app .results-section-console { min-height:0 !important; padding:14px 16px !important; }
+  html body #app .results-section-grid { display:grid !important; grid-template-columns:repeat(4,minmax(0,1fr)) !important; gap:8px !important; }
+  html body #app .results-lower-grid { display:grid !important; min-height:0 !important; grid-template-columns:minmax(0,1fr) 360px !important; gap:10px !important; }
+  html body #app .run-insights-panel { display:grid !important; height:auto !important; min-height:0 !important; grid-template-rows:42px minmax(0,1fr) !important; padding:14px !important; }
+  html body #app .run-insights-panel .insight-grid { display:grid !important; height:auto !important; min-height:0 !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important; grid-template-rows:repeat(2,minmax(0,1fr)) !important; gap:7px !important; background:transparent !important; }
+  html body #app .result-insight { min-height:0 !important; grid-template-columns:42px minmax(0,1fr) !important; padding:10px !important; }
+  html body #app .result-insight small { font-size:11px !important; }
+  html body #app .result-insight strong { font-size:18px !important; }
+  html body #app .results-action-rail { display:grid !important; min-height:0 !important; grid-template-rows:42px repeat(3,minmax(0,1fr)) !important; padding:14px !important; gap:7px !important; }
+  html body #app .result-action { min-height:0 !important; }
+
+  /* Review and account surfaces follow the same density and alignment rules. */
+  html body #app section.v3-review-page { display:grid !important; grid-template-rows:90px minmax(0,1fr) 58px !important; padding:22px 34px !important; gap:10px !important; }
+  html body #app .review-command-head { display:grid !important; grid-template-columns:minmax(0,1fr) 720px !important; align-items:center !important; margin:0 !important; gap:20px !important; }
+  html body #app .review-command-head .review-score-strip { height:76px !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important; }
+  html body #app .review-workstation { grid-template-columns:230px minmax(0,1fr) 340px !important; grid-template-rows:160px minmax(0,1fr) !important; }
+  html body #app .review-filter-panel { grid-column:1 !important; grid-row:1 !important; }
+  html body #app .review-item-panel { grid-column:1 !important; grid-row:2 !important; min-height:0 !important; max-height:none !important; }
+  html body #app .review-question-panel { grid-column:2 !important; grid-row:1 / 3 !important; min-height:0 !important; }
+  html body #app .review-explanation-panel { grid-column:3 !important; grid-row:1 / 3 !important; min-height:0 !important; }
+  html body #app .review-metadata { grid-template-columns:1fr !important; }
+  html body #app .review-footer { margin:0 !important; }
+  html body #app .account-settings-form,
+  html body #app .account-settings-form:has(.account-password-panel:not([open])) {
+    display:grid !important; grid-template-rows:auto auto minmax(0,1fr) auto auto !important; gap:16px !important;
+  }
+  html body #app .account-field-grid { grid-row:1 !important; }
+  html body #app .account-password-panel { grid-row:2 !important; }
+  html body #app .account-modal-actions,
+  html body #app .account-settings-form:has(.account-password-panel:not([open])) .account-modal-actions {
+    grid-row:4 !important; grid-template-columns:1fr 1fr !important; grid-template-rows:58px !important;
+  }
+  html body #app .account-danger-row,
+  html body #app .account-settings-form:has(.account-password-panel:not([open])) .account-danger-row { grid-row:5 !important; }
+
+  html body #app .diagnostic-screen { grid-template-columns:minmax(280px,420px) minmax(560px,760px) !important; justify-content:center !important; }
+  html body #app .diagnostic-screen > :last-child:nth-child(3) { display:none !important; }
+}
+
+@media (max-width:1099px) {
+  html body #app .header-actions { gap:6px !important; }
+  html body #app .audio-control-button { width:40px !important; height:40px !important; }
+  html body #app .audio-popover { position:fixed !important; top:62px !important; right:10px !important; width:min(310px,calc(100vw - 20px)) !important; }
+  html body #app .simplified-hub .hub-ring-legend,
+  html body #app .simplified-hub .hub-run-telemetry,
+  html body #app .simplified-hub .hub-performance-ribbon { display:none !important; }
+  html body #app .simplified-hub .hub-run-details { grid-template-rows:auto 220px auto 60px !important; }
+  html body #app .practice-mode-cards { display:grid !important; margin:12px 0 !important; gap:8px !important; }
+  html body #app .practice-mode-card { --mode-tone:var(--cockpit-cyan); display:grid !important; min-height:78px !important; border:1px solid var(--mode-tone) !important; grid-template-columns:40px minmax(0,1fr) 20px !important; align-items:center !important; padding:10px 12px !important; background:#07151a !important; color:var(--mode-tone) !important; text-align:left !important; gap:10px !important; }
+  html body #app .practice-mode-card.mistakes { --mode-tone:var(--cockpit-amber); }
+  html body #app .practice-mode-card.flagged { --mode-tone:var(--cockpit-purple); }
+  html body #app .practice-mode-card span { display:grid !important; gap:3px !important; }
+  html body #app .practice-mode-card strong { color:var(--mode-tone) !important; font-size:18px !important; }
+  html body #app .practice-mode-card small { color:#92a6aa !important; font-size:12px !important; }
+  html body #app .practice-console,
+  html body #app .category-plates { display:grid !important; gap:9px !important; }
+  html body #app .run-profile-panel { margin-top:10px !important; }
+  html body #app .mistake-attempt-card { display:grid !important; grid-template-columns:38px minmax(0,1fr) 76px !important; gap:8px !important; }
+  html body #app .mistake-attempt-card .mistake-section-strip,
+  html body #app .mistake-attempt-card .technical-row-cta { grid-column:1 / -1 !important; }
+  html body #app .statistics-rail { grid-template-columns:repeat(3,minmax(0,1fr)) !important; }
+  html body #app section.v3-results-page { display:block !important; }
+  html body #app .results-command-title > strong { display:block !important; color:#eef3f2 !important; font:italic 800 38px/.95 var(--display-font) !important; text-transform:uppercase !important; }
+  html body #app .results-command-title > small { display:block !important; margin-top:6px !important; }
+  html body #app .insight-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  html body #app .review-command-head .review-score-strip { grid-template-columns:repeat(3,minmax(0,1fr)) !important; }
+  html body #app .account-modal-actions { grid-template-columns:1fr !important; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #app .hub-ring-progress,
+  #app .score-gauge { animation:cockpit-gauge-in 620ms cubic-bezier(.2,.8,.2,1) both; }
+  #app .hub-checkpoint-icon,
+  #app .practice-mode-card.active > .local-icon:first-child { animation:cockpit-status-breathe 2.8s ease-in-out infinite; }
+  #app .hub-scan-lines { animation:cockpit-scan-drift 3.6s linear infinite; }
+  #app .technical-cta::after,
+  #app .hub-resume-button::after { animation:cockpit-hatch-drift 2.4s linear infinite; }
+}
+
+@keyframes cockpit-gauge-in { from { opacity:.25; transform:scale(.88) rotate(-4deg); } to { opacity:1; transform:scale(1) rotate(0); } }
+@keyframes cockpit-status-breathe { 0%,100% { filter:drop-shadow(0 0 2px currentColor); } 50% { filter:drop-shadow(0 0 9px currentColor); } }
+@keyframes cockpit-scan-drift { to { background-position:44px 0; } }
+@keyframes cockpit-hatch-drift { to { background-position:48px 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  #app *, #app *::before, #app *::after { animation-duration:.001ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; }
+}
+
+/* T0024: shared cockpit system ------------------------------------------------ */
+
+/* T0028 visual loop corrections: override the older :has() workstation grids. */
+@media (min-width:1100px) {
+  html body #app .practice-review-page:has(.practice-console),
+  html body #app .practice-review-page:has(.mistakes-hub),
+  html body #app .practice-review-page:has(.review-queue) {
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    grid-template-rows:84px 106px minmax(0,1fr) !important;
+    padding:24px 34px !important;
+    gap:12px !important;
+  }
+  html body #app .practice-review-page:has(.practice-console) > .page-title-row,
+  html body #app .practice-review-page:has(.mistakes-hub) > .page-title-row,
+  html body #app .practice-review-page:has(.review-queue) > .page-title-row {
+    width:100% !important;
+    height:84px !important;
+    min-height:0 !important;
+    grid-column:1 !important;
+    grid-row:1 !important;
+    align-items:center !important;
+  }
+  html body #app .practice-review-page:has(.practice-console) > .practice-mode-cards,
+  html body #app .practice-review-page:has(.mistakes-hub) > .practice-mode-cards,
+  html body #app .practice-review-page:has(.review-queue) > .practice-mode-cards {
+    width:100% !important;
+    height:106px !important;
+    grid-column:1 !important;
+    grid-row:2 !important;
+  }
+  html body #app .practice-review-page:has(.practice-console) > form.practice-console,
+  html body #app .practice-review-page:has(.mistakes-hub) > .mistakes-hub,
+  html body #app .practice-review-page:has(.review-queue) > .review-queue {
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    grid-column:1 !important;
+    grid-row:3 !important;
+  }
+  html body #app .practice-review-page:has(.practice-console) > form.practice-console {
+    display:grid !important;
+    grid-template-columns:minmax(0,1.55fr) minmax(390px,.65fr) !important;
+    gap:12px !important;
+  }
+  html body #app .practice-review-page:has(.practice-console) .practice-section-picker,
+  html body #app .practice-review-page:has(.practice-console) form.practice-console.custom-practice > .run-profile-panel {
+    width:auto !important;
+    height:100% !important;
+    min-height:0 !important;
+    grid-column:auto !important;
+    grid-row:auto !important;
+  }
+  html body #app .practice-review-page:has(.mistakes-hub) .mistakes-list-only,
+  html body #app .practice-review-page:has(.review-queue) .flagged-table-only,
+  html body #app .practice-review-page:has(.mistakes-hub) .mistakes-empty,
+  html body #app .practice-review-page:has(.review-queue) .flagged-empty {
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    grid-column:1 !important;
+    grid-row:1 !important;
+  }
+  html body #app .practice-review-page:has(.review-queue) .flagged-workspace {
+    width:100% !important;
+    height:100% !important;
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  html body #app .practice-review-page:has(.review-queue) .flagged-table-panel {
+    display:grid !important;
+    width:100% !important;
+    max-width:none !important;
+    grid-template-rows:56px 40px minmax(0,1fr) !important;
+  }
+  html body #app .practice-review-page:has(.review-queue) .flagged-table-scroll { min-width:0 !important; }
+  html body #app .mistake-list-footer {
+    display:flex !important;
+    min-width:0 !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    border-top:1px solid #304950 !important;
+    padding-top:9px !important;
+    gap:12px !important;
+  }
+  html body #app .mistake-list-footer > span { display:grid !important; grid-template-columns:28px auto minmax(80px,1fr) !important; align-items:center !important; color:var(--cockpit-cyan) !important; gap:8px !important; }
+  html body #app .mistake-list-footer .local-icon { width:24px !important; height:24px !important; }
+  html body #app .mistake-list-footer b { color:#82989c !important; font-size:12px !important; text-transform:uppercase !important; }
+  html body #app .mistake-list-footer strong { color:var(--cockpit-cyan) !important; font-size:18px !important; }
+
+  html body #app .results-lower-grid .run-insights-panel .insight-grid {
+    display:grid !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    grid-template-rows:repeat(2,minmax(0,1fr)) !important;
+    align-content:stretch !important;
+    gap:7px !important;
+  }
+  html body #app .results-lower-grid .run-insights-panel .result-insight { height:auto !important; min-height:0 !important; }
+  html body #app .review-workstation { grid-template-rows:232px minmax(0,1fr) !important; }
+  html body #app .review-filter-panel { overflow:hidden !important; }
+  html body #app .review-filter-panel .filter-list { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  html body #app .review-filter-panel .filter-list button { min-height:46px !important; }
+  html body #app .exam-nav .group-counts span {
+    display:flex !important;
+    min-width:0 !important;
+    min-height:24px !important;
+    align-items:center !important;
+    border:1px solid #304a52 !important;
+    border-radius:0 !important;
+    padding:3px 7px !important;
+    background:#07161b !important;
+    color:#91a5a9 !important;
+    font-size:11px !important;
+  }
+  html body #app .exam-nav .group-counts span:nth-child(1) { border-color:#188f89 !important; color:var(--cockpit-cyan) !important; }
+  html body #app .exam-nav .group-counts span:nth-child(3) { border-color:#8d6c29 !important; color:var(--cockpit-amber) !important; }
+  html body #app .exam-nav .group-counts span:nth-child(4) { border-color:#84353a !important; color:#ff7177 !important; }
 }

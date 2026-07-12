@@ -10,7 +10,7 @@ const states = [
   "loading", "config", "fatal", "create", "create-loading", "select", "signin-loading",
   "forgot-password", "forgot-error", "forgot-success", "dashboard", "dashboard-empty", "setup", "exam",
   "exam-collapsed", "graph", "chart-modal", "pause", "submit", "timeout", "practice",
-  "mistakes", "mistakes-empty", "flagged", "flagged-empty", "progress", "progress-empty",
+  "mistakes", "mistakes-empty", "flagged", "flagged-empty", "recent", "progress", "progress-empty",
   "results", "results-fail", "results-practice", "review", "review-empty", "profile-modal", "password-expanded",
   "delete-account", "delete-attempt"
 ];

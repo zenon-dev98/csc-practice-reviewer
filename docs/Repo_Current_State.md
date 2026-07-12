@@ -1,6 +1,6 @@
 # Repo Current State
 
-Last updated: 2026-07-11
+Last updated: 2026-07-12
 
 ## Workspace
 
@@ -109,7 +109,30 @@ Current source item boundaries:
 
 ## Current Active Ticket
 
-- None. T0025 is complete and verified.
+- None. T0028 is complete; the next planned work is the Supabase backup/export or content pedagogy review pass.
+
+## T0028 Outcome
+
+- Simplified the cockpit product across all 37 named fixture states: Study Hub, Mock Exam, Practice & Review, Progress, Results, Answer Review, Account Settings, system, auth, and dialogs.
+- Added explicit user-controlled, disabled-by-default ambient audio/effects with license records in `app/assets/audio/LICENSE.md`.
+- Final automated desktop QA produced `148` screenshots across four desktop targets; mobile QA produced `74` screenshots across two targets; interaction QA produced `61` screenshots and passed `20/20` checks.
+- Maximized external Microsoft Edge at 100% zoom traversed all 37 fixture states and saved evidence under `qa/t0028-external-edge-final`.
+- Static assets are cache-busted through `v=20260712-01`.
+
+## T0027 Outcome
+
+- Consolidated the complete generated-image adaptation workflow into `docs/Generated_Image_To_UI_Playbook.md` for reuse in this and future projects.
+- Added a mandatory Generated Image Parity Agent to `AGENTS.md` covering content approval, reference authority, state completeness, target-browser measurement, typography/icons, safe geometry, screenshot iteration, and live verification.
+- Documented the key failure modes encountered during earlier passes: recolor-only redesigns, raw-width copying, shrink-to-fit layouts, hidden overflow, malformed generated polygons, wrong-font compensation, tiny supporting copy, duplicate metrics, header drift, and automated-only signoff.
+- Left application code, runtime behavior, and deployment unchanged.
+
+## T0026 Outcome
+
+- Audited all 37 named fixture states, including the `recent` alias that renders the Progress route.
+- Grouped every canonical page by visible container and classified content as required, compact, duplicated, movable, removable, or needing a product decision.
+- Identified the largest density causes: repeated Study Hub progress, repeated Practice selections, repeated Mistakes summaries, decorative Setup metrics, and duplicate Results accuracy.
+- Proposed a simpler next architecture while leaving the running app unchanged.
+- Recorded license and browser constraints for optional music and sound effects in `docs/T0026_State_Content_Audit.md`.
 
 ## T0025 Outcome
 

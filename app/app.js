@@ -7,6 +7,7 @@
   const PASSING_PERCENT = 80;
   const SYNC_INTERVAL_MS = 3500;
   const DEFAULT_PRACTICE_COUNT = 20;
+  const AUDIO_PREFS_KEY = "csc-reviewer-audio";
   const generatedVersions = window.CSC_EXAM_VERSIONS || [];
   const generatedQuestions = generatedVersions.flatMap((version) => version.questions || []);
   const sourceQuestions = window.CSC_QUESTIONS || [];
@@ -115,6 +116,9 @@
     reviewFilter: "all",
     recentTab: "all",
     practiceReviewTab: "practice",
+    audioMenuOpen: false,
+    audio: loadAudioPreferences(),
+    audioElements: null,
     questionVersion: "1",
     fixtureMode: false,
     fixtureState: ""
@@ -129,7 +133,12 @@
       flushDirty({ immediate: true });
     });
     document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden") flushDirty({ immediate: true });
+      if (document.visibilityState === "hidden") {
+        flushDirty({ immediate: true });
+        pauseBackgroundMusic();
+      } else {
+        syncBackgroundMusic();
+      }
     });
     document.addEventListener("click", handleClick);
     document.addEventListener("submit", handleSubmit);
@@ -405,7 +414,7 @@
       id,
       user_id: "fixture-user",
       mode: "full",
-      title: "Professional Mock Exam",
+      title: "Mock Exam",
       practice_category: null,
       exam_version_id: "fixture-version-1",
       status: options.status,
@@ -630,9 +639,13 @@
   }
 
   function setView(view) {
+    const previousView = app.view.name;
     if ((view.name === "create" || view.name === "signin") && app.view.name !== view.name) app.toast = "";
     app.view = view;
+    app.audioMenuOpen = false;
     render();
+    syncBackgroundMusic();
+    if (view.name === "results" && previousView !== "results") playSound("result");
   }
 
   function render() {
@@ -670,9 +683,7 @@
           <small class="boot-product-line">Independent mock exam and review tool</small>
           <h1>Syncing reviewer data</h1>
           <div class="segmented-loader" aria-label="Loading"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <b class="boot-progress">68%</b>
-          <span>Initializing secure synchronization</span>
-          <div class="boot-security"><span>${icon("lock")}<b>Encrypted connection</b><small>AES-256</small></span><span>${icon("shield")}<b>Secure channel</b><small>TLS 1.3</small></span></div>
+          <span>Connecting securely</span>
         </div>
       </section>
     `, "system-frame");
@@ -691,7 +702,6 @@
           <details><summary>Technical details</summary><code>No credentials, account data, or secrets are shown in this diagnostic.</code></details>
           <button class="btn primary" data-action="reload-app" type="button">${icon("refresh")} Reload App</button>
         </article>
-        <aside class="diagnostic-rail metrics-rail"><strong>System Metrics</strong><span>Service availability <b>0%</b></span><span>Error rate <b>100%</b></span><span>Connections <b>0</b></span></aside>
       </section>
     `, "system-frame");
   }
@@ -712,7 +722,6 @@
 };</pre></details>
           <button class="btn primary" data-action="reload-app" type="button">${icon("refresh")} Reload App</button>
         </article>
-        <aside class="diagnostic-rail metrics-rail"><strong>Configuration</strong><span>Project URL <b>Required</b></span><span>Browser key <b>Required</b></span><span>Secrets exposed <b>No</b></span></aside>
       </section>
     `, "system-frame");
   }
@@ -848,10 +857,7 @@
     const totalMistakes = wrongAnswerCount(completed);
     const fullMocks = completed.filter((attempt) => attempt.mode === "full");
     const bestFull = fullMocks.reduce((best, attempt) => Math.max(best, resultPercent(attempt)), 0);
-    const fastestPass = fullMocks
-      .filter((attempt) => resultPercent(attempt) >= PASSING_PERCENT)
-      .sort((a, b) => a.elapsed_seconds - b.elapsed_seconds)[0];
-    const categoryStats = categoryPerformance(completed);
+    const latestCompleted = completed.slice().sort((a, b) => new Date(b.submitted_at || b.started_at) - new Date(a.submitted_at || a.started_at))[0];
     const hubSections = [
       { section: "Verbal Ability", label: "Verbal", tone: "verbal", icon: "message-square" },
       { section: "Numerical Ability", label: "Numerical", tone: "numerical", icon: "calculator" },
@@ -867,27 +873,22 @@
       const answered = related.filter((answer) => answer.selected_choice).length;
       return { ...entry, answered, total: related.length, progress: related.length ? Math.round((answered / related.length) * 100) : 0 };
     });
-    const strongest = hubSections
-      .map((entry) => ({ ...entry, percent: categoryStats[entry.section]?.percent ?? -1 }))
-      .sort((a, b) => b.percent - a.percent)[0];
-    const numericalRecord = categoryStats["Numerical Ability"]?.percent;
-    const totalQuestionsCompleted = attempts.reduce((sum, attempt) => sum + answeredCount(attempt), 0);
     const firstName = String(app.profile?.name || "Reviewer").trim().split(/\s+/)[0] || "Reviewer";
     const activeVersion = activeAttempt ? examVersions.find((version) => version.id === activeAttempt.exam_version_id) : null;
     const activeVersionNumber = app.fixtureMode ? 7 : activeVersion?.number;
     const runTitle = activeAttempt?.mode === "practice"
-      ? "Focused Practice"
+      ? "Practice"
       : activeAttempt && activeVersionNumber
-        ? `Professional Mock ${String(activeVersionNumber).padStart(2, "0")}`
-        : activeAttempt ? examTitle(activeAttempt) : "Professional Mock";
+        ? `Mock Exam ${String(activeVersionNumber).padStart(2, "0")}`
+        : activeAttempt ? examTitle(activeAttempt) : "Mock Exam";
     const runAction = activeAttempt ? "resume-exam" : "open-setup";
-    const runActionLabel = activeAttempt ? "Resume Run" : "Start Full Mock";
+    const runActionLabel = activeAttempt ? "Resume" : "Start Mock Exam";
     const runTime = activeAttempt
       ? activeAttempt.total_time_seconds ? formatDuration(timeRemaining(activeAttempt)) : "Untimed"
       : formatDuration(TOTAL_TIME_SECONDS);
     const runCheckpoint = activeAttempt ? `Item ${activeAttempt.current_question_index + 1}` : "Ready to begin";
     root.innerHTML = authedShell(`
-      <section class="study-hub">
+      <section class="study-hub simplified-hub">
         <div class="hub-grid-pattern" aria-hidden="true"></div>
         <div class="hub-stage">
           <header class="hub-hero">
@@ -903,12 +904,8 @@
                 <span class="hub-scan-lines" aria-hidden="true"></span>
               </div>
               <div class="hub-run-body">
-                <div class="hub-ring" style="--hub-completion:${completion * 3.6}deg" aria-label="${activeAnswered} of ${activeTotal} questions answered. Ring colors identify Verbal, Numerical, Analytical, General, and skipped items." tabindex="0">
+                <div class="hub-ring" style="--hub-completion:${completion * 3.6}deg" aria-label="${activeAnswered} of ${activeTotal} questions answered" tabindex="0">
                   <span class="hub-ring-progress" aria-hidden="true"></span>
-                  <i class="hub-ring-node node-one" aria-hidden="true"></i>
-                  <i class="hub-ring-node node-two" aria-hidden="true"></i>
-                  <i class="hub-ring-node node-three" aria-hidden="true"></i>
-                  <i class="hub-ring-node node-four" aria-hidden="true"></i>
                   <div class="hub-ring-core">
                     <strong>${activeAnswered}</strong>
                     <span>/ ${activeTotal}</span>
@@ -920,11 +917,6 @@
                     ${localIcon("timer")}
                     <span>${activeAttempt?.total_time_seconds === null ? "Practice mode" : "Time remaining"}</span>
                     <strong>${escapeHtml(runTime)}</strong>
-                    <div class="hub-run-telemetry" aria-label="Run status">
-                      <span><b>${completion}%</b> complete</span>
-                      <span><b>${activeTotal - activeAnswered}</b> remaining</span>
-                      <span><b>${activeAttempt ? "Live" : "Ready"}</b> status</span>
-                    </div>
                   </div>
                   <div class="hub-checkpoints">
                     ${sectionRows.map((entry) => `
@@ -932,7 +924,7 @@
                         <span class="hub-checkpoint-icon">${localIcon(entry.icon)}</span>
                         ${entry.answered ? `<i class="hub-checkpoint-check">${localIcon("circle-check")}</i>` : ""}
                         <strong>${escapeHtml(entry.label)}</strong>
-                        <small>${entry.total ? `${entry.answered}/${entry.total}` : "--"}</small>
+                        <small>${entry.total ? `${entry.answered} / ${entry.total}` : "No items"}</small>
                       </div>
                     `).join("")}
                   </div>
@@ -945,10 +937,6 @@
                     <span>${escapeHtml(runActionLabel)}</span>
                     <span class="hub-chevron-stack" aria-hidden="true">${localIcon("chevron-right")}${localIcon("chevron-right")}${localIcon("chevron-right")}</span>
                   </button>
-                </div>
-                <div class="hub-ring-legend" role="note" aria-label="Progress ring legend">
-                  ${sectionRows.map((entry) => `<span class="${entry.tone}"><i></i>${escapeHtml(entry.label)}</span>`).join("")}
-                  <span class="ring-progress-key"><i></i>Overall progress</span>
                 </div>
               </div>
             </section>
@@ -963,55 +951,40 @@
                 <span class="hub-record-rail" aria-hidden="true"></span>
                 <div class="hub-record teal">
                   <span>${localIcon("trophy")}</span>
-                  <p><strong>Best full mock</strong><small>${fullMocks.length ? "Personal best" : "Complete a mock to set it"}</small></p>
+                  <p><strong>Best score</strong><small>${fullMocks.length ? "Across mock exams" : "Complete a mock exam"}</small></p>
                   <b>${fullMocks.length ? `${Math.round(bestFull)}%` : "--"}</b>
                 </div>
                 <div class="hub-record blue">
-                  <span>${localIcon("calculator")}</span>
-                  <p><strong>Numerical</strong><small>Across completed attempts</small></p>
-                  <b>${numericalRecord == null ? "--" : `${Math.round(numericalRecord)}%`}</b>
+                  <span>${localIcon("history")}</span>
+                  <p><strong>Latest score</strong><small>${latestCompleted ? escapeHtml(examTitle(latestCompleted)) : "No completed attempt"}</small></p>
+                  <b>${latestCompleted ? `${Math.round(resultPercent(latestCompleted))}%` : "--"}</b>
                 </div>
                 <div class="hub-record green">
-                  <span>${localIcon("timer")}</span>
-                  <p><strong>Fastest pass</strong><small>Full mock at 80%+</small></p>
-                  <b>${fastestPass ? formatDuration(fastestPass.elapsed_seconds) : "--"}</b>
+                  <span>${localIcon("circle-check")}</span>
+                  <p><strong>Completed</strong><small>Mock exams and practice</small></p>
+                  <b>${completed.length}</b>
                 </div>
               </div>
-              <button class="hub-record-foot" data-action="recent-page" type="button">${localIcon("history")} Open complete progress ${localIcon("chevron-right")}</button>
+              <button class="hub-record-foot" data-action="recent-page" type="button">${localIcon("history")} View Progress ${localIcon("chevron-right")}</button>
             </section>
           </div>
 
           <section class="hub-action-dock" aria-label="Choose your next mode">
             <button class="hub-mode full" data-action="open-setup" type="button">
               ${localIcon("target")}
-              <span><strong>Full Mock</strong><small>170 items under exam conditions</small></span>
+              <span><strong>Mock Exam</strong><small>170 questions / 3 hours 10 minutes</small></span>
               <span class="hub-chevron-stack" aria-hidden="true">${localIcon("chevron-right")}${localIcon("chevron-right")}</span>
             </button>
             <button class="hub-mode practice" data-action="practice-page" type="button">
               ${localIcon("brain-circuit")}
-              <span><strong>Focused Practice</strong><small>Drill by section and difficulty</small></span>
+              <span><strong>Practice</strong><small>Choose a section, length, and difficulty</small></span>
               <span class="hub-chevron-stack" aria-hidden="true">${localIcon("chevron-right")}${localIcon("chevron-right")}</span>
             </button>
             <button class="hub-mode mistakes" data-action="mistakes-page" type="button">
               ${localIcon("notebook-tabs")}
-              <span><strong>Review Mistakes</strong><small>${totalMistakes} missed items / ${totalFlagged} flagged</small></span>
+              <span><strong>Review</strong><small>${totalMistakes} mistakes / ${totalFlagged} flagged</small></span>
               <span class="hub-chevron-stack" aria-hidden="true">${localIcon("chevron-right")}${localIcon("chevron-right")}</span>
             </button>
-          </section>
-
-          <section class="hub-performance-ribbon">
-            <div class="hub-ribbon-label"><span>Section performance ${localIcon("chevron-right")}</span><small>${totalQuestionsCompleted} questions completed</small></div>
-            ${hubSections.map((entry) => {
-              const percent = categoryStats[entry.section]?.percent;
-              return `
-                <button class="hub-section-score ${entry.tone}" data-action="practice-page" type="button">
-                  ${localIcon(entry.icon)}
-                  <span>${escapeHtml(entry.label)}</span>
-                  <strong>${percent == null ? "--" : `${Math.round(percent)}%`}</strong>
-                </button>
-              `;
-            }).join("")}
-            <span class="sr-only">Strongest recorded section: ${strongest?.percent >= 0 ? escapeHtml(strongest.label) : "No score yet"}</span>
           </section>
         </div>
       </section>
@@ -1026,9 +999,8 @@
       <section class="setup-page">
         <div class="page-title-row">
           <div>
-            <p class="eyebrow">Full mock / run protocol</p>
-            <h1>Mission Briefing</h1>
-            <p>Configure one complete Professional-level simulation.</p>
+            <h1>Mock Exam Setup</h1>
+            <p>Choose a version and exam options.</p>
           </div>
         </div>
 
@@ -1036,18 +1008,16 @@
           <section class="card setup-main mission-briefing v3-panel">
             <div class="exam-badge-row">
               <span class="soft-pill"><i></i> Timed simulation</span>
-              <strong>Professional Mock / 170-item protocol</strong>
+              <strong>170 questions / 3 hours 10 minutes</strong>
             </div>
             <div class="setup-facts instrument-grid">
-              ${setupFact("target", "cyan", "Total Questions", "170")}
-              ${setupFact("timer", "blue", "Time Limit", "3h 10m")}
-              ${setupFact("notebook-tabs", "green", "Exam Type", "Professional")}
+              ${setupFact("target", "cyan", "Questions", "170")}
+              ${setupFact("timer", "blue", "Time", "3h 10m")}
               ${setupFact("brain-circuit", "purple", "Navigation", "Free movement")}
-              ${setupFact("target", "amber", "Review Tools", "Flag, skip, revisit")}
-              ${setupFact("timer", "blue", "Pause", "Save and exit")}
+              ${setupFact("circle-check", "green", "Progress", "Pause and resume")}
             </div>
             <div class="section-list allocation-console">
-              <div class="technical-title"><h2>Section Allocation</h2><span aria-hidden="true"></span></div>
+              <div class="technical-title"><h2>Exam Sections</h2><span aria-hidden="true"></span></div>
               ${setupGroups.map((group) => `
                 <div class="section-row allocation-card ${group.tone}">
                   <span class="section-hud-icon">${localIcon(sectionIconName(group.section))}</span>
@@ -1056,8 +1026,6 @@
                     <span>Items ${group.range}</span>
                   </div>
                   <b>${group.end - group.start + 1}<small> items</small></b>
-                  <div class="allocation-meter" aria-label="${Math.round(((group.end - group.start + 1) / 170) * 100)} percent of the exam"><i style="--allocation:${((group.end - group.start + 1) / 170) * 100}%"></i></div>
-                  <em>${Math.round(((group.end - group.start + 1) / 170) * 1000) / 10}%</em>
                 </div>
               `).join("")}
             </div>
@@ -1068,24 +1036,17 @@
           </section>
 
           <form class="card setup-options run-configuration v3-panel" data-form="setup">
-            <div class="technical-title"><h2>Run Configuration</h2><span aria-hidden="true"></span></div>
-            <label>Mock Version
+            <div class="technical-title"><h2>Exam Options</h2><span aria-hidden="true"></span></div>
+            <label>Exam Version
               <select name="versionId">
                 ${examVersions.map((version) => `<option value="${escapeAttr(version.id)}" ${version.id === savedVersionId ? "selected" : ""}>Version ${version.number} - ${escapeHtml(version.title)}</option>`).join("")}
               </select>
             </label>
-            ${toggleControl("showTimer", "Show Timer", draftOptions.showTimer)}
-            ${toggleControl("enablePause", "Enable Pause", draftOptions.enablePause)}
             ${toggleControl("shuffleQuestions", "Shuffle Questions", draftOptions.shuffleQuestions)}
             ${toggleControl("shuffleAnswers", "Shuffle Answer Choices", draftOptions.shuffleAnswers)}
-            <div class="readiness-card">
-              <div class="technical-title"><strong>Preflight Check</strong><span aria-hidden="true"></span></div>
-              <span>${localIcon("cloud-check")} Stable internet connection ${localIcon("circle-check")}</span>
-              <span>${localIcon("brain-circuit")} Quiet review space ${localIcon("circle-check")}</span>
-              <span>${localIcon("timer")} At least 3 hours available ${localIcon("circle-check")}</span>
-            </div>
-            <button class="btn primary technical-cta" data-action="setup-submit" type="button"><span>${icon("play")} Start Full Mock</span>${icon("arrow")}</button>
-            <button class="btn secondary technical-cta secondary-cta" data-action="save-setup" type="button"><span>${icon("save")} Save Configuration</span></button>
+            <p class="setup-auto-save">${localIcon("cloud-check")} Changes are saved automatically. Timer and pause/resume are always available.</p>
+            <p class="setup-tools-note">During the exam you can flag, skip, and revisit any question.</p>
+            <button class="btn primary technical-cta" data-action="setup-submit" type="button"><span>${icon("play")} Start Mock Exam</span>${icon("arrow")}</button>
           </form>
         </div>
       </section>
@@ -1102,7 +1063,7 @@
     const isPaused = attempt.status === "paused";
 
     const version = examVersions.find((candidate) => candidate.id === attempt.exam_version_id);
-    const runLabel = attempt.mode === "practice" ? escapeHtml(attempt.title || "Focused Practice") : `Professional Mock ${version ? String(version.number).padStart(2, "0") : ""}`.trim();
+    const runLabel = attempt.mode === "practice" ? escapeHtml(attempt.title || "Practice") : `Mock Exam ${version ? String(version.number).padStart(2, "0") : ""}`.trim();
     root.innerHTML = cockpitFrame(`
       <section class="exam-shell ${app.fixtureMode ? "fixture-exam" : ""} state-${escapeAttr(app.fixtureState || "live")} ${isPaused ? "is-paused" : ""} ${isPaused || app.modal === "submit" ? "exam-dimmed" : ""}">
         <header class="exam-topbar">
@@ -1193,8 +1154,7 @@
     root.innerHTML = authedShell(`
       <section class="results-page v3-results-page ${passed ? "passed" : "needs-work"} ${isPractice ? "practice-result" : ""}">
         <div class="results-command-title">
-          <span>Results</span>
-          <strong>${isPractice ? "Focused Practice Debrief" : "Professional Mock Debrief"}</strong>
+          <strong>${isPractice ? "Practice Results" : "Exam Results"}</strong>
           <small>${escapeHtml(examTitle(attempt))} / ${formatDate(attempt.submitted_at || attempt.started_at)}</small>
         </div>
 
@@ -1227,16 +1187,14 @@
 
         <div class="results-lower-grid">
           <section class="run-insights-panel v3-panel">
-            <div class="technical-title"><h2>Run Insights</h2><span aria-hidden="true"></span></div>
+            <div class="technical-title"><h2>Exam Highlights</h2><span aria-hidden="true"></span></div>
             <div class="insight-grid">
               ${resultInsight("timer", "Fastest Question", insights.fastest ? formatDuration(insights.fastest.time_spent_seconds) : "--", insights.fastest ? `Item ${insights.fastest.display_number}` : "No timing yet", "cyan")}
               ${resultInsight("timer", "Longest Question", insights.slowest ? formatDuration(insights.slowest.time_spent_seconds) : "--", insights.slowest ? `Item ${insights.slowest.display_number}` : "No timing yet", "amber")}
               ${resultInsight("trophy", "Strongest Area", insights.strongest?.section || "--", insights.strongest ? `${Math.round(insights.strongest.percent)}% accuracy` : "No data yet", "green")}
               ${resultInsight("target", "Weakest Area", insights.weakest?.section || "--", insights.weakest ? `${Math.round(insights.weakest.percent)}% accuracy` : "No data yet", "red")}
               ${resultInsight("brain-circuit", "Changed Answers", String(insights.changed), `${insights.wrongToCorrect} improved / ${insights.correctToWrong} lost`, "purple")}
-              ${resultInsight("notebook-tabs", "Flagged Questions", String(flaggedCount(attempt)), `${Math.round((flaggedCount(attempt) / Math.max(1, attempt.total_questions)) * 100)}% of run`, "amber")}
-              ${resultInsight("target", "Skipped Questions", String(skippedCount(attempt)), `${unansweredCount(attempt)} unanswered`, "blue")}
-              ${resultInsight("circle-check", "Overall Accuracy", `${Math.round(pct)}%`, `${score} / ${attempt.total_questions} correct`, "green")}
+              ${resultInsight("notebook-tabs", "Review Status", `${flaggedCount(attempt)} flagged`, `${skippedCount(attempt)} skipped / ${unansweredCount(attempt)} unanswered`, "blue")}
             </div>
           </section>
           <aside class="results-action-rail v3-panel">
@@ -1244,7 +1202,7 @@
             <button class="result-action primary" data-action="review-answers" type="button">${localIcon("notebook-tabs")}<span><strong>Review Answers</strong><small>Inspect every item and explanation</small></span>${icon("arrow")}</button>
             ${isPractice
               ? `<button class="result-action purple" data-action="repeat-practice" type="button">${localIcon("target")}<span><strong>Repeat Drill</strong><small>Run the same practice profile</small></span>${icon("arrow")}</button><button class="result-action green" data-action="change-practice" type="button">${localIcon("brain-circuit")}<span><strong>Change Practice</strong><small>Choose another section or difficulty</small></span>${icon("arrow")}</button>`
-              : `<button class="result-action purple" data-action="practice-weakest" type="button">${localIcon("target")}<span><strong>Practice Weakest Area</strong><small>${escapeHtml(insights.weakest?.section || "Targeted review")}</small></span>${icon("arrow")}</button><button class="result-action green" data-action="retake-same-version" type="button">${localIcon("history")}<span><strong>Retake Same Version</strong><small>Restart this 170-item mock</small></span>${icon("arrow")}</button>`}
+              : `<button class="result-action purple" data-action="practice-weakest" type="button">${localIcon("target")}<span><strong>Practice Weakest Area</strong><small>${escapeHtml(insights.weakest?.section || "Targeted review")}</small></span>${icon("arrow")}</button><button class="result-action green" data-action="retake-same-version" type="button">${localIcon("history")}<span><strong>Retake Mock Exam</strong><small>Restart this 170-question version</small></span>${icon("arrow")}</button>`}
           </aside>
         </div>
       </section>
@@ -1259,19 +1217,16 @@
     const answer = filtered[index] || Object.values(attempt.answers).sort(byPosition)[0];
     const correct = answer?.selected_choice === answer?.correct_choice;
     const score = scoreAttempt(attempt);
-    const pct = resultPercent(attempt);
     const navWindow = reviewNavigatorWindow(filtered, index);
     root.innerHTML = authedShell(`
       <section class="review-page v3-review-page">
         <header class="review-command-head">
-          <div><p class="eyebrow">Attempt inspection</p><h1>Answer Review</h1><small>${escapeHtml(examTitle(attempt))}</small></div>
+          <div><h1>Answer Review</h1><small>${escapeHtml(examTitle(attempt))}</small></div>
           <div class="review-score-strip telemetry-rail">
-            ${telemetryMetric("target", "Score", `${Math.round(pct)}%`)}
             ${telemetryMetric("circle-check", "Correct", score)}
             ${telemetryMetric("notebook-tabs", "Needs Review", attempt.total_questions - score)}
             ${telemetryMetric("target", "Flagged", flaggedCount(attempt))}
           </div>
-          <button class="btn secondary" data-action="back-results" type="button">${icon("back")} Back to Results</button>
         </header>
 
         <div class="review-workstation">
@@ -1281,7 +1236,6 @@
             <div class="filter-list">
               ${["all", "wrong", "correct", "flagged"].map((filter) => `<button class="${app.reviewFilter === filter ? "active" : ""}" data-review-filter="${filter}" type="button">${filterLabel(filter)}<small>${filteredReviewAnswers(attempt, filter).length}</small></button>`).join("")}
             </div>
-            <div class="review-filter-note">${localIcon("target")}<span><strong>Current scope</strong><small>${escapeHtml(filterLabel(app.reviewFilter))} questions</small></span></div>
           </aside>
 
           <aside class="review-item-panel v3-panel">
@@ -1307,7 +1261,7 @@
 
           <aside class="review-explanation-panel v3-panel">
             <div class="technical-title"><h2>Explanation</h2><span aria-hidden="true"></span></div>
-            ${answer && filtered.length ? `<div class="explanation-copy"><p>${escapeHtml(answer.explanation || "No explanation provided.")}</p></div><div class="review-metadata"><span>${localIcon("timer")}<b>Time Spent</b><strong>${formatDuration(answer.time_spent_seconds)}</strong></span><span>${localIcon("target")}<b>Visits</b><strong>${answer.visit_count || 0}</strong></span><span>${localIcon("history")}<b>Answer Changes</b><strong>${answer.answer_changes || 0}</strong></span><span>${icon("flag")}<b>Flagged</b><strong>${answer.flagged ? "Yes" : "No"}</strong></span></div>` : `<p class="explanation-empty">Select another filter to restore the explanation panel.</p>`}
+            ${answer && filtered.length ? `<div class="explanation-copy"><p>${escapeHtml(answer.explanation || "No explanation provided.")}</p></div><div class="review-metadata"><span>${localIcon("timer")}<b>Time Spent</b><strong>${formatDuration(answer.time_spent_seconds)}</strong></span><span>${localIcon("history")}<b>Answer Changes</b><strong>${answer.answer_changes || 0}</strong></span><span>${icon("flag")}<b>Flagged</b><strong>${answer.flagged ? "Yes" : "No"}</strong></span></div>` : `<p class="explanation-empty">Select another filter to restore the explanation panel.</p>`}
           </aside>
         </div>
 
@@ -1326,9 +1280,8 @@
       <section class="content-page practice-review-page">
         <div class="page-title-row">
           <div>
-            <p class="eyebrow">Targeted training console</p>
             <h1>Practice & Review</h1>
-            <p>Build focused drills, revisit missed items, and inspect flagged questions.</p>
+            <p>Choose practice, revisit mistakes, or return to flagged questions.</p>
           </div>
         </div>
         ${practiceReviewTabs(tab)}
@@ -1342,8 +1295,6 @@
     const completed = completedAttempts();
     const average = averagePercent(completed);
     const highest = completed.reduce((best, attempt) => Math.max(best, resultPercent(attempt)), 0);
-    const fullMocks = attempts.filter((attempt) => attempt.mode === "full");
-    const practiceRuns = attempts.filter((attempt) => attempt.mode === "practice");
     const categoryStats = categoryPerformance(completed);
     const weakest = practiceCategoriesForDisplay()
       .map((category) => ({ category, percent: categoryPercent(categoryStats[category.section], category.section) }))
@@ -1352,15 +1303,12 @@
       <section class="content-page progress-page">
         <div class="page-title-row">
           <div>
-            <p class="eyebrow">Private performance telemetry</p>
             <h1>Progress</h1>
             <p>Track scores, section performance, and attempt history.</p>
           </div>
         </div>
         <div class="summary-cards statistics-rail telemetry-rail">
-          ${telemetryMetric("target", "Total Attempts", attempts.length)}
-          ${telemetryMetric("notebook-tabs", "Full Mocks", fullMocks.length)}
-          ${telemetryMetric("brain-circuit", "Practice Runs", practiceRuns.length)}
+          ${telemetryMetric("target", "Completed Attempts", completed.length)}
           ${telemetryMetric("calculator", "Average Score", average == null ? "--" : `${Math.round(average)}%`)}
           ${telemetryMetric("trophy", "Best Score", completed.length ? `${Math.round(highest)}%` : "--")}
         </div>
@@ -1374,7 +1322,7 @@
           <div class="performance-bars">
             ${practiceCategoriesForDisplay().map((category) => progressBarRow(category, categoryPercent(categoryStats[category.section], category.section))).join("")}
           </div>
-          <button class="review-focus-cta" data-action="practice-weakest" type="button">${localIcon("target")} Review Focus <strong>${weakest && completed.length ? escapeHtml(weakest.category.label) : "Awaiting results"}</strong>${icon("arrow")}</button>
+          <button class="review-focus-cta" data-action="practice-weakest" type="button">${localIcon("target")} Practice weakest section <strong>${weakest && completed.length ? escapeHtml(weakest.category.label) : "Awaiting results"}</strong>${icon("arrow")}</button>
         </section>
         </div>
         <section class="card attempts-table-card v3-panel">
@@ -1382,9 +1330,8 @@
           <div class="tabs progress-tabs">
             ${[
               ["all", "All Attempts"],
-              ["full", "Full Mocks"],
-              ["practice", "Practice"],
-              ["review", "Review"]
+              ["full", "Mock Exams"],
+              ["practice", "Practice"]
             ].map(([key, label]) => `<button class="${app.recentTab === key ? "active" : ""}" data-recent-tab="${key}" type="button">${label}</button>`).join("")}
           </div>
           <div class="attempt-table">
@@ -1392,7 +1339,7 @@
             ${filteredAttemptsByTab(attempts, app.recentTab).map((attempt, index) => `
               <div class="table-row">
                 <span class="attempt-name"><i>${String(index + 1).padStart(2, "0")}</i><span><strong>${escapeHtml(examTitle(attempt))}</strong><small>${formatDate(attempt.started_at)}</small></span></span>
-                <span class="attempt-type">${attempt.mode === "practice" ? "Practice" : "Full Mock"}</span>
+                <span class="attempt-type">${attempt.mode === "practice" ? "Practice" : "Mock Exam"}</span>
                 <span class="attempt-status ${escapeAttr(attempt.status)}">${attempt.status === "submitted" || attempt.status === "timed_out" ? localIcon("circle-check") : localIcon("timer")} ${statusLabel(attempt.status)}</span>
                 <span class="attempt-score">${attempt.status === "submitted" || attempt.status === "timed_out" ? `${Math.round(resultPercent(attempt))}%` : "--"}</span>
                 <span class="attempt-answered">${answeredCount(attempt)} / ${attempt.total_questions}</span>
@@ -1402,7 +1349,7 @@
                   ${app.modal === `overflow:${attempt.id}` ? overflowMenu(attempt) : ""}
                 </span>
               </div>
-            `).join("") || `<div class="progress-empty-state">${emptyInline("No attempts yet", "Start a full mock or focused practice run to create your first record.")}<button class="btn primary" data-action="open-setup" type="button">${icon("play")} Start Full Mock</button></div>`}
+            `).join("") || `<div class="progress-empty-state">${emptyInline("No attempts yet", "Start a mock exam or practice session to create your first record.")}<button class="btn primary" data-action="open-setup" type="button">${icon("play")} Start Mock Exam</button></div>`}
           </div>
         </section>
       </section>
@@ -1420,50 +1367,35 @@
   }
 
   function practiceReviewTabs(active) {
+    const mistakes = wrongAnswerCount(completedAttempts());
+    const flagged = app.attempts.reduce((sum, attempt) => sum + flaggedCount(attempt), 0);
     return `
-      <div class="tabs practice-review-tabs">
+      <div class="practice-mode-cards" aria-label="Practice and review modes">
         ${[
-          ["practice", "Practice"],
-          ["mistakes", "Mistakes"],
-          ["flagged", "Flagged"]
-        ].map(([key, label]) => `<button class="${active === key ? "active" : ""}" data-practice-review-tab="${key}" type="button">${escapeHtml(label)}</button>`).join("")}
+          ["practice", "Practice", "brain-circuit", "Build a custom drill"],
+          ["mistakes", "Mistakes", "target", `${mistakes} ready to review`],
+          ["flagged", "Flagged", "notebook-tabs", `${flagged} saved questions`]
+        ].map(([key, label, iconName, detail]) => `<button class="practice-mode-card ${key} ${active === key ? "active" : ""}" data-practice-review-tab="${key}" type="button">${localIcon(iconName)}<span><strong>${escapeHtml(label)}</strong><small>${escapeHtml(detail)}</small></span>${localIcon("chevron-right")}</button>`).join("")}
       </div>
     `;
   }
 
   function practiceTabContent() {
-    const categoryStats = categoryPerformance(completedAttempts());
     const categories = practiceCategoriesForDisplay();
-    const selected = categories[0];
     return `
       <form class="custom-practice practice-console" data-form="custom-practice">
         <section class="card practice-section-picker v3-panel">
-          <div class="technical-title"><h2>Choose a Section</h2><span aria-hidden="true"></span></div>
+          <div class="technical-title"><div><h2>Choose a Section</h2><p>Select the skill area you want to practice.</p></div><span aria-hidden="true"></span></div>
           <fieldset class="category-plates"><legend class="sr-only">Section</legend>${categories.map((category, index) => `<label class="section-plate ${category.tone}"><input type="radio" name="category" value="${escapeAttr(category.section)}" ${index === 0 ? "checked" : ""}/><span class="section-hud-icon">${localIcon(sectionIconName(category.section))}</span><span class="section-copy"><strong>${escapeHtml(category.label)}</strong><small>${escapeHtml(category.description)}</small><em>${category.poolSize} questions</em></span></label>`).join("")}</fieldset>
         </section>
         <section class="card run-profile-panel v3-panel">
-          <div class="technical-title"><h2>Run Profile</h2><span aria-hidden="true"></span></div>
-          <div class="selected-run-section ${selected.tone}" data-practice-profile-section>${localIcon(sectionIconName(selected.section))}<strong>${escapeHtml(selected.label)} selected</strong></div>
+          <div class="technical-title"><div><h2>Practice Options</h2><p>Choose the length and difficulty.</p></div><span aria-hidden="true"></span></div>
           <fieldset class="count-segments"><legend>Question Count</legend>${[10, 20, 30, 40, 60].map((count) => `<label><input type="radio" name="count" value="${count}" ${count === 20 ? "checked" : ""}/><span>${count}</span></label>`).join("")}</fieldset>
           <fieldset class="difficulty-segments"><legend>Difficulty</legend>${[["mixed", "Mixed"], ["medium", "Standard"], ["hard", "Challenge"]].map(([value, label], index) => `<label><input type="radio" name="difficulty" value="${value}" ${index === 0 ? "checked" : ""}/><span>${label}</span></label>`).join("")}</fieldset>
-          <div class="run-profile-facts">
-            <span>${localIcon("notebook-tabs")}<strong data-practice-count>20</strong><small>Questions</small></span>
-            <span>${localIcon("brain-circuit")}<strong data-practice-difficulty>Mixed</strong><small>Difficulty</small></span>
-            <span>${localIcon("timer")}<strong>Untimed</strong><small>Practice</small></span>
-          </div>
-          <button class="btn primary technical-cta" data-action="custom-practice-submit" type="button"><span>${icon("play")} Start Custom Practice</span>${icon("arrow")}</button>
-          <button class="btn secondary technical-cta secondary-cta" data-action="reset-practice" type="button"><span>${icon("refresh")} Reset Options</span></button>
+          <p class="practice-option-note">${localIcon("timer")} Practice is untimed and can be paused at any point.</p>
+          <button class="btn primary technical-cta" data-action="custom-practice-submit" type="button"><span>${icon("play")} Start Practice</span>${icon("arrow")}</button>
         </section>
       </form>
-      <section class="card category-picker quick-run-grid v3-panel">
-        <div class="technical-title quick-title">
-          <h2>Quick Practice</h2>
-          <p>Launch a 20-item mixed drill from one section.</p>
-        </div>
-        <div class="category-card-grid">
-          ${categories.map((category) => quickPracticeModule(category, categoryStats[category.section])).join("")}
-        </div>
-      </section>
     `;
   }
 
@@ -1481,50 +1413,27 @@
     return `
       <section class="mistakes-hub">
         ${withMistakes.length ? `
-          <div class="mistake-summary telemetry-rail">
-            ${telemetryMetric("target", "Total Missed", totalMissed)}
-            ${telemetryMetric("notebook-tabs", "Attempts Ready", withMistakes.length)}
-            ${telemetryMetric("brain-circuit", "Sections Affected", affected.length)}
-            ${telemetryMetric(sectionIconName(priority?.category.section || "Numerical Ability"), "Highest Priority", priority ? priority.category.label : "--")}
-          </div>
-          <div class="mistakes-workspace">
-            <section class="card mistake-list v3-panel">
-              <div class="technical-title"><h2>Choose an Attempt</h2><span aria-hidden="true"></span></div>
+            <section class="card mistake-list mistakes-list-only v3-panel">
+              <div class="technical-title"><div><h2>Mistakes by Attempt</h2><p>${totalMissed} questions ready across ${withMistakes.length} completed attempt${withMistakes.length === 1 ? "" : "s"}.</p></div><span aria-hidden="true"></span></div>
               <div class="mistake-attempt-scroll">
                 ${withMistakes.map(({ attempt, mistakes }, index) => {
                   const perSection = categories.map((category) => ({ category, count: mistakes.filter((answer) => answer.section === category.section).length })).filter((entry) => entry.count);
                   return `<article class="mistake-attempt-card">
                     <div class="attempt-index">${String(index + 1).padStart(2, "0")}</div>
-                    <div class="mistake-attempt-title"><strong>${escapeHtml(examTitle(attempt))}</strong><small>${attempt.mode === "practice" ? "Type: Practice" : "Type: Full Mock"} / ${formatDate(attempt.submitted_at || attempt.started_at)}</small></div>
+                    <div class="mistake-attempt-title"><strong>${escapeHtml(examTitle(attempt))}</strong><small>${attempt.mode === "practice" ? "Practice" : "Mock Exam"} / ${formatDate(attempt.submitted_at || attempt.started_at)}</small></div>
                     <metric><span>Score</span><strong>${Math.round(resultPercent(attempt))}%</strong></metric>
-                    <metric class="missed"><span>Missed</span><strong>${mistakes.length}</strong></metric>
-                    <metric><span>Answered</span><strong>${answeredCount(attempt)} / ${attempt.total_questions}</strong></metric>
+                    <metric class="missed"><span>Mistakes</span><strong>${mistakes.length}</strong></metric>
                     <div class="mistake-section-strip">${perSection.map((entry) => `<span class="${entry.category.tone}">${localIcon(sectionIconName(entry.category.section))}<b>${entry.category.label}</b><strong>${entry.count}</strong></span>`).join("")}</div>
-                    <button class="btn technical-row-cta" data-review-mistakes="${attempt.id}" type="button">Review Mistakes ${icon("arrow")}</button>
+                    <button class="btn technical-row-cta" data-review-mistakes="${attempt.id}" type="button">Review ${icon("arrow")}</button>
                   </article>`;
                 }).join("")}
               </div>
-            </section>
-            <section class="card review-focus-panel v3-panel">
-              <div class="technical-title"><h2>Review Focus</h2><span aria-hidden="true"></span></div>
-              <div class="focus-total"><span>!</span><strong>${totalMissed}</strong><b>questions ready</b></div>
-              <p>Review missed questions by section or open the largest attempt queue.</p>
-              <div class="focus-section-list">
-                ${sectionCounts.map(({ category, count }) => `<div class="focus-section ${category.tone}">${localIcon(sectionIconName(category.section))}<strong>${category.label}</strong><b>${count}</b><i><span style="width:${totalMissed ? Math.max(4, (count / totalMissed) * 100) : 0}%"></span></i>${priority?.category.section === category.section ? "<em>Top priority</em>" : ""}</div>`).join("")}
+              <div class="mistake-list-footer">
+                <span>${localIcon(sectionIconName(priority?.category.section || "Verbal Ability"))}<b>Most mistakes</b><strong>${priority ? escapeHtml(priority.category.label) : "--"}</strong></span>
+                ${priority ? `<button class="btn secondary" data-practice-category="${escapeAttr(priority.category.section)}" type="button">Practice this section ${icon("arrow")}</button>` : ""}
               </div>
-              <button class="btn primary technical-cta" data-review-mistakes="${withMistakes[0].attempt.id}" type="button"><span>Review Largest Mistake Set</span>${icon("arrow")}</button>
-              ${priority ? `<button class="btn secondary technical-cta secondary-cta" data-practice-category="${escapeAttr(priority.category.section)}" type="button"><span>Start ${escapeHtml(priority.category.label)} Practice</span></button>` : ""}
             </section>
-          </div>
-          <div class="mistake-note">${icon("info")} Correctly answered items stay out of this queue. New mistakes are added after each completed run.</div>
-        ` : `<div class="mistake-summary telemetry-rail empty-mistake-summary">
-              ${telemetryMetric("target", "Total Missed", "0")}
-              ${telemetryMetric("notebook-tabs", "Attempts Ready", "0")}
-              ${telemetryMetric("brain-circuit", "Sections Affected", "0")}
-              ${telemetryMetric("calculator", "Highest Priority", "--")}
-            </div>
-            <section class="card mistakes-empty v3-panel">${emptyState("No mistakes yet", completed.length ? "Your submitted attempts do not have missed items." : "Complete a mock exam or practice drill first, then missed items will appear here.", "open-setup", "Start Full Mock", "practice-page", "Start Practice")}</section>
-            <div class="mistake-note">${icon("info")} Missed questions appear here after a submitted mock exam or practice run.</div>`}
+        ` : `<section class="card mistakes-empty v3-panel">${emptyState("No mistakes yet", completed.length ? "Your completed attempts do not contain any mistakes." : "Complete a mock exam or practice session and missed questions will appear here.", "open-setup", "Start Mock Exam", "practice-page", "Start Practice")}</section>`}
       </section>
     `;
   }
@@ -1532,31 +1441,19 @@
   function flaggedTabContent() {
     const flagged = app.attempts.flatMap((attempt) => Object.values(attempt.answers).filter((answer) => answer.flagged).map((answer) => ({ attempt, answer })));
     const grouped = practiceCategoriesForDisplay().map((category) => ({ category, rows: flagged.filter((item) => item.answer.section === category.section) })).filter((group) => group.rows.length);
-    const totalTime = flagged.reduce((sum, item) => sum + (item.answer.time_spent_seconds || 0), 0);
-    const dated = flagged.map((item) => item.answer.last_seen_at || item.attempt.started_at).filter(Boolean).sort();
     return `
       <section class="review-queue">
-        ${flagged.length ? `<div class="flagged-workspace">
-          <aside class="card flagged-summary v3-panel">
-            <div class="technical-title"><h2>Summary</h2><span aria-hidden="true"></span></div>
-            <div class="flagged-total">${icon("flag")}<span><b>Flagged Items</b><strong>${flagged.length}</strong></span></div>
-            ${practiceCategoriesForDisplay().map((category) => {
-              const count = flagged.filter((item) => item.answer.section === category.section).length;
-              return `<div class="flagged-summary-row ${category.tone}">${localIcon(sectionIconName(category.section))}<span><b>${category.label}</b><strong>${count}</strong></span></div>`;
-            }).join("")}
-            <div class="flagged-date-row">${localIcon("history")}<span><b>Oldest Flagged</b><strong>${formatDate(dated[0])}</strong></span></div>
-            <div class="flagged-date-row">${localIcon("timer")}<span><b>Average Time / Item</b><strong>${formatDuration(totalTime / Math.max(1, flagged.length))}</strong></span></div>
-          </aside>
-          <section class="card flagged-table-panel v3-panel">
-            <div class="flagged-table-toolbar"><h2>Flagged Review Queue</h2><div><button class="btn tiny" type="button">${icon("filter")} Filters</button><span>Sorted by section</span></div></div>
-            <div class="flagged-table-head"><span>Item / Topic</span><span>Source Attempt</span><span>Answer State</span><span>Time Spent</span><span>Review</span></div>
+        ${flagged.length ? `<div class="flagged-workspace simplified-flagged-workspace">
+          <section class="card flagged-table-panel flagged-table-only v3-panel">
+            <div class="technical-title"><div><h2>Flagged Questions</h2><p>${flagged.length} saved question${flagged.length === 1 ? "" : "s"}, grouped by section.</p></div><span aria-hidden="true"></span></div>
+            <div class="flagged-table-head"><span>Item / Topic</span><span>Source Attempt</span><span>Answer State</span><span>Review</span></div>
             <div class="flagged-table-scroll">
               ${grouped.map(({ category, rows }) => `<section class="flagged-section ${category.tone}"><header>${localIcon(sectionIconName(category.section))}<h2>${escapeHtml(category.label)}</h2><em>${rows.length} items</em></header>${rows.map(({ attempt, answer }) => `
-                <div class="flagged-table-row"><span><i>${icon("flag")}</i><strong>Item ${answer.display_number}</strong><small>${escapeHtml(answer.subtopic || answer.topic || "Review item")}</small></span><span>${escapeHtml(examTitle(attempt))}<small>${formatDate(attempt.started_at)}</small></span><span class="${answer.selected_choice === answer.correct_choice ? "correct" : answer.selected_choice ? "wrong" : "unanswered"}">${answer.selected_choice ? answer.selected_choice === answer.correct_choice ? "Correct" : "Incorrect" : "Unanswered"}</span><span>${formatDuration(answer.time_spent_seconds)}</span><button class="btn tiny" data-open-review="${attempt.id}" data-review-question="${answer.question_id}" type="button">Review</button></div>
+                <div class="flagged-table-row"><span><i>${icon("flag")}</i><strong>Item ${answer.display_number}</strong><small>${escapeHtml(answer.subtopic || answer.topic || "Review item")}</small></span><span>${escapeHtml(examTitle(attempt))}<small>${formatDate(attempt.started_at)}</small></span><span class="${answer.selected_choice === answer.correct_choice ? "correct" : answer.selected_choice ? "wrong" : "unanswered"}">${answer.selected_choice ? answer.selected_choice === answer.correct_choice ? "Correct" : "Incorrect" : "Unanswered"}</span><button class="btn tiny" data-open-review="${attempt.id}" data-review-question="${answer.question_id}" type="button">Review</button></div>
               `).join("")}</section>`).join("")}
             </div>
           </section>
-        </div>` : `<section class="card flagged-empty v3-panel">${emptyState("No flagged questions yet", "Flag an item during an exam or answer review to place it in this queue.", "open-setup", "Start Full Mock", "practice-page", "Start Practice")}</section>`}
+        </div>` : `<section class="card flagged-empty v3-panel">${emptyState("No flagged questions yet", "Flag a question during an exam or answer review and it will appear here.", "open-setup", "Start Mock Exam", "practice-page", "Start Practice")}</section>`}
       </section>
     `;
   }
@@ -1600,8 +1497,8 @@
       ? `<img class="logo hub-logo" src="assets/brand-shield.svg" alt="CSC Practice Reviewer logo" />`
       : logo();
     const routes = [
-      ["dashboard", "Study Hub", "dashboard"],
-      ["setup", "Full Mock", "setup-page"],
+      ["dashboard", "Home", "dashboard"],
+      ["setup", "Mock Exam", "setup-page"],
       ["practice", "Practice & Review", "practice-page"],
       ["recent", "Progress", "recent-page"]
     ];
@@ -1612,6 +1509,10 @@
           ${routes.map(([route, label, action]) => `<button class="${activeRoute === route ? "active" : ""}" data-action="${action}" type="button">${escapeHtml(label)}</button>`).join("")}
         </nav>
         <div class="header-actions">
+          <div class="audio-control-wrap">
+            <button class="audio-control-button ${app.audio.music || app.audio.sfx ? "is-enabled" : ""}" data-action="toggle-audio-menu" type="button" aria-label="Audio settings" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${icon(app.audio.music || app.audio.sfx ? "volume" : "volume-off")}</button>
+            ${audioPopover()}
+          </div>
           <button class="account-button" data-action="account-settings" type="button">${avatar(profile)}<span>${escapeHtml(profile?.name || "Account")}</span>${icon("chev")}</button>
         </div>
       </header>
@@ -1641,8 +1542,8 @@
 
   function mobileBottomNav(active) {
     const items = [
-      ["dashboard", "Study Hub", "dashboard", "home"],
-      ["setup", "Full Mock", "setup-page", "play"],
+      ["dashboard", "Home", "dashboard", "home"],
+      ["setup", "Mock Exam", "setup-page", "play"],
       ["practice", "Practice", "practice-page", "brain"],
       ["recent", "Progress", "recent-page", "stats"]
     ];
@@ -1680,14 +1581,10 @@
         <section class="profile-modal account-settings-modal command-drawer" role="dialog" aria-modal="true" aria-labelledby="account-settings-title" tabindex="-1">
           <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
           <div class="modal-heading">
-            <p class="eyebrow">Account command</p>
             <h2 id="account-settings-title">Account Settings</h2>
-            <p>Identity, security, and session controls.</p>
+            <p>Update your name, password, or session.</p>
           </div>
           <form class="account-settings-form" data-form="profile">
-            <div class="account-avatar-panel">
-              ${avatar(profile, "large")}
-            </div>
             <div class="account-field-grid">
               <label>Full Name<input name="name" value="${escapeAttr(profile.name)}" required /></label>
               <label>Email Address <small>(used for sign-in)</small><input name="email" value="${escapeAttr(profile.email)}" disabled /></label>
@@ -1723,7 +1620,7 @@
           <p class="eyebrow">Checkpoint secured</p>
           <h2 id="pause-title">Exam Paused</h2>
           <div class="pause-facts"><span>${localIcon("timer")}<b>Time Remaining (Frozen)</b><strong>${formatDuration(timeRemaining(attempt))}</strong></span><span>${icon("flag")}<b>Current Checkpoint</b><strong>Item ${attempt.current_question_index + 1}</strong></span><span>${localIcon("cloud-check")}<b>Sync Status</b><strong>Saved Online</strong></span></div>
-          <p>Your progress has been saved.<br />Resume now or save and return to the Study Hub.</p>
+          <p>Your progress has been saved.<br />Resume now or save and return Home.</p>
           <div class="pause-actions"><button class="btn primary" data-action="resume-paused" type="button">${icon("play")} Resume Exam</button><button class="btn secondary" data-action="save-exit" type="button">${icon("save")} Save and Exit</button></div>
         </section>
       </div>
@@ -1906,7 +1803,7 @@
       <div class="dashboard-attempt-list">
         ${rows.map((attempt) => `
           <button class="dashboard-attempt-row" data-attempt-open="${attempt.id}" type="button">
-            <span><strong>${escapeHtml(examTitle(attempt))}</strong><small>${attempt.mode === "practice" ? "Practice" : "Full Mock"} / ${formatDate(attempt.submitted_at || attempt.started_at)}</small></span>
+            <span><strong>${escapeHtml(examTitle(attempt))}</strong><small>${attempt.mode === "practice" ? "Practice" : "Mock Exam"} / ${formatDate(attempt.submitted_at || attempt.started_at)}</small></span>
             <em>${attempt.status === "submitted" || attempt.status === "timed_out" ? `${Math.round(resultPercent(attempt))}%` : statusLabel(attempt.status)}</em>
             <b>${answeredCount(attempt)}/${attempt.total_questions}</b>
             ${icon("arrow")}
@@ -2177,6 +2074,72 @@
     return `<article class="result-insight ${escapeAttr(tone)}"><span>${localIcon(iconName)}</span><div><small>${escapeHtml(title)}</small><strong>${escapeHtml(value)}</strong><p>${escapeHtml(detail)}</p></div></article>`;
   }
 
+  function loadAudioPreferences() {
+    const defaults = { music: false, sfx: false, musicVolume: 0.16, sfxVolume: 0.34 };
+    try {
+      const saved = JSON.parse(localStorage.getItem(AUDIO_PREFS_KEY) || "null");
+      return saved ? { ...defaults, ...saved, music: Boolean(saved.music), sfx: Boolean(saved.sfx) } : defaults;
+    } catch {
+      return defaults;
+    }
+  }
+
+  function saveAudioPreferences() {
+    localStorage.setItem(AUDIO_PREFS_KEY, JSON.stringify(app.audio));
+  }
+
+  function ensureAudioElements() {
+    if (app.audioElements) return app.audioElements;
+    const music = new Audio("assets/audio/ambient-airy.mp3");
+    const ui = new Audio("assets/audio/ui-activate.mp3");
+    const result = new Audio("assets/audio/result-complete.mp3");
+    music.loop = true;
+    music.preload = "none";
+    ui.preload = "auto";
+    result.preload = "auto";
+    app.audioElements = { music, ui, result };
+    updateAudioVolumes();
+    return app.audioElements;
+  }
+
+  function updateAudioVolumes() {
+    if (!app.audioElements) return;
+    app.audioElements.music.volume = Math.max(0, Math.min(1, Number(app.audio.musicVolume) || 0));
+    app.audioElements.ui.volume = Math.max(0, Math.min(1, Number(app.audio.sfxVolume) || 0));
+    app.audioElements.result.volume = Math.max(0, Math.min(1, Number(app.audio.sfxVolume) || 0));
+  }
+
+  function syncBackgroundMusic() {
+    if (!app.audio.music || app.view.name === "exam" || document.visibilityState !== "visible") return pauseBackgroundMusic();
+    const { music } = ensureAudioElements();
+    updateAudioVolumes();
+    music.play().catch(() => {});
+  }
+
+  function pauseBackgroundMusic() {
+    app.audioElements?.music.pause();
+  }
+
+  function playSound(kind = "ui") {
+    if (!app.audio.sfx) return;
+    const sound = ensureAudioElements()[kind] || ensureAudioElements().ui;
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
+  }
+
+  function audioPopover() {
+    if (!app.audioMenuOpen) return "";
+    return `
+      <section class="audio-popover" aria-label="Audio settings">
+        <div class="audio-popover-head">${icon("music")}<span><strong>Audio</strong><small>Off by default</small></span></div>
+        <button class="audio-toggle ${app.audio.music ? "active" : ""}" data-action="toggle-music" type="button"><span>Ambient music<small>Non-exam pages</small></span><b>${app.audio.music ? "On" : "Off"}</b></button>
+        <label>Music volume<input data-audio-volume="musicVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.musicVolume)}" /></label>
+        <button class="audio-toggle ${app.audio.sfx ? "active" : ""}" data-action="toggle-sfx" type="button"><span>Sound effects<small>Actions and results</small></span><b>${app.audio.sfx ? "On" : "Off"}</b></button>
+        <label>Effects volume<input data-audio-volume="sfxVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.sfxVolume)}" /></label>
+      </section>
+    `;
+  }
+
   function toast() {
     return app.toast ? `<div class="toast">${escapeHtml(app.toast)}</div>` : "";
   }
@@ -2384,6 +2347,26 @@
 
     try {
       if (app.fixtureMode && handleFixtureClick(target, action)) return;
+      if (action === "toggle-audio-menu") {
+        app.audioMenuOpen = !app.audioMenuOpen;
+        render();
+        return syncBackgroundMusic();
+      }
+      if (action === "toggle-music") {
+        app.audio.music = !app.audio.music;
+        saveAudioPreferences();
+        render();
+        return syncBackgroundMusic();
+      }
+      if (action === "toggle-sfx") {
+        app.audio.sfx = !app.audio.sfx;
+        saveAudioPreferences();
+        render();
+        if (app.audio.sfx) playSound("ui");
+        return;
+      }
+      syncBackgroundMusic();
+      if (!target.disabled) playSound("ui");
       if (action === "reload-app") return location.reload();
       if (action === "toggle-password") return togglePasswordVisibility(target);
       if (action === "show-signin") return setView({ name: "signin" });
@@ -2507,6 +2490,13 @@
   }
 
   function handleInput(event) {
+    const audioInput = event.target.closest("[data-audio-volume]");
+    if (audioInput) {
+      app.audio[audioInput.dataset.audioVolume] = Number(audioInput.value);
+      updateAudioVolumes();
+      saveAudioPreferences();
+      return;
+    }
     const input = event.target.closest("[data-delete-confirm]");
     if (!input) return;
     const button = input.closest("[role='alertdialog']")?.querySelector("[data-action='confirm-delete-account']");
@@ -2729,8 +2719,8 @@
     const values = Object.fromEntries(new FormData(form).entries());
     return {
       versionId: values.versionId || examVersions[0]?.id,
-      showTimer: Boolean(values.showTimer),
-      enablePause: Boolean(values.enablePause),
+      showTimer: true,
+      enablePause: true,
       shuffleQuestions: Boolean(values.shuffleQuestions),
       shuffleAnswers: Boolean(values.shuffleAnswers)
     };
@@ -3383,7 +3373,11 @@
   }
 
   function examTitle(attempt) {
-    return attempt.title || examVersions.find((version) => version.id === attempt.exam_version_id)?.title || "Professional Mock Exam";
+    if (attempt.mode === "practice") return attempt.title || `${sectionLabel(attempt.practice_category || "Verbal Ability")} Practice`;
+    const version = examVersions.find((candidate) => candidate.id === attempt.exam_version_id);
+    const fallbackNumber = String(attempt.title || "").match(/(?:version|mock)\s*(\d+)/i)?.[1];
+    const number = version?.number || fallbackNumber;
+    return number ? `Mock Exam ${String(number).padStart(2, "0")}` : "Mock Exam";
   }
 
   function sectionLabel(section) {
@@ -3399,6 +3393,7 @@
   }
 
   function openModal(name) {
+    app.audioMenuOpen = false;
     app.modal = name;
     render();
   }
@@ -3512,6 +3507,9 @@
       chev: "M9 6l6 6-6 6",
       logout: "M10 17l5-5-5-5M15 12H3M21 4v16h-8",
       bell: "M18 16H6l2-3V9a4 4 0 0 1 8 0v4l2 3zM10 19h4",
+      volume: "M4 10h4l5-4v12l-5-4H4v-4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11",
+      "volume-off": "M4 10h4l5-4v12l-5-4H4v-4zM17 9l5 5M22 9l-5 5",
+      music: "M9 18V5l10-2v13M9 9l10-2M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM16 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
       grid: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
       clock: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 5v5l4 2",
       stats: "M5 19V9M12 19V5M19 19v-7",

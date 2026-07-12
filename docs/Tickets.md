@@ -7,6 +7,80 @@
 - `done`: completed and verified
 - `blocked`: cannot continue without input or external setup
 
+## T0028 - Simplified Cockpit Product Rework, Audio, QA, And Deployment
+
+Status: done
+
+Implement the approved defaults from T0026 across all 37 named states, preserve the generated cockpit visual language under the T0027 parity workflow, add restrained motion and explicit user-controlled audio, complete automated and maximized external Microsoft Edge QA, then deploy and verify the cache-busted build.
+
+Acceptance criteria:
+
+- Signed navigation uses `Home`, `Mock Exam`, `Practice & Review`, and `Progress` consistently.
+- Home contains one active-run representation, three stable destinations, and compact useful records without a duplicate section-performance ribbon.
+- Mock Exam Setup removes Professional exam type, Preflight Check, allocation percentages/meters, and redundant protocol copy; timer/pause are standard behavior and option changes auto-save.
+- Practice, Mistakes, and Flagged remain visible as static mode cards while only a bounded workspace changes.
+- Practice removes duplicated selection/fact/quick-practice structures; Mistakes and Flagged remove repeated summary content.
+- Progress uses three primary metrics, score trend, section performance, and attempt records without a meaningless Review filter.
+- Results use protected score-gauge geometry and six content-fitted highlights without duplicate overall accuracy.
+- Answer Review, system diagnostics, and Account Settings remove duplicated or decorative jargon while preserving behavior.
+- Shared motion is restrained, task-safe, and reduced-motion compatible.
+- Music and effects are disabled by default, explicitly controlled by the user, license-documented, and do not autoplay before user interaction.
+- All fixture and interaction states pass syntax, data, dependency, overflow, console, and screenshot checks.
+- Maximized external Microsoft Edge at 100% zoom is visually inspected and repaired before deployment.
+- The final cache-busted GitHub Pages build is live and verified.
+
+## T0028 Outcome
+
+- Applied the approved lower-density cockpit architecture across the 37 fixture states while preserving exam, auth, timing, Supabase, and local persistence behavior.
+- Added restrained motion and opt-in audio controls with CC0 license documentation under `app/assets/audio/`.
+- Verified the final build with syntax, data, dependency, Impeccable, desktop/mobile fixture, interaction, and maximized external Microsoft Edge QA.
+- Pushed the cache-busted build to GitHub Pages and verified the live asset version after propagation.
+
+## T0027 - Generated Image To Production UI Playbook
+
+Status: done
+
+Consolidate the lessons from the complete generated-image adaptation cycle into reusable project documentation and a mandatory agent contract before any further redesign work.
+
+Acceptance criteria:
+
+- The documentation separates product/content approval from visual-parity approval.
+- It covers reference versioning, source authority, state inventory, target-browser measurement, proportional layout, typography, iconography, color semantics, decorative safe areas, scrolling, real-data shapes, motion, accessibility, screenshot iteration, interaction QA, deployment verification, and common failure modes.
+- It includes portable templates/checklists suitable for reuse in future projects.
+- `AGENTS.md` contains a concise mandatory generated-image parity agent that points to the full playbook.
+- No application code, styles, runtime behavior, or deployment changes are made.
+
+Completion notes:
+
+- Added `docs/Generated_Image_To_UI_Playbook.md` as the reusable long-form workflow.
+- Added a mandatory `Generated Image Parity Agent` section to `AGENTS.md`.
+- Linked the T0026 state-content audit to the new playbook so content decisions remain a prerequisite to visual implementation.
+- Recorded the implementation order, screenshot delta loop, external-browser requirements, generated-image artifact handling, and definition of done learned during the auth and cockpit passes.
+- Left the running application unchanged.
+
+## T0026 - Complete State Content Audit And Simplification Brief
+
+Status: done
+
+Inventory every rendered route and fixture before another visual redesign, group all visible content by container, identify duplication and clutter, propose familiar naming, and document a license-safe audio direction without changing the running application.
+
+Acceptance criteria:
+
+- All 37 fixture states are accounted for, including the `recent` Progress alias.
+- Every canonical page lists its containers, information, controls, and variant states.
+- Required, duplicated, movable, confusing, and removable content is explicitly classified.
+- The user-reported Study Hub legend, panel collision, Setup redundancy, Results spacing, Practice/Review orientation, naming, color, and motion concerns are represented.
+- Music/SFX sources and browser autoplay constraints are researched from primary sources.
+- No application code, styling, runtime behavior, or deployment changes are made during the audit.
+
+Completion notes:
+
+- Added `docs/T0026_State_Content_Audit.md` with a complete 37-state register and page-by-page container inventory.
+- Proposed a lower-density architecture for Study Hub, Mock Exam Setup, Practice/Mistakes/Flagged, Progress, Results, Answer Review, and Account Settings.
+- Recorded eight explicit product decisions that must be settled before generating the next visual reference set.
+- Documented Pixabay/Freesound licensing considerations and the browser requirement to start audible playback only after user interaction.
+- Left the deployed application unchanged.
+
 ## T0025 - Cockpit Visual Parity And Containment Repair
 
 Status: done

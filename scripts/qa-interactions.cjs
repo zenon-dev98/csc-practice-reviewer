@@ -100,6 +100,13 @@ function safeName(value) {
     await gotoFixture("dashboard");
     await page.locator(".hub-mode.practice").hover();
     await screenshot("dashboard-focused-practice-hover");
+    await page.locator("[data-action='toggle-audio-menu']").click();
+    await screenshot("dashboard-audio-settings-open");
+    await page.locator("[data-action='toggle-music']").click();
+    await page.locator("[data-action='toggle-sfx']").click();
+    await page.locator("[data-audio-volume='musicVolume']").fill("0.25");
+    await screenshot("dashboard-audio-settings-enabled");
+    await page.locator("[data-action='toggle-audio-menu']").click();
     await page.locator(".account-button").focus();
     await screenshot("dashboard-account-keyboard-focus");
     await page.locator(".account-button").click();
@@ -218,7 +225,7 @@ function safeName(value) {
 
   await test("progress filters and row menu", async () => {
     await gotoFixture("progress");
-    for (const filter of ["full", "practice", "review", "all"]) {
+    for (const filter of ["full", "practice", "all"]) {
       await page.locator(`[data-recent-tab='${filter}']`).click();
       await screenshot(`progress-filter-${filter}`);
     }

@@ -1041,3 +1041,116 @@ Verification: `144` desktop fixture screenshots passed across `1672x942`, `1904x
 Risks: Generated state images remain visual references and can contain fictional sample labels; production copy and CSC section semantics remain authoritative. Desktop intentionally preserves the `1672x942` reference ratio through uniform scaling and ambient side margins.
 
 Follow-ups: None required for this ticket.
+
+## 2026-07-12 - T0026 Complete State Content Audit And Simplification Brief
+
+Summary:
+
+- Inventoried all 37 named fixture states and every canonical page container before another visual redesign.
+- Classified essential information, contextual information, duplication, clutter, naming problems, visual defects, and removal candidates.
+- Proposed a simpler cross-page architecture and researched license-safe audio sources plus browser playback constraints.
+
+Files changed:
+
+- `docs/T0026_State_Content_Audit.md`
+- `docs/Tickets.md`
+- `docs/Repo_Current_State.md`
+- `docs/Known_Issues_And_Followups.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- `rg` route, fixture, render-function, dialog, shell, and interaction searches in `app/app.js`
+- State and QA artifact inventories with PowerShell
+- Primary-source web research for Pixabay licensing, Freesound licensing, and browser autoplay behavior
+- `git diff --check`
+
+Verification:
+
+- The state register totals 37 named fixtures and includes every branch in `initFixture()`.
+- Canonical inventories cover system, auth, Study Hub, Setup, Exam, Graph, Pause, Submit, Timeout, Practice, Mistakes, Flagged, Progress, Results, Answer Review, Account Settings, and destructive states.
+- No application, stylesheet, script, question-bank, backend, or deployment file changed.
+
+Risks:
+
+- The proposed removals and renames are recommendations, not approved requirements.
+- Audio asset selection remains intentionally deferred until the next visual direction and desired music mood are approved.
+
+## 2026-07-12 - T0027 Generated Image To Production UI Playbook
+
+Summary:
+
+- Consolidated all generated-image adaptation lessons into a reusable long-form playbook.
+- Added a mandatory condensed agent contract to `AGENTS.md` for future screenshot-parity work.
+- Linked the state-content audit to the playbook while preserving the requirement to approve content before visual implementation.
+
+Files changed:
+
+- `AGENTS.md`
+- `docs/Generated_Image_To_UI_Playbook.md`
+- `docs/T0026_State_Content_Audit.md`
+- `docs/Tickets.md`
+- `docs/Repo_Current_State.md`
+- `docs/Known_Issues_And_Followups.md`
+- `docs/Completion_Reports.md`
+
+Commands run:
+
+- Documentation and rule inspection with PowerShell
+- `git diff --check`
+- Markdown heading/link/reference checks with PowerShell
+
+Verification:
+
+- The playbook covers both approval gates, reference manifests, target-environment measurement, full-state inventory, typography, icons, color semantics, geometry safe areas, content density, implementation order, scrolling, fixtures, screenshot comparison, interaction QA, motion, accessibility, common failure modes, and definition of done.
+- `AGENTS.md` points to the playbook and contains the mandatory condensed release gates.
+- No files under `app/`, `scripts/`, `data/`, or `supabase/` changed.
+
+Risks:
+
+- The playbook is process documentation; it does not resolve the eight product decisions in T0026.
+- Future projects must copy both the short agent contract and the long-form playbook if they want the same workflow outside this repository.
+
+## 2026-07-12 - T0028 Simplified Cockpit Product Rework, Audio, QA, And Deployment
+
+Summary:
+
+- Applied the approved T0026 simplification across all 37 fixture states while preserving the existing auth, Supabase, exam-bank, timing, scoring, review, and persistence behavior.
+- Added restrained cockpit motion and explicit user-controlled ambient/effect audio, disabled by default, with CC0 source/license documentation.
+- Reworked Study Hub, Mock Exam Setup, Practice & Review, Progress, Results, Answer Review, Account Settings, dialogs, and shared navigation into one coherent cockpit system.
+
+Files changed:
+
+- `app/app.js`
+- `app/cockpit-theme.css`
+- `app/index.html`
+- `app/assets/audio/`
+- `scripts/qa-cockpit.cjs`
+- `scripts/qa-interactions.cjs`
+- project instructions and ticket documentation
+
+Commands run:
+
+- `node --check app/app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- `node scripts/qa-cockpit.cjs qa/t0028-desktop-matrix-r1`
+- `node scripts/qa-cockpit.cjs qa/t0028-mobile-matrix-r1`
+- `node scripts/qa-cockpit.cjs qa/t0028-exam-final`
+- `node scripts/qa-interactions.cjs qa/t0028-interactions-r1`
+- maximized external Microsoft Edge at 100% zoom across all 37 fixture states
+
+Verification:
+
+- Desktop fixture matrix: `148` screenshots, zero console/document failures, zero sampled element overflows.
+- Mobile fixture matrix: `74` screenshots, zero console/document failures, zero sampled element overflows.
+- Exam fixture matrix: `20` screenshots, zero console/document failures, zero sampled element overflows.
+- Interaction sweep: `61` screenshots, `20/20` checks passed.
+- External Edge evidence: `37` maximized screenshots saved under `qa/t0028-external-edge-final`.
+- GitHub Pages was pushed with static asset version `v=20260712-01` and live propagation was verified.
+
+Risks:
+
+- Desktop preserves the cockpit's logical reference ratio through uniform scaling and balanced ambient margins; mobile uses normal stacked scrolling.
+- The newer visual/content feedback received after this T0028 pass remains a follow-up rather than part of this deployment.

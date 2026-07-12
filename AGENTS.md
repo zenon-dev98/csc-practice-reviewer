@@ -95,3 +95,28 @@ Use these rules whenever adapting generated mockups, Stitch output, screenshots,
 - Compare bounding boxes as well as screenshots. The QA report must flag visible descendants outside their parent bounds, text intersecting decorative pseudo-element zones, controls with less than 8 logical pixels of edge clearance, and unintended text truncation.
 - The visual agent must repair defects it finds and rerun the affected screenshots. A written observation without the corresponding UI correction is not a completed parity loop.
 - Keep compatible page headers structurally identical. Brand mark, two-line product lockup, primary navigation, active marker, and account control may change state but not geometry between Study Hub, Full Mock, Practice & Review, and Progress.
+
+## Generated Image Parity Agent
+
+For any future generated-image, Stitch, screenshot, or mockup adaptation, read and follow `docs/Generated_Image_To_UI_Playbook.md`. The playbook is the long-form reusable source; the rules below are mandatory release gates for this repository.
+
+- Use two separate approvals: first product/content architecture, then visual reference parity. Do not implement a visually attractive screen before deciding what information, controls, and states belong on it.
+- Save every approved generated image under a versioned `states/` folder with its canvas, target browser, approval status, required parity, behavioral source, and allowed deviations. Name one active visual version and do not mix retired references into it.
+- Treat generated images as fallible. Remove fabricated data, fake security claims, inert controls, warped geometry, unexplained color, inconsistent headers, and decorative jargon unless the user explicitly approves them.
+- Inventory every route, fixture, alias, empty/partial/full state, modal, menu, error, loading state, and interaction before coding. Compare that inventory against the screenshot harness so no state is silently omitted.
+- Record the real target environment: actual browser content viewport, maximized/windowed state, browser zoom, bookmarks bar, device pixel ratio, and desktop scaling contract. Monitor resolution is not browser viewport size.
+- Choose responsive reflow or one uniformly scaled logical canvas deliberately. Never stretch width and height independently, and never require 90% zoom to make the page work.
+- Match in this order: information architecture, shared shell, typography, canvas/anchors, major panel bounds, content, icons, color semantics, decoration, state variants, motion, then mobile.
+- Match proportions across the entire composition. Outer margins, center gaps, top/bottom whitespace, panel padding, visual spans, and primary-action placement must balance together.
+- Treat final physical text size as authoritative. A label that is readable on the source image but tiny after scaling must be enlarged logically; do not globally shrink typography to force fit.
+- Treat icons as measured layout elements. Match glyph, stroke/fill style, optical weight, color, plate shape, baseline, label gap, and safe clearance.
+- Give every data-like ring, node, bar, color, and status mark an explicit meaning through visible labels and accessible text. Remove decoration whose meaning cannot be explained.
+- Protect content from clipped corners, notches, hatches, rails, pseudo-elements, and connector lines. Generated geometry must be rebuilt as bounded production-safe shapes when direct copying would deform or clip.
+- Keep one primary representation of each fact on a screen. Repeated counts, percentages, remaining values, gauges, and bars are clutter unless they support different decisions.
+- Use familiar task names unless thematic language improves comprehension. Do not let cockpit/game vocabulary obscure ordinary actions such as Mock Exam, Practice, Progress, Results, and Review.
+- Fit content through architecture and correct scroll ownership, not global shrinking or hidden overflow. Fixed desktop pages use bounded internal scrolling; mobile may use normal document scrolling.
+- Build deterministic fixtures for new, empty, partial, dense, long-text, success, error, disabled, open, closed, hover, focus, and submitted states. Fixture data must never leak into production persistence.
+- Run both geometry checks and visual checks. Metrics catch overflow; screenshots catch poor proportion, weak icons, tiny text, malformed shapes, excess empty space, and bad hierarchy.
+- Perform the screenshot loop in the real requested browser at 100% zoom. Headless screenshots supplement but do not replace final external-browser inspection when that is the target.
+- Any meaningful edit after a screenshot invalidates that evidence. Recapture affected states, then rerun the complete release matrix after the last visual change.
+- Cache-bust and verify the live asset versions before calling deployment complete. Local parity is not live parity.
