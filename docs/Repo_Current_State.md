@@ -110,7 +110,7 @@ Current source item boundaries:
 
 ## Current Active Ticket
 
-- None. T0029 is complete; the next planned work is the Supabase backup/export or content pedagogy review pass.
+- T0030 is in progress. It reopens the complete pasted request because T0029 was closed without faithful V5 implementation or requirement-by-requirement visual verification.
 
 ## T0029 Outcome
 

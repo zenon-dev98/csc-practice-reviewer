@@ -2,6 +2,8 @@
 
 ## Open
 
+- T0030 is redoing the complete original pasted request. T0029's completion record is not accepted as V5 parity evidence because the original requirements were compressed and multiple visible states were never matched reference-by-reference.
+
 - Future generated-image work must follow `docs/Generated_Image_To_UI_Playbook.md` and the `Generated Image Parity Agent` in `AGENTS.md`; the playbook does not itself approve the unresolved T0026 content decisions.
 - T0026 documents a lower-density information architecture for all 37 fixture states. The eight decisions at the end of `docs/T0026_State_Content_Audit.md` must be approved before generating vNext references or implementing another redesign.
 - T0028 repaired the Study Hub ring legend, Review Mistakes/Your Records collision, Mock Exam Setup density, and Results score/insight geometry; the final fixture and external-Edge sweeps passed without sampled overflow.

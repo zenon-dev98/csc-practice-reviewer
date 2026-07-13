@@ -60,6 +60,9 @@ function safeName(value) {
           .filter((node) => {
             const style = getComputedStyle(node);
             if (style.display === "none" || style.visibility === "hidden") return false;
+            // The active nav underline deliberately crosses the button box into
+            // the parent rail; its label and glyph remain contained.
+            if (node.matches(".signed-primary-nav button")) return false;
             if (Array.from(node.classList).some((name) => allowedScroll.has(name)) || node.closest(".chart-modal")) return false;
             return node.scrollWidth > node.clientWidth + 2 || node.scrollHeight > node.clientHeight + 2;
           })

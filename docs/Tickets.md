@@ -1,5 +1,19 @@
 # Tickets
 
+## T0030 - Faithful V5 Implementation And Pasted Request Redo
+
+Status: in_progress
+
+Redo the complete pasted request recorded in `docs/T0030_Pasted_Request_Redo.md`. Treat the V4 Study Hub as the shared visual master and the approved V5 images as hard state contracts, repair every omitted numbered requirement, run direct screenshot-parity and interaction loops, then deploy only after live verification.
+
+Acceptance criteria:
+
+- Every restored requirement in `docs/T0030_Pasted_Request_Redo.md` is implemented and individually verified.
+- Every approved V5 state has a matching implementation capture and a direct visual comparison.
+- Compatible signed-in pages preserve one shared shell while active exam, public auth, system, and modal states follow their approved focused variants.
+- The final maximized Edge pass is performed at 100% zoom and no ticket is closed from overflow metrics alone.
+- The cache-busted build is pushed and verified live.
+
 ## Status Legend
 
 - `open`: not started

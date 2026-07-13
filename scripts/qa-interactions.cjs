@@ -98,6 +98,14 @@ function safeName(value) {
 
   await test("dashboard and account", async () => {
     await gotoFixture("dashboard");
+    const primaryNav = page.locator(".signed-primary-nav button").first();
+    const navWidthBefore = await primaryNav.evaluate((node) => node.getBoundingClientRect().width);
+    await primaryNav.hover();
+    await page.waitForTimeout(220);
+    const navWidthAfter = await primaryNav.evaluate((node) => node.getBoundingClientRect().width);
+    await check("navigation label reveal does not shift header", async () => Math.abs(navWidthAfter - navWidthBefore) < 1);
+    await check("navigation label appears on hover", async () => Number(await primaryNav.locator(".nav-label").evaluate((node) => getComputedStyle(node).opacity)) > 0.9);
+    await screenshot("dashboard-navigation-label-hover");
     await page.locator(".hub-mode.practice").hover();
     await screenshot("dashboard-focused-practice-hover");
     await page.locator(".account-button").focus();
@@ -156,15 +164,42 @@ function safeName(value) {
     await page.locator("[data-action='clear-answer']").click();
     await page.locator("[data-action='skip-question']").click();
     await screenshot("exam-explicit-skip");
-    const more = page.locator(".more-chip").first();
+    const more = page.locator(".exam-nav .more-chip:visible").first();
     if (await more.count()) {
+      const nav = page.locator(".exam-nav");
+      await more.evaluate((node) => node.scrollIntoView({ block: "center" }));
+      const scrollBeforeMore = await nav.evaluate((node) => node.scrollTop);
       await more.click();
+      const scrollAfterMore = await nav.evaluate((node) => node.scrollTop);
+      await check("exam navigator keeps scroll after More", async () => Math.abs(scrollAfterMore - scrollBeforeMore) < 3);
       await screenshot("exam-group-more");
       const less = page.locator(".more-chip", { hasText: "Less" }).first();
       if (await less.count()) {
+        const scrollBeforeLess = await nav.evaluate((node) => node.scrollTop);
         await less.click();
+        const scrollAfterLess = await nav.evaluate((node) => node.scrollTop);
+        await check("exam navigator keeps scroll after Less", async () => Math.abs(scrollAfterLess - scrollBeforeLess) < 3);
         await screenshot("exam-group-less");
       }
+      await page.locator(".exam-nav").evaluate((node) => {
+        node.querySelectorAll("details.question-group").forEach((group) => { group.open = true; });
+      });
+      await nav.evaluate((node) => { node.scrollTop = 0; });
+      await nav.hover();
+      await page.mouse.wheel(0, 260);
+      await page.waitForTimeout(80);
+      await check("exam navigator supports mouse wheel", async () => await nav.evaluate((node) => node.scrollTop > 0));
+      const dragBox = await nav.boundingBox();
+      if (dragBox) {
+        await nav.evaluate((node) => { node.scrollTop = 180; });
+        const dragBefore = await nav.evaluate((node) => node.scrollTop);
+        await page.mouse.move(dragBox.x + 6, dragBox.y + dragBox.height / 2);
+        await page.mouse.down();
+        await page.mouse.move(dragBox.x + 6, dragBox.y + dragBox.height / 2 - 90, { steps: 6 });
+        await page.mouse.up();
+        await check("exam navigator supports pointer drag", async () => await nav.evaluate((node, before) => node.scrollTop > before, dragBefore));
+      }
+      await screenshot("exam-navigator-wheel-and-drag");
     }
     await page.locator("[data-action='pause-exam']").click();
     await screenshot("exam-pause-open");
@@ -186,6 +221,24 @@ function safeName(value) {
     await page.locator("[data-action='confirm-submit']").click();
     await check("submit reaches results", async () => await page.locator(".results-page").count() === 1);
     await screenshot("exam-submitted-results");
+  });
+
+  await test("question timing and non-submitting exit", async () => {
+    runtimeErrors.length = 0;
+    await page.goto(`${baseUrl}?fixture=exam&qaTiming=1&qa=timing`, { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    const initial = Number(await page.locator(".question-panel").getAttribute("data-question-seconds"));
+    await page.waitForTimeout(1250);
+    await page.locator("[data-goto='43']").click();
+    await page.waitForTimeout(1100);
+    await page.locator("[data-goto='42']").click();
+    const resumed = Number(await page.locator(".question-panel").getAttribute("data-question-seconds"));
+    await check("per-question time survives navigation", async () => resumed >= initial + 0.8, `initial=${initial}, resumed=${resumed}`);
+    await screenshot("exam-question-time-restored");
+    await page.locator("[data-action='save-exit']").click();
+    await check("exit returns home without submitting", async () => await page.locator(".study-hub").count() === 1);
+    await check("exit leaves attempt resumable", async () => await page.locator("[data-action='resume-exam']").count() === 1);
+    await screenshot("exam-save-and-exit-home");
   });
 
   await test("graph modal", async () => {
