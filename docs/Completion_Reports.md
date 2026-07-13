@@ -1154,3 +1154,54 @@ Risks:
 
 - Desktop preserves the cockpit's logical reference ratio through uniform scaling and balanced ambient margins; mobile uses normal stacked scrolling.
 - The newer visual/content feedback received after this T0028 pass remains a follow-up rather than part of this deployment.
+
+## 2026-07-13 - T0029 V4 Theme Unification, Account Personalization, Telemetry, QA, And Deployment
+
+Summary:
+
+- Unified the signed-in cockpit shell against the v4 Study Hub visual master and recorded the cross-page visual contract before using the v5 state references.
+- Added nickname-first account identity, 20 animal avatar choices, a dedicated password-change dialog, compact audio controls, and visibility-safe attempt telemetry.
+- Repaired content-proportional layout contracts in Setup, Practice & Review, Progress, Account Settings, Submit, and the exam navigator. Navigator scroll position now survives rerenders and supports wheel/pointer-drag scrolling without a visible scrollbar.
+
+Files changed:
+
+- `AGENTS.md`
+- `app/app.js`
+- `app/cockpit-theme.css`
+- `app/t0029-overrides.css`
+- `app/index.html`
+- `scripts/qa-interactions.cjs`
+- `docs/Tickets.md`
+- `docs/Repo_Current_State.md`
+- `docs/Known_Issues_And_Followups.md`
+- `docs/T0029_Pending_Work.md`
+- `docs/V4_Visual_Contract.md`
+- `states/v5/`
+
+Commands run:
+
+- `node --check app/app.js`
+- `npm run validate:data`
+- `npm run check`
+- `npx --yes impeccable detect app`
+- `node scripts/qa-interactions.cjs qa/t0029-interactions-r13`
+- `node scripts/qa-cockpit.cjs qa/t0029-desktop-logical-final`
+- `node scripts/qa-cockpit.cjs qa/t0029-desktop-matrix-final`
+- `node scripts/qa-cockpit.cjs qa/t0029-mobile-final2`
+
+Verification:
+
+- Logical desktop matrix: `37` screenshots, zero console/document failures, zero sampled element overflows.
+- PC matrix: `111` screenshots across `1904x913`, `1536x816`, and `1536x736`, zero console/document failures, zero sampled element overflows.
+- Mobile matrix: `74` screenshots across `390x844` and `412x915`, zero console/document failures, zero sampled element overflows.
+- Interaction sweep: `56` screenshots and `20/20` checks passed.
+- Impeccable detection, syntax, static-data, and local-only dependency checks passed.
+
+Risks:
+
+- External Edge takeover was not available as a callable desktop-control tool in this session; the final visual evidence was produced with the Microsoft Edge channel at the requested target sizes. Live deployment verification remains required after push.
+
+Follow-ups:
+
+- Add Supabase backup/export workflow before broader public use.
+- Perform the human content-pedagogy review for generated Filipino, data-interpretation, legal/general-information, and symbolic-reasoning items.

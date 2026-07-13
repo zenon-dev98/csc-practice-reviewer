@@ -8,6 +8,12 @@
   const SYNC_INTERVAL_MS = 3500;
   const DEFAULT_PRACTICE_COUNT = 20;
   const AUDIO_PREFS_KEY = "csc-reviewer-audio";
+  const AVATAR_OPTIONS = [
+    ["cat", "🐱"], ["dog", "🐶"], ["fox", "🦊"], ["panda", "🐼"], ["rabbit", "🐰"],
+    ["bear", "🐻"], ["tiger", "🐯"], ["lion", "🦁"], ["koala", "🐨"], ["frog", "🐸"],
+    ["owl", "🦉"], ["penguin", "🐧"], ["duck", "🦆"], ["pig", "🐷"], ["monkey", "🐵"],
+    ["deer", "🦌"], ["sheep", "🐑"], ["hamster", "🐹"], ["turtle", "🐢"], ["bee", "🐝"]
+  ];
   const generatedVersions = window.CSC_EXAM_VERSIONS || [];
   const generatedQuestions = generatedVersions.flatMap((version) => version.questions || []);
   const sourceQuestions = window.CSC_QUESTIONS || [];
@@ -100,6 +106,7 @@
     view: { name: "boot" },
     modal: null,
     dialogTarget: null,
+    modalReturn: null,
     dialogError: "",
     resetEmail: "",
     fatal: null,
@@ -119,6 +126,10 @@
     audioMenuOpen: false,
     audio: loadAudioPreferences(),
     audioElements: null,
+    accountAvatarDraft: null,
+    examNavScrollTop: 0,
+    examNavDrag: null,
+    visibilityStartedAt: document.visibilityState === "visible" ? performance.now() : null,
     questionVersion: "1",
     fixtureMode: false,
     fixtureState: ""
@@ -134,9 +145,11 @@
     });
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "hidden") {
+        recordVisibilityEvent("hidden");
         flushDirty({ immediate: true });
         pauseBackgroundMusic();
       } else {
+        recordVisibilityEvent("visible");
         syncBackgroundMusic();
       }
     });
@@ -145,6 +158,10 @@
     document.addEventListener("input", handleInput);
     document.addEventListener("change", handleChange);
     document.addEventListener("keydown", handleKeydown);
+    document.addEventListener("pointerdown", handlePointerDown, { passive: false });
+    document.addEventListener("pointermove", handlePointerMove, { passive: false });
+    document.addEventListener("pointerup", handlePointerUp, { passive: true });
+    document.addEventListener("pointercancel", handlePointerUp, { passive: true });
     new MutationObserver(focusActiveDialog).observe(root, { childList: true, subtree: true });
     init();
   }
@@ -311,7 +328,7 @@
       return setView({ name: "review", attemptId: submitted.id, index: fixtureState === "review" ? 42 : 0 });
     }
     if (fixtureState === "profile-modal" || fixtureState === "password-expanded" || fixtureState === "delete-account") {
-      app.modal = "profile";
+      app.modal = fixtureState === "password-expanded" ? "password" : "profile";
       if (fixtureState === "delete-account") app.modal = "delete-account";
       return setView({ name: "dashboard" });
     }
@@ -357,6 +374,8 @@
     if (updatesResult.error) throw updatesResult.error;
 
     app.profile = profileResult.data || await createProfileFromSession();
+    app.profile.nickname = app.profile.nickname || user.user_metadata?.nickname || "";
+    app.profile.avatar_preset = Number(app.profile.avatar_preset || user.user_metadata?.avatar_preset || 0);
     app.attempts = (attemptsResult.data || []).map(normalizeAttempt);
     app.draft = draftResult.data;
     app.updates = updatesResult.data || [];
@@ -383,6 +402,7 @@
     return {
       user_id: "fixture-user",
       name: "John Smith",
+      nickname: "John",
       email: "john.smith@email.com",
       avatar_preset: 1,
       level: "Professional",
@@ -1061,6 +1081,9 @@
     const remaining = timeRemaining(attempt);
     const linked = linkedStimulusAnswers(attempt, current);
     const isPaused = attempt.status === "paused";
+    const existingNav = root.querySelector(".exam-nav");
+    if (existingNav) app.examNavScrollTop = existingNav.scrollTop;
+    attempt._lastTickMs = performance.now();
 
     const version = examVersions.find((candidate) => candidate.id === attempt.exam_version_id);
     const runLabel = attempt.mode === "practice" ? escapeHtml(attempt.title || "Practice") : `Mock Exam ${version ? String(version.number).padStart(2, "0") : ""}`.trim();
@@ -1139,6 +1162,10 @@
     if (!app.fixtureMode && attempt.status === "in_progress" && app.modal !== "timeout") {
       app.timerId = setInterval(() => tickAttempt(attempt.id), 1000);
     }
+    requestAnimationFrame(() => {
+      const nav = root.querySelector(".exam-nav");
+      if (nav) nav.scrollTop = app.examNavScrollTop;
+    });
   }
 
   function renderResults() {
@@ -1176,7 +1203,7 @@
         </section>
 
         <section class="results-section-console v3-panel">
-          <div class="technical-title"><h2>Section Performance</h2><span aria-hidden="true"></span></div>
+          <div class="technical-title"><div><h2>Section Accuracy</h2><p>Correct-answer history across completed attempts.</p></div><span aria-hidden="true"></span></div>
           <div class="results-section-grid">
             ${stats.map((stat) => {
               const percent = Math.round((stat.correct / Math.max(1, stat.total)) * 100);
@@ -1277,7 +1304,7 @@
   function renderPractice() {
     const tab = app.practiceReviewTab || "practice";
     root.innerHTML = sideShell("practice", `
-      <section class="content-page practice-review-page">
+      <section class="content-page practice-review-page" style="grid-template-rows:auto auto auto!important;height:auto!important;min-height:0!important;align-content:start!important;">
         <div class="page-title-row">
           <div>
             <h1>Practice & Review</h1>
@@ -1304,7 +1331,7 @@
         <div class="page-title-row">
           <div>
             <h1>Progress</h1>
-            <p>Track scores, section performance, and attempt history.</p>
+            <p>Track scores, section accuracy, and attempt history.</p>
           </div>
         </div>
         <div class="summary-cards statistics-rail telemetry-rail">
@@ -1318,7 +1345,7 @@
           ${progressTrendSvg(completed)}
         </section>
         <section class="card performance-card v3-panel">
-          <div class="technical-title"><h2>Section Performance</h2><span aria-hidden="true"></span></div>
+          <div class="technical-title"><div><h2>Section Accuracy</h2><p>Historical correctness by exam section.</p></div><span aria-hidden="true"></span></div>
           <div class="performance-bars">
             ${practiceCategoriesForDisplay().map((category) => progressBarRow(category, categoryPercent(categoryStats[category.section], category.section))).join("")}
           </div>
@@ -1383,12 +1410,12 @@
   function practiceTabContent() {
     const categories = practiceCategoriesForDisplay();
     return `
-      <form class="custom-practice practice-console" data-form="custom-practice">
-        <section class="card practice-section-picker v3-panel">
+      <form class="custom-practice practice-console" data-form="custom-practice" style="height:auto!important;min-height:0!important;align-self:start!important;">
+        <section class="card practice-section-picker v3-panel" style="height:auto!important;min-height:0!important;align-self:start!important;">
           <div class="technical-title"><div><h2>Choose a Section</h2><p>Select the skill area you want to practice.</p></div><span aria-hidden="true"></span></div>
           <fieldset class="category-plates"><legend class="sr-only">Section</legend>${categories.map((category, index) => `<label class="section-plate ${category.tone}"><input type="radio" name="category" value="${escapeAttr(category.section)}" ${index === 0 ? "checked" : ""}/><span class="section-hud-icon">${localIcon(sectionIconName(category.section))}</span><span class="section-copy"><strong>${escapeHtml(category.label)}</strong><small>${escapeHtml(category.description)}</small><em>${category.poolSize} questions</em></span></label>`).join("")}</fieldset>
         </section>
-        <section class="card run-profile-panel v3-panel">
+        <section class="card run-profile-panel v3-panel" style="height:auto!important;min-height:0!important;align-self:start!important;grid-template-rows:auto auto auto auto auto!important;align-content:start!important;">
           <div class="technical-title"><div><h2>Practice Options</h2><p>Choose the length and difficulty.</p></div><span aria-hidden="true"></span></div>
           <fieldset class="count-segments"><legend>Question Count</legend>${[10, 20, 30, 40, 60].map((count) => `<label><input type="radio" name="count" value="${count}" ${count === 20 ? "checked" : ""}/><span>${count}</span></label>`).join("")}</fieldset>
           <fieldset class="difficulty-segments"><legend>Difficulty</legend>${[["mixed", "Mixed"], ["medium", "Standard"], ["hard", "Challenge"]].map(([value, label], index) => `<label><input type="radio" name="difficulty" value="${value}" ${index === 0 ? "checked" : ""}/><span>${label}</span></label>`).join("")}</fieldset>
@@ -1493,9 +1520,6 @@
   function signedHeader(active = "dashboard") {
     const profile = app.profile;
     const activeRoute = active === "results" || active === "review" ? "recent" : active;
-    const signedLogo = active === "dashboard"
-      ? `<img class="logo hub-logo" src="assets/brand-shield.svg" alt="CSC Practice Reviewer logo" />`
-      : logo();
     const routes = [
       ["dashboard", "Home", "dashboard"],
       ["setup", "Mock Exam", "setup-page"],
@@ -1504,23 +1528,19 @@
     ];
     return `
       <header class="app-header signed-header study-hub-header">
-        <div class="brand">${signedLogo}${brandText()}</div>
+        <div class="brand">${logo()}${brandText()}</div>
         <nav class="signed-primary-nav" aria-label="Primary navigation">
           ${routes.map(([route, label, action]) => `<button class="${activeRoute === route ? "active" : ""}" data-action="${action}" type="button">${escapeHtml(label)}</button>`).join("")}
         </nav>
         <div class="header-actions">
-          <div class="audio-control-wrap">
-            <button class="audio-control-button ${app.audio.music || app.audio.sfx ? "is-enabled" : ""}" data-action="toggle-audio-menu" type="button" aria-label="Audio settings" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${icon(app.audio.music || app.audio.sfx ? "volume" : "volume-off")}</button>
-            ${audioPopover()}
-          </div>
-          <button class="account-button" data-action="account-settings" type="button">${avatar(profile)}<span>${escapeHtml(profile?.name || "Account")}</span>${icon("chev")}</button>
+          <button class="account-button" data-action="account-settings" type="button">${avatar(profile)}<span>${escapeHtml(displayName(profile))}</span>${icon("chev")}</button>
         </div>
       </header>
     `;
   }
 
   function authedShell(content, active = "dashboard") {
-    return cockpitFrame(`${signedHeader(active)}<main class="signed-main">${content}</main>${profileModal()}${confirmationModal()}${mobileBottomNav(active)}`, `signed-frame view-${active}`);
+    return cockpitFrame(`${signedHeader(active)}<main class="signed-main">${content}</main>${profileModal()}${passwordModal()}${confirmationModal()}${mobileBottomNav(active)}`, `signed-frame view-${active}`);
   }
 
   function sideShell(active, content) {
@@ -1530,6 +1550,7 @@
         <main class="side-content">${content}</main>
       </div>
       ${profileModal()}
+      ${passwordModal()}
       ${confirmationModal()}
       ${toast()}
       ${mobileBottomNav(active)}
@@ -1569,35 +1590,38 @@
   }
 
   function avatar(profile, size = "") {
-    const label = initials(profile?.name || profile?.email || "Reviewer");
-    return `<span class="avatar ${size} tone-account">${escapeHtml(label)}</span>`;
+    const presetIndex = Number(profile?.avatar_preset || 0) - 1;
+    const preset = presetIndex >= 0 ? AVATAR_OPTIONS[presetIndex] : null;
+    const label = preset ? `${preset[0]} avatar` : initials(profile?.name || profile?.email || "Reviewer");
+    return `<span class="avatar ${size} tone-account ${preset ? "has-animal" : ""}" aria-label="${escapeAttr(label)}">${preset ? preset[1] : escapeHtml(label)}</span>`;
+  }
+
+  function displayName(profile) {
+    return String(profile?.nickname || profile?.name || "Account").trim() || "Account";
   }
 
   function profileModal() {
-    if (app.modal !== "profile") return "";
+    if (app.modal !== "profile" && !(app.modal === "password" && app.modalReturn === "profile")) return "";
     const profile = app.profile;
+    const selectedAvatar = app.accountAvatarDraft ?? Number(profile.avatar_preset || 0);
     return `
       <div class="modal-backdrop drawer-backdrop">
         <section class="profile-modal account-settings-modal command-drawer" role="dialog" aria-modal="true" aria-labelledby="account-settings-title" tabindex="-1">
           <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
           <div class="modal-heading">
             <h2 id="account-settings-title">Account Settings</h2>
-            <p>Update your name, password, or session.</p>
+            <p>Personalize your reviewer account and session.</p>
           </div>
           <form class="account-settings-form" data-form="profile">
+            <div class="account-identity-preview">${avatar({ ...profile, avatar_preset: selectedAvatar }, "large")}<div><strong>${escapeHtml(displayName(profile))}</strong><small>${escapeHtml(profile.email)}</small></div></div>
+            <fieldset class="avatar-picker"><legend>Choose an avatar</legend><div class="avatar-options">${AVATAR_OPTIONS.map(([id, emoji], index) => `<button class="avatar-option ${Number(selectedAvatar) === index + 1 ? "selected" : ""}" data-avatar-preset="${index + 1}" type="button" aria-label="Choose ${id} avatar" aria-pressed="${Number(selectedAvatar) === index + 1 ? "true" : "false"}">${emoji}</button>`).join("")}</div></fieldset>
             <div class="account-field-grid">
+              <label>Nickname<input name="nickname" value="${escapeAttr(profile.nickname || "")}" placeholder="What should we call you?" /></label>
               <label>Full Name<input name="name" value="${escapeAttr(profile.name)}" required /></label>
               <label>Email Address <small>(used for sign-in)</small><input name="email" value="${escapeAttr(profile.email)}" disabled /></label>
             </div>
-            <details class="account-password-panel" ${app.fixtureState === "password-expanded" ? "open" : ""}>
-              <summary>${icon("lock")} <span>Change Password</span>${icon("chev")}</summary>
-              <div class="account-password-grid" data-form="change-password">
-                <label>Current Password<div class="field-with-icon has-toggle">${icon("key")}<input name="currentPassword" type="password" autocomplete="current-password" /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
-                <label>New Password<div class="field-with-icon has-toggle">${icon("key")}<input name="newPassword" type="password" minlength="8" autocomplete="new-password" /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
-                <label>Confirm New Password<div class="field-with-icon has-toggle">${icon("key")}<input name="confirmNewPassword" type="password" minlength="8" autocomplete="new-password" /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
-              </div>
-              <button class="btn secondary account-password-save" data-action="password-submit" type="button" ${app.busyAction === "password" ? "disabled" : ""}>${icon("key")} ${app.busyAction === "password" ? "Updating..." : "Update Password"}</button>
-            </details>
+            <button class="account-command-row" data-action="open-password" type="button">${icon("key")}<span><strong>Change Password</strong><small>Open the secure password update flow</small></span>${icon("arrow")}</button>
+            ${audioSettingsBlock()}
             <div class="account-modal-actions">
               <button class="btn primary" data-action="profile-submit" type="button" ${app.busyAction === "profile" ? "disabled" : ""}>${icon("save")} ${app.busyAction === "profile" ? "Saving..." : "Save Changes"}</button>
               <button class="btn secondary" data-action="signout" type="button">${icon("logout")} Sign Out</button>
@@ -1609,6 +1633,31 @@
         </section>
       </div>
     `;
+  }
+
+  function passwordModal() {
+    if (app.modal !== "password") return "";
+    return `
+      <div class="modal-backdrop account-password-backdrop">
+        <section class="password-modal" role="dialog" aria-modal="true" aria-labelledby="password-title" tabindex="-1">
+          <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
+          <p class="eyebrow">Account security</p>
+          <h2 id="password-title">Change Password</h2>
+          <p>Use your current password to confirm this change.</p>
+          ${app.dialogError ? `<p class="form-error" role="alert">${escapeHtml(app.dialogError)}</p>` : ""}
+          <form data-form="change-password" class="password-change-form">
+            <label>Current Password<div class="field-with-icon has-toggle">${icon("key")}<input name="currentPassword" type="password" autocomplete="current-password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
+            <label>New Password<div class="field-with-icon has-toggle">${icon("key")}<input name="newPassword" type="password" minlength="8" autocomplete="new-password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
+            <label>Confirm New Password<div class="field-with-icon has-toggle">${icon("key")}<input name="confirmNewPassword" type="password" minlength="8" autocomplete="new-password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
+            <div class="modal-actions"><button class="btn secondary" data-action="close-modal" type="button">Cancel</button><button class="btn primary" data-action="password-submit" type="button" ${app.busyAction === "password" ? "disabled" : ""}>${app.busyAction === "password" ? "Updating..." : "Update Password"}</button></div>
+          </form>
+        </section>
+      </div>
+    `;
+  }
+
+  function audioSettingsBlock() {
+    return `<section class="account-audio-settings"><div><strong>Audio</strong><small>Optional ambience and interface sounds</small></div><button class="audio-toggle master ${app.audio.music || app.audio.sfx ? "active" : ""}" data-action="toggle-audio-master" type="button"><span>Audio</span><b>${app.audio.music || app.audio.sfx ? "On" : "Off"}</b></button><label>Music volume<input data-audio-volume="musicVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.musicVolume)}" /></label><label>Effects volume<input data-audio-volume="sfxVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.sfxVolume)}" /></label></section>`;
   }
 
   function pauseModal(attempt) {
@@ -1632,9 +1681,7 @@
     return `
       <div class="modal-backdrop">
         <section class="submit-modal" role="dialog" aria-modal="true" aria-labelledby="submit-title" tabindex="-1">
-          <span class="submit-danger-symbol">!</span>
-          <p class="eyebrow">Final submission</p>
-          <h2 id="submit-title">Submit Exam?</h2>
+          <div class="submit-title-row"><span class="submit-danger-symbol">${icon("shield")}</span><div><p class="eyebrow">Final submission</p><h2 id="submit-title">Submit Exam?</h2></div></div>
           <p>You are about to submit this run. <strong>This action cannot be undone.</strong></p>
           <div class="submit-stats">
             <metric class="answered">${localIcon("circle-check")}<span>Answered</span><strong>${answeredCount(attempt)}</strong></metric>
@@ -1642,7 +1689,7 @@
             <metric class="skipped">${icon("skip")}<span>Skipped</span><strong>${skippedCount(attempt)}</strong></metric>
             <metric class="flagged">${icon("flag")}<span>Flagged</span><strong>${flaggedCount(attempt)}</strong></metric>
           </div>
-          <div class="submit-warning">${icon("shield")} Review unanswered and flagged questions before submitting.</div>
+          <div class="submit-warning">${icon("info")}<span>Review unanswered and flagged questions before submitting.</span></div>
           <div class="modal-actions">
             <button class="btn secondary" data-action="review-unanswered" type="button">Review Unanswered</button>
             <button class="btn secondary" data-action="review-flagged" type="button">Review Flagged</button>
@@ -2075,7 +2122,7 @@
   }
 
   function loadAudioPreferences() {
-    const defaults = { music: false, sfx: false, musicVolume: 0.16, sfxVolume: 0.34 };
+    const defaults = { music: false, sfx: false, musicVolume: 0.28, sfxVolume: 0.46 };
     try {
       const saved = JSON.parse(localStorage.getItem(AUDIO_PREFS_KEY) || "null");
       return saved ? { ...defaults, ...saved, music: Boolean(saved.music), sfx: Boolean(saved.sfx) } : defaults;
@@ -2127,6 +2174,20 @@
     sound.play().catch(() => {});
   }
 
+  function toggleAudioMaster() {
+    const enabled = !(app.audio.music || app.audio.sfx);
+    app.audio.music = enabled;
+    app.audio.sfx = enabled;
+    saveAudioPreferences();
+    render();
+    if (enabled) {
+      playSound("ui");
+      syncBackgroundMusic();
+    } else {
+      pauseBackgroundMusic();
+    }
+  }
+
   function audioPopover() {
     if (!app.audioMenuOpen) return "";
     return `
@@ -2138,6 +2199,33 @@
         <label>Effects volume<input data-audio-volume="sfxVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.sfxVolume)}" /></label>
       </section>
     `;
+  }
+
+  function handlePointerDown(event) {
+    const nav = event.target.closest(".exam-nav");
+    if (!nav || event.button !== 0 || event.target.closest("button, summary, input, select, textarea, a")) return;
+    app.examNavDrag = { nav, pointerId: event.pointerId, startY: event.clientY, startScroll: nav.scrollTop, moved: false };
+    nav.classList.add("is-dragging");
+    nav.setPointerCapture?.(event.pointerId);
+  }
+
+  function handlePointerMove(event) {
+    const drag = app.examNavDrag;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const delta = event.clientY - drag.startY;
+    if (Math.abs(delta) > 4) drag.moved = true;
+    if (!drag.moved) return;
+    event.preventDefault();
+    drag.nav.scrollTop = drag.startScroll - delta;
+    app.examNavScrollTop = drag.nav.scrollTop;
+  }
+
+  function handlePointerUp(event) {
+    const drag = app.examNavDrag;
+    if (!drag || (event.pointerId !== undefined && drag.pointerId !== event.pointerId)) return;
+    drag.nav.classList.remove("is-dragging");
+    app.examNavScrollTop = drag.nav.scrollTop;
+    app.examNavDrag = null;
   }
 
   function toast() {
@@ -2160,7 +2248,7 @@
       if (formName === "custom-practice") await startPractice(data.category, Number(data.count), data.difficulty);
       if (formName === "forgot-password") await runBusy("reset", () => sendPasswordReset(data));
     } catch (error) {
-      if (formName === "forgot-password") {
+      if (formName === "forgot-password" || formName === "change-password") {
         app.dialogError = readableError(error);
         render();
         return;
@@ -2236,7 +2324,13 @@
         return setView({ name: "dashboard" }) || true;
     }
     if (action === "close-modal") {
+      if (app.modal === "password" && app.modalReturn === "profile") {
+        app.modal = "profile";
+        app.modalReturn = null;
+        return render() || true;
+      }
       app.modal = null;
+      app.modalReturn = null;
       app.fixtureState = app.view.name === "exam" ? "exam-collapsed" : "dashboard";
       render();
       return true;
@@ -2323,6 +2417,15 @@
       showToast("Fixture mode: no Supabase data is changed.");
       return true;
     }
+    if (action === "open-password") {
+      app.modal = "password";
+      app.modalReturn = "profile";
+      return render() || true;
+    }
+    if (target.dataset.avatarPreset) {
+      app.accountAvatarDraft = Number(target.dataset.avatarPreset);
+      return render() || true;
+    }
     if (action === "signout") {
       app.fixtureState = "select";
       return setView({ name: "signin" }) || true;
@@ -2365,6 +2468,7 @@
         if (app.audio.sfx) playSound("ui");
         return;
       }
+      if (action === "toggle-audio-master") return toggleAudioMaster();
       syncBackgroundMusic();
       if (!target.disabled) playSound("ui");
       if (action === "reload-app") return location.reload();
@@ -2402,6 +2506,11 @@
       }
       if (action === "results-history-page") return setView({ name: "recent" });
       if (action === "manage-profile" || action === "account-settings") return openModal("profile");
+      if (action === "open-password") return openModal("password");
+      if (target.dataset.avatarPreset) {
+        app.accountAvatarDraft = Number(target.dataset.avatarPreset);
+        return render();
+      }
       if (action === "close-modal") return closeModal();
       if (action === "signout") return await signOut();
       if (action === "forgot-password") return await forgotPassword();
@@ -2653,8 +2762,9 @@
 
   async function changePassword(data) {
     const email = app.profile.email;
-    const currentPassword = data.currentPassword;
-    const newPassword = data.newPassword;
+    const currentPassword = String(data.currentPassword || "");
+    const newPassword = String(data.newPassword || "");
+    if (newPassword.length < 8) throw new Error("Use at least 8 characters for the new password.");
     if (data.confirmNewPassword !== undefined && newPassword !== data.confirmNewPassword) {
       throw new Error("New passwords do not match.");
     }
@@ -2675,9 +2785,15 @@
       notes: app.profile.notes || "",
       last_active_at: nowIso()
     };
+    if (app.accountAvatarDraft !== null) updates.avatar_preset = app.accountAvatarDraft;
     const { data, error } = await app.client.from("profiles").update(updates).eq("user_id", app.session.user.id).select("*").single();
     if (error) throw error;
-    app.profile = data;
+    const nickname = String(formData.nickname || "").trim();
+    const metadata = { ...(app.session.user.user_metadata || {}), nickname, avatar_preset: app.accountAvatarDraft ?? Number(data.avatar_preset || 0), display_name: data.name };
+    const authUpdate = await app.client.auth.updateUser({ data: metadata });
+    if (authUpdate.error) throw authUpdate.error;
+    app.session.user.user_metadata = metadata;
+    app.profile = { ...data, nickname, avatar_preset: Number(metadata.avatar_preset || 0) };
     closeModal();
     showToast("Account settings saved.");
   }
@@ -2799,7 +2915,10 @@
       current_question_index: 0,
       total_questions: questions.length,
       total_time_seconds: totalTimeSeconds,
-      options,
+      options: {
+        ...(options || {}),
+        telemetry: { version: 1, eventCount: 0, actionCounts: {}, visibility: { hiddenSeconds: 0, interruptions: 0 }, events: [] }
+      },
       question_order: questionOrder
     };
     const answerRows = questions.map((entry, position) => answerSnapshot(attemptId, entry.question, position, entry.displayNumber || position + 1, options.shuffleAnswers));
@@ -2893,13 +3012,59 @@
     return { choices, correctChoice: choices.find((choice) => choice.text === correctText)?.id || "A" };
   }
 
+  function ensureTelemetry(attempt) {
+    attempt.options = { ...(attempt.options || {}) };
+    attempt.options.telemetry = {
+      version: 1,
+      eventCount: 0,
+      actionCounts: {},
+      visibility: { hiddenSeconds: 0, interruptions: 0 },
+      events: [],
+      ...(attempt.options.telemetry || {})
+    };
+    return attempt.options.telemetry;
+  }
+
+  function recordAttemptEvent(attempt, type, data = {}) {
+    if (!attempt) return;
+    const telemetry = ensureTelemetry(attempt);
+    const event = { type, at: nowIso(), questionId: currentAnswer(attempt)?.question_id || null, ...data };
+    telemetry.events = [...toArray(telemetry.events), event].slice(-200);
+    telemetry.eventCount = Number(telemetry.eventCount || 0) + 1;
+    telemetry.actionCounts[type] = Number(telemetry.actionCounts[type] || 0) + 1;
+    touchAttempt(attempt);
+  }
+
+  function recordVisibilityEvent(nextState) {
+    const attempt = app.view.name === "exam" ? getAttempt(app.view.attemptId) : null;
+    if (!attempt || attempt.status !== "in_progress") return;
+    const now = performance.now();
+    const telemetry = ensureTelemetry(attempt);
+    if (nextState === "hidden") {
+      telemetry.visibility.interruptions = Number(telemetry.visibility.interruptions || 0) + 1;
+      telemetry.visibility.hiddenStartedAt = nowIso();
+      recordAttemptEvent(attempt, "visibility-hidden");
+    } else {
+      const hiddenAt = telemetry.visibility.hiddenStartedAt ? Date.parse(telemetry.visibility.hiddenStartedAt) : 0;
+      if (hiddenAt) telemetry.visibility.hiddenSeconds = Number(telemetry.visibility.hiddenSeconds || 0) + Math.max(0, (Date.now() - hiddenAt) / 1000);
+      delete telemetry.visibility.hiddenStartedAt;
+      recordAttemptEvent(attempt, "visibility-visible");
+    }
+    app.visibilityStartedAt = now;
+    attempt._lastTickMs = now;
+    touchAttempt(attempt);
+  }
+
   function tickAttempt(attemptId) {
     const attempt = getAttempt(attemptId);
     if (!attempt || attempt.status !== "in_progress") return;
-    attempt.elapsed_seconds += 1;
+    const now = performance.now();
+    const delta = Math.max(0.2, Math.min(2.5, attempt._lastTickMs ? (now - attempt._lastTickMs) / 1000 : 1));
+    attempt._lastTickMs = now;
+    attempt.elapsed_seconds += delta;
     const answer = currentAnswer(attempt);
     if (answer) {
-      answer.time_spent_seconds += 1;
+      answer.time_spent_seconds += delta;
       answer.last_seen_at = nowIso();
       touchAnswer(attempt, answer.question_id);
     }
@@ -2939,7 +3104,8 @@
     answer.skipped = false;
     answer.last_answered_at = nowIso();
     answer.first_answered_at = answer.first_answered_at || answer.last_answered_at;
-    answer.answer_history = [...toArray(answer.answer_history), { choice, at: answer.last_answered_at }];
+    answer.answer_history = [...toArray(answer.answer_history), { action: "select", choice, at: answer.last_answered_at }];
+    recordAttemptEvent(attempt, "answer-selected", { choice, previousChoice: previous || null });
     touchAnswer(attempt, answer.question_id);
     touchAttempt(attempt);
     renderExam();
@@ -2951,6 +3117,8 @@
     if (!answer || attempt.status !== "in_progress") return;
     answer.selected_choice = null;
     answer.last_answered_at = nowIso();
+    answer.answer_history = [...toArray(answer.answer_history), { action: "clear", at: answer.last_answered_at }];
+    recordAttemptEvent(attempt, "answer-cleared");
     touchAnswer(attempt, answer.question_id);
     renderExam();
   }
@@ -2960,6 +3128,7 @@
     const answer = currentAnswer(attempt);
     if (!answer || attempt.status !== "in_progress") return;
     answer.skipped = true;
+    recordAttemptEvent(attempt, "skip");
     touchAnswer(attempt, answer.question_id);
     if (answer.position < attempt.total_questions - 1) gotoQuestion(answer.position + 1);
     else renderExam();
@@ -2970,6 +3139,7 @@
     const answer = currentAnswer(attempt);
     if (!answer) return;
     answer.flagged = !answer.flagged;
+    recordAttemptEvent(attempt, answer.flagged ? "flag" : "unflag");
     touchAnswer(attempt, answer.question_id);
     renderExam();
   }
@@ -2982,12 +3152,13 @@
       showToast("Choose an answer or use Skip.");
       return;
     }
-    gotoQuestion(Math.min(Math.max(0, attempt.current_question_index + delta), attempt.total_questions - 1));
+    gotoQuestion(Math.min(Math.max(0, attempt.current_question_index + delta), attempt.total_questions - 1), delta > 0 ? "next" : "previous");
   }
 
-  function gotoQuestion(index) {
+  function gotoQuestion(index, source = "chip") {
     const attempt = getAttempt(app.view.attemptId);
     if (!attempt || index < 0 || index >= attempt.total_questions) return;
+    recordAttemptEvent(attempt, "navigate", { source, from: attempt.current_question_index, to: index });
     attempt.current_question_index = index;
     app.examNavOpen = false;
     const answer = currentAnswer(attempt);
@@ -3144,6 +3315,7 @@
           current_question_index: attempt.current_question_index,
           score: attempt.score ?? null,
           percent: attempt.percent ?? null,
+          options: attempt.options || {},
           timed_out: attempt.timed_out || false,
           submitted_at: attempt.submitted_at || null,
           paused_at: attempt.paused_at || null,
@@ -3394,13 +3566,25 @@
 
   function openModal(name) {
     app.audioMenuOpen = false;
+    if (name === "profile") app.accountAvatarDraft = Number(app.profile?.avatar_preset || 0);
+    if (name === "password") app.dialogError = "";
+    app.modalReturn = name === "password" ? "profile" : null;
     app.modal = name;
     render();
   }
 
   function closeModal(rerender = true) {
+    if (app.modalReturn && app.modal === "password") {
+      app.modal = app.modalReturn;
+      app.modalReturn = null;
+      app.dialogError = "";
+      if (rerender) render();
+      return;
+    }
     app.modal = null;
+    app.modalReturn = null;
     app.dialogError = "";
+    app.accountAvatarDraft = null;
     if (rerender) render();
   }
 

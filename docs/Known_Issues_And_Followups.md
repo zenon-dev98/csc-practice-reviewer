@@ -22,6 +22,7 @@
 - T0024 is PC-first and uses a fixed logical desktop frame. Wider or differently proportioned desktop viewports intentionally show balanced ambient margins instead of stretching the cockpit.
 - Mobile is fully responsive and screenshot-checked at `390x844` and `412x915`; long setup, practice, analytics, results, and review pages scroll normally by design rather than reproducing the fixed desktop frame.
 - T0025 adds the actual maximized Edge content viewport (`1536x736`) to permanent fixture QA. Future cockpit changes must pass that target in addition to the logical, `1904x913`, and `1536x816` desktop canvases.
+- T0029 final QA is clean across logical desktop, `1904x913`, `1536x816`, `1536x736`, `390x844`, and `412x915`; the only issue found during the last pass was a 4px narrow-screen Account Settings arrow overflow, which was repaired in the final override layer.
 
 ## Follow-Up Ticket Ideas
 

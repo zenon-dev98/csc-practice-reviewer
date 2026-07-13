@@ -1,0 +1,148 @@
+/* T0029 release-gate overrides. This file is intentionally last-loaded so the
+   browser applies the final content-proportional contracts after legacy CSS. */
+
+html body #app .command-drawer.account-settings-modal {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 580px !important;
+  min-width: 0 !important;
+  max-width: min(580px, 100vw) !important;
+  height: min(942px, 100vh) !important;
+  overflow-y: auto !important;
+}
+html body #app .account-settings-form {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  grid-template-columns: none !important;
+  grid-template-rows: none !important;
+  overflow: visible !important;
+  gap: 12px !important;
+}
+html body #app .account-settings-form > * { grid-column: auto !important; grid-row: auto !important; }
+html body #app .account-identity-preview { min-height: 76px !important; height: 76px !important; padding: 6px 0 !important; }
+html body #app .account-identity-preview .avatar.large { width: 64px !important; height: 64px !important; min-width: 64px !important; min-height: 64px !important; font-size: 27px !important; }
+html body #app .avatar-picker { padding: 8px 0 0 !important; }
+html body #app .avatar-options { gap: 4px !important; margin-top: 6px !important; }
+html body #app .avatar-option { height: 31px !important; min-height: 31px !important; aspect-ratio: auto !important; font-size: 17px !important; }
+html body #app .account-field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; grid-template-rows: none !important; gap: 7px 10px !important; margin-top: 0 !important; }
+html body #app .account-field-grid label:last-child { grid-column: 1 / -1 !important; }
+html body #app .account-field-grid input { height: 44px !important; min-height: 44px !important; margin-top: 4px !important; }
+html body #app .account-command-row { min-height: 68px !important; height: auto !important; overflow: visible !important; margin-top: 0 !important; }
+html body #app .account-command-row > span { min-width: 0 !important; }
+html body #app .account-command-row > svg:last-child { width: 18px !important; height: 18px !important; min-width: 18px !important; min-height: 18px !important; }
+html body #app .account-command-row small { white-space: normal !important; }
+html body #app .account-audio-settings { margin-top: 0 !important; padding: 8px 0 0 !important; gap: 5px 10px !important; }
+html body #app .account-audio-settings label { min-height: 28px !important; height: 28px !important; }
+html body #app .account-modal-actions { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; grid-template-rows: auto !important; gap: 10px !important; margin-top: 2px !important; padding-top: 0 !important; }
+html body #app .account-modal-actions .btn { min-width: 0 !important; min-height: 46px !important; height: 46px !important; }
+html body #app .account-danger-row { margin-top: 2px !important; padding-top: 8px !important; }
+html body #app .account-danger-row .btn { min-height: 44px !important; height: 44px !important; }
+
+html body #app .submit-modal {
+  height: auto !important;
+  min-height: 0 !important;
+  grid-template-rows: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+}
+html body #app .submit-title-row { display: flex !important; width: 100% !important; align-items: center !important; justify-content: flex-start !important; gap: 14px !important; margin: 0 0 14px !important; }
+html body #app .submit-title-row > div { min-width: 0 !important; }
+html body #app .submit-title-row .eyebrow { display: block !important; text-align: left !important; margin: 0 0 5px !important; }
+html body #app .submit-title-row h2 { display: block !important; height: auto !important; margin: 0 !important; text-align: left !important; }
+html body #app .submit-danger-symbol { position: static !important; inset: auto !important; width: 54px !important; height: 54px !important; flex: 0 0 54px !important; border: 1px solid var(--cockpit-red) !important; clip-path: polygon(18% 0,82% 0,100% 18%,100% 82%,82% 100%,18% 100%,0 82%,0 18%) !important; font-size: 0 !important; }
+html body #app .submit-danger-symbol svg { width: 28px !important; height: 28px !important; }
+html body #app .submit-modal > p:not(.eyebrow) { height: auto !important; width: 100% !important; margin: 0 0 18px !important; text-align: center !important; }
+html body #app .submit-stats { height: 176px !important; min-height: 176px !important; flex: 0 0 176px !important; }
+html body #app .submit-warning { height: auto !important; min-height: 64px !important; flex: 0 0 auto !important; margin: 10px 0 14px !important; }
+html body #app .submit-modal .modal-actions { height: auto !important; min-height: 54px !important; flex: 0 0 auto !important; }
+
+html body #app .exam-nav { scrollbar-width: none !important; cursor: grab !important; }
+html body #app .exam-nav::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
+html body #app .exam-nav.is-dragging { cursor: grabbing !important; user-select: none !important; }
+html body #app .exam-nav .chip-grid.is-scroll { max-height: 230px !important; overflow: auto !important; scrollbar-width: none !important; }
+html body #app .exam-nav .chip-grid.is-scroll::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
+
+@media (min-width: 1100px) {
+  #app.cockpit-desktop .setup-options {
+    display: flex !important;
+    flex-direction: column !important;
+    align-self: start !important;
+    height: auto !important;
+    min-height: 0 !important;
+    gap: 12px !important;
+  }
+  #app.cockpit-desktop .setup-options .setup-auto-save,
+  #app.cockpit-desktop .setup-options .setup-tools-note { height: auto !important; min-height: 0 !important; margin: 0 !important; }
+  #app.cockpit-desktop .setup-options .setup-auto-save { padding: 14px !important; }
+  #app.cockpit-desktop .setup-options .setup-tools-note { padding: 12px 14px !important; }
+
+  #app.cockpit-desktop .practice-review-page:has(.practice-console) {
+    grid-template-rows: auto auto auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    align-content: start !important;
+    align-self: start !important;
+  }
+  #app.cockpit-desktop .practice-review-page:has(.practice-console) > form.practice-console,
+  #app.cockpit-desktop .practice-review-page:has(.practice-console) .practice-section-picker,
+  #app.cockpit-desktop .practice-review-page:has(.practice-console) .run-profile-panel,
+  #app.cockpit-desktop .practice-review-page:has(.practice-console) .category-plates { height: auto !important; min-height: 0 !important; align-self: start !important; }
+  #app.cockpit-desktop .practice-review-page:has(.practice-console) .category-plates { grid-template-rows: auto auto !important; align-content: start !important; gap: 12px !important; }
+  #app.cockpit-desktop .practice-review-page:has(.practice-console) .run-profile-panel { grid-template-rows: auto auto auto auto auto !important; align-content: start !important; }
+
+  #app.cockpit-desktop .progress-page { grid-template-rows: auto auto auto !important; height: auto !important; min-height: 0 !important; align-content: start !important; align-self: start !important; }
+  #app.cockpit-desktop .progress-page .attempts-table-card,
+  #app.cockpit-desktop .progress-page .attempt-table { height: auto !important; min-height: 0 !important; }
+}
+
+@media (max-width: 1099px) {
+  html body #app .command-drawer.account-settings-modal { width: 100% !important; max-width: 100% !important; }
+  html body #app .account-field-grid { grid-template-columns: 1fr !important; }
+  html body #app .account-field-grid label:last-child { grid-column: auto !important; }
+  html body #app .submit-modal { max-height: calc(100vh - 24px) !important; overflow-y: auto !important; }
+  html body #app .submit-stats { height: auto !important; min-height: 0 !important; flex-basis: auto !important; }
+  html body #app .submit-stats metric { min-height: 130px !important; height: auto !important; }
+  html body #app .submit-modal .modal-actions { grid-template-columns: 1fr 1fr !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #app .hub-hero h1 em { animation: none !important; }
+}
+
+/* These selectors intentionally mirror the legacy ownership selectors and are
+   last in the cascade, so content sizing wins over old filler tracks. */
+html body #app .practice-review-page:has(.practice-console) {
+  grid-template-rows: auto auto auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  align-content: start !important;
+}
+html body #app .practice-review-page:has(.practice-console) > form.practice-console,
+html body #app form.practice-console.custom-practice > .practice-section-picker,
+html body #app form.practice-console.custom-practice > .run-profile-panel {
+  height: auto !important;
+  min-height: 0 !important;
+  align-self: start !important;
+}
+html body #app .practice-review-page:has(.practice-console) .run-profile-panel {
+  grid-template-rows: auto auto auto auto auto !important;
+  align-content: start !important;
+}
+html body #app form.practice-console.custom-practice > .run-profile-panel {
+  height: auto !important;
+  min-height: 0 !important;
+  align-self: start !important;
+  grid-template-rows: auto auto auto auto auto !important;
+  align-content: start !important;
+}
+html body #app .progress-page {
+  grid-template-rows: auto auto auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  align-content: start !important;
+}
+html body #app .progress-page .attempts-table-card,
+html body #app .progress-page .attempt-table { height: auto !important; min-height: 0 !important; }

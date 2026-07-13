@@ -95,6 +95,9 @@ Use these rules whenever adapting generated mockups, Stitch output, screenshots,
 - Compare bounding boxes as well as screenshots. The QA report must flag visible descendants outside their parent bounds, text intersecting decorative pseudo-element zones, controls with less than 8 logical pixels of edge clearance, and unintended text truncation.
 - The visual agent must repair defects it finds and rerun the affected screenshots. A written observation without the corresponding UI correction is not a completed parity loop.
 - Keep compatible page headers structurally identical. Brand mark, two-line product lockup, primary navigation, active marker, and account control may change state but not geometry between Study Hub, Full Mock, Practice & Review, and Progress.
+- Size panels from their content and purpose. Never stretch a short label, four compact section summaries, a small form, or a single action into a large container merely to fill the viewport. Empty area must serve a deliberate visualization, reading, or focus purpose; otherwise reduce the panel, rebalance the grid, or move related content into the space.
+- Reject forced compositions during screenshot QA. A panel fails when its visible content occupies only a small fraction of its area without a documented reason, when equal-height grid tracks create dead zones, or when spacing exists only to make the page fill the logical canvas. Prefer content-sized rows, proportional spans, and clearly separated groups.
+- Keep the v4 Study Hub shell invariant across compatible signed-in pages: the same shield, two-line product lockup, four-tab navigation geometry, account control placement, fonts, background treatment, border language, corner cuts, and spacing rhythm. State-specific content may change; the shell may not drift.
 
 ## Generated Image Parity Agent
 

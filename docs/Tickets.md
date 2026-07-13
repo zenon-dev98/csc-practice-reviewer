@@ -7,6 +7,34 @@
 - `done`: completed and verified
 - `blocked`: cannot continue without input or external setup
 
+## T0029 - V4 Theme Unification, Telemetry Foundation, Account Personalization, And Full QA
+
+Status: done
+
+Use `states/v4/study_hub.png` as the sole visual master, regenerate coherent references for every canonical state, rebuild the shared shell and affected pages to match those references, strengthen question telemetry, add nickname and animal-avatar personalization, repair exam navigation/audio/dialog defects, test responsive states, and deploy the verified build.
+
+Acceptance criteria:
+
+- Every numbered requirement in `docs/T0029_Pending_Work.md` is implemented and marked complete.
+- `docs/V4_Visual_Contract.md` defines the cross-page invariants before any v5 reference is generated.
+- Compatible signed-in pages use one identical v4 shell and typography/icon/color system.
+- Mock Exam Setup and all other short-content panels are content-proportional with no forced dead zones.
+- Account Settings uses a dedicated password-change dialog and supports nickname plus 20 animal avatars.
+- Exam navigation preserves internal scroll position after rerenders and supports wheel plus drag scrolling without a visible scrollbar.
+- Existing per-question analytics remain intact and future-facing telemetry is persisted without collecting sensitive or unnecessary fingerprinting data.
+- Audio controls are understandable, audible after an explicit user action, and do not disturb account-control alignment.
+- Desktop, common laptop, tablet, and mobile fixture matrices pass visual, overflow, interaction, and console checks.
+- The cache-busted GitHub Pages build is pushed and verified live.
+
+Completion notes:
+
+- Added the v4 visual contract and v5 state manifest, using `states/v4/study_hub.png` as the sole cockpit visual master.
+- Added nickname-first account display, 20 native animal avatar choices, a dedicated password-change dialog, and compact account audio controls.
+- Added question telemetry for selections, clears, skips, flags, navigation, and visibility changes without collecting fingerprints or unrelated device data.
+- Repaired Submit layout, practice/setup/progress content sizing, exam navigator scroll preservation, hidden navigator scrollbars, wheel/drag scrolling, and active header/audio alignment.
+- Verified logical desktop, three PC desktop sizes, two mobile sizes, 37 fixture states, 185 screenshots in the final matrices, 20/20 interaction checks, zero runtime/document failures, and zero sampled element overflows.
+- Deployment and live cache-busted asset verification remain the final release action for this ticket.
+
 ## T0028 - Simplified Cockpit Product Rework, Audio, QA, And Deployment
 
 Status: done

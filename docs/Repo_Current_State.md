@@ -1,6 +1,6 @@
 # Repo Current State
 
-Last updated: 2026-07-12
+Last updated: 2026-07-13
 
 ## Workspace
 
@@ -91,6 +91,7 @@ Current source item boundaries:
 - Microsoft Edge-channel desktop QA exposed and repaired the T0013 forced-fit visual regression: dashboard cards now keep proportional row spacing, exam question groups use bounded internal sidebar scrolling, result/fun-fact cards fit without clipping, and the profile modal is compact without giant blank zones. Static assets are cache-busted through `v=20260705-3`.
 - The public auth entry states now use account language and the `states/v2/sign_in.png` direction: create account includes two-column password/confirm-password fields with eye toggles and validation, sign-in uses the v2 icon-label left rail and `New here? Create account` switch, and static assets are cache-busted through `v=20260705-9`.
 - The project screenshot-parity rules now explicitly require optical checks for icon glyph quality, icon size, icon positioning, proportional full-page spacing, font family/style, font hierarchy sizes, line heights, font colors, and contrast roles before UI work can be called complete.
+- T0029 adds the v4 visual contract, v5 state manifest, content-proportional final overrides, per-question telemetry, nickname-first account personalization, 20 animal avatars, a dedicated password dialog, persistent exam navigator scrolling, explicit audio controls inside Account Settings, and the release-gate QA artifacts under `qa/t0029-*`.
 - Signed-in account-era flows have been reworked: the signed-in header now uses only the brand and upper-right account control, Account Settings replaces Manage Profile, Switch/Edit Profile and preset profile photos are retired, Practice and Review Mistakes now open purposeful setup/review hubs, Recent Attempts can display more than two attempts, and exam Next/Skip behavior is explicit.
 - Maximized Microsoft Edge QA for T0022 ran at `1528x732` with no document/body scrollbars or console errors on the checked signed-in states. QA screenshots are saved under `qa/t0022-edge-final`, `qa/t0022-edge-r7`, and `qa/t0022-edge-r8`.
 - Static assets are cache-busted through `v=20260706-1`.
@@ -105,11 +106,23 @@ Current source item boundaries:
 - Password reset, delete-account, and delete-attempt flows are in-app dialogs; no native `prompt()` or `confirm()` calls remain.
 - Final T0024 Edge evidence is stored under `qa/t0024-cockpit-final-desktop`, `qa/t0024-cockpit-final-mobile`, `qa/t0024-cockpit-mobile-full-r2`, `qa/t0024-cockpit-modals-final`, and `qa/t0024-cockpit-interactions-final`.
 - The final fixture sweep covered 36 states at three desktop sizes (`108` screenshots) and two mobile sizes (`72` screenshots), with zero console/document failures and zero sampled element overflows. The interaction harness passed `15/15` checks across `59` screenshots.
-- Static assets are cache-busted through `v=20260711-01`.
+- Static assets are cache-busted through `v=20260713-01`.
 
 ## Current Active Ticket
 
-- None. T0028 is complete; the next planned work is the Supabase backup/export or content pedagogy review pass.
+- None. T0029 is complete; the next planned work is the Supabase backup/export or content pedagogy review pass.
+
+## T0029 Outcome
+
+- Unified all canonical states under the v4 cockpit shell and documented the invariant shell/reference contract before implementation.
+- Added account personalization and security rework: nickname-first identity, 20 animal avatars, compact audio controls, and a dedicated password-change dialog.
+- Added privacy-conscious interaction telemetry and visibility-based timing protection while preserving existing per-question timing and persistence behavior.
+- Repaired content-proportional sizing in Setup, Practice & Review, Progress, Account Settings, and Submit; removed the remaining mobile account-row overflow.
+- Preserved exam navigator position across rerenders and added scrollbar-free wheel and pointer-drag scrolling.
+- Final logical desktop QA: `37` screenshots, zero console/document failures, zero sampled element overflows.
+- Final PC matrix QA: `111` screenshots across `1904x913`, `1536x816`, and `1536x736`, zero console/document failures, zero sampled element overflows.
+- Final mobile matrix QA: `74` screenshots across `390x844` and `412x915`, zero console/document failures, zero sampled element overflows.
+- Final interaction QA: `20/20` checks passed across `56` screenshots.
 
 ## T0028 Outcome
 
