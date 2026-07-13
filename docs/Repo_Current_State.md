@@ -106,11 +106,20 @@ Current source item boundaries:
 - Password reset, delete-account, and delete-attempt flows are in-app dialogs; no native `prompt()` or `confirm()` calls remain.
 - Final T0024 Edge evidence is stored under `qa/t0024-cockpit-final-desktop`, `qa/t0024-cockpit-final-mobile`, `qa/t0024-cockpit-mobile-full-r2`, `qa/t0024-cockpit-modals-final`, and `qa/t0024-cockpit-interactions-final`.
 - The final fixture sweep covered 36 states at three desktop sizes (`108` screenshots) and two mobile sizes (`72` screenshots), with zero console/document failures and zero sampled element overflows. The interaction harness passed `15/15` checks across `59` screenshots.
-- Static assets are cache-busted through `v=20260713-01`.
+- Static assets are cache-busted through `v=20260713-03`.
 
 ## Current Active Ticket
 
-- T0030 is in progress. It reopens the complete pasted request because T0029 was closed without faithful V5 implementation or requirement-by-requirement visual verification.
+- None. T0030 is complete; the next planned work remains Supabase backup/export or the generated-content pedagogy/key review.
+
+## T0030 Outcome
+
+- Reopened the original pasted request and completed every restored product, interaction, analytics, and visual requirement rather than relying on the incomplete T0029 summary.
+- Added `app/v5-parity.css` as the measured V5 state layer under the invariant V4 shell, without introducing a framework or dependency inside Google Drive.
+- Distinguished live Exam Sections completion from historical Section Accuracy and inventoried answer, timing, navigation, pause, visibility, flag, skip, and answer-change analytics in `docs/Analytics_Inventory.md`.
+- Added nickname-first identity, 20 animal avatars, a dedicated current/new/confirm password flow, icon-first stable navigation, reduced-motion-safe cockpit animation, and the full Practice/Review/Progress/Results/Review state set.
+- Final local QA produced 222 screenshots across six viewports with zero console/document/element-overflow failures; interaction QA passed 29/29 checks across 64 screenshots.
+- The cache-busted `acc5b2b` build deployed successfully to GitHub Pages, passed live state and interaction checks, and was manually inspected in maximized external Edge at 100% zoom.
 
 ## T0029 Outcome
 

@@ -2,7 +2,7 @@
 
 ## T0030 - Faithful V5 Implementation And Pasted Request Redo
 
-Status: in_progress
+Status: done
 
 Redo the complete pasted request recorded in `docs/T0030_Pasted_Request_Redo.md`. Treat the V4 Study Hub as the shared visual master and the approved V5 images as hard state contracts, repair every omitted numbered requirement, run direct screenshot-parity and interaction loops, then deploy only after live verification.
 
@@ -13,6 +13,16 @@ Acceptance criteria:
 - Compatible signed-in pages preserve one shared shell while active exam, public auth, system, and modal states follow their approved focused variants.
 - The final maximized Edge pass is performed at 100% zoom and no ticket is closed from overflow metrics alone.
 - The cache-busted build is pushed and verified live.
+
+Completion notes:
+
+- Restored and completed all 16 numbered requirements in `docs/T0030_Pasted_Request_Redo.md`.
+- Clarified current-attempt Exam Sections completion versus historical Section Accuracy and documented the persisted analytics foundation in `docs/Analytics_Inventory.md`.
+- Rebuilt the V5 state layer under the shared V4 shell, including Study Hub, Setup, active exam, Practice & Review, Progress, Results, Answer Review, Account Settings, and modal/empty/error variants.
+- Verified question timing across navigation, non-submitting exit, answer-gated Next, explicit Skip, hidden-scrollbar wheel/drag navigation, nav label reveal without layout shift, and password/account interactions.
+- Final local QA passed 222 state screenshots with zero console/document/element-overflow failures and 29/29 interaction checks across 64 screenshots.
+- Live GitHub Pages QA passed the representative state sweep, the transient boot-resource retry at all six viewports, and 29/29 interaction checks; maximized external Edge at 100% zoom was inspected at the real `1536x736` content viewport.
+- Static assets are cache-busted through `v=20260713-03` and deployed from commit `acc5b2b`.
 
 ## Status Legend
 

@@ -1,6 +1,6 @@
 # T0030 Pasted Request Redo Register
 
-Status: in progress - live verification pending
+Status: complete
 
 Source of truth: `C:\Users\Acer\.codex\attachments\d5fe2964-2ad9-4c0a-9617-0c6386421e93\pasted-text.txt`
 
@@ -34,15 +34,27 @@ T0029 was closed without implementing or visually verifying the complete pasted 
 ## Release Gates
 
 - [x] V4/V5 source images and matching implementation screenshots are paired in the final QA folder.
-- [ ] Maximized Microsoft Edge at 100% zoom is inspected at the real desktop content viewport.
+- [x] Maximized Microsoft Edge at 100% zoom is inspected at the real desktop content viewport.
 - [x] Empty, partial, populated, dense, open, closed, hover, focus, disabled, loading, error, modal, and submitted states are checked where applicable.
 - [x] JavaScript, data, dependency, Impeccable, console, overflow, interaction, and responsive checks pass.
-- [ ] Assets are cache-busted, pushed to `main`, and the live GitHub Pages asset versions and representative states are verified.
+- [x] Assets are cache-busted, pushed to `main`, and the live GitHub Pages asset versions and representative states are verified.
 
 ## Verification Evidence
 
 - `qa/t0030-release-final/`: 37 states at six viewports, 222 screenshots, zero console/document failures, and zero sampled element overflows.
 - `qa/t0030-release-interactions-final/`: 64 screenshots and 29/29 interaction assertions passed.
 - `qa/t0030-final-comparison/`: eight direct V4/V5 reference/current pairs.
+- `qa/t0030-live-logical/` and `qa/t0030-live-loading-retry/`: deployed-state captures; the one transient CDN 503 on the first boot capture was isolated and the retry passed at all six target viewports.
+- `qa/t0030-live-interactions/`: deployed interaction run with 29/29 assertions passed.
 - `docs/Analytics_Inventory.md`: persisted analytics inventory and the completion-versus-accuracy distinction.
 - Static checks passed: JavaScript syntax, generated-bank validation, local dependency policy, and Impeccable detection.
+- Maximized external Microsoft Edge was reset to 100% zoom and manually inspected at a `1536x816` window / `1536x736` content viewport across the canonical signed-in workstations and dialogs.
+
+## Completion Report
+
+- Summary: rebuilt the previously incomplete V5 pass as one coherent V4-derived cockpit, completed all 16 restored requirements, documented telemetry semantics, and deployed the cache-busted result.
+- Files changed: `app/app.js`, `app/index.html`, `app/v5-parity.css`, QA harnesses, and T0030 analytics/ticket documentation.
+- Commands run: JavaScript syntax checks, `npm run validate:data`, `npm run check`, `npx --yes impeccable detect app`, local/live state matrices, local/live interaction suites, Git commit/push, and GitHub Pages verification.
+- Verification: 222 final local state screenshots, 64 final local interaction screenshots, 37 live logical-state captures plus six boot retries, 64 live interaction screenshots, and direct external Edge inspection.
+- Risks: generated exam content still requires the separate human pedagogy/key-review pass; Supabase backup/export remains a future operational ticket.
+- Follow-ups: none for T0030 UI parity or restored behavior.

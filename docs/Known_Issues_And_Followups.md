@@ -2,8 +2,6 @@
 
 ## Open
 
-- T0030 is redoing the complete original pasted request. T0029's completion record is not accepted as V5 parity evidence because the original requirements were compressed and multiple visible states were never matched reference-by-reference.
-
 - Future generated-image work must follow `docs/Generated_Image_To_UI_Playbook.md` and the `Generated Image Parity Agent` in `AGENTS.md`; the playbook does not itself approve the unresolved T0026 content decisions.
 - T0026 documents a lower-density information architecture for all 37 fixture states. The eight decisions at the end of `docs/T0026_State_Content_Audit.md` must be approved before generating vNext references or implementing another redesign.
 - T0028 repaired the Study Hub ring legend, Review Mistakes/Your Records collision, Mock Exam Setup density, and Results score/insight geometry; the final fixture and external-Edge sweeps passed without sampled overflow.
@@ -25,6 +23,7 @@
 - Mobile is fully responsive and screenshot-checked at `390x844` and `412x915`; long setup, practice, analytics, results, and review pages scroll normally by design rather than reproducing the fixed desktop frame.
 - T0025 adds the actual maximized Edge content viewport (`1536x736`) to permanent fixture QA. Future cockpit changes must pass that target in addition to the logical, `1904x913`, and `1536x816` desktop canvases.
 - T0029 final QA is clean across logical desktop, `1904x913`, `1536x816`, `1536x736`, `390x844`, and `412x915`; the only issue found during the last pass was a 4px narrow-screen Account Settings arrow overflow, which was repaired in the final override layer.
+- T0030 supersedes the incomplete T0029 parity claim. Its final local six-viewport matrix, local/live 29-check interaction suites, live boot retry, and maximized external Edge inspection are clean. No open V5 parity defect remains from the restored pasted request.
 
 ## Follow-Up Ticket Ideas
 
