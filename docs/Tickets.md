@@ -33,7 +33,7 @@ Completion notes:
 - Added question telemetry for selections, clears, skips, flags, navigation, and visibility changes without collecting fingerprints or unrelated device data.
 - Repaired Submit layout, practice/setup/progress content sizing, exam navigator scroll preservation, hidden navigator scrollbars, wheel/drag scrolling, and active header/audio alignment.
 - Verified logical desktop, three PC desktop sizes, two mobile sizes, 37 fixture states, 185 screenshots in the final matrices, 20/20 interaction checks, zero runtime/document failures, and zero sampled element overflows.
-- Deployment and live cache-busted asset verification remain the final release action for this ticket.
+- Pushed to `origin/main` as `78e9acd` and verified live on GitHub Pages with cache-busted assets `v=20260713-01`.
 
 ## T0028 - Simplified Cockpit Product Rework, Audio, QA, And Deployment
 

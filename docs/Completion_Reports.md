@@ -1196,6 +1196,9 @@ Verification:
 - Mobile matrix: `74` screenshots across `390x844` and `412x915`, zero console/document failures, zero sampled element overflows.
 - Interaction sweep: `56` screenshots and `20/20` checks passed.
 - Impeccable detection, syntax, static-data, and local-only dependency checks passed.
+- Live representative-state sweep: `10` screenshots, zero console/document failures, zero sampled element overflows.
+- Live interaction sweep: `60` screenshots and `20/20` checks passed.
+- GitHub Pages is serving commit `78e9acd` with `20260713-01` cache-busted assets.
 
 Risks:
 
