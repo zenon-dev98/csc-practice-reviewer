@@ -2,7 +2,7 @@
 
 ## T0031 - Full Section Navigator Reachability
 
-Status: in_progress
+Status: done
 
 Repair the active-exam question navigator so expanding a section exposes every item in that section and users can move from the end of a section back to its beginning without refreshing.
 
@@ -14,6 +14,16 @@ Acceptance criteria:
 - Expansion state and sidebar scroll behavior remain stable across question rerenders.
 - The sequence is covered by an automated Edge interaction check and manually verified in maximized external Edge at 100% zoom.
 - The cache-busted fix is deployed and verified on GitHub Pages.
+
+Completion notes:
+
+- Replaced the moving 20-item expanded window with the complete section question list.
+- Removed the competing nested chip-grid scroll so the bounded question sidebar remains the single scroll owner.
+- Added a permanent Edge regression that expands Verbal Ability, opens item 80, then returns to item 21.
+- Local and live interaction suites passed 33/33 checks across 66 screenshots each.
+- The exam fixture passed at all six target viewports with zero console, document-overflow, or sampled element-overflow failures.
+- The 80-to-21 sequence passed locally and live at `390x844` and was manually repeated in maximized external Edge at 100% zoom.
+- Deployed from commit `25f3575` with `app.js?v=20260714-01`.
 
 ## T0030 - Faithful V5 Implementation And Pasted Request Redo
 

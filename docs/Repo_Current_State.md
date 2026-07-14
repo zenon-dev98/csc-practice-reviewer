@@ -106,11 +106,19 @@ Current source item boundaries:
 - Password reset, delete-account, and delete-attempt flows are in-app dialogs; no native `prompt()` or `confirm()` calls remain.
 - Final T0024 Edge evidence is stored under `qa/t0024-cockpit-final-desktop`, `qa/t0024-cockpit-final-mobile`, `qa/t0024-cockpit-mobile-full-r2`, `qa/t0024-cockpit-modals-final`, and `qa/t0024-cockpit-interactions-final`.
 - The final fixture sweep covered 36 states at three desktop sizes (`108` screenshots) and two mobile sizes (`72` screenshots), with zero console/document failures and zero sampled element overflows. The interaction harness passed `15/15` checks across `59` screenshots.
-- Static assets are cache-busted through `v=20260713-03`.
+- Static assets are cache-busted through `app.js?v=20260714-01`.
 
 ## Current Active Ticket
 
-- T0031 is in progress. It repairs the active-exam section navigator after reproducing that the moving 20-item expanded window makes question 21 unreachable after navigating to question 80.
+- None. T0031 is complete; the next planned work remains Supabase backup/export or the generated-content pedagogy/key review.
+
+## T0031 Outcome
+
+- Reproduced the item 80 to item 21 navigation failure in maximized external Edge: expanded sections rendered only a moving 20-item slice, so item 21 was absent from the DOM at item 80.
+- Expanded sections now render their complete question range while the existing bounded sidebar owns scrolling, eliminating the nested-scroll trap.
+- Added an automated 80-to-21 regression to the permanent interaction harness.
+- Local and live Edge interaction suites passed 33/33 checks; the exam state passed all six target viewports, and targeted mobile navigation passed at `390x844`.
+- The cache-busted fix is live from commit `25f3575` and was manually verified in maximized external Edge at 100% zoom.
 
 ## T0030 Outcome
 
