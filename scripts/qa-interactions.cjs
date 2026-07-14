@@ -223,6 +223,22 @@ function safeName(value) {
     await screenshot("exam-submitted-results");
   });
 
+  await test("exam full section navigation", async () => {
+    await gotoFixture("exam");
+    const verbalGroup = () => page.locator(".exam-nav details.question-group").filter({ has: page.getByText("Verbal Ability", { exact: true }) }).first();
+    await verbalGroup().locator(".more-chip").click();
+    await check("expanded Verbal section contains question 21", async () => await verbalGroup().locator("[data-goto='20']").count() === 1);
+    await check("expanded Verbal section contains question 80", async () => await verbalGroup().locator("[data-goto='79']").count() === 1);
+    await verbalGroup().locator("[data-goto='79']").scrollIntoViewIfNeeded();
+    await verbalGroup().locator("[data-goto='79']").click();
+    await check("navigator opens question 80", async () => /Item 80\b/i.test(await page.locator(".question-index").innerText()));
+    await screenshot("exam-question-80");
+    await verbalGroup().locator("[data-goto='20']").scrollIntoViewIfNeeded();
+    await verbalGroup().locator("[data-goto='20']").click();
+    await check("navigator returns from question 80 to question 21", async () => /Item 21\b/i.test(await page.locator(".question-index").innerText()));
+    await screenshot("exam-question-21-after-80");
+  });
+
   await test("question timing and non-submitting exit", async () => {
     runtimeErrors.length = 0;
     await page.goto(`${baseUrl}?fixture=exam&qaTiming=1&qa=timing`, { waitUntil: "networkidle" });

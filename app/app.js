@@ -1957,7 +1957,7 @@
       const skipped = groupAnswers.filter((answer) => answer.skipped && !answer.selected_choice).length;
       const flagged = groupAnswers.filter((answer) => answer.flagged).length;
       const expandedFull = app.expandedNavGroups.has(group.section);
-      const previewAnswers = expandedFull ? navExpandedPreviewAnswers(groupAnswers, attempt.current_question_index) : navPreviewAnswers(groupAnswers, attempt.current_question_index);
+      const previewAnswers = expandedFull ? groupAnswers : navPreviewAnswers(groupAnswers, attempt.current_question_index);
       const stimulusBody = renderStimulusNavigator(group, groupAnswers, attempt);
       return `
         <details class="question-group ${group.tone}" ${navGroupOpen(group, hasCurrent) ? "open" : ""}>
@@ -1973,7 +1973,7 @@
               <span>${skipped} skipped</span>
               <span>${flagged} flagged</span>
             </div>
-            <div class="chip-grid ${expandedFull ? "is-scroll" : ""}">
+            <div class="chip-grid">
               ${previewAnswers.map((answer) => navChip(answer, attempt)).join("")}
               ${!expandedFull && groupAnswers.length > previewAnswers.length ? `<button class="question-chip more-chip" data-action="toggle-nav-full" data-nav-group="${escapeAttr(group.section)}" type="button">More</button>` : ""}
               ${expandedFull && groupAnswers.length > 10 ? `<button class="question-chip more-chip" data-action="toggle-nav-full" data-nav-group="${escapeAttr(group.section)}" type="button">Less</button>` : ""}
@@ -2051,13 +2051,6 @@
     const currentPosition = groupAnswers.findIndex((answer) => answer.position === currentIndex);
     const blockStart = currentPosition >= 0 ? Math.floor(currentPosition / 10) * 10 : 0;
     return groupAnswers.slice(blockStart, blockStart + 10);
-  }
-
-  function navExpandedPreviewAnswers(groupAnswers, currentIndex) {
-    if (groupAnswers.length <= 20) return groupAnswers;
-    const currentPosition = groupAnswers.findIndex((answer) => answer.position === currentIndex);
-    const blockStart = currentPosition >= 0 ? Math.floor(currentPosition / 10) * 10 : 0;
-    return groupAnswers.slice(blockStart, blockStart + 20);
   }
 
   function navChip(answer, attempt) {

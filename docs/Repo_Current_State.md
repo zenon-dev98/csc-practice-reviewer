@@ -110,7 +110,7 @@ Current source item boundaries:
 
 ## Current Active Ticket
 
-- None. T0030 is complete; the next planned work remains Supabase backup/export or the generated-content pedagogy/key review.
+- T0031 is in progress. It repairs the active-exam section navigator after reproducing that the moving 20-item expanded window makes question 21 unreachable after navigating to question 80.
 
 ## T0030 Outcome
 

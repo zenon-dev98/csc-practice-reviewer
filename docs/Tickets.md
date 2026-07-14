@@ -1,5 +1,20 @@
 # Tickets
 
+## T0031 - Full Section Navigator Reachability
+
+Status: in_progress
+
+Repair the active-exam question navigator so expanding a section exposes every item in that section and users can move from the end of a section back to its beginning without refreshing.
+
+Acceptance criteria:
+
+- Expanding Verbal Ability exposes questions 21-80 in one bounded, scrollable navigator flow.
+- A user can select question 80, scroll back, and select question 21 without refreshing or leaving the attempt.
+- The sidebar owns scrolling; expanded chip grids do not create a competing nested scroll area.
+- Expansion state and sidebar scroll behavior remain stable across question rerenders.
+- The sequence is covered by an automated Edge interaction check and manually verified in maximized external Edge at 100% zoom.
+- The cache-busted fix is deployed and verified on GitHub Pages.
+
 ## T0030 - Faithful V5 Implementation And Pasted Request Redo
 
 Status: done
