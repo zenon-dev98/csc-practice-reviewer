@@ -27,6 +27,7 @@
 - T0031 removed the moving expanded-section window and nested chip-grid scroll. The complete Verbal 21-80 range is now reachable in one sidebar flow; local/live desktop and mobile 80-to-21 regressions pass.
 - T0032 deliberately retires all decorative animation and transitions. Motion should remain disabled until a future ticket defines a meaningful trigger, endpoint, duration, easing, and reduced-motion fallback.
 - T0032 adds permanent release checks for pointer/keyboard focus modality, Setup label/value collisions and physical icon/type scale, Mistakes heading clearance, active animations, More/Less lower-content reachability, and mobile content that extends beyond the browser's actual scrolling element.
+- T0032 now uses `app/v5-production.css` as the sole post-theme V5 production authority. The former `v5-parity.css` remains in repository history only and is not loaded by the app.
 
 ## Follow-Up Ticket Ideas
 

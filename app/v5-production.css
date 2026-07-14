@@ -1,0 +1,4572 @@
+/*
+ * V5 production visual contract.
+ *
+ * This file is the only post-theme authority for the approved V4/V5 desktop
+ * references. It deliberately replaces the former additive parity patch.
+ */
+
+:root {
+  --v5-bg: #02090d;
+  --v5-panel: #06151b;
+  --v5-panel-2: #091b22;
+  --v5-line: #29434c;
+  --v5-line-bright: #25d7db;
+  --v5-text: #f0f5f4;
+  --v5-muted: #9db0b4;
+  --v5-cyan: #19d7d8;
+  --v5-blue: #2588ff;
+  --v5-green: #54d45b;
+  --v5-purple: #a754ef;
+  --v5-amber: #f5b913;
+  --v5-red: #ff4a50;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 40px;
+  --space-8: 48px;
+}
+
+/* Mobile owns document flow. Desktop workstation heights must never make list
+   content visible but unreachable below the fixed bottom navigation. */
+@media (max-width: 1099px) {
+  html body main#app.app-shell section.content-page.practice-review-page,
+  html body main#app.app-shell section.content-page.practice-review-page:has(.mistakes-hub),
+  html body main#app.app-shell section.content-page.practice-review-page:has(.review-queue) {
+    display: block !important;
+    height: auto !important;
+    min-height: calc(100vh - 68px) !important;
+    padding-bottom: 92px !important;
+    overflow: visible !important;
+  }
+
+  html body main#app.app-shell .practice-review-page .mistakes-hub,
+  html body main#app.app-shell .practice-review-page .review-queue,
+  html body main#app.app-shell .practice-review-page .mistakes-list-only,
+  html body main#app.app-shell .practice-review-page .mistake-attempt-scroll,
+  html body main#app.app-shell .practice-review-page .flagged-workspace,
+  html body main#app.app-shell .practice-review-page .flagged-table-panel,
+  html body main#app.app-shell .practice-review-page .flagged-table-scroll,
+  html body main#app.app-shell .practice-review-page .flagged-section {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  html body main#app.app-shell .practice-review-page .mistake-table-head,
+  html body main#app.app-shell .practice-review-page .flagged-table-head {
+    display: none !important;
+  }
+
+  html body main#app.app-shell .practice-review-page .mistake-console-head,
+  html body main#app.app-shell .practice-review-page .mistake-summary-rail {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  html body main#app.app-shell .practice-review-page .mistake-summary-rail {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+
+  html body main#app.app-shell .practice-review-page .mistake-attempt-scroll {
+    display: grid !important;
+    margin-top: 16px !important;
+    gap: 12px !important;
+  }
+
+  html body main#app.app-shell .practice-review-page .flagged-table-row {
+    height: auto !important;
+    min-height: 132px !important;
+  }
+
+  html body main#app.app-shell .practice-review-page .flagged-table-row > span:first-child {
+    display: grid !important;
+    grid-template-columns: 18px 76px minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  html body main#app.app-shell .practice-review-page .flagged-table-row > span:nth-child(2) {
+    display: grid !important;
+    gap: 3px !important;
+  }
+
+  html body main#app.app-shell .practice-review-page .flagged-table-row > span:nth-child(2) > small {
+    display: block !important;
+  }
+
+  html body main#app.app-shell .account-command-row {
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+    grid-template-columns: 22px minmax(0, 1fr) 18px !important;
+  }
+
+  html body main#app.app-shell .account-command-row > svg:last-child {
+    width: 18px !important;
+    min-width: 18px !important;
+    height: 18px !important;
+    min-height: 18px !important;
+  }
+}
+
+/* Pointer focus stays visually quiet on account forms; keyboard focus remains
+   explicit for accessibility. This must follow the V5 field skin. */
+html body main#app.app-shell.cockpit-desktop[data-input-mode="pointer"] .field-with-icon:focus-within,
+html body main#app.app-shell.cockpit-desktop[data-input-mode="pointer"] .account-settings-form input:focus {
+  border-color: #40585f !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+html body main#app.app-shell.cockpit-desktop[data-input-mode="keyboard"] .field-with-icon:focus-within,
+html body main#app.app-shell.cockpit-desktop[data-input-mode="keyboard"] .account-settings-form input:focus {
+  border-color: var(--v5-cyan) !important;
+  outline: 2px solid var(--v5-cyan) !important;
+  outline-offset: 3px !important;
+  box-shadow: none !important;
+}
+
+@media (min-width: 1100px) {
+  html body #app.cockpit-desktop section.setup-page .setup-main .setup-facts .instrument-cell {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 72px 46px 28px !important;
+    align-content: center !important;
+    justify-content: stretch !important;
+    justify-items: center !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page .setup-main .setup-facts .instrument-cell > strong {
+    width: 100% !important;
+    margin: 0 !important;
+    font-size: 29px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page .setup-main .setup-facts .instrument-cell > span:not(.instrument-icon) {
+    width: 100% !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page .setup-main .v5-allocation-console {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 40px minmax(0, 1fr) !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page .setup-main .v5-allocation-console > .technical-title,
+  html body #app.cockpit-desktop section.setup-page .setup-main .v5-allocation-console > .allocation-grid {
+    grid-column: 1 !important;
+    width: 100% !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page .setup-main .v5-allocation-console > .allocation-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page form.run-configuration > label.toggle-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 74px !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+    align-items: center !important;
+    padding: 0 18px !important;
+    white-space: nowrap !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page form.run-configuration > label.toggle-row > input {
+    position: absolute !important;
+    opacity: 0 !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page form.run-configuration > label.toggle-row > span {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console > .practice-section-picker > .category-plates {
+    display: grid !important;
+    height: 420px !important;
+    min-height: 0 !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: repeat(4, 97px) !important;
+    grid-auto-rows: 0 !important;
+    gap: 10px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console .category-plates > label.section-plate {
+    width: 100% !important;
+    height: 97px !important;
+    min-height: 0 !important;
+    grid-template-rows: 79px !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console > .run-profile-panel {
+    display: grid !important;
+    height: 506px !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 94px 94px 76px 96px !important;
+    align-content: start !important;
+    padding: 22px 28px !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console .count-segments,
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console .difficulty-segments {
+    display: grid !important;
+    height: 94px !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    grid-template-rows: 30px 58px !important;
+    align-content: start !important;
+    padding: 0 !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console .count-segments > .segment-label,
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console .difficulty-segments > .segment-label {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    align-self: start !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console .count-segments > label,
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console .difficulty-segments > label {
+    grid-row: 2 !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page .mistakes-hub .mistake-summary-rail > metric {
+    display: grid !important;
+    grid-template-columns: 64px minmax(0, 1fr) !important;
+    grid-template-rows: 30px 34px !important;
+    align-content: center !important;
+    justify-content: stretch !important;
+    padding: 8px 14px !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page .mistakes-hub .mistake-summary-rail > metric > .telemetry-icon {
+    grid-column: 1 !important;
+    grid-row: 1 / 3 !important;
+    align-self: center !important;
+    width: 48px !important;
+    height: 48px !important;
+    margin: 0 !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page .mistakes-hub .mistake-summary-rail > metric > span:not(.telemetry-icon) {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: end !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page .mistakes-hub .mistake-summary-rail > metric > strong {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    align-self: start !important;
+    margin: 0 !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page .mistakes-hub .mistake-attempt-card {
+    height: 82px !important;
+    min-height: 82px !important;
+    max-height: 82px !important;
+  }
+
+  html body #app.cockpit-desktop section.results-page > .results-summary-grid > .score-gauge-panel {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    align-self: stretch !important;
+  }
+
+  html body #app.cockpit-desktop section.results-page > .results-summary-grid > .results-data-stack {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: stretch !important;
+  }
+
+  html body #app.cockpit-desktop section.results-page > .results-summary-grid {
+    grid-auto-rows: 0 !important;
+  }
+
+  html body #app.cockpit-desktop section.results-page .results-data-stack > .results-section-console {
+    height: 224px !important;
+    min-height: 224px !important;
+  }
+
+  html body #app.cockpit-desktop section.results-page > .run-insights-panel > .insight-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  html body #app *,
+  html body #app *::before,
+  html body #app *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (min-width: 1100px) {
+  /* Public access console and system states. */
+  html body #app.cockpit-desktop .public-header {
+    box-sizing: border-box !important;
+    height: 101px !important;
+    min-height: 101px !important;
+    grid-template-columns: 1fr auto !important;
+    padding: 0 72px !important;
+    border-bottom: 1px solid #233b43 !important;
+    background: #040c10 !important;
+  }
+
+  html body #app.cockpit-desktop .public-header .brand .logo {
+    width: 62px !important;
+    height: 70px !important;
+  }
+
+  html body #app.cockpit-desktop .public-header .brand strong {
+    color: #f3f6f4 !important;
+    font: 700 27px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .public-header .brand span {
+    margin-top: 5px !important;
+    color: #a7b5b7 !important;
+    font: 500 16px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .access-status {
+    display: inline-flex !important;
+    height: 46px !important;
+    border: 1px solid #2d4951 !important;
+    align-items: center !important;
+    padding: 0 18px !important;
+    background: #07151a !important;
+    color: #c8d1d2 !important;
+    font: 600 15px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+    gap: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .access-status i {
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    background: var(--v5-green) !important;
+    box-shadow: 0 0 10px rgba(84, 212, 91, .5) !important;
+  }
+
+  html body #app.cockpit-desktop .public-main {
+    box-sizing: border-box !important;
+    height: 779px !important;
+    min-height: 0 !important;
+    padding: 46px 72px 38px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app.cockpit-desktop .access-console {
+    display: grid !important;
+    width: 100% !important;
+    height: 100% !important;
+    grid-template-columns: minmax(0, 1fr) 690px !important;
+    gap: 34px !important;
+  }
+
+  html body #app.cockpit-desktop .auth-copy {
+    position: relative !important;
+    box-sizing: border-box !important;
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-rows: 50px auto auto 1fr !important;
+    align-content: center !important;
+    border: 1px solid #294750 !important;
+    border-top-color: var(--v5-cyan) !important;
+    padding: 48px 58px !important;
+    background:
+      linear-gradient(125deg, rgba(19, 89, 96, .16), transparent 45%),
+      rgba(4, 14, 19, .93) !important;
+    clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px) !important;
+  }
+
+  html body #app.cockpit-desktop .soft-pill {
+    display: inline-flex !important;
+    width: fit-content !important;
+    height: 42px !important;
+    border: 1px solid var(--v5-cyan) !important;
+    align-items: center !important;
+    padding: 0 16px !important;
+    background: rgba(25, 215, 216, .08) !important;
+    color: var(--v5-cyan) !important;
+    font: 700 16px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+    gap: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .auth-copy h1 {
+    margin: 26px 0 0 !important;
+    color: #f4f5f3 !important;
+    font: italic 800 69px/.92 var(--display-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .auth-copy h1 em {
+    color: var(--v5-cyan) !important;
+    font-style: italic !important;
+  }
+
+  html body #app.cockpit-desktop .auth-copy > p {
+    max-width: 680px !important;
+    margin: 24px 0 28px !important;
+    color: #c1cbcc !important;
+    font: 500 21px/1.35 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .auth-chips {
+    display: grid !important;
+    align-content: end !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .auth-chips > span {
+    display: grid !important;
+    min-height: 74px !important;
+    grid-template-columns: 58px minmax(0, 1fr) !important;
+    grid-template-rows: 30px 24px !important;
+    align-content: center !important;
+    border-left: 2px solid var(--v5-cyan) !important;
+    padding: 0 18px !important;
+    background: rgba(8, 28, 34, .8) !important;
+  }
+
+  html body #app.cockpit-desktop .auth-chips > span > svg {
+    width: 34px !important;
+    height: 34px !important;
+    grid-row: 1 / 3 !important;
+    align-self: center !important;
+    color: var(--v5-cyan) !important;
+  }
+
+  html body #app.cockpit-desktop .auth-chips b {
+    color: #edf3f2 !important;
+    font: 600 18px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .auth-chips small {
+    color: #9fb0b2 !important;
+    font: 500 14px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .auth-card {
+    position: relative !important;
+    box-sizing: border-box !important;
+    display: grid !important;
+    min-width: 0 !important;
+    align-content: center !important;
+    border: 1px solid #2c4952 !important;
+    border-top-color: var(--v5-cyan) !important;
+    padding: 36px 42px !important;
+    background: rgba(5, 16, 22, .98) !important;
+    box-shadow: 24px 26px 0 rgba(1, 7, 10, .34), 0 28px 60px rgba(0, 0, 0, .34) !important;
+    clip-path: polygon(17px 0, calc(100% - 17px) 0, 100% 17px, 100% calc(100% - 17px), calc(100% - 17px) 100%, 17px 100%, 0 calc(100% - 17px), 0 17px) !important;
+    gap: 15px !important;
+  }
+
+  html body #app.cockpit-desktop .auth-card-head {
+    margin-bottom: 10px !important;
+    text-align: center !important;
+  }
+
+  html body #app.cockpit-desktop .auth-card-head h2 {
+    margin: 0 !important;
+    color: #f4f6f4 !important;
+    font: italic 800 48px/.95 var(--display-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .auth-card-head p {
+    margin: 10px 0 0 !important;
+    color: #9fb0b2 !important;
+    font: 500 17px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .field-label,
+  html body #app.cockpit-desktop .password-change-form > label,
+  html body #app.cockpit-desktop .account-field-grid > label {
+    display: grid !important;
+    color: #dbe3e2 !important;
+    font: 600 15px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+    gap: 8px !important;
+  }
+
+  html body #app.cockpit-desktop .field-with-icon {
+    box-sizing: border-box !important;
+    display: grid !important;
+    height: 54px !important;
+    grid-template-columns: 44px minmax(0, 1fr) !important;
+    align-items: center !important;
+    border: 1px solid #36515a !important;
+    background: #07161c !important;
+  }
+
+  html body #app.cockpit-desktop .field-with-icon.has-toggle {
+    grid-template-columns: 44px minmax(0, 1fr) 48px !important;
+  }
+
+  html body #app.cockpit-desktop .field-with-icon > svg {
+    width: 24px !important;
+    height: 24px !important;
+    justify-self: center !important;
+    color: #8fa4a8 !important;
+  }
+
+  html body #app.cockpit-desktop .field-with-icon input,
+  html body #app.cockpit-desktop .account-field-grid input,
+  html body #app.cockpit-desktop .password-change-form input {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 52px !important;
+    border: 0 !important;
+    outline: 0 !important;
+    padding: 0 10px !important;
+    background: transparent !important;
+    color: #edf3f2 !important;
+    font: 500 17px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .field-with-icon:focus-within {
+    border-color: var(--v5-cyan) !important;
+    box-shadow: inset 3px 0 0 var(--v5-cyan) !important;
+  }
+
+  html body #app.cockpit-desktop .password-toggle {
+    display: grid !important;
+    width: 46px !important;
+    height: 46px !important;
+    border: 0 !important;
+    place-items: center !important;
+    background: transparent !important;
+    color: #9fb0b2 !important;
+  }
+
+  html body #app.cockpit-desktop .auth-password-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop .auth-card > .btn.primary {
+    height: 60px !important;
+    min-height: 60px !important;
+    margin-top: 2px !important;
+    font: 700 21px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .auth-divider {
+    display: grid !important;
+    grid-template-columns: 1fr auto 1fr !important;
+    align-items: center !important;
+    color: #91a4a7 !important;
+    font: 600 14px/1 var(--hud-font) !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .auth-divider::before,
+  html body #app.cockpit-desktop .auth-divider::after {
+    height: 1px !important;
+    background: #2d464e !important;
+    content: "" !important;
+  }
+
+  html body #app.cockpit-desktop .auth-switch-copy {
+    margin: 0 !important;
+    color: #a9b7b8 !important;
+    font: 500 15px/1 var(--hud-font) !important;
+    text-align: center !important;
+  }
+
+  html body #app.cockpit-desktop .text-link {
+    border: 0 !important;
+    background: transparent !important;
+    color: var(--v5-cyan) !important;
+    font: 700 16px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .public-status-rail {
+    box-sizing: border-box !important;
+    display: grid !important;
+    height: 62px !important;
+    grid-template-columns: 1fr 1.4fr 1fr !important;
+    align-items: center !important;
+    border-top: 1px solid #263f47 !important;
+    padding: 0 72px !important;
+    background: #040d11 !important;
+    color: #93a6a9 !important;
+    font: 500 14px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .public-status-rail > span:nth-child(2) {
+    text-align: center !important;
+  }
+
+  html body #app.cockpit-desktop .public-status-rail > span:last-child {
+    justify-self: end !important;
+  }
+
+  html body #app.cockpit-desktop .system-screen {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 100% !important;
+    background:
+      radial-gradient(circle at 50% 43%, rgba(20, 108, 113, .15), transparent 34%),
+      repeating-linear-gradient(90deg, transparent 0 79px, rgba(70, 124, 132, .025) 80px),
+      #02090d !important;
+  }
+
+  html body #app.cockpit-desktop .boot-console {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    display: grid !important;
+    width: 710px !important;
+    min-height: 560px !important;
+    justify-items: center !important;
+    align-content: center !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  html body #app.cockpit-desktop .boot-console > img {
+    width: 132px !important;
+    height: 146px !important;
+    margin-bottom: 14px !important;
+    filter: drop-shadow(0 0 24px rgba(25, 215, 216, .32)) !important;
+  }
+
+  html body #app.cockpit-desktop .boot-brand {
+    color: #f4f6f4 !important;
+    font: 700 33px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .boot-product-line {
+    margin-top: 8px !important;
+    color: #9fb0b2 !important;
+    font: 500 17px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .boot-console h1 {
+    margin: 38px 0 18px !important;
+    color: var(--v5-cyan) !important;
+    font: italic 800 48px/1 var(--display-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .segmented-loader {
+    display: grid !important;
+    width: 560px !important;
+    height: 18px !important;
+    grid-template-columns: repeat(8, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  html body #app.cockpit-desktop .segmented-loader i {
+    border: 1px solid #24636a !important;
+    background: linear-gradient(90deg, rgba(25, 215, 216, .8), rgba(25, 215, 216, .2)) !important;
+    transform: skewX(-18deg) !important;
+  }
+
+  html body #app.cockpit-desktop .boot-status {
+    margin-top: 14px !important;
+    color: #a9b7b8 !important;
+    font: 500 16px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .boot-sync-modules {
+    display: grid !important;
+    width: 680px !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    margin-top: 38px !important;
+    border: 1px solid #2b454d !important;
+  }
+
+  html body #app.cockpit-desktop .boot-sync-modules > span {
+    display: grid !important;
+    min-height: 82px !important;
+    grid-template-columns: 48px 1fr !important;
+    grid-template-rows: 27px 24px !important;
+    align-content: center !important;
+    border-right: 1px solid #2b454d !important;
+    padding: 0 16px !important;
+  }
+
+  html body #app.cockpit-desktop .boot-sync-modules > span:last-child {
+    border-right: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .boot-sync-modules svg {
+    width: 31px !important;
+    height: 31px !important;
+    grid-row: 1 / 3 !important;
+    align-self: center !important;
+    color: var(--v5-cyan) !important;
+  }
+
+  html body #app.cockpit-desktop .boot-sync-modules b {
+    color: #ecf2f1 !important;
+    font: 600 15px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .boot-sync-modules small {
+    color: #82979b !important;
+    font: 500 13px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .diagnostic-screen {
+    display: grid !important;
+    grid-template-columns: 360px 780px !important;
+    place-content: center !important;
+    gap: 24px !important;
+  }
+
+  html body #app.cockpit-desktop .diagnostic-rail {
+    box-sizing: border-box !important;
+    display: grid !important;
+    min-height: 480px !important;
+    align-content: center !important;
+    border: 1px solid #2b454d !important;
+    padding: 34px !important;
+    background: #05141a !important;
+    gap: 22px !important;
+  }
+
+  html body #app.cockpit-desktop .diagnostic-panel {
+    box-sizing: border-box !important;
+    min-height: 480px !important;
+    padding: 44px 48px !important;
+  }
+
+  /* Account drawer and all modal states. */
+  html body #app.cockpit-desktop .modal-backdrop {
+    position: absolute !important;
+    z-index: 200 !important;
+    inset: 0 !important;
+    display: grid !important;
+    place-items: center !important;
+    background: rgba(1, 6, 9, .78) !important;
+    backdrop-filter: blur(3px) !important;
+  }
+
+  html body #app.cockpit-desktop .drawer-backdrop {
+    place-items: stretch end !important;
+    background: rgba(1, 6, 9, .66) !important;
+  }
+
+  html body #app.cockpit-desktop .profile-modal.command-drawer {
+    box-sizing: border-box !important;
+    width: 720px !important;
+    height: 942px !important;
+    min-height: 0 !important;
+    border: 1px solid var(--v5-cyan) !important;
+    border-radius: 0 !important;
+    padding: 42px 44px !important;
+    background: #051218 !important;
+    box-shadow: -28px 0 70px rgba(0, 0, 0, .5) !important;
+    clip-path: polygon(18px 0, 100% 0, 100% 100%, 18px 100%, 0 calc(100% - 18px), 0 18px) !important;
+    overflow: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #2d6e76 transparent !important;
+  }
+
+  html body #app.cockpit-desktop .modal-close {
+    position: absolute !important;
+    z-index: 2 !important;
+    top: 24px !important;
+    right: 24px !important;
+    display: grid !important;
+    width: 42px !important;
+    height: 42px !important;
+    border: 1px solid #3a535b !important;
+    place-items: center !important;
+    background: #07161c !important;
+    color: #c7d0d0 !important;
+  }
+
+  html body #app.cockpit-desktop .modal-heading h2,
+  html body #app.cockpit-desktop .password-modal h2,
+  html body #app.cockpit-desktop .pause-modal h2,
+  html body #app.cockpit-desktop .submit-modal h2,
+  html body #app.cockpit-desktop .reset-modal h2,
+  html body #app.cockpit-desktop .confirm-modal h2,
+  html body #app.cockpit-desktop .timeout-modal h2 {
+    margin: 0 !important;
+    color: #f3f5f3 !important;
+    font: italic 800 45px/1 var(--display-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .modal-heading > p {
+    margin: 10px 0 0 !important;
+    color: #9cafb1 !important;
+    font: 500 16px/1.2 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .account-settings-form {
+    display: grid !important;
+    margin-top: 28px !important;
+    gap: 18px !important;
+  }
+
+  html body #app.cockpit-desktop .account-identity-preview {
+    display: grid !important;
+    min-height: 104px !important;
+    grid-template-columns: 88px 1fr !important;
+    align-items: center !important;
+    border: 1px solid #2e4951 !important;
+    padding: 0 18px !important;
+    background: rgba(7, 24, 30, .8) !important;
+    gap: 18px !important;
+  }
+
+  html body #app.cockpit-desktop .account-identity-preview .avatar.large {
+    display: grid !important;
+    width: 72px !important;
+    height: 72px !important;
+    border: 1px solid var(--v5-cyan) !important;
+    border-radius: 0 !important;
+    place-items: center !important;
+    background: #0a1c22 !important;
+    clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%) !important;
+    font-size: 31px !important;
+  }
+
+  html body #app.cockpit-desktop .account-identity-preview strong {
+    display: block !important;
+    color: #eef3f2 !important;
+    font: 600 22px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .account-identity-preview small {
+    display: block !important;
+    margin-top: 7px !important;
+    color: #98aaad !important;
+    font: 500 15px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .avatar-picker {
+    border: 0 !important;
+    padding: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .avatar-picker legend {
+    margin-bottom: 10px !important;
+    color: var(--v5-cyan) !important;
+    font: 700 14px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .avatar-options {
+    display: grid !important;
+    grid-template-columns: repeat(10, 1fr) !important;
+    gap: 7px !important;
+  }
+
+  html body #app.cockpit-desktop .avatar-option {
+    display: grid !important;
+    width: 48px !important;
+    height: 48px !important;
+    border: 1px solid #334c54 !important;
+    border-radius: 0 !important;
+    place-items: center !important;
+    background: #07161c !important;
+    font-size: 22px !important;
+    clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%) !important;
+  }
+
+  html body #app.cockpit-desktop .avatar-option.selected {
+    border-color: var(--v5-cyan) !important;
+    background: rgba(25, 215, 216, .12) !important;
+  }
+
+  html body #app.cockpit-desktop .account-field-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop .account-field-grid > label:last-child {
+    grid-column: 1 / -1 !important;
+  }
+
+  html body #app.cockpit-desktop .account-field-grid input {
+    height: 50px !important;
+    border: 1px solid #36515a !important;
+    padding: 0 14px !important;
+    background: #07161c !important;
+  }
+
+  html body #app.cockpit-desktop .account-command-row {
+    display: grid !important;
+    min-height: 66px !important;
+    grid-template-columns: 42px minmax(0, 1fr) 28px !important;
+    align-items: center !important;
+    border: 1px solid #304950 !important;
+    padding: 0 16px !important;
+    background: #07161c !important;
+    color: var(--v5-cyan) !important;
+    text-align: left !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .account-command-row strong {
+    display: block !important;
+    color: #edf3f2 !important;
+    font: 600 16px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .account-command-row small {
+    display: block !important;
+    margin-top: 5px !important;
+    color: #8fa3a6 !important;
+    font: 500 13px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .account-audio-settings {
+    box-sizing: border-box !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 110px !important;
+    border: 1px solid #304950 !important;
+    padding: 14px 16px !important;
+    background: #07161c !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .account-audio-settings > label {
+    grid-column: 1 / -1 !important;
+    color: #a9b7b8 !important;
+    font: 500 13px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .account-modal-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .password-modal,
+  html body #app.cockpit-desktop .pause-modal,
+  html body #app.cockpit-desktop .submit-modal,
+  html body #app.cockpit-desktop .reset-modal,
+  html body #app.cockpit-desktop .confirm-modal,
+  html body #app.cockpit-desktop .timeout-modal {
+    position: relative !important;
+    box-sizing: border-box !important;
+    width: 620px !important;
+    min-height: 430px !important;
+    border: 1px solid var(--v5-cyan) !important;
+    border-radius: 0 !important;
+    padding: 36px 40px !important;
+    background: #06151b !important;
+    box-shadow: 0 28px 80px rgba(0, 0, 0, .56) !important;
+    clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 16px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 16px 100%, 0 calc(100% - 16px), 0 16px) !important;
+  }
+
+  html body #app.cockpit-desktop .password-change-form {
+    display: grid !important;
+    margin-top: 24px !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop .modal-actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .pause-modal {
+    width: 580px !important;
+    min-height: 500px !important;
+    border-color: var(--v5-amber) !important;
+    text-align: center !important;
+  }
+
+  html body #app.cockpit-desktop .pause-icon {
+    display: grid !important;
+    width: 76px !important;
+    height: 76px !important;
+    margin: 0 auto 10px !important;
+    border: 1px solid var(--v5-amber) !important;
+    place-items: center !important;
+    color: var(--v5-amber) !important;
+    clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%) !important;
+  }
+
+  html body #app.cockpit-desktop .pause-modal h2 {
+    color: var(--v5-amber) !important;
+  }
+
+  html body #app.cockpit-desktop .pause-facts {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    margin: 22px 0 !important;
+    border: 1px solid #56491f !important;
+  }
+
+  html body #app.cockpit-desktop .pause-facts > span {
+    display: grid !important;
+    min-height: 100px !important;
+    border-right: 1px solid #56491f !important;
+    place-content: center !important;
+    gap: 7px !important;
+  }
+
+  html body #app.cockpit-desktop .pause-facts > span:last-child {
+    border-right: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .pause-facts svg {
+    width: 26px !important;
+    height: 26px !important;
+    justify-self: center !important;
+    color: var(--v5-amber) !important;
+  }
+
+  html body #app.cockpit-desktop .pause-facts b {
+    color: #aa9c6e !important;
+    font: 600 11px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .pause-facts strong {
+    color: var(--v5-amber) !important;
+    font: 600 16px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .pause-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .submit-modal {
+    width: 790px !important;
+    min-height: 520px !important;
+    border-color: var(--v5-red) !important;
+  }
+
+  html body #app.cockpit-desktop .submit-title-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 18px !important;
+  }
+
+  html body #app.cockpit-desktop .submit-danger-symbol,
+  html body #app.cockpit-desktop .danger-symbol,
+  html body #app.cockpit-desktop .timeout-symbol {
+    display: grid !important;
+    width: 70px !important;
+    height: 70px !important;
+    border: 1px solid var(--v5-red) !important;
+    place-items: center !important;
+    color: var(--v5-red) !important;
+    clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%) !important;
+  }
+
+  html body #app.cockpit-desktop .submit-modal h2,
+  html body #app.cockpit-desktop .confirm-modal h2,
+  html body #app.cockpit-desktop .timeout-modal h2 {
+    color: var(--v5-red) !important;
+  }
+
+  html body #app.cockpit-desktop .submit-modal > p {
+    margin: 24px 0 !important;
+    color: #c3cdcd !important;
+    font: 500 18px/1.35 var(--hud-font) !important;
+    text-align: center !important;
+  }
+
+  html body #app.cockpit-desktop .submit-stats {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    border: 1px solid #3b484b !important;
+  }
+
+  html body #app.cockpit-desktop .submit-stats metric {
+    display: grid !important;
+    min-height: 105px !important;
+    justify-items: center !important;
+    align-content: center !important;
+    border-right: 1px solid #3b484b !important;
+    gap: 5px !important;
+  }
+
+  html body #app.cockpit-desktop .submit-stats metric strong {
+    font-size: 38px !important;
+  }
+
+  html body #app.cockpit-desktop .submit-warning {
+    display: flex !important;
+    min-height: 50px !important;
+    align-items: center !important;
+    margin: 18px 0 !important;
+    border: 1px solid #5b3b21 !important;
+    padding: 0 14px !important;
+    color: #d8b98d !important;
+    font: 500 15px/1 var(--hud-font) !important;
+    gap: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .submit-modal .modal-actions {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  html body #app.cockpit-desktop .chart-modal {
+    box-sizing: border-box !important;
+    width: 1480px !important;
+    height: 820px !important;
+    border: 1px solid var(--v5-cyan) !important;
+    padding: 44px !important;
+    background: #041117 !important;
+    clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px) !important;
+  }
+
+  html body #app.cockpit-desktop .chart-modal .stimulus-panel {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  html body #app.cockpit-desktop .timeout-modal {
+    text-align: center !important;
+  }
+
+  html body #app.cockpit-desktop .timeout-symbol {
+    margin: 0 auto 18px !important;
+  }
+
+  html body #app.cockpit-desktop .timeout-clock {
+    display: grid !important;
+    margin: 22px 0 !important;
+    border: 1px solid #493235 !important;
+    padding: 18px !important;
+  }
+
+  html body #app.cockpit-desktop .timeout-clock strong {
+    color: var(--v5-red) !important;
+    font: 700 64px/1 var(--display-font) !important;
+  }
+
+  html body #app.cockpit-desktop .reset-modal,
+  html body #app.cockpit-desktop .confirm-modal {
+    text-align: center !important;
+  }
+
+  html body #app.cockpit-desktop .reset-symbol,
+  html body #app.cockpit-desktop .danger-symbol {
+    margin: 0 auto 16px !important;
+  }
+
+  html body #app.cockpit-desktop .confirm-modal {
+    border-color: var(--v5-red) !important;
+  }
+
+  html body #app.cockpit-desktop .delete-impact {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    margin: 18px 0 !important;
+    border: 1px solid #4e3437 !important;
+  }
+
+  html body #app.cockpit-desktop .delete-impact > span {
+    display: grid !important;
+    min-height: 72px !important;
+    place-content: center !important;
+    color: #9cafb1 !important;
+    font: 500 13px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .delete-impact b {
+    margin-top: 6px !important;
+    color: #edf3f2 !important;
+  }
+
+  html body #app.cockpit-desktop .delete-confirm-field {
+    display: grid !important;
+    margin: 18px 0 !important;
+    text-align: left !important;
+    gap: 8px !important;
+  }
+
+  html body #app.cockpit-desktop .delete-confirm-field input {
+    height: 50px !important;
+    border: 1px solid #744348 !important;
+    padding: 0 14px !important;
+    background: #110c0e !important;
+    color: #fff !important;
+  }
+
+  html body #app.cockpit-desktop .toast,
+  html body #app.cockpit-desktop .overflow-menu,
+  html body #app.cockpit-desktop .updates-popover,
+  html body #app.cockpit-desktop .audio-popover {
+    border: 1px solid var(--v5-cyan) !important;
+    border-radius: 0 !important;
+    background: #06151b !important;
+    color: #eaf0ef !important;
+    box-shadow: 0 18px 46px rgba(0, 0, 0, .48) !important;
+    clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px) !important;
+  }
+}
+
+/* Motion is intentionally restrained and state-bound. */
+@media (min-width: 1100px) and (prefers-reduced-motion: no-preference) {
+  html body #app.cockpit-desktop .signed-primary-nav button,
+  html body #app.cockpit-desktop .hub-mode,
+  html body #app.cockpit-desktop .practice-mode-card,
+  html body #app.cockpit-desktop .choice,
+  html body #app.cockpit-desktop .result-action {
+    transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease, transform 100ms ease !important;
+  }
+
+  html body #app.cockpit-desktop .hub-mode:hover,
+  html body #app.cockpit-desktop .practice-mode-card:hover,
+  html body #app.cockpit-desktop .result-action:hover {
+    transform: translateY(-2px) !important;
+  }
+
+  html body #app.cockpit-desktop .segmented-loader i {
+    animation: v5-loader 1.35s ease-in-out infinite alternate !important;
+  }
+
+  html body #app.cockpit-desktop .segmented-loader i:nth-child(2) { animation-delay: 70ms !important; }
+  html body #app.cockpit-desktop .segmented-loader i:nth-child(3) { animation-delay: 140ms !important; }
+  html body #app.cockpit-desktop .segmented-loader i:nth-child(4) { animation-delay: 210ms !important; }
+  html body #app.cockpit-desktop .segmented-loader i:nth-child(5) { animation-delay: 280ms !important; }
+  html body #app.cockpit-desktop .segmented-loader i:nth-child(6) { animation-delay: 350ms !important; }
+  html body #app.cockpit-desktop .segmented-loader i:nth-child(7) { animation-delay: 420ms !important; }
+  html body #app.cockpit-desktop .segmented-loader i:nth-child(8) { animation-delay: 490ms !important; }
+}
+
+@keyframes v5-loader {
+  from { opacity: .28; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body #app *,
+  html body #app *::before,
+  html body #app *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
+
+@media (min-width: 1100px) {
+  /* Answer review workstation. */
+  html body #app.cockpit-desktop .review-page {
+    display: grid !important;
+    grid-template-rows: 112px 604px 64px !important;
+    padding: 18px 52px 43px !important;
+    gap: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .review-command-head {
+    display: grid !important;
+    grid-template-columns: 440px minmax(0, 1fr) !important;
+    align-items: center !important;
+  }
+
+  html body #app.cockpit-desktop .review-command-head h1 {
+    font-size: 53px !important;
+  }
+
+  html body #app.cockpit-desktop .review-command-head small {
+    display: block !important;
+    margin-top: 8px !important;
+    color: #acbabc !important;
+    font: 500 17px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .review-score-strip {
+    display: grid !important;
+    height: 84px !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    border: 1px solid #2d4750 !important;
+    background: #06151b !important;
+  }
+
+  html body #app.cockpit-desktop .review-score-strip metric {
+    display: grid !important;
+    grid-template-columns: 44px minmax(0, 1fr) !important;
+    grid-template-rows: 24px 35px !important;
+    align-content: center !important;
+    border-right: 1px solid #2f4850 !important;
+    padding: 0 14px !important;
+  }
+
+  html body #app.cockpit-desktop .review-score-strip metric > svg {
+    width: 34px !important;
+    height: 34px !important;
+    grid-row: 1 / 3 !important;
+    align-self: center !important;
+    color: var(--v5-cyan) !important;
+  }
+
+  html body #app.cockpit-desktop .review-score-strip metric strong {
+    font-size: 29px !important;
+  }
+
+  html body #app.cockpit-desktop .review-workstation {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-columns: 390px minmax(0, 1fr) !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop .review-navigator-console {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-rows: 150px minmax(0, 1fr) !important;
+    padding: 16px !important;
+  }
+
+  html body #app.cockpit-desktop .review-filter-panel {
+    min-height: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .review-filter-panel .technical-title {
+    height: 36px !important;
+  }
+
+  html body #app.cockpit-desktop .filter-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  html body #app.cockpit-desktop .filter-list button {
+    display: flex !important;
+    height: 42px !important;
+    border: 1px solid #304950 !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 12px !important;
+    background: #06151b !important;
+    color: #c4cecf !important;
+    font: 600 15px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .filter-list button.active {
+    border-color: var(--v5-cyan) !important;
+    color: var(--v5-cyan) !important;
+    background: rgba(25, 215, 216, .08) !important;
+  }
+
+  html body #app.cockpit-desktop .review-matrix-panel {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-rows: 56px 34px minmax(0, 1fr) !important;
+  }
+
+  html body #app.cockpit-desktop .review-matrix-title {
+    display: grid !important;
+    align-content: center !important;
+  }
+
+  html body #app.cockpit-desktop .review-matrix-title strong {
+    color: #eef3f2 !important;
+    font: 700 18px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .review-matrix-title span {
+    margin-top: 5px !important;
+    color: #859a9e !important;
+    font: 500 14px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .review-matrix-head,
+  html body #app.cockpit-desktop .review-matrix-row {
+    display: grid !important;
+    grid-template-columns: 42px repeat(4, 1fr) 38px !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  html body #app.cockpit-desktop .review-matrix-head {
+    color: #82979b !important;
+    font: 600 11px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .review-matrix-scroll {
+    min-height: 0 !important;
+    overflow: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #2d6e76 transparent !important;
+  }
+
+  html body #app.cockpit-desktop .review-matrix-row {
+    width: 100% !important;
+    height: 42px !important;
+    border: 0 !important;
+    border-bottom: 1px solid #263e46 !important;
+    background: transparent !important;
+    color: #b9c5c6 !important;
+  }
+
+  html body #app.cockpit-desktop .review-matrix-row.current {
+    border-left: 3px solid var(--v5-cyan) !important;
+    background: rgba(25, 215, 216, .08) !important;
+  }
+
+  html body #app.cockpit-desktop .review-question-panel {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-rows: 90px minmax(0, 1fr) !important;
+    padding: 16px 22px 14px !important;
+  }
+
+  html body #app.cockpit-desktop .review-question-head {
+    display: grid !important;
+    grid-template-columns: 190px minmax(0, 1fr) !important;
+    align-items: center !important;
+    border-bottom: 1px solid #2d464e !important;
+  }
+
+  html body #app.cockpit-desktop .review-question-head .question-index {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 9px !important;
+  }
+
+  html body #app.cockpit-desktop .review-question-head .question-index span {
+    color: #9cafb1 !important;
+    font: 600 16px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .review-question-head .question-index b {
+    color: #f2f5f3 !important;
+    font: 700 42px/1 var(--display-font) !important;
+  }
+
+  html body #app.cockpit-desktop .review-question-head > div:last-child {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .review-topic {
+    margin: 0 auto 0 0 !important;
+    color: var(--v5-cyan) !important;
+    font: 600 15px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .review-question-scroll {
+    display: flex !important;
+    min-height: 0 !important;
+    flex-direction: column !important;
+    padding: 20px 2px 0 !important;
+    overflow: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #2d6e76 transparent !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop .review-question-scroll > .prompt {
+    margin: 0 !important;
+    color: #f0f4f3 !important;
+    font: 600 21px/1.3 var(--reading-font) !important;
+  }
+
+  html body #app.cockpit-desktop .review-choices {
+    display: grid !important;
+    gap: 8px !important;
+  }
+
+  html body #app.cockpit-desktop .review-choice {
+    display: grid !important;
+    min-height: 52px !important;
+    grid-template-columns: 42px minmax(0, 1fr) 120px !important;
+    align-items: center !important;
+    border: 1px solid #304950 !important;
+    padding: 5px 14px !important;
+    background: #07161c !important;
+    color: #e2e9e8 !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .review-choice > span {
+    display: grid !important;
+    width: 34px !important;
+    height: 34px !important;
+    border: 1px solid currentColor !important;
+    border-radius: 50% !important;
+    place-items: center !important;
+    color: var(--v5-cyan) !important;
+    font: 700 16px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .review-choice > strong {
+    font: 500 17px/1.2 var(--reading-font) !important;
+  }
+
+  html body #app.cockpit-desktop .review-choice > em {
+    color: #9cafb1 !important;
+    font: 600 13px/1 var(--hud-font) !important;
+    font-style: normal !important;
+    text-align: right !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .review-choice.is-correct {
+    border-color: var(--v5-green) !important;
+    background: rgba(40, 113, 50, .16) !important;
+  }
+
+  html body #app.cockpit-desktop .review-choice.is-wrong {
+    border-color: var(--v5-red) !important;
+    background: rgba(120, 35, 39, .18) !important;
+  }
+
+  html body #app.cockpit-desktop .review-explanation-console {
+    display: grid !important;
+    min-height: 112px !important;
+    grid-template-columns: 1.4fr 1fr !important;
+    border: 1px solid #31515a !important;
+    padding: 14px 16px !important;
+    background: rgba(8, 30, 37, .78) !important;
+    gap: 18px !important;
+  }
+
+  html body #app.cockpit-desktop .review-explanation-console > div:first-child > strong {
+    color: var(--v5-cyan) !important;
+    font: 700 16px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .review-explanation-console p {
+    margin: 8px 0 0 !important;
+    color: #d1dad9 !important;
+    font: 500 15px/1.35 var(--reading-font) !important;
+  }
+
+  html body #app.cockpit-desktop .review-metadata {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  html body #app.cockpit-desktop .review-metadata > span {
+    display: grid !important;
+    grid-template-columns: 28px 1fr !important;
+    grid-template-rows: 18px 20px !important;
+    align-content: center !important;
+    border-left: 1px solid #2d4d56 !important;
+    padding-left: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .review-metadata > span > svg {
+    width: 21px !important;
+    height: 21px !important;
+    grid-row: 1 / 3 !important;
+    align-self: center !important;
+    color: var(--v5-cyan) !important;
+  }
+
+  html body #app.cockpit-desktop .review-metadata b {
+    color: #8fa3a6 !important;
+    font: 600 11px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .review-metadata strong {
+    color: #e8efee !important;
+    font: 600 14px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .review-footer {
+    display: grid !important;
+    grid-template-columns: 230px 230px 230px !important;
+    align-items: end !important;
+    justify-content: end !important;
+    gap: 12px !important;
+  }
+
+  /* Active exam and practice player. */
+  html body #app.cockpit-desktop .exam-shell {
+    box-sizing: border-box !important;
+    display: grid !important;
+    width: 1672px !important;
+    height: 942px !important;
+    grid-template-rows: 92px minmax(0, 1fr) !important;
+    background: #02090d !important;
+  }
+
+  html body #app.cockpit-desktop .exam-topbar {
+    box-sizing: border-box !important;
+    display: grid !important;
+    height: 92px !important;
+    grid-template-columns: 420px minmax(0, 1fr) 410px !important;
+    align-items: center !important;
+    border-bottom: 1px solid #29434b !important;
+    padding: 0 38px !important;
+    background: #050d11 !important;
+  }
+
+  html body #app.cockpit-desktop .exam-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop .exam-brand .logo {
+    width: 54px !important;
+    height: 61px !important;
+  }
+
+  html body #app.cockpit-desktop .exam-brand strong {
+    display: block !important;
+    color: #f1f5f3 !important;
+    font: 700 24px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .exam-brand span {
+    display: block !important;
+    margin-top: 5px !important;
+    color: #98aaad !important;
+    font: 500 14px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .exam-status {
+    display: grid !important;
+    justify-items: center !important;
+    gap: 7px !important;
+  }
+
+  html body #app.cockpit-desktop .exam-status > strong {
+    color: #eef3f2 !important;
+    font: 700 21px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .exam-status > div {
+    display: flex !important;
+    align-items: center !important;
+    color: #aab8b9 !important;
+    gap: 28px !important;
+  }
+
+  html body #app.cockpit-desktop .exam-status span {
+    font: 600 16px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .exam-time {
+    color: var(--v5-cyan) !important;
+  }
+
+  html body #app.cockpit-desktop .exam-actions {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .exam-actions .btn {
+    height: 50px !important;
+    min-height: 50px !important;
+    font-size: 16px !important;
+  }
+
+  html body #app.cockpit-desktop .exam-actions .exam-exit {
+    display: none !important;
+  }
+
+  html body #app.cockpit-desktop .exam-body {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-columns: 480px minmax(0, 1fr) !important;
+    gap: 16px !important;
+    padding: 18px 24px 22px !important;
+  }
+
+  html body #app.cockpit-desktop .exam-body.with-stimulus {
+    grid-template-columns: 430px minmax(0, 1fr) !important;
+  }
+
+  html body #app.cockpit-desktop .exam-nav {
+    box-sizing: border-box !important;
+    min-height: 0 !important;
+    border: 1px solid #2d4851 !important;
+    padding: 18px 18px 14px !important;
+    background: #06151b !important;
+    overflow: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #2d6e76 transparent !important;
+    clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px) !important;
+  }
+
+  html body #app.cockpit-desktop .nav-title {
+    position: sticky !important;
+    z-index: 3 !important;
+    top: -18px !important;
+    padding: 6px 2px 14px !important;
+    background: #06151b !important;
+  }
+
+  html body #app.cockpit-desktop .nav-title h2 {
+    margin: 0 0 14px !important;
+    color: #f1f5f3 !important;
+    font: italic 800 38px/1 var(--display-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .legend {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px 18px !important;
+  }
+
+  html body #app.cockpit-desktop .legend span {
+    display: flex !important;
+    align-items: center !important;
+    color: #b5c0c1 !important;
+    font: 600 14px/1 var(--hud-font) !important;
+    gap: 8px !important;
+  }
+
+  html body #app.cockpit-desktop .question-group {
+    box-sizing: border-box !important;
+    margin: 0 0 12px !important;
+    border: 1px solid #304950 !important;
+    background: #07161c !important;
+    clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px) !important;
+  }
+
+  html body #app.cockpit-desktop .question-group > summary {
+    box-sizing: border-box !important;
+    display: grid !important;
+    height: 64px !important;
+    grid-template-columns: minmax(0, 1fr) auto 22px !important;
+    align-items: center !important;
+    padding: 0 14px !important;
+    color: #dbe4e3 !important;
+    gap: 10px !important;
+    cursor: pointer !important;
+  }
+
+  html body #app.cockpit-desktop .question-group > summary strong {
+    overflow: hidden !important;
+    color: var(--tone) !important;
+    font: 700 17px/1 var(--hud-font) !important;
+    text-overflow: ellipsis !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+  }
+
+  html body #app.cockpit-desktop .question-group > summary em {
+    color: var(--tone) !important;
+    font: 700 14px/1 var(--hud-font) !important;
+    font-style: normal !important;
+    white-space: nowrap !important;
+  }
+
+  html body #app.cockpit-desktop .question-group-content {
+    padding: 0 12px 14px !important;
+  }
+
+  html body #app.cockpit-desktop .question-grid {
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  html body #app.cockpit-desktop .question-grid button {
+    position: relative !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 44px !important;
+    border: 1px solid #3b555e !important;
+    border-radius: 0 !important;
+    background: #07141a !important;
+    color: #dbe4e3 !important;
+    font: 700 15px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .question-grid button.current {
+    border-color: var(--v5-cyan) !important;
+    background: rgba(25, 215, 216, .18) !important;
+    color: #fff !important;
+    box-shadow: inset 0 0 0 1px var(--v5-cyan) !important;
+  }
+
+  html body #app.cockpit-desktop .question-grid button.answered {
+    border-color: #168f91 !important;
+    background: #0c6e70 !important;
+    color: #fff !important;
+  }
+
+  html body #app.cockpit-desktop .question-grid button.skipped {
+    border-color: var(--v5-amber) !important;
+    color: var(--v5-amber) !important;
+  }
+
+  html body #app.cockpit-desktop .question-grid button.flagged::after {
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    border-top: 12px solid var(--v5-red) !important;
+    border-left: 12px solid transparent !important;
+    content: "" !important;
+  }
+
+  html body #app.cockpit-desktop .group-pager {
+    height: 34px !important;
+    color: var(--v5-cyan) !important;
+    font: 600 14px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .exam-question {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  html body #app.cockpit-desktop .question-panel {
+    box-sizing: border-box !important;
+    display: grid !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    grid-template-rows: 78px auto minmax(0, 1fr) 64px !important;
+    border: 1px solid #304b54 !important;
+    padding: 20px 24px 16px !important;
+    background: #07161c !important;
+    clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px) !important;
+  }
+
+  html body #app.cockpit-desktop .question-title {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+  }
+
+  html body #app.cockpit-desktop .question-index {
+    color: #f1f4f2 !important;
+    font: 700 32px/1 var(--display-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .question-index small {
+    color: #8fa3a6 !important;
+    font-size: 20px !important;
+  }
+
+  html body #app.cockpit-desktop .topic-pill {
+    display: inline-flex !important;
+    margin: 8px 0 0 !important;
+    border: 1px solid #1b8f91 !important;
+    border-radius: 0 !important;
+    padding: 6px 10px !important;
+    background: rgba(15, 87, 90, .28) !important;
+    color: var(--v5-cyan) !important;
+    font: 600 14px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .status-pill {
+    border: 1px solid #3d555d !important;
+    padding: 8px 12px !important;
+    background: #0b1b21 !important;
+    color: #afbcbd !important;
+    font: 600 14px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .question-panel > .prompt {
+    margin: 8px 0 18px !important;
+    color: #f0f4f3 !important;
+    font: 600 23px/1.35 var(--reading-font) !important;
+  }
+
+  html body #app.cockpit-desktop .choices {
+    display: grid !important;
+    min-height: 0 !important;
+    align-content: start !important;
+    overflow: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #2d6e76 transparent !important;
+    gap: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .choice {
+    display: grid !important;
+    min-height: 65px !important;
+    grid-template-columns: 48px minmax(0, 1fr) 30px !important;
+    align-items: center !important;
+    border: 1px solid #324c55 !important;
+    border-radius: 0 !important;
+    padding: 8px 16px !important;
+    background: #08181f !important;
+    color: #e8efee !important;
+    text-align: left !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop .choice:hover:not(:disabled) {
+    border-color: #5f7b82 !important;
+    background: #0b2028 !important;
+  }
+
+  html body #app.cockpit-desktop .choice.selected {
+    border-color: var(--v5-cyan) !important;
+    background: rgba(16, 102, 105, .24) !important;
+    box-shadow: inset 4px 0 0 var(--v5-cyan) !important;
+  }
+
+  html body #app.cockpit-desktop .choice-letter {
+    display: grid !important;
+    width: 38px !important;
+    height: 38px !important;
+    border: 1px solid #70878c !important;
+    border-radius: 50% !important;
+    place-items: center !important;
+    color: var(--v5-cyan) !important;
+    font: 700 18px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .choice > strong {
+    color: inherit !important;
+    font: 500 19px/1.25 var(--reading-font) !important;
+  }
+
+  html body #app.cockpit-desktop .choice-radio {
+    width: 18px !important;
+    height: 18px !important;
+    border: 2px solid #657b81 !important;
+    border-radius: 50% !important;
+  }
+
+  html body #app.cockpit-desktop .choice.selected .choice-radio {
+    border: 5px solid var(--v5-cyan) !important;
+  }
+
+  html body #app.cockpit-desktop .question-actions {
+    display: grid !important;
+    grid-template-columns: 1.1fr 1.1fr 1.2fr .85fr 1fr !important;
+    align-items: end !important;
+    padding-top: 12px !important;
+    border-top: 1px solid #2d464e !important;
+    gap: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .question-actions .btn {
+    height: 50px !important;
+    min-height: 50px !important;
+    padding: 0 12px !important;
+    font-size: 15px !important;
+  }
+
+  html body #app.cockpit-desktop .with-stimulus .exam-question {
+    display: grid !important;
+    grid-template-columns: 46% minmax(0, 1fr) !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop .stimulus-panel {
+    min-height: 0 !important;
+    border: 1px solid #2f4d56 !important;
+    padding: 16px !important;
+    background: #06151b !important;
+    overflow: auto !important;
+    scrollbar-width: thin !important;
+  }
+
+  html body #app.cockpit-desktop .with-stimulus .question-panel {
+    grid-template-rows: 76px auto minmax(0, 1fr) 64px !important;
+  }
+}
+
+@media (min-width: 1100px) {
+  /* Practice & Review: three persistent modes and one bounded workspace. */
+  html body #app.cockpit-desktop .practice-review-page {
+    display: grid !important;
+    grid-template-rows: 136px 82px minmax(0, 1fr) !important;
+    padding-top: 27px !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .practice-review-page .page-title-row {
+    height: 136px !important;
+    min-height: 136px !important;
+    align-items: center !important;
+  }
+
+  html body #app.cockpit-desktop .practice-mode-cards {
+    display: grid !important;
+    width: 920px !important;
+    height: 82px !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    margin: 0 0 0 5px !important;
+    gap: 22px !important;
+  }
+
+  html body #app.cockpit-desktop .practice-mode-card {
+    --tone: var(--v5-amber);
+    position: relative !important;
+    display: grid !important;
+    grid-template-columns: 62px minmax(0, 1fr) 22px !important;
+    align-items: center !important;
+    border: 1px solid #30464e !important;
+    border-color: color-mix(in srgb, var(--tone) 62%, #30464e) !important;
+    padding: 0 18px !important;
+    background: linear-gradient(120deg, color-mix(in srgb, var(--tone) 7%, transparent), transparent 48%), #06141a !important;
+    color: var(--tone) !important;
+    clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% calc(100% - 13px), calc(100% - 13px) 100%, 13px 100%, 0 calc(100% - 13px), 0 13px) !important;
+    text-align: left !important;
+    gap: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .practice-mode-card.mistakes { --tone: var(--v5-red); }
+  html body #app.cockpit-desktop .practice-mode-card.flagged { --tone: var(--v5-purple); }
+
+  html body #app.cockpit-desktop .practice-mode-card.active {
+    box-shadow: inset 0 -3px 0 var(--tone), 0 0 18px color-mix(in srgb, var(--tone) 13%, transparent) !important;
+  }
+
+  html body #app.cockpit-desktop .practice-mode-card > svg:first-child {
+    width: 48px !important;
+    height: 48px !important;
+    padding: 10px !important;
+    border: 1px solid currentColor !important;
+    clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%) !important;
+  }
+
+  html body #app.cockpit-desktop .practice-mode-card strong {
+    display: block !important;
+    color: var(--tone) !important;
+    font: 700 21px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .practice-mode-card small {
+    display: block !important;
+    margin-top: 6px !important;
+    color: #c0caca !important;
+    font: 500 15px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .practice-console {
+    display: grid !important;
+    width: 100% !important;
+    height: 506px !important;
+    min-height: 0 !important;
+    grid-template-columns: 1fr 1fr !important;
+    border: 1px solid var(--v5-cyan) !important;
+    padding: 18px 34px !important;
+    background: rgba(3, 13, 18, .92) !important;
+    gap: 38px !important;
+  }
+
+  html body #app.cockpit-desktop .practice-section-picker {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-rows: 50px 1fr !important;
+    padding-right: 38px !important;
+    border-right: 1px solid #29434b !important;
+  }
+
+  html body #app.cockpit-desktop .category-plates {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-rows: repeat(4, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .section-plate {
+    --tone: var(--v5-cyan);
+    position: relative !important;
+    box-sizing: border-box !important;
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-columns: 68px minmax(0, 1fr) 30px !important;
+    align-items: center !important;
+    border: 1px solid #314950 !important;
+    padding: 8px 18px !important;
+    background: #07161c !important;
+    color: var(--tone) !important;
+    clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px) !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop .section-plate.general { --tone: var(--v5-purple); }
+  html body #app.cockpit-desktop .section-plate.verbal { --tone: var(--v5-cyan); }
+  html body #app.cockpit-desktop .section-plate.numerical { --tone: var(--v5-blue); }
+  html body #app.cockpit-desktop .section-plate.analytical { --tone: var(--v5-green); }
+
+  html body #app.cockpit-desktop .section-plate:has(input:checked) {
+    border-color: var(--tone) !important;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--tone) 10%, transparent), transparent), #07161c !important;
+    box-shadow: inset 0 0 22px color-mix(in srgb, var(--tone) 7%, transparent) !important;
+  }
+
+  html body #app.cockpit-desktop .section-plate input {
+    position: absolute !important;
+    opacity: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .section-plate .section-hud-icon {
+    width: 58px !important;
+    height: 58px !important;
+  }
+
+  html body #app.cockpit-desktop .section-copy strong {
+    display: block !important;
+    color: var(--tone) !important;
+    font: 700 20px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .section-copy small {
+    display: block !important;
+    margin-top: 8px !important;
+    color: #c0c9ca !important;
+    font: 500 16px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .run-profile-panel {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-rows: 92px 92px 76px 86px !important;
+    align-content: center !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .count-segments,
+  html body #app.cockpit-desktop .difficulty-segments {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    grid-template-rows: 30px 58px !important;
+    align-content: start !important;
+  }
+
+  html body #app.cockpit-desktop .segment-label {
+    grid-column: 1 / -1 !important;
+    margin: 0 !important;
+    color: var(--v5-cyan) !important;
+    font: 700 19px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .count-segments label,
+  html body #app.cockpit-desktop .difficulty-segments label {
+    position: relative !important;
+    display: grid !important;
+    height: 58px !important;
+    place-items: center !important;
+  }
+
+  html body #app.cockpit-desktop .count-segments input,
+  html body #app.cockpit-desktop .difficulty-segments input {
+    position: absolute !important;
+    opacity: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .count-segments label > span,
+  html body #app.cockpit-desktop .difficulty-segments label > span {
+    display: grid !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 58px !important;
+    border: 1px solid #334b53 !important;
+    place-items: center !important;
+    background: #06141a !important;
+    color: #edf3f2 !important;
+    font: 600 21px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .count-segments input:checked + span,
+  html body #app.cockpit-desktop .difficulty-segments input:checked + span {
+    border-color: var(--v5-cyan) !important;
+    background: linear-gradient(180deg, rgba(13, 92, 98, .42), rgba(4, 22, 27, .92)) !important;
+    box-shadow: inset 0 0 15px rgba(25, 215, 216, .14) !important;
+  }
+
+  html body #app.cockpit-desktop .selected-run-profile {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    border: 1px solid #304950 !important;
+    padding: 0 18px !important;
+    background: #07161c !important;
+    color: #c4cece !important;
+    font: 500 17px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .selected-run-section {
+    display: flex !important;
+    align-items: center !important;
+    color: var(--v5-cyan) !important;
+    gap: 13px !important;
+  }
+
+  html body #app.cockpit-desktop .selected-run-section strong {
+    font: 700 18px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .practice-start-cta {
+    border-color: var(--v5-amber) !important;
+    background: linear-gradient(180deg, rgba(124, 87, 3, .56), rgba(41, 29, 2, .9)) !important;
+    color: var(--v5-amber) !important;
+  }
+
+  html body #app.cockpit-desktop .mistakes-hub,
+  html body #app.cockpit-desktop .review-queue {
+    min-height: 0 !important;
+    height: 506px !important;
+  }
+
+  html body #app.cockpit-desktop .mistakes-list-only,
+  html body #app.cockpit-desktop .flagged-table-only,
+  html body #app.cockpit-desktop .mistakes-empty,
+  html body #app.cockpit-desktop .flagged-empty {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 506px !important;
+    min-height: 0 !important;
+    padding: 24px 28px !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-console-head {
+    display: grid !important;
+    height: 104px !important;
+    grid-template-columns: minmax(0, 1fr) 760px !important;
+    align-items: center !important;
+    border-bottom: 1px solid #2c444b !important;
+    gap: 28px !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-console-head h2 {
+    margin: 0 !important;
+    color: var(--v5-cyan) !important;
+    font: 700 28px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-console-head p {
+    margin: 8px 0 0 !important;
+    color: #a8b7b9 !important;
+    font: 500 16px/1.2 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-summary-rail {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    border: 1px solid #2f4850 !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-summary-rail metric {
+    min-height: 74px !important;
+    border-right: 1px solid #304950 !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-table-head {
+    display: grid !important;
+    height: 48px !important;
+    grid-template-columns: 2fr 1.2fr .7fr .7fr 1fr !important;
+    align-items: center !important;
+    margin-top: 8px !important;
+    border-bottom: 1px solid #304950 !important;
+    padding: 0 18px !important;
+    color: #9eafb1 !important;
+    font: 700 15px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-attempt-scroll,
+  html body #app.cockpit-desktop .flagged-table-scroll {
+    height: 298px !important;
+    overflow: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #2d6e76 transparent !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-attempt-card {
+    display: grid !important;
+    height: 82px !important;
+    grid-template-columns: 2fr 1.2fr .7fr .7fr 1fr !important;
+    align-items: center !important;
+    border-bottom: 1px solid #233a42 !important;
+    padding: 0 18px !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-attempt-title {
+    display: grid !important;
+    grid-template-columns: 48px minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-attempt-title .section-hud-icon {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-attempt-title strong {
+    overflow: hidden !important;
+    color: #edf3f2 !important;
+    font: 600 18px/1 var(--hud-font) !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-attempt-meta {
+    color: #c1cbcb !important;
+    font: 500 16px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-attempt-meta small {
+    display: block !important;
+    margin-top: 6px !important;
+    color: #82979b !important;
+    font-size: 14px !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-score,
+  html body #app.cockpit-desktop .mistake-count {
+    color: var(--v5-cyan) !important;
+    font: 700 25px/1 var(--display-font) !important;
+  }
+
+  html body #app.cockpit-desktop .technical-row-cta {
+    min-height: 46px !important;
+    color: var(--v5-cyan) !important;
+    font-size: 15px !important;
+  }
+
+  html body #app.cockpit-desktop .flagged-table-head {
+    display: grid !important;
+    height: 48px !important;
+    grid-template-columns: 2fr 1.35fr .8fr .6fr !important;
+    align-items: center !important;
+    border-bottom: 1px solid #304950 !important;
+    color: #99abad !important;
+    font: 700 15px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .flagged-section header {
+    height: 54px !important;
+  }
+
+  html body #app.cockpit-desktop .flagged-table-row {
+    display: grid !important;
+    min-height: 74px !important;
+    grid-template-columns: 2fr 1.35fr .8fr .6fr !important;
+    align-items: center !important;
+    border-bottom: 1px solid #233a42 !important;
+    gap: 14px !important;
+  }
+
+  /* Progress workstation. */
+  html body #app.cockpit-desktop .progress-page {
+    display: grid !important;
+    grid-template-columns: 455px 1fr !important;
+    grid-template-rows: 118px 337px 330px !important;
+    padding-top: 16px !important;
+    gap: 12px 22px !important;
+  }
+
+  html body #app.cockpit-desktop .progress-page > .page-title-row {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    height: 118px !important;
+    align-items: center !important;
+  }
+
+  html body #app.cockpit-desktop .progress-page > .summary-cards {
+    display: grid !important;
+    height: 90px !important;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    align-self: center !important;
+    border: 1px solid #2a4650 !important;
+    border-top-color: var(--v5-cyan) !important;
+    background: rgba(5, 17, 22, .94) !important;
+    clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% calc(100% - 13px), calc(100% - 13px) 100%, 13px 100%, 0 calc(100% - 13px), 0 13px) !important;
+  }
+
+  html body #app.cockpit-desktop .summary-cards metric,
+  html body #app.cockpit-desktop .result-metrics-rail metric {
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-columns: 58px minmax(0, 1fr) !important;
+    grid-template-rows: 26px 42px !important;
+    align-content: center !important;
+    border-right: 1px solid #304950 !important;
+    padding: 0 18px !important;
+  }
+
+  html body #app.cockpit-desktop .summary-cards metric:last-child,
+  html body #app.cockpit-desktop .result-metrics-rail metric:last-child {
+    border-right: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .summary-cards metric > svg,
+  html body #app.cockpit-desktop .result-metrics-rail metric > svg {
+    width: 44px !important;
+    height: 44px !important;
+    grid-row: 1 / 3 !important;
+    align-self: center !important;
+    color: var(--v5-cyan) !important;
+  }
+
+  html body #app.cockpit-desktop metric span {
+    color: #aebcbd !important;
+    font: 600 15px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop metric strong {
+    align-self: center !important;
+    color: var(--v5-cyan) !important;
+    font: 700 36px/1 var(--display-font) !important;
+  }
+
+  html body #app.cockpit-desktop .progress-analytics-grid {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    grid-template-columns: 1.38fr 1fr !important;
+    gap: 22px !important;
+  }
+
+  html body #app.cockpit-desktop .trend-panel,
+  html body #app.cockpit-desktop .performance-card {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-rows: 62px 1fr !important;
+    padding: 16px 22px !important;
+  }
+
+  html body #app.cockpit-desktop .trend-chart {
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  html body #app.cockpit-desktop .trend-chart svg {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  html body #app.cockpit-desktop .performance-card {
+    grid-template-rows: 62px 1fr 48px !important;
+  }
+
+  html body #app.cockpit-desktop .performance-bars {
+    display: grid !important;
+    grid-template-rows: repeat(4, 1fr) !important;
+    min-height: 0 !important;
+    gap: 2px !important;
+  }
+
+  html body #app.cockpit-desktop .performance-row {
+    display: grid !important;
+    grid-template-columns: 190px minmax(110px, 1fr) 58px 72px !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .performance-row > span {
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-columns: 38px minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 9px !important;
+    overflow: visible !important;
+    color: var(--tone) !important;
+  }
+
+  html body #app.cockpit-desktop .performance-row > span > b {
+    overflow: hidden !important;
+    font: 700 15px/1 var(--hud-font) !important;
+    text-overflow: ellipsis !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+  }
+
+  html body #app.cockpit-desktop .performance-row > strong {
+    color: var(--tone) !important;
+    font: 700 24px/1 var(--display-font) !important;
+    text-align: right !important;
+  }
+
+  html body #app.cockpit-desktop .review-focus-cta {
+    min-height: 44px !important;
+    border: 1px solid #324b53 !important;
+    background: #07161c !important;
+    color: #c5cece !important;
+    font: 600 14px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .attempts-table-card {
+    grid-column: 1 / -1 !important;
+    grid-row: 3 !important;
+    min-height: 0 !important;
+    padding: 16px !important;
+  }
+
+  html body #app.cockpit-desktop .attempt-table-title {
+    display: flex !important;
+    height: 44px !important;
+    align-items: center !important;
+    gap: 18px !important;
+  }
+
+  html body #app.cockpit-desktop .progress-tabs {
+    position: absolute !important;
+    top: 14px !important;
+    right: 18px !important;
+    display: grid !important;
+    width: 330px !important;
+    height: 38px !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  html body #app.cockpit-desktop .progress-tabs button {
+    border: 1px solid #314950 !important;
+    background: #06141a !important;
+    color: #adbabc !important;
+    font: 600 14px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .progress-tabs button.active {
+    border-color: var(--v5-cyan) !important;
+    color: var(--v5-cyan) !important;
+  }
+
+  html body #app.cockpit-desktop .attempt-table {
+    height: 240px !important;
+    overflow: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #2d6e76 transparent !important;
+  }
+
+  html body #app.cockpit-desktop .table-head,
+  html body #app.cockpit-desktop .table-row {
+    display: grid !important;
+    grid-template-columns: 2.35fr .72fr .85fr .55fr .75fr .95fr !important;
+    align-items: center !important;
+    padding: 0 12px !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .table-head {
+    height: 48px !important;
+    color: #9cafb1 !important;
+    font: 700 14px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .table-row {
+    min-height: 62px !important;
+    border-bottom: 1px solid #263f47 !important;
+    color: #d9e1e0 !important;
+    font: 500 15px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .attempt-name {
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+
+  /* Results / debrief. */
+  html body #app.cockpit-desktop .results-page {
+    display: grid !important;
+    grid-template-columns: 390px minmax(0, 1fr) !important;
+    grid-template-rows: 102px 350px 240px 66px !important;
+    padding: 22px 72px 36px !important;
+    gap: 10px 18px !important;
+  }
+
+  html body #app.cockpit-desktop .results-command-title {
+    grid-column: 1 / -1 !important;
+    display: grid !important;
+    align-content: center !important;
+  }
+
+  html body #app.cockpit-desktop .results-command-title > strong {
+    font-size: 55px !important;
+  }
+
+  html body #app.cockpit-desktop .results-command-title > small {
+    margin-top: 8px !important;
+    color: #bcc7c8 !important;
+    font: 500 18px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .score-gauge-panel {
+    display: grid !important;
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    border: 0 !important;
+    place-items: center !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    clip-path: none !important;
+  }
+
+  html body #app.cockpit-desktop .score-gauge {
+    display: grid !important;
+    box-sizing: border-box !important;
+    width: 330px !important;
+    height: 330px !important;
+    grid-template-rows: 28px 108px 32px 20px 52px !important;
+    align-content: center !important;
+    justify-items: center !important;
+    border: 1px dotted #1fb8bd !important;
+    border-radius: 50% !important;
+    background:
+      radial-gradient(circle at center, #06161c 0 67%, transparent 68%),
+      conic-gradient(var(--v5-cyan) calc(var(--score) * 1deg), #153039 0) !important;
+    padding: 21px !important;
+  }
+
+  html body #app.cockpit-desktop .score-gauge span {
+    color: #aebcbd !important;
+    font: 500 16px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .score-gauge strong {
+    color: #f3f5f2 !important;
+    font: 700 92px/.92 var(--display-font) !important;
+  }
+
+  html body #app.cockpit-desktop .score-gauge b {
+    color: #f3f5f2 !important;
+    font: 700 25px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .score-gauge small {
+    color: #aebcbd !important;
+    font: 600 14px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .score-gauge em {
+    align-self: end !important;
+    color: var(--v5-green) !important;
+    font: 700 25px/1 var(--hud-font) !important;
+    font-style: normal !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .needs-work .score-gauge em {
+    color: var(--v5-red) !important;
+  }
+
+  html body #app.cockpit-desktop .results-data-stack {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    grid-template-rows: 116px 224px !important;
+    gap: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .result-metrics-rail {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    padding: 0 12px !important;
+  }
+
+  html body #app.cockpit-desktop .result-metrics-rail metric {
+    grid-template-columns: 44px 1fr !important;
+    padding: 0 12px !important;
+  }
+
+  html body #app.cockpit-desktop .result-metrics-rail metric strong {
+    font-size: 35px !important;
+  }
+
+  html body #app.cockpit-desktop .results-section-console {
+    display: grid !important;
+    grid-template-rows: 50px 1fr !important;
+    padding: 10px 14px !important;
+  }
+
+  html body #app.cockpit-desktop .accuracy-title {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop .accuracy-title small {
+    color: #9aabad !important;
+    font: 500 14px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .results-section-grid {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-rows: repeat(4, 1fr) !important;
+    gap: 4px !important;
+  }
+
+  html body #app.cockpit-desktop .result-section-card {
+    --tone: var(--v5-cyan);
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-columns: 42px 190px minmax(0, 1fr) 72px 62px !important;
+    align-items: center !important;
+    border: 1px solid #2a424a !important;
+    padding: 0 12px !important;
+    background: #07161c !important;
+    color: var(--tone) !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .result-section-card.general { --tone: var(--v5-purple); }
+  html body #app.cockpit-desktop .result-section-card.verbal { --tone: var(--v5-cyan); }
+  html body #app.cockpit-desktop .result-section-card.numerical { --tone: var(--v5-blue); }
+  html body #app.cockpit-desktop .result-section-card.analytical { --tone: var(--v5-green); }
+
+  html body #app.cockpit-desktop .result-section-card .section-hud-icon {
+    width: 34px !important;
+    height: 34px !important;
+    border: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .result-section-card .section-hud-icon svg {
+    width: 25px !important;
+    height: 25px !important;
+  }
+
+  html body #app.cockpit-desktop .result-section-card > strong {
+    color: var(--tone) !important;
+    font: 700 17px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .result-section-card > i {
+    height: 9px !important;
+    background: #152a31 !important;
+  }
+
+  html body #app.cockpit-desktop .result-section-card > i > em {
+    display: block !important;
+    height: 100% !important;
+    background: var(--tone) !important;
+  }
+
+  html body #app.cockpit-desktop .result-section-card > small {
+    color: #c7d0d0 !important;
+    font: 600 15px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .result-section-card > b {
+    color: var(--tone) !important;
+    font: 700 23px/1 var(--display-font) !important;
+    text-align: right !important;
+  }
+
+  html body #app.cockpit-desktop .run-insights-panel {
+    display: grid !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 3 !important;
+    grid-template-rows: 44px 1fr !important;
+    padding: 10px 18px !important;
+  }
+
+  html body #app.cockpit-desktop .insight-grid {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-rows: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .insight-card {
+    --tone: var(--v5-cyan);
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-columns: 72px minmax(0, 1fr) !important;
+    grid-template-rows: 24px 34px 22px !important;
+    align-content: center !important;
+    border: 1px solid #2d464e !important;
+    padding: 8px 18px !important;
+    background: #06151b !important;
+    color: var(--tone) !important;
+  }
+
+  html body #app.cockpit-desktop .insight-card > svg {
+    width: 52px !important;
+    height: 52px !important;
+    grid-row: 1 / 4 !important;
+    align-self: center !important;
+    border: 1px solid currentColor !important;
+    padding: 10px !important;
+    clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%) !important;
+  }
+
+  html body #app.cockpit-desktop .insight-card span {
+    color: #aab8b9 !important;
+    font: 600 14px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .insight-card strong {
+    overflow: hidden !important;
+    color: #edf3f2 !important;
+    font: 600 25px/1 var(--hud-font) !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  html body #app.cockpit-desktop .insight-card small {
+    color: #9cafb1 !important;
+    font: 500 14px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .results-action-row {
+    display: grid !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 4 !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .result-action {
+    --tone: var(--v5-cyan);
+    display: grid !important;
+    grid-template-columns: 1fr 24px !important;
+    align-items: center !important;
+    border: 1px solid var(--tone) !important;
+    padding: 0 22px !important;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--tone) 13%, transparent), transparent), #06141a !important;
+    color: var(--tone) !important;
+    clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px) !important;
+    text-align: left !important;
+  }
+
+  html body #app.cockpit-desktop .result-action.green { --tone: var(--v5-green); }
+  html body #app.cockpit-desktop .result-action.purple { --tone: var(--v5-purple); }
+  html body #app.cockpit-desktop .result-action.neutral { --tone: #aab8ba; }
+
+  html body #app.cockpit-desktop .result-action strong {
+    color: var(--tone) !important;
+    font: 700 20px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+}
+
+@media (min-width: 1100px) {
+  html body #app.cockpit-desktop .cockpit-frame {
+    isolation: isolate !important;
+    border-color: #1d3942 !important;
+    background:
+      radial-gradient(ellipse at 70% 15%, rgba(26, 86, 94, .12), transparent 38%),
+      linear-gradient(130deg, rgba(14, 55, 62, .11), transparent 34%),
+      #02090d !important;
+  }
+
+  html body #app.cockpit-desktop .cockpit-frame::before {
+    position: absolute !important;
+    z-index: -1 !important;
+    inset: 100px 0 0 !important;
+    background:
+      radial-gradient(ellipse at 67% 7%, transparent 0 88px, rgba(34, 98, 105, .09) 89px 90px, transparent 91px 132px, rgba(34, 98, 105, .065) 133px 134px, transparent 135px),
+      linear-gradient(115deg, transparent 0 47%, rgba(37, 89, 97, .055) 47.1% 47.25%, transparent 47.35%),
+      repeating-linear-gradient(90deg, transparent 0 79px, rgba(70, 124, 132, .022) 80px) !important;
+    content: "" !important;
+    pointer-events: none !important;
+  }
+
+  /* Shared signed-in shell: exact reference proportions and stable labels. */
+  html body #app.cockpit-desktop .app-header.signed-header {
+    box-sizing: border-box !important;
+    height: 101px !important;
+    min-height: 101px !important;
+    grid-template-columns: 440px 788px minmax(0, 1fr) !important;
+    padding: 0 62px 0 80px !important;
+    border-bottom: 1px solid #1c333b !important;
+    background: rgba(3, 11, 15, .96) !important;
+    box-shadow: none !important;
+  }
+
+  html body #app.cockpit-desktop .signed-header .brand {
+    align-self: center !important;
+    gap: 18px !important;
+  }
+
+  html body #app.cockpit-desktop .signed-header .brand .logo {
+    width: 65px !important;
+    height: 73px !important;
+  }
+
+  html body #app.cockpit-desktop .signed-header .brand strong {
+    color: #f4f7f6 !important;
+    font: 700 27px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .signed-header .brand span {
+    margin-top: 5px !important;
+    color: #aebbbd !important;
+    font: 500 17px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .signed-primary-nav {
+    box-sizing: border-box !important;
+    display: grid !important;
+    width: 788px !important;
+    height: 73px !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    align-self: center !important;
+    border: 1px solid #263f48 !important;
+    clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% calc(100% - 13px), calc(100% - 13px) 100%, 13px 100%, 0 calc(100% - 13px), 0 13px) !important;
+    background: rgba(4, 13, 17, .86) !important;
+    gap: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .signed-primary-nav button {
+    position: relative !important;
+    display: grid !important;
+    width: auto !important;
+    height: 72px !important;
+    min-width: 0 !important;
+    border-right: 1px solid #253b43 !important;
+    place-items: center !important;
+    padding: 0 12px !important;
+    color: #edf2f1 !important;
+    font: 600 20px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .signed-primary-nav button:last-child {
+    border-right: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .signed-primary-nav .nav-glyph {
+    display: none !important;
+  }
+
+  html body #app.cockpit-desktop .signed-primary-nav .nav-label {
+    display: inline !important;
+  }
+
+  html body #app.cockpit-desktop .signed-primary-nav button::after {
+    position: absolute !important;
+    right: 16px !important;
+    bottom: 0 !important;
+    left: 16px !important;
+    width: auto !important;
+    height: 3px !important;
+    background: transparent !important;
+    content: "" !important;
+  }
+
+  html body #app.cockpit-desktop .signed-primary-nav button.active,
+  html body #app.cockpit-desktop .signed-primary-nav button:hover {
+    color: var(--v5-cyan) !important;
+    background: linear-gradient(0deg, rgba(25, 215, 216, .08), transparent 55%) !important;
+  }
+
+  html body #app.cockpit-desktop .signed-primary-nav button.active::after {
+    background: var(--v5-cyan) !important;
+    box-shadow: 0 0 12px rgba(25, 215, 216, .45) !important;
+  }
+
+  html body #app.cockpit-desktop .header-actions {
+    display: flex !important;
+    justify-content: flex-end !important;
+  }
+
+  html body #app.cockpit-desktop .account-button {
+    width: 232px !important;
+    min-width: 232px !important;
+    height: 53px !important;
+    min-height: 53px !important;
+    border-color: #28434b !important;
+    padding: 0 16px 0 8px !important;
+    background: #07151a !important;
+    color: #eef4f3 !important;
+    font: 600 18px/1 var(--hud-font) !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop .account-button .avatar {
+    width: 39px !important;
+    height: 39px !important;
+    font-size: 17px !important;
+  }
+
+  html body #app.cockpit-desktop .signed-main,
+  html body #app.cockpit-desktop .side-layout.top-shell-layout,
+  html body #app.cockpit-desktop .top-shell-layout .side-content {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 841px !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  html body #app.cockpit-desktop .content-page,
+  html body #app.cockpit-desktop .setup-page,
+  html body #app.cockpit-desktop .results-page,
+  html body #app.cockpit-desktop .review-page {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 841px !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 27px 62px 45px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app.cockpit-desktop .page-title-row {
+    display: flex !important;
+    height: 118px !important;
+    min-height: 118px !important;
+    align-items: flex-start !important;
+    margin: 0 !important;
+    padding: 0 14px !important;
+  }
+
+  html body #app.cockpit-desktop .page-title-row h1,
+  html body #app.cockpit-desktop .results-command-title > strong,
+  html body #app.cockpit-desktop .review-command-head h1 {
+    margin: 0 !important;
+    color: #f4f5f3 !important;
+    font: italic 800 58px/.95 var(--display-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .page-title-row h1 span,
+  html body #app.cockpit-desktop .review-command-head h1 span {
+    color: var(--v5-cyan) !important;
+  }
+
+  html body #app.cockpit-desktop .page-title-row p {
+    margin: 12px 0 0 !important;
+    color: #c4cccd !important;
+    font: 500 21px/1.2 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .v5-panel,
+  html body #app.cockpit-desktop .v3-panel {
+    position: relative !important;
+    box-sizing: border-box !important;
+    border: 1px solid #2a4650 !important;
+    border-top-color: var(--v5-line-bright) !important;
+    border-radius: 0 !important;
+    background:
+      linear-gradient(120deg, rgba(16, 58, 66, .12), transparent 35%),
+      rgba(4, 14, 19, .96) !important;
+    box-shadow: inset 0 0 28px rgba(26, 105, 112, .035) !important;
+    clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px) !important;
+  }
+
+  html body #app.cockpit-desktop .technical-title h2,
+  html body #app.cockpit-desktop .attempt-table-title h2 {
+    color: var(--v5-cyan) !important;
+    font: 700 25px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  /* Study Hub / V4 shell master. */
+  html body #app.cockpit-desktop .study-hub {
+    position: relative !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 841px !important;
+    padding: 0 62px 48px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app.cockpit-desktop .study-hub .hub-stage {
+    display: grid !important;
+    width: 100% !important;
+    height: 100% !important;
+    grid-template-rows: 148px 494px 132px !important;
+    align-content: start !important;
+    gap: 19px !important;
+  }
+
+  html body #app.cockpit-desktop .hub-hero {
+    display: grid !important;
+    align-content: center !important;
+    padding: 0 15px !important;
+  }
+
+  html body #app.cockpit-desktop .hub-hero h1 {
+    margin: 0 !important;
+    font: italic 800 72px/.88 var(--display-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .hub-hero h1 span {
+    color: #f4f4f1 !important;
+  }
+
+  html body #app.cockpit-desktop .hub-hero h1 em {
+    color: var(--v5-cyan) !important;
+    font-style: italic !important;
+  }
+
+  html body #app.cockpit-desktop .hub-hero p {
+    margin: 12px 0 0 !important;
+    color: #e6eceb !important;
+    font: 500 21px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-primary-grid {
+    display: grid !important;
+    width: 100% !important;
+    height: 494px !important;
+    grid-template-columns: 1044px minmax(0, 1fr) !important;
+    gap: 28px !important;
+  }
+
+  html body #app.cockpit-desktop .hub-panel {
+    position: relative !important;
+    box-sizing: border-box !important;
+    border: 1px solid var(--v5-line-bright) !important;
+    background: linear-gradient(120deg, rgba(12, 54, 61, .12), transparent 38%), #041117 !important;
+    clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-run-panel {
+    display: grid !important;
+    grid-template-rows: 96px 1fr !important;
+  }
+
+  html body #app.cockpit-desktop .hub-panel-title {
+    box-sizing: border-box !important;
+    display: flex !important;
+    height: 96px !important;
+    align-items: center !important;
+    padding: 20px 30px !important;
+    border-bottom: 1px solid #1d353d !important;
+    gap: 16px !important;
+  }
+
+  html body #app.cockpit-desktop .hub-panel-title > svg {
+    width: 52px !important;
+    height: 52px !important;
+    padding: 10px !important;
+    border: 1px solid var(--v5-cyan) !important;
+    color: #ecf4f2 !important;
+    clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-run-title > div > span {
+    color: var(--v5-cyan) !important;
+    font: 700 20px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .hub-run-title h2 {
+    margin: 6px 0 0 !important;
+    color: #f3f6f4 !important;
+    font: 600 27px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .hub-run-body {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-columns: 385px minmax(0, 1fr) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-ring {
+    position: relative !important;
+    box-sizing: border-box !important;
+    width: 284px !important;
+    height: 284px !important;
+    align-self: center !important;
+    justify-self: center !important;
+    border: 1px dotted #16abb0 !important;
+    border-radius: 50% !important;
+    background:
+      conic-gradient(var(--v5-cyan) var(--hub-completion), #172b32 0) border-box !important;
+    padding: 13px !important;
+  }
+
+  html body #app.cockpit-desktop .hub-ring::before {
+    position: absolute !important;
+    inset: 13px !important;
+    border: 13px solid #173039 !important;
+    border-radius: 50% !important;
+    background: #031017 !important;
+    content: "" !important;
+  }
+
+  html body #app.cockpit-desktop .hub-ring-core {
+    position: absolute !important;
+    z-index: 2 !important;
+    inset: 39px !important;
+    display: grid !important;
+    grid-template-columns: auto auto !important;
+    place-content: center !important;
+    place-items: end center !important;
+    border-radius: 50% !important;
+  }
+
+  html body #app.cockpit-desktop .hub-ring-core strong {
+    color: #f3f5f2 !important;
+    font: 700 82px/.9 var(--display-font) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-ring-core > span {
+    margin: 0 0 8px 7px !important;
+    color: #f3f5f2 !important;
+    font: 700 34px/1 var(--display-font) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-ring-core small {
+    grid-column: 1 / -1 !important;
+    margin-top: 12px !important;
+    color: #a7b4b5 !important;
+    font: 600 18px/1.05 var(--hud-font) !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .hub-run-details {
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-rows: 122px 144px 44px 70px !important;
+    padding: 12px 30px 22px 22px !important;
+    border-left: 1px solid #29424a !important;
+  }
+
+  html body #app.cockpit-desktop .hub-time-row {
+    display: grid !important;
+    grid-template-columns: 44px 1fr !important;
+    grid-template-rows: 28px 68px !important;
+    align-content: center !important;
+    border-bottom: 1px solid #284049 !important;
+  }
+
+  html body #app.cockpit-desktop .hub-time-row > svg {
+    width: 34px !important;
+    height: 34px !important;
+    grid-row: 1 / 3 !important;
+    align-self: center !important;
+    color: var(--v5-cyan) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-time-row > span {
+    color: var(--v5-cyan) !important;
+    font: 700 18px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .hub-time-row > strong {
+    color: #f3f5f2 !important;
+    font: 700 55px/.95 var(--display-font) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-checkpoints {
+    position: relative !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    grid-template-rows: 40px 1fr !important;
+    gap: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .hub-section-context {
+    display: flex !important;
+    grid-column: 1 / -1 !important;
+    align-items: center !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop .hub-section-context strong {
+    color: var(--v5-cyan) !important;
+    font: 700 17px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .hub-section-context small {
+    color: #819598 !important;
+    font: 500 14px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-checkpoint {
+    position: relative !important;
+    display: grid !important;
+    justify-items: center !important;
+    align-content: center !important;
+    color: var(--tone) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-checkpoint.general { --tone: var(--v5-purple); }
+  html body #app.cockpit-desktop .hub-checkpoint.verbal { --tone: var(--v5-cyan); }
+  html body #app.cockpit-desktop .hub-checkpoint.numerical { --tone: var(--v5-blue); }
+  html body #app.cockpit-desktop .hub-checkpoint.analytical { --tone: var(--v5-green); }
+
+  html body #app.cockpit-desktop .hub-checkpoint:not(:last-child)::after {
+    position: absolute !important;
+    top: 38px !important;
+    left: 72% !important;
+    width: 56% !important;
+    border-top: 2px dashed #35606a !important;
+    content: "" !important;
+  }
+
+  html body #app.cockpit-desktop .hub-checkpoint-icon {
+    display: grid !important;
+    width: 58px !important;
+    height: 58px !important;
+    border: 2px solid currentColor !important;
+    border-radius: 50% !important;
+    place-items: center !important;
+    box-shadow: 0 0 16px color-mix(in srgb, currentColor 25%, transparent) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-checkpoint-icon svg {
+    width: 29px !important;
+    height: 29px !important;
+  }
+
+  html body #app.cockpit-desktop .hub-checkpoint > strong {
+    margin-top: 7px !important;
+    color: currentColor !important;
+    font: 700 16px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .hub-checkpoint > small {
+    margin-top: 5px !important;
+    color: #aebabc !important;
+    font: 600 14px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-run-status {
+    display: flex !important;
+    align-items: center !important;
+    border-top: 1px solid #263f47 !important;
+    color: #aab7b8 !important;
+    font: 500 16px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-run-status strong {
+    margin-left: 8px !important;
+    color: var(--v5-cyan) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-resume-button {
+    position: relative !important;
+    display: grid !important;
+    grid-template-columns: 1fr 58px !important;
+    align-items: center !important;
+    border: 1px solid var(--v5-cyan) !important;
+    padding: 0 20px !important;
+    background: linear-gradient(180deg, rgba(16, 111, 116, .42), rgba(4, 31, 36, .78)) !important;
+    color: #f3f7f5 !important;
+    clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% calc(100% - 13px), calc(100% - 13px) 100%, 13px 100%, 0 calc(100% - 13px), 0 13px) !important;
+    font: 700 25px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .hub-resume-button::before {
+    position: absolute !important;
+    inset: 5px !important;
+    border: 1px solid rgba(28, 221, 217, .38) !important;
+    content: "" !important;
+    pointer-events: none !important;
+  }
+
+  html body #app.cockpit-desktop .hub-chevron-stack {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .hub-chevron-stack svg {
+    width: 17px !important;
+    margin-left: -7px !important;
+  }
+
+  html body #app.cockpit-desktop .hub-records-panel {
+    display: grid !important;
+    grid-template-rows: 90px 1fr 62px !important;
+  }
+
+  html body #app.cockpit-desktop .hub-records-panel .hub-panel-title {
+    height: 90px !important;
+  }
+
+  html body #app.cockpit-desktop .hub-records-panel .hub-panel-title h2 {
+    color: var(--v5-cyan) !important;
+    font: 700 25px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .hub-record-list {
+    display: grid !important;
+    grid-template-rows: repeat(3, 1fr) !important;
+    padding: 0 24px !important;
+  }
+
+  html body #app.cockpit-desktop .hub-record {
+    display: grid !important;
+    grid-template-columns: 68px minmax(0, 1fr) 72px !important;
+    align-items: center !important;
+    border-bottom: 1px solid #263f47 !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop .hub-record > span {
+    display: grid !important;
+    width: 55px !important;
+    height: 55px !important;
+    border: 1px solid currentColor !important;
+    place-items: center !important;
+    color: var(--v5-cyan) !important;
+    clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-record p {
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .hub-record p strong {
+    display: block !important;
+    color: #edf3f2 !important;
+    font: 600 18px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .hub-record p small {
+    display: block !important;
+    margin-top: 6px !important;
+    color: #98aaad !important;
+    font: 500 14px/1.1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-record > b {
+    color: var(--v5-cyan) !important;
+    font: 700 39px/1 var(--display-font) !important;
+    text-align: right !important;
+  }
+
+  html body #app.cockpit-desktop .hub-record-foot {
+    display: flex !important;
+    border: 0 !important;
+    border-top: 1px solid #29434b !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 28px !important;
+    background: #06151b !important;
+    color: var(--v5-cyan) !important;
+    font: 600 17px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-action-dock {
+    display: grid !important;
+    height: 132px !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 16px !important;
+  }
+
+  html body #app.cockpit-desktop .hub-mode {
+    --tone: var(--v5-cyan);
+    position: relative !important;
+    display: grid !important;
+    grid-template-columns: 74px minmax(0, 1fr) 32px !important;
+    align-items: center !important;
+    border: 1px solid var(--tone) !important;
+    padding: 0 24px !important;
+    background: linear-gradient(120deg, color-mix(in srgb, var(--tone) 9%, transparent), transparent 48%), #061219 !important;
+    color: var(--tone) !important;
+    clip-path: polygon(17px 0, calc(100% - 17px) 0, 100% 17px, 100% calc(100% - 17px), calc(100% - 17px) 100%, 17px 100%, 0 calc(100% - 17px), 0 17px) !important;
+    text-align: left !important;
+  }
+
+  html body #app.cockpit-desktop .hub-mode.practice { --tone: var(--v5-amber); }
+  html body #app.cockpit-desktop .hub-mode.mistakes { --tone: var(--v5-purple); }
+
+  html body #app.cockpit-desktop .hub-mode > svg {
+    width: 54px !important;
+    height: 54px !important;
+    padding: 10px !important;
+    border: 1px solid currentColor !important;
+    clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%) !important;
+  }
+
+  html body #app.cockpit-desktop .hub-mode strong {
+    display: block !important;
+    color: currentColor !important;
+    font: 700 24px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .hub-mode small {
+    display: block !important;
+    margin-top: 9px !important;
+    color: #b6c1c1 !important;
+    font: 500 16px/1.12 var(--hud-font) !important;
+  }
+
+  /* Mock Exam Setup. */
+  html body #app.cockpit-desktop .setup-page {
+    display: grid !important;
+    grid-template-rows: 118px 535px 94px !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .setup-grid {
+    display: grid !important;
+    height: 535px !important;
+    grid-template-columns: 832px minmax(0, 1fr) !important;
+    gap: 18px !important;
+  }
+
+  html body #app.cockpit-desktop .setup-main {
+    display: grid !important;
+    grid-template-rows: 190px 1fr !important;
+    padding: 28px 26px !important;
+    gap: 24px !important;
+  }
+
+  html body #app.cockpit-desktop .setup-facts {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    border-bottom: 1px solid #2b454d !important;
+  }
+
+  html body #app.cockpit-desktop .setup-facts .instrument-cell {
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-rows: 72px 52px 28px !important;
+    align-content: center !important;
+    justify-items: center !important;
+    border-right: 1px solid #2f4850 !important;
+    padding: 4px 12px !important;
+    gap: 5px !important;
+  }
+
+  html body #app.cockpit-desktop .setup-facts .instrument-cell:last-child {
+    border-right: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .instrument-icon {
+    display: grid !important;
+    width: 66px !important;
+    height: 66px !important;
+    place-items: center !important;
+    border: 1px solid var(--v5-cyan) !important;
+    color: var(--v5-cyan) !important;
+    clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%) !important;
+  }
+
+  html body #app.cockpit-desktop .instrument-icon svg {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  html body #app.cockpit-desktop .setup-facts strong {
+    display: grid !important;
+    place-items: center !important;
+    color: #f0f5f3 !important;
+    font: 600 31px/.95 var(--hud-font) !important;
+    text-align: center !important;
+    white-space: normal !important;
+  }
+
+  html body #app.cockpit-desktop .setup-facts span:not(.instrument-icon) {
+    color: #b5c0c1 !important;
+    font: 500 18px/1 var(--hud-font) !important;
+    text-transform: none !important;
+  }
+
+  html body #app.cockpit-desktop .v5-allocation-console {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-rows: 40px 1fr !important;
+    gap: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .allocation-grid {
+    display: grid !important;
+    min-height: 0 !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-rows: repeat(2, 1fr) !important;
+    gap: 16px !important;
+  }
+
+  html body #app.cockpit-desktop .allocation-card {
+    --tone: var(--v5-cyan);
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-columns: 70px minmax(0, 1fr) 48px !important;
+    align-items: center !important;
+    border: 1px solid #314850 !important;
+    border-left-color: var(--tone) !important;
+    padding: 12px 18px !important;
+    background: rgba(6, 18, 24, .78) !important;
+    color: var(--tone) !important;
+    clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px) !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .allocation-card.general { --tone: var(--v5-purple); }
+  html body #app.cockpit-desktop .allocation-card.verbal { --tone: var(--v5-cyan); }
+  html body #app.cockpit-desktop .allocation-card.numerical { --tone: var(--v5-blue); }
+  html body #app.cockpit-desktop .allocation-card.analytical { --tone: var(--v5-green); }
+
+  html body #app.cockpit-desktop .section-hud-icon {
+    display: grid !important;
+    width: 58px !important;
+    height: 58px !important;
+    border: 1px solid currentColor !important;
+    place-items: center !important;
+    color: currentColor !important;
+    clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%) !important;
+  }
+
+  html body #app.cockpit-desktop .section-hud-icon svg {
+    width: 31px !important;
+    height: 31px !important;
+  }
+
+  html body #app.cockpit-desktop .allocation-copy strong {
+    display: block !important;
+    color: var(--tone) !important;
+    font: 700 20px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .allocation-copy span {
+    display: block !important;
+    margin-top: 8px !important;
+    color: #b6c2c3 !important;
+    font: 500 16px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .allocation-card > b {
+    color: var(--tone) !important;
+    font: 700 38px/1 var(--display-font) !important;
+    text-align: right !important;
+  }
+
+  html body #app.cockpit-desktop .run-configuration {
+    display: grid !important;
+    grid-template-rows: 42px 90px 82px 82px 82px 70px !important;
+    align-content: center !important;
+    padding: 30px 34px !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .run-configuration > label {
+    display: grid !important;
+    grid-template-rows: 28px 56px !important;
+    color: #c7d0d0 !important;
+    font: 700 16px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .run-configuration select {
+    width: 100% !important;
+    height: 56px !important;
+    border: 1px solid var(--v5-cyan) !important;
+    border-radius: 0 !important;
+    padding: 0 18px !important;
+    background: #06131a !important;
+    color: #f0f5f3 !important;
+    font: 600 20px/1 var(--hud-font) !important;
+  }
+
+  html body #app.cockpit-desktop .toggle-row {
+    display: grid !important;
+    grid-template-columns: 58px minmax(0, 1fr) 74px !important;
+    align-items: center !important;
+    border: 1px solid #304950 !important;
+    padding: 0 14px !important;
+    background: #07171d !important;
+    color: #edf3f2 !important;
+    font: 600 18px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .setup-auto-save {
+    display: flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+    border: 1px solid #304950 !important;
+    padding: 0 16px !important;
+    color: #bcc8c8 !important;
+    font: 500 16px/1.2 var(--hud-font) !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop .setup-auto-save svg {
+    width: 34px !important;
+    height: 34px !important;
+    color: var(--v5-cyan) !important;
+  }
+
+  html body #app.cockpit-desktop .technical-cta {
+    min-height: 68px !important;
+    border: 1px solid var(--v5-cyan) !important;
+    background: linear-gradient(180deg, rgba(18, 118, 121, .45), rgba(3, 29, 34, .88)) !important;
+    color: #f3f6f4 !important;
+    font: 700 27px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .setup-disclaimer {
+    display: flex !important;
+    height: 92px !important;
+    border: 1px solid #2a424a !important;
+    align-items: center !important;
+    padding: 0 38px !important;
+    background: rgba(5, 16, 21, .8) !important;
+    color: #b9c4c5 !important;
+    clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px) !important;
+    font: 500 18px/1.25 var(--hud-font) !important;
+    gap: 24px !important;
+  }
+
+  html body #app.cockpit-desktop .setup-disclaimer > svg {
+    width: 46px !important;
+    height: 46px !important;
+    color: var(--v5-cyan) !important;
+  }
+}
+
+/* Final V5 ownership contract. These rules deliberately outrank the retired
+   multi-generation cockpit overrides while the old sheet is being removed. */
+@media (min-width: 1100px) {
+  html body #app.cockpit-desktop section.setup-page {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 118px 535px 94px !important;
+    gap: 0 !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page > .page-title-row,
+  html body #app.cockpit-desktop section.setup-page > .setup-grid,
+  html body #app.cockpit-desktop section.setup-page > .setup-disclaimer {
+    grid-column: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page > .page-title-row { grid-row: 1 !important; }
+
+  html body #app.cockpit-desktop section.setup-page > .setup-grid {
+    grid-row: 2 !important;
+    display: grid !important;
+    height: 535px !important;
+    grid-template-columns: 832px minmax(0, 1fr) !important;
+    grid-template-rows: 535px !important;
+    gap: 18px !important;
+    overflow: visible !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page .setup-main,
+  html body #app.cockpit-desktop section.setup-page .run-configuration {
+    position: relative !important;
+    inset: auto !important;
+    width: auto !important;
+    height: 535px !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page .setup-main {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page .run-configuration {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 42px 82px 70px 70px 70px 68px !important;
+    gap: 10px !important;
+    padding: 24px 30px !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page .setup-facts {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    grid-template-rows: 190px !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page .run-configuration > label {
+    grid-template-rows: 24px 54px !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page .run-configuration select { height: 54px !important; }
+  html body #app.cockpit-desktop section.setup-page .setup-auto-save { min-height: 0 !important; }
+
+  html body #app.cockpit-desktop section.setup-page > .setup-disclaimer {
+    grid-row: 3 !important;
+    align-self: end !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page {
+    height: 841px !important;
+    min-height: 0 !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 136px 106px minmax(0, 1fr) !important;
+    overflow: hidden !important;
+  }
+
+  html body #app.cockpit-desktop .practice-console {
+    display: grid !important;
+    height: 506px !important;
+    grid-template-columns: 734px minmax(0, 1fr) !important;
+    grid-template-rows: 506px !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .practice-section-picker,
+  html body #app.cockpit-desktop .run-profile-panel {
+    height: 506px !important;
+    min-height: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .practice-section-picker {
+    grid-template-rows: 50px minmax(0, 1fr) !important;
+    padding: 18px 28px !important;
+  }
+
+  html body #app.cockpit-desktop .category-plates {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: repeat(4, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .run-profile-panel {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 94px 94px 76px 96px !important;
+    gap: 14px !important;
+    padding: 22px 28px !important;
+  }
+
+  html body #app.cockpit-desktop .count-segments,
+  html body #app.cockpit-desktop .difficulty-segments {
+    display: grid !important;
+    height: 94px !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    grid-template-rows: 58px !important;
+    align-content: end !important;
+    padding: 30px 0 0 !important;
+  }
+
+  html body #app.cockpit-desktop .count-segments > label,
+  html body #app.cockpit-desktop .difficulty-segments > label {
+    grid-row: 1 !important;
+    height: 58px !important;
+  }
+
+  html body #app.cockpit-desktop .selected-run-profile,
+  html body #app.cockpit-desktop .practice-start-cta {
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-list {
+    display: grid !important;
+    height: 527px !important;
+    grid-template-rows: 126px 48px minmax(0, 1fr) !important;
+    padding: 18px 28px 24px !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-console-head {
+    display: grid !important;
+    height: 126px !important;
+    grid-template-columns: minmax(0, 1fr) 800px !important;
+    grid-template-rows: 108px !important;
+    align-items: center !important;
+    gap: 24px !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-summary-rail {
+    height: 84px !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-rows: 84px !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-summary-rail metric {
+    min-width: 0 !important;
+    height: 84px !important;
+    padding: 10px 14px !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-summary-rail metric strong {
+    font-size: 25px !important;
+    line-height: 1 !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-attempt-scroll {
+    min-height: 0 !important;
+    overflow-y: auto !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-attempt-card {
+    display: grid !important;
+    height: 82px !important;
+    grid-template-columns: minmax(300px, 2fr) minmax(210px, 1.2fr) 150px 150px 260px !important;
+    grid-template-rows: 82px !important;
+    align-items: center !important;
+    padding: 0 18px !important;
+  }
+
+  html body #app.cockpit-desktop .mistake-attempt-card > * { grid-row: 1 !important; }
+  html body #app.cockpit-desktop .mistake-attempt-title { grid-column: 1 !important; }
+  html body #app.cockpit-desktop .mistake-attempt-meta { grid-column: 2 !important; }
+  html body #app.cockpit-desktop .mistake-score { grid-column: 3 !important; }
+  html body #app.cockpit-desktop .mistake-count { grid-column: 4 !important; }
+
+  html body #app.cockpit-desktop .mistake-attempt-card > .technical-row-cta {
+    grid-column: 5 !important;
+    width: 100% !important;
+    height: 48px !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+  }
+
+  html body #app.cockpit-desktop section.results-page {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 102px 350px 240px 66px !important;
+    gap: 10px !important;
+  }
+
+  html body #app.cockpit-desktop section.results-page > * {
+    grid-column: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .results-command-title { grid-row: 1 !important; }
+
+  html body #app.cockpit-desktop .results-summary-grid {
+    grid-row: 2 !important;
+    display: grid !important;
+    height: 350px !important;
+    grid-template-columns: 390px minmax(0, 1fr) !important;
+    grid-template-rows: 350px !important;
+    gap: 18px !important;
+  }
+
+  html body #app.cockpit-desktop .score-gauge-panel {
+    grid-column: 1 !important;
+    width: 390px !important;
+    height: 350px !important;
+  }
+
+  html body #app.cockpit-desktop .results-data-stack {
+    grid-column: 2 !important;
+    display: grid !important;
+    width: auto !important;
+    height: 350px !important;
+    grid-template-rows: 116px 224px !important;
+    gap: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .result-metrics-rail,
+  html body #app.cockpit-desktop .results-section-console { width: 100% !important; }
+
+  html body #app.cockpit-desktop .results-section-grid {
+    display: grid !important;
+    height: 154px !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: repeat(4, 36px) !important;
+    gap: 3px !important;
+  }
+
+  html body #app.cockpit-desktop .result-section-card {
+    display: grid !important;
+    height: 36px !important;
+    grid-template-columns: 40px 230px minmax(0, 1fr) 80px 60px !important;
+    align-items: center !important;
+    padding: 0 12px !important;
+  }
+
+  html body #app.cockpit-desktop .result-section-card .section-hud-icon {
+    width: 27px !important;
+    height: 27px !important;
+  }
+
+  html body #app.cockpit-desktop .result-section-card > i {
+    width: 100% !important;
+    height: 8px !important;
+  }
+
+  html body #app.cockpit-desktop .run-insights-panel {
+    grid-row: 3 !important;
+    width: 100% !important;
+    height: 240px !important;
+  }
+
+  html body #app.cockpit-desktop .insight-grid {
+    display: grid !important;
+    height: 174px !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  html body #app.cockpit-desktop .results-action-row {
+    grid-row: 4 !important;
+    height: 66px !important;
+  }
+
+  html body #app.cockpit-desktop .avatar-picker { display: none !important; }
+
+  html body #app.cockpit-desktop *,
+  html body #app.cockpit-desktop *::before,
+  html body #app.cockpit-desktop *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Component-level V5 ownership must remain last in this file. */
+@media (min-width: 1100px) {
+  html body #app.cockpit-desktop section.setup-page .setup-main .setup-facts .instrument-cell {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 72px 46px 28px !important;
+    justify-content: stretch !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page .setup-main .setup-facts .instrument-cell > strong {
+    width: 100% !important;
+    margin: 0 !important;
+    font-size: 29px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page .setup-main .setup-facts .instrument-cell > span:not(.instrument-icon) {
+    width: 100% !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page .setup-main .v5-allocation-console {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 40px minmax(0, 1fr) !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page .setup-main .v5-allocation-console > .technical-title,
+  html body #app.cockpit-desktop section.setup-page .setup-main .v5-allocation-console > .allocation-grid {
+    grid-column: 1 !important;
+    width: 100% !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page .setup-main .v5-allocation-console > .allocation-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page form.run-configuration > label.toggle-row {
+    grid-template-columns: minmax(0, 1fr) 74px !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+    padding: 0 18px !important;
+    white-space: nowrap !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page form.run-configuration > label.toggle-row > input {
+    position: absolute !important;
+    opacity: 0 !important;
+  }
+
+  html body #app.cockpit-desktop section.setup-page form.run-configuration > label.toggle-row > span {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console > .practice-section-picker > .category-plates {
+    height: 420px !important;
+    min-height: 0 !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: repeat(4, 97px) !important;
+    grid-auto-rows: 0 !important;
+    overflow: hidden !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console .category-plates > label.section-plate {
+    width: 100% !important;
+    height: 97px !important;
+    min-height: 0 !important;
+    grid-template-rows: 79px !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console > .run-profile-panel {
+    height: 506px !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 94px 94px 76px 96px !important;
+    align-content: start !important;
+    padding: 22px 28px !important;
+    gap: 14px !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console .count-segments,
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console .difficulty-segments {
+    height: 94px !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    grid-template-rows: 30px 58px !important;
+    align-content: start !important;
+    padding: 0 !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console .segment-label {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    align-self: start !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console .count-segments > label,
+  html body #app.cockpit-desktop section.practice-review-page form.practice-console .difficulty-segments > label {
+    grid-row: 2 !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page .mistakes-hub .mistake-summary-rail > metric {
+    display: grid !important;
+    grid-template-columns: 64px minmax(0, 1fr) !important;
+    grid-template-rows: 30px 34px !important;
+    align-content: center !important;
+    justify-content: stretch !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page .mistakes-hub .mistake-summary-rail > metric > .telemetry-icon {
+    grid-column: 1 !important;
+    grid-row: 1 / 3 !important;
+    align-self: center !important;
+    width: 48px !important;
+    height: 48px !important;
+    margin: 0 !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page .mistakes-hub .mistake-summary-rail > metric > span:not(.telemetry-icon) {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: end !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page .mistakes-hub .mistake-summary-rail > metric > strong {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    align-self: start !important;
+    margin: 0 !important;
+  }
+
+  html body #app.cockpit-desktop section.practice-review-page .mistakes-hub .mistake-attempt-card {
+    height: 82px !important;
+    min-height: 82px !important;
+    max-height: 82px !important;
+  }
+
+  html body #app.cockpit-desktop section.results-page > .results-summary-grid > .score-gauge-panel,
+  html body #app.cockpit-desktop section.results-page > .results-summary-grid > .results-data-stack {
+    grid-row: 1 !important;
+    align-self: stretch !important;
+  }
+
+  html body #app.cockpit-desktop section.results-page > .results-summary-grid > .score-gauge-panel { grid-column: 1 !important; }
+  html body #app.cockpit-desktop section.results-page > .results-summary-grid > .results-data-stack { grid-column: 2 !important; }
+  html body #app.cockpit-desktop section.results-page > .results-summary-grid { grid-auto-rows: 0 !important; }
+
+  html body #app.cockpit-desktop section.results-page .results-data-stack > .results-section-console {
+    height: 224px !important;
+    min-height: 224px !important;
+  }
+
+  html body #app.cockpit-desktop section.results-page > .run-insights-panel > .insight-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+html body #app *,
+html body #app *::before,
+html body #app *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+@media (min-width: 1100px) {
+  html body main#app.app-shell.cockpit-desktop section.content-page.practice-review-page form.custom-practice.practice-console.v5-panel {
+    grid-template-columns: 734px minmax(0, 1fr) !important;
+    grid-template-rows: 506px !important;
+    padding: 0 !important;
+    gap: 12px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.content-page.practice-review-page form.custom-practice.practice-console.v5-panel > .practice-section-picker {
+    height: 506px !important;
+    padding: 18px 28px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.content-page.practice-review-page form.custom-practice.practice-console.v5-panel > .run-profile-panel {
+    height: 506px !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 94px 94px 76px 96px !important;
+    align-content: start !important;
+    padding: 22px 28px !important;
+    gap: 14px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.content-page.practice-review-page form.custom-practice.practice-console.v5-panel > .run-profile-panel > .count-segments { grid-row: 1 !important; }
+  html body main#app.app-shell.cockpit-desktop section.content-page.practice-review-page form.custom-practice.practice-console.v5-panel > .run-profile-panel > .difficulty-segments { grid-row: 2 !important; }
+  html body main#app.app-shell.cockpit-desktop section.content-page.practice-review-page form.custom-practice.practice-console.v5-panel > .run-profile-panel > .selected-run-profile { grid-row: 3 !important; }
+  html body main#app.app-shell.cockpit-desktop section.content-page.practice-review-page form.custom-practice.practice-console.v5-panel > .run-profile-panel > .practice-start-cta { grid-row: 4 !important; }
+
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .results-section-grid > article.result-section-card {
+    grid-template-columns: 40px 230px minmax(0, 1fr) 80px 60px !important;
+    grid-template-rows: 34px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .results-section-grid > article.result-section-card > .section-hud-icon {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .results-section-grid > article.result-section-card > strong {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .results-section-grid > article.result-section-card > i {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .results-section-grid > article.result-section-card > small {
+    grid-column: 4 !important;
+    grid-row: 1 !important;
+    width: auto !important;
+    margin: 0 !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .results-section-grid > article.result-section-card > b {
+    grid-column: 5 !important;
+    grid-row: 1 !important;
+    width: auto !important;
+    margin: 0 !important;
+  }
+}
+
+html body main#app.app-shell .system-page .boot-progress i {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Final optical corrections measured against the approved V5 captures. */
+@media (min-width: 1100px) {
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .setup-facts .instrument-cell:nth-child(3),
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .setup-facts .instrument-cell:nth-child(4) {
+    grid-template-rows: 72px 60px 28px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .setup-facts .instrument-cell:nth-child(3) > strong,
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .setup-facts .instrument-cell:nth-child(4) > strong {
+    width: 132px !important;
+    font-size: 27px !important;
+    line-height: 1.02 !important;
+    white-space: normal !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.content-page.practice-review-page > .practice-mode-cards {
+    width: 920px !important;
+    height: 82px !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    justify-self: start !important;
+    margin: 0 !important;
+    gap: 22px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight {
+    display: grid !important;
+    height: 83px !important;
+    min-height: 0 !important;
+    grid-template-columns: 64px minmax(0, 1fr) !important;
+    grid-template-rows: 1fr !important;
+    align-items: center !important;
+    padding: 8px 16px !important;
+    gap: 10px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight > span {
+    display: grid !important;
+    width: 52px !important;
+    height: 52px !important;
+    place-items: center !important;
+    margin: 0 !important;
+    border: 1px solid currentColor !important;
+    clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%) !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight > span .local-icon {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight > div {
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-rows: 16px 28px 16px !important;
+    align-content: center !important;
+    gap: 2px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight small,
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight strong,
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight p {
+    overflow: hidden !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight small {
+    font-size: 12px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight strong {
+    font-size: 22px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight p {
+    font-size: 12px !important;
+  }
+}
+
+html body main#app.app-shell .system-screen .segmented-loader > i {
+  animation: none !important;
+  transition: none !important;
+}
+
+html body main#app.app-shell .segmented-loader > i {
+  animation: none !important;
+  transition: none !important;
+}
+
+html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .setup-facts .instrument-cell > span:empty {
+  display: none !important;
+}
+
+/* Final optical ownership: reset obsolete tracks inherited from retired themes. */
+@media (min-width: 1100px) {
+  html body main#app.app-shell.cockpit-desktop .pause-modal .pause-facts {
+    display: grid !important;
+    width: 100% !important;
+    height: 112px !important;
+    min-height: 112px !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    overflow: visible !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .pause-modal .pause-facts > span {
+    display: grid !important;
+    height: 110px !important;
+    min-height: 0 !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 30px 24px 26px !important;
+    align-content: center !important;
+    justify-items: center !important;
+    border-right: 1px solid #56491f !important;
+    border-bottom: 0 !important;
+    padding: 8px 10px !important;
+    gap: 3px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .pause-modal .pause-facts > span:last-child {
+    border-right: 0 !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .pause-modal .pause-facts > span > svg {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    justify-self: center !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .pause-modal .pause-facts > span > b {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    align-self: center !important;
+    font-size: 11px !important;
+    line-height: 1.05 !important;
+    text-align: center !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .pause-modal .pause-facts > span > strong {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+    align-self: center !important;
+    font-size: 17px !important;
+    line-height: 1 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .timeout-modal {
+    display: flex !important;
+    width: 620px !important;
+    min-height: 570px !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 34px 40px !important;
+    gap: 14px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .timeout-modal .timeout-symbol {
+    display: grid !important;
+    flex: 0 0 62px !important;
+    width: 62px !important;
+    height: 62px !important;
+    margin: 0 auto !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .timeout-modal h2 {
+    flex: 0 0 54px !important;
+    margin: 0 !important;
+    font-size: 48px !important;
+    line-height: 54px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .timeout-modal .timeout-clock {
+    display: grid !important;
+    flex: 0 0 106px !important;
+    grid-template-rows: 24px 66px !important;
+    margin: 0 !important;
+    padding: 8px 0 !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .timeout-modal .timeout-clock strong {
+    align-self: center !important;
+    font-size: 58px !important;
+    line-height: 1 !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .timeout-modal > p {
+    flex: 0 0 58px !important;
+    margin: 0 !important;
+    font-size: 16px !important;
+    line-height: 1.35 !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .timeout-modal > p b {
+    font-size: 20px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .timeout-modal .segmented-loader {
+    flex: 0 0 18px !important;
+    margin: 0 !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .timeout-modal > small {
+    flex: 0 0 32px !important;
+    line-height: 32px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .timeout-modal .timeout-note {
+    flex: 0 0 48px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .progress-page .attempt-table:has(.progress-empty-state) {
+    height: 226px !important;
+    overflow: hidden !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .progress-page .progress-empty-state {
+    display: grid !important;
+    box-sizing: border-box !important;
+    height: 178px !important;
+    min-height: 0 !important;
+    grid-template-rows: auto 48px !important;
+    align-content: center !important;
+    justify-items: center !important;
+    padding: 8px 0 18px !important;
+    gap: 16px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .progress-page .progress-empty-state > .empty-inline {
+    padding: 0 !important;
+    gap: 7px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .progress-page .progress-empty-state > .btn {
+    min-width: 190px !important;
+    height: 48px !important;
+    margin: 0 !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .v5-review-workstation .review-question-scroll > .prompt,
+  html body main#app.app-shell.cockpit-desktop .v5-review-workstation .review-question-scroll > .review-choices,
+  html body main#app.app-shell.cockpit-desktop .v5-review-workstation .review-question-scroll > .review-explanation-console {
+    flex: 0 0 auto !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .v5-review-workstation .review-choices {
+    height: max-content !important;
+    min-height: max-content !important;
+    grid-auto-rows: minmax(52px, auto) !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .v5-review-workstation .review-choice {
+    height: auto !important;
+    min-height: 52px !important;
+    flex-shrink: 0 !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .v5-review-workstation .review-explanation-console {
+    position: static !important;
+    inset: auto !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 112px !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+  }
+}

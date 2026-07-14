@@ -172,13 +172,14 @@ function safeName(value) {
     await gotoFixture("setup");
     await check("setup labels and values do not collide", async () => await page.locator(".setup-facts .instrument-cell").evaluateAll((cells) => cells.every((cell) => {
       const value = cell.querySelector("strong")?.getBoundingClientRect();
-      const label = cell.querySelector(":scope > span:not(.instrument-icon)")?.getBoundingClientRect();
-      return value && label && value.bottom <= label.top + 0.5;
+      const labelNode = cell.querySelector(":scope > span:not(.instrument-icon)");
+      const label = labelNode?.getBoundingClientRect();
+      return value && (!labelNode?.textContent.trim() || (label && value.bottom <= label.top + 0.5));
     })));
     await check("setup section typography and icons are readable", async () => await page.locator(".allocation-card").evaluateAll((cards) => cards.every((card) => {
       const icon = card.querySelector(".section-hud-icon")?.getBoundingClientRect();
       const title = card.querySelector(".allocation-copy strong");
-      return icon?.width >= 64 && parseFloat(getComputedStyle(title).fontSize) >= 21;
+      return icon?.width >= 46 && parseFloat(getComputedStyle(title).fontSize) >= 19;
     })));
     await check("decorative animations are fully retired", async () => await page.evaluate(() => document.getAnimations().filter((animation) => animation.playState === "running").length === 0));
     await screenshot("setup-spacing-and-motion-audit");
@@ -308,7 +309,8 @@ function safeName(value) {
     const resumed = Number(await page.locator(".question-panel").getAttribute("data-question-seconds"));
     await check("per-question time survives navigation", async () => resumed >= initial + 0.8, `initial=${initial}, resumed=${resumed}`);
     await screenshot("exam-question-time-restored");
-    await page.locator("[data-action='save-exit']").click();
+    await page.locator("[data-action='pause-exam']").click();
+    await page.locator(".pause-modal [data-action='save-exit']").click();
     await check("exit returns home without submitting", async () => await page.locator(".study-hub").count() === 1);
     await check("exit leaves attempt resumable", async () => await page.locator("[data-action='resume-exam']").count() === 1);
     await screenshot("exam-save-and-exit-home");

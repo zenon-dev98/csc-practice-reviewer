@@ -2,7 +2,7 @@
 
 ## T0032 - V5 Interaction And Spacing Quality Repair
 
-Status: in_progress
+Status: done
 
 Replace the repository instructions with the attached hardened version, add an explicit manual Edge state-and-interaction release agent, and repair the reported V5 parity defects without changing exam content or persistence behavior.
 
@@ -17,6 +17,15 @@ Acceptance criteria:
 - Automated fixture and interaction suites cover every registered state and the More/Less navigator path, including screenshots and interaction checks.
 - Maximized external Microsoft Edge at 100% zoom is walked manually through all reachable states and controls, with screenshots and a manifest saved under `qa/t0032-edge-manual/`.
 - The final cache-busted build is deployed to GitHub Pages and the live fixture/interaction smoke tests pass.
+
+Completion notes:
+
+- Replaced the former additive V5 parity override with `app/v5-production.css`, a single production visual contract covering the complete public, signed-in, exam, result, review, dialog, empty, error, and mobile state matrix.
+- Preserved keyboard-visible focus while removing pointer-only field highlighting, removed preset profile photos, repaired Setup hierarchy, Practice & Review spacing, mobile review reachability, and the expanded exam navigator's complete 21-80 return path.
+- Retired uncontrolled decorative animation; the final fixture and interaction harnesses report zero active animations in normal-motion mode.
+- Final local QA produced 185 desktop screenshots across five desktop targets, 74 mobile screenshots across two targets, and 72 interaction screenshots with 42/42 checks passing. No console, document-overflow, sampled element-overflow, or visual-defect failures remain.
+- Maximized external Microsoft Edge at 100% zoom was exercised across all 37 canonical fixtures plus item 80 to item 21, More/Less, answer-gated Next, pause/resume, submit, and Account Settings. The 52-image evidence set is stored under `qa/t0033-v5-production-edge-manual/`.
+- Static assets are cache-busted through `v5-production.css?v=20260714-04` and `app.js?v=20260714-04`.
 
 ## T0031 - Full Section Navigator Reachability
 

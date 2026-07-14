@@ -42,6 +42,7 @@ Path:
 - `app/app.js`
 - `app/styles.css`
 - `app/cockpit-theme.css`
+- `app/v5-production.css`
 - `app/question-data.js`
 - `app/generated-question-bank.js`
 - `app/assets/brand-shield.svg`
@@ -110,11 +111,20 @@ Current source item boundaries:
 - T0032 uses pointer-versus-keyboard input modality so mouse clicks do not add a distracting auth/account field ring while keyboard focus remains visible. It also repairs the Study Hub title fill, Mock Exam Setup label/value and section scale, Practice & Review heading clearance, and mobile Practice & Review scroll ownership.
 - Decorative animation and transition rules are disabled pending a purposeful motion specification. The interaction harness verifies that no animation remains active under normal-motion browser settings.
 - T0032 release evidence includes 42/42 interaction checks across 72 screenshots and a 222-screenshot fixture matrix across logical desktop, `1904x913`, `1536x816`, `1536x736`, `390x844`, and `412x915`, with zero console/document failures, sampled overflows, geometry defects, or active animations.
-- Static assets are cache-busted through `app.js?v=20260714-02`, `cockpit-theme.css?v=20260714-02`, and `v5-parity.css?v=20260714-02`.
+- T0032 replaces the superseded additive V5 patch with `app/v5-production.css`, the final production visual authority for all 37 canonical states and their desktop/mobile variants.
+- T0032 local release evidence includes 185 desktop screenshots, 74 mobile screenshots, 72 automated interaction screenshots with 42/42 checks passing, and 52 maximized external-Edge screenshots. The item 80 to item 21 path, More/Less, answer-gated Next, pause/resume, submit, and Account Settings entry all pass.
+- Static assets are cache-busted through `app.js?v=20260714-04`, `cockpit-theme.css?v=20260714-02`, and `v5-production.css?v=20260714-04`.
 
 ## Current Active Ticket
 
-- None. T0031 is complete; the next planned work remains Supabase backup/export or the generated-content pedagogy/key review.
+- None. T0032 is complete; the next planned work remains Supabase backup/export or the generated-content pedagogy/key review.
+
+## T0032 Outcome
+
+- Promoted the approved V5 cockpit language from an incomplete override into a complete production state layer rather than another recolor or small spacing patch.
+- Repaired the full desktop/mobile page matrix, all system/auth states, signed-in navigation, Setup, exam/navigator/chart/dialog states, Practice & Review, Progress, Results, Answer Review, and Account Settings.
+- Final local automated QA is clean across five desktop and two mobile viewports; interaction QA passes 42/42 checks, including the permanent item 80 to item 21 regression.
+- Maximized external Edge at 100% zoom captured every canonical state and the critical interaction paths under `qa/t0033-v5-production-edge-manual/`.
 
 ## T0031 Outcome
 

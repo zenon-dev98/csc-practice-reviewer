@@ -715,7 +715,12 @@
           <small class="boot-product-line">Independent mock exam and review tool</small>
           <h1>Syncing reviewer data</h1>
           <div class="segmented-loader" aria-label="Loading"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <span>Connecting securely</span>
+          <span class="boot-status">Connecting securely</span>
+          <div class="boot-sync-modules" aria-label="Reviewer synchronization status">
+            <span>${localIcon("circle-check")}<b>Account</b><small>Authenticating</small></span>
+            <span>${localIcon("notebook-tabs")}<b>Question bank</b><small>Loading locally</small></span>
+            <span>${localIcon("cloud-check")}<b>Progress</b><small>Checking cloud state</small></span>
+          </div>
         </div>
       </section>
     `, "system-frame");
@@ -779,7 +784,7 @@
           <label class="field-label">Full Name<div class="field-with-icon">${icon("user")}<input name="name" autocomplete="name" placeholder="Enter your full name" required /></div></label>
           <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="email" placeholder="Enter your email address" required /></div></label>
           <div class="auth-password-grid">
-            <label class="field-label">Password<div class="field-with-icon has-toggle">${icon("key")}<input name="password" type="password" autocomplete="new-password" minlength="8" placeholder="Create a password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
+            <label class="field-label">Password<div class="field-with-icon has-toggle">${icon("key")}<input name="password" type="password" autocomplete="new-password" minlength="8" placeholder="New password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
             <label class="field-label">Confirm Password<div class="field-with-icon has-toggle">${icon("key")}<input name="confirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Confirm" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
           </div>
           <label class="field-label">Invite Code<div class="field-with-icon">${icon("shield")}<input name="inviteCode" autocomplete="off" placeholder="Enter invite code" required /></div></label>
@@ -1043,8 +1048,8 @@
             <div class="setup-facts instrument-grid">
               ${setupFact("notebook-tabs", "cyan", "Questions", "170")}
               ${setupFact("timer", "cyan", "Time Limit", "3h 10m")}
-              ${setupFact("brain-circuit", "cyan", "Navigation", "Free Movement")}
-              ${setupFact("circle-check", "cyan", "Progress", "Pause & Resume")}
+              ${setupFact("brain-circuit", "cyan", "", "Free Movement")}
+              ${setupFact("circle-check", "cyan", "", "Pause & Resume")}
             </div>
             <div class="section-list allocation-console v5-allocation-console">
               <div class="technical-title"><h2>Exam Sections</h2><span aria-hidden="true"></span></div>
@@ -1604,10 +1609,8 @@
   }
 
   function avatar(profile, size = "") {
-    const presetIndex = Number(profile?.avatar_preset || 0) - 1;
-    const preset = presetIndex >= 0 ? AVATAR_OPTIONS[presetIndex] : null;
-    const label = preset ? `${preset[0]} avatar` : initials(profile?.name || profile?.email || "Reviewer");
-    return `<span class="avatar ${size} tone-account ${preset ? "has-animal" : ""}" aria-label="${escapeAttr(label)}">${preset ? preset[1] : escapeHtml(label)}</span>`;
+    const label = initials(profile?.name || profile?.email || "Reviewer");
+    return `<span class="avatar ${size} tone-account" aria-label="${escapeAttr(label)}">${escapeHtml(label)}</span>`;
   }
 
   function displayName(profile) {
@@ -1617,7 +1620,6 @@
   function profileModal() {
     if (app.modal !== "profile" && !(app.modal === "password" && app.modalReturn === "profile")) return "";
     const profile = app.profile;
-    const selectedAvatar = app.accountAvatarDraft ?? Number(profile.avatar_preset || 0);
     return `
       <div class="modal-backdrop drawer-backdrop">
         <section class="profile-modal account-settings-modal command-drawer" role="dialog" aria-modal="true" aria-labelledby="account-settings-title" tabindex="-1">
@@ -1627,8 +1629,7 @@
             <p>Personalize your reviewer account and session.</p>
           </div>
           <form class="account-settings-form" data-form="profile">
-            <div class="account-identity-preview">${avatar({ ...profile, avatar_preset: selectedAvatar }, "large")}<div><strong>${escapeHtml(displayName(profile))}</strong><small>${escapeHtml(profile.email)}</small></div></div>
-            <fieldset class="avatar-picker"><legend>Choose an avatar</legend><div class="avatar-options">${AVATAR_OPTIONS.map(([id, emoji], index) => `<button class="avatar-option ${Number(selectedAvatar) === index + 1 ? "selected" : ""}" data-avatar-preset="${index + 1}" type="button" aria-label="Choose ${id} avatar" aria-pressed="${Number(selectedAvatar) === index + 1 ? "true" : "false"}">${emoji}</button>`).join("")}</div></fieldset>
+            <div class="account-identity-preview">${avatar(profile, "large")}<div><strong>${escapeHtml(displayName(profile))}</strong><small>${escapeHtml(profile.email)}</small></div></div>
             <div class="account-field-grid">
               <label>Nickname<input name="nickname" value="${escapeAttr(profile.nickname || "")}" placeholder="What should we call you?" /></label>
               <label>Full Name<input name="name" value="${escapeAttr(profile.name)}" required /></label>
@@ -1837,7 +1838,7 @@
   }
 
   function setupFact(iconName, tone, label, value) {
-    return `<div class="instrument-cell ${escapeAttr(tone)}"><span class="instrument-icon">${localIcon(iconName)}</span><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`;
+    return `<div class="instrument-cell ${escapeAttr(tone)}"><span class="instrument-icon">${localIcon(iconName)}</span><strong>${escapeHtml(value)}</strong><span>${escapeHtml(label)}</span></div>`;
   }
 
   function telemetryMetric(iconName, label, value) {
