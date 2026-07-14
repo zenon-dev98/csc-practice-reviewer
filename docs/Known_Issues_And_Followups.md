@@ -25,6 +25,8 @@
 - T0029 final QA is clean across logical desktop, `1904x913`, `1536x816`, `1536x736`, `390x844`, and `412x915`; the only issue found during the last pass was a 4px narrow-screen Account Settings arrow overflow, which was repaired in the final override layer.
 - T0030 supersedes the incomplete T0029 parity claim. Its final local six-viewport matrix, local/live 29-check interaction suites, live boot retry, and maximized external Edge inspection are clean. No open V5 parity defect remains from the restored pasted request.
 - T0031 removed the moving expanded-section window and nested chip-grid scroll. The complete Verbal 21-80 range is now reachable in one sidebar flow; local/live desktop and mobile 80-to-21 regressions pass.
+- T0032 deliberately retires all decorative animation and transitions. Motion should remain disabled until a future ticket defines a meaningful trigger, endpoint, duration, easing, and reduced-motion fallback.
+- T0032 adds permanent release checks for pointer/keyboard focus modality, Setup label/value collisions and physical icon/type scale, Mistakes heading clearance, active animations, More/Less lower-content reachability, and mobile content that extends beyond the browser's actual scrolling element.
 
 ## Follow-Up Ticket Ideas
 

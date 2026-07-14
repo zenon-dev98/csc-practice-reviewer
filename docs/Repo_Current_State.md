@@ -1,6 +1,6 @@
 # Repo Current State
 
-Last updated: 2026-07-13
+Last updated: 2026-07-14
 
 ## Workspace
 
@@ -106,7 +106,11 @@ Current source item boundaries:
 - Password reset, delete-account, and delete-attempt flows are in-app dialogs; no native `prompt()` or `confirm()` calls remain.
 - Final T0024 Edge evidence is stored under `qa/t0024-cockpit-final-desktop`, `qa/t0024-cockpit-final-mobile`, `qa/t0024-cockpit-mobile-full-r2`, `qa/t0024-cockpit-modals-final`, and `qa/t0024-cockpit-interactions-final`.
 - The final fixture sweep covered 36 states at three desktop sizes (`108` screenshots) and two mobile sizes (`72` screenshots), with zero console/document failures and zero sampled element overflows. The interaction harness passed `15/15` checks across `59` screenshots.
-- Static assets are cache-busted through `app.js?v=20260714-01`.
+- T0032 replaces the repository operating instructions with the hardened account, exam, persistence, security, accessibility, spacing, visual-QA, and deployment contract. It adds dedicated Manual Edge State and Interaction and Visual Parity Quality agents.
+- T0032 uses pointer-versus-keyboard input modality so mouse clicks do not add a distracting auth/account field ring while keyboard focus remains visible. It also repairs the Study Hub title fill, Mock Exam Setup label/value and section scale, Practice & Review heading clearance, and mobile Practice & Review scroll ownership.
+- Decorative animation and transition rules are disabled pending a purposeful motion specification. The interaction harness verifies that no animation remains active under normal-motion browser settings.
+- T0032 release evidence includes 42/42 interaction checks across 72 screenshots and a 222-screenshot fixture matrix across logical desktop, `1904x913`, `1536x816`, `1536x736`, `390x844`, and `412x915`, with zero console/document failures, sampled overflows, geometry defects, or active animations.
+- Static assets are cache-busted through `app.js?v=20260714-02`, `cockpit-theme.css?v=20260714-02`, and `v5-parity.css?v=20260714-02`.
 
 ## Current Active Ticket
 

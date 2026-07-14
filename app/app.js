@@ -131,6 +131,7 @@
   };
 
   const root = document.getElementById("app");
+  root.dataset.inputMode = "pointer";
 
   function boot() {
     syncCockpitScale();
@@ -2208,6 +2209,7 @@
   }
 
   function handlePointerDown(event) {
+    root.dataset.inputMode = "pointer";
     const nav = event.target.closest(".exam-nav");
     if (!nav || event.button !== 0 || event.target.closest("button, summary, input, select, textarea, a")) return;
     app.examNavDrag = { nav, pointerId: event.pointerId, startY: event.clientY, startScroll: nav.scrollTop, moved: false };
@@ -2636,6 +2638,7 @@
   }
 
   function handleKeydown(event) {
+    if (event.key === "Tab") root.dataset.inputMode = "keyboard";
     if (event.key === "Enter" && !event.shiftKey && event.target instanceof HTMLInputElement) {
       const form = event.target.closest("form");
       const action = form?.dataset.form === "signin"

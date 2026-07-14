@@ -68,6 +68,43 @@ function safeName(value) {
           })
           .slice(0, 20)
           .map((node) => ({ selector: `${node.tagName.toLowerCase()}.${Array.from(node.classList).join(".")}`, client: [node.clientWidth, node.clientHeight], scroll: [node.scrollWidth, node.scrollHeight], text: (node.textContent || "").trim().slice(0, 80) }));
+        const visualDefects = [];
+        const isOwnedByScrollContainer = (node) => {
+          for (let parent = node.parentElement; parent && parent !== document.body; parent = parent.parentElement) {
+            const style = getComputedStyle(parent);
+            const ownsVerticalOverflow = /auto|scroll/.test(style.overflowY) && parent.scrollHeight > parent.clientHeight + 2;
+            const ownsHorizontalOverflow = /auto|scroll/.test(style.overflowX) && parent.scrollWidth > parent.clientWidth + 2;
+            if (ownsVerticalOverflow || ownsHorizontalOverflow) return true;
+          }
+          return false;
+        };
+        const visibleContentBottom = Array.from(document.body.querySelectorAll("*"))
+          .filter((node) => {
+            const style = getComputedStyle(node);
+            const rect = node.getBoundingClientRect();
+            return style.display !== "none" && style.visibility !== "hidden" && rect.width > 0 && rect.height > 0 && !isOwnedByScrollContainer(node);
+          })
+          .reduce((bottom, node) => Math.max(bottom, node.getBoundingClientRect().bottom + scrollY), 0);
+        const reachableDocumentBottom = document.scrollingElement?.scrollHeight || document.documentElement.scrollHeight;
+        if (innerWidth < 1100 && visibleContentBottom > reachableDocumentBottom + 2) {
+          visualDefects.push(`mobile content bottom ${Math.ceil(visibleContentBottom)} exceeds reachable document bottom ${reachableDocumentBottom}`);
+        }
+        document.querySelectorAll(".setup-facts .instrument-cell").forEach((cell, index) => {
+          const value = cell.querySelector("strong")?.getBoundingClientRect();
+          const label = cell.querySelector(":scope > span:not(.instrument-icon)")?.getBoundingClientRect();
+          const overlaps = value && label
+            && value.left < label.right && value.right > label.left
+            && value.top < label.bottom && value.bottom > label.top;
+          if (overlaps) visualDefects.push(`setup fact ${index + 1} label/value collision`);
+        });
+        document.querySelectorAll(".mistake-table-head").forEach((head) => {
+          if (getComputedStyle(head).display === "none") return;
+          const bounds = head.getBoundingClientRect();
+          Array.from(head.children).forEach((label) => {
+            const rect = label.getBoundingClientRect();
+            if (rect.top - bounds.top < 8 || bounds.bottom - rect.bottom < 8) visualDefects.push(`mistake heading '${label.textContent.trim()}' lacks vertical clearance`);
+          });
+        });
         return {
           viewport: [innerWidth, innerHeight],
           body: [document.body.scrollWidth, document.body.scrollHeight],
@@ -75,7 +112,11 @@ function safeName(value) {
           frame: frameRect ? { x: frameRect.x, y: frameRect.y, width: frameRect.width, height: frameRect.height } : null,
           scale: getComputedStyle(document.getElementById("app")).getPropertyValue("--cockpit-scale").trim(),
           view: document.getElementById("app")?.dataset.view,
-          overflow
+          overflow,
+          activeAnimations: document.getAnimations().filter((animation) => animation.playState === "running").length,
+          visualDefects,
+          visibleContentBottom,
+          reachableDocumentBottom
         };
       });
       const file = `${safeName(state)}-${viewport.label}.png`;
@@ -83,7 +124,7 @@ function safeName(value) {
       const entry = { state, viewport, file, metrics, errors: [...pageErrors] };
       report.entries.push(entry);
       const documentOverflow = metrics.body[0] > viewport.width || (viewport.width >= 1100 && metrics.body[1] > viewport.height);
-      if (pageErrors.length || documentOverflow) report.errors.push(entry);
+      if (pageErrors.length || documentOverflow || metrics.activeAnimations || metrics.visualDefects.length) report.errors.push(entry);
     }
     await context.close();
   }
@@ -93,7 +134,9 @@ function safeName(value) {
   const summary = {
     screenshots: report.entries.length,
     consoleOrDocumentFailures: report.errors.length,
-    elementOverflowSamples: report.entries.reduce((sum, entry) => sum + entry.metrics.overflow.length, 0)
+    elementOverflowSamples: report.entries.reduce((sum, entry) => sum + entry.metrics.overflow.length, 0),
+    visualDefects: report.entries.reduce((sum, entry) => sum + entry.metrics.visualDefects.length, 0),
+    activeAnimations: report.entries.reduce((sum, entry) => sum + entry.metrics.activeAnimations, 0)
   };
   process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
   if (report.errors.length) process.exitCode = 1;

@@ -638,6 +638,22 @@ body::before {
   box-shadow: 0 0 0 1px rgba(33, 222, 215, 0.2), 0 0 18px rgba(33, 222, 215, 0.08);
 }
 
+/* Pointer focus stays quiet; keyboard focus remains visible and deliberate. */
+#app[data-input-mode="pointer"] .field-with-icon:focus-within,
+#app[data-input-mode="pointer"] .account-settings-form input:focus {
+  border-color: #40585f !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+#app[data-input-mode="keyboard"] .field-with-icon:focus-within,
+#app[data-input-mode="keyboard"] .account-settings-form input:focus {
+  border-color: var(--cockpit-cyan) !important;
+  outline: 2px solid var(--cockpit-cyan) !important;
+  outline-offset: 3px !important;
+  box-shadow: none !important;
+}
+
 #app .field-with-icon > .icon {
   width: 23px;
   height: 23px;

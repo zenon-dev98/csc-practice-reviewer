@@ -1,5 +1,23 @@
 # Tickets
 
+## T0032 - V5 Interaction And Spacing Quality Repair
+
+Status: in_progress
+
+Replace the repository instructions with the attached hardened version, add an explicit manual Edge state-and-interaction release agent, and repair the reported V5 parity defects without changing exam content or persistence behavior.
+
+Acceptance criteria:
+
+- `AGENTS.md` uses the attached instruction set, preserves the known `1536x736` maximized-Edge target, and includes explicit manual interaction and visual-parity agents.
+- Pointer clicks on account/auth text fields do not show the distracting cyan focus box; keyboard navigation retains a visible accessible focus state.
+- The Study Hub `LOCK IN.` title renders as legible light text rather than a mostly black textured fill.
+- Mock Exam Setup has no label/value collisions, uses readable option and section typography/icons, and tracks the approved V5 setup composition at the final physical desktop scale.
+- Practice & Review mistake-table headings have deliberate clearance from the summary rail and attempt rows.
+- Existing decorative continuous animations are removed; no replacement motion is introduced until a purposeful motion design is approved.
+- Automated fixture and interaction suites cover every registered state and the More/Less navigator path, including screenshots and interaction checks.
+- Maximized external Microsoft Edge at 100% zoom is walked manually through all reachable states and controls, with screenshots and a manifest saved under `qa/t0032-edge-manual/`.
+- The final cache-busted build is deployed to GitHub Pages and the live fixture/interaction smoke tests pass.
+
 ## T0031 - Full Section Navigator Reachability
 
 Status: done

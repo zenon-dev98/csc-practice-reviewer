@@ -14,7 +14,7 @@ function safeName(value) {
 
 (async () => {
   const browser = await chromium.launch({ channel: "msedge", headless: true });
-  const context = await browser.newContext({ viewport: { width: 1672, height: 942 }, deviceScaleFactor: 1, reducedMotion: "reduce" });
+  const context = await browser.newContext({ viewport: { width: 1672, height: 942 }, deviceScaleFactor: 1, reducedMotion: "no-preference" });
   const page = await context.newPage();
   page.setDefaultTimeout(6000);
   page.setDefaultNavigationTimeout(30000);
@@ -89,6 +89,24 @@ function safeName(value) {
     await gotoFixture("select");
     await check("sign-in fields do not retain credentials", async () =>
       await page.locator("input[name='email']").inputValue() === "" && await page.locator("input[name='password']").inputValue() === "");
+    const signInEmail = page.locator("input[name='email']");
+    await signInEmail.click();
+    await check("pointer focus does not highlight auth field", async () => await signInEmail.evaluate((input) => {
+      const app = document.getElementById("app");
+      const field = input.closest(".field-with-icon");
+      const style = getComputedStyle(field);
+      return app?.dataset.inputMode === "pointer" && style.boxShadow === "none" && style.outlineStyle === "none";
+    }));
+    await screenshot("auth-signin-pointer-focus-quiet");
+    await page.keyboard.press("Tab");
+    await check("keyboard focus remains visible on auth field", async () => await page.evaluate(() => {
+      const app = document.getElementById("app");
+      const field = document.activeElement?.closest(".field-with-icon");
+      if (!field) return false;
+      const style = getComputedStyle(field);
+      return app?.dataset.inputMode === "keyboard" && (style.outlineStyle !== "none" || style.borderColor === "rgb(33, 222, 215)");
+    }));
+    await screenshot("auth-signin-keyboard-focus-visible");
     await page.locator("input[name='email']").fill("john.smith@email.com");
     await page.locator("input[name='password']").fill("ReviewPass123");
     await page.locator("input[name='password']").press("Enter");
@@ -112,6 +130,20 @@ function safeName(value) {
     await screenshot("dashboard-account-keyboard-focus");
     await page.locator(".account-button").click();
     await screenshot("account-settings-open");
+    const nickname = page.locator(".account-settings-modal input[name='nickname']");
+    await nickname.click();
+    await check("pointer focus does not highlight account field", async () => await nickname.evaluate((input) => {
+      const app = document.getElementById("app");
+      const style = getComputedStyle(input);
+      return app?.dataset.inputMode === "pointer" && style.boxShadow === "none" && style.outlineStyle === "none";
+    }));
+    await screenshot("account-field-pointer-focus-quiet");
+    await page.keyboard.press("Tab");
+    await check("keyboard focus remains visible in account settings", async () => await page.evaluate(() => {
+      const style = getComputedStyle(document.activeElement);
+      return document.getElementById("app")?.dataset.inputMode === "keyboard" && style.outlineStyle !== "none";
+    }));
+    await screenshot("account-field-keyboard-focus-visible");
     await page.locator("[data-action='toggle-audio-master']").click();
     await page.locator("[data-audio-volume='musicVolume']").fill("0.25");
     await screenshot("account-audio-settings-enabled");
@@ -138,6 +170,18 @@ function safeName(value) {
 
   await test("setup controls", async () => {
     await gotoFixture("setup");
+    await check("setup labels and values do not collide", async () => await page.locator(".setup-facts .instrument-cell").evaluateAll((cells) => cells.every((cell) => {
+      const value = cell.querySelector("strong")?.getBoundingClientRect();
+      const label = cell.querySelector(":scope > span:not(.instrument-icon)")?.getBoundingClientRect();
+      return value && label && value.bottom <= label.top + 0.5;
+    })));
+    await check("setup section typography and icons are readable", async () => await page.locator(".allocation-card").evaluateAll((cards) => cards.every((card) => {
+      const icon = card.querySelector(".section-hud-icon")?.getBoundingClientRect();
+      const title = card.querySelector(".allocation-copy strong");
+      return icon?.width >= 64 && parseFloat(getComputedStyle(title).fontSize) >= 21;
+    })));
+    await check("decorative animations are fully retired", async () => await page.evaluate(() => document.getAnimations().filter((animation) => animation.playState === "running").length === 0));
+    await screenshot("setup-spacing-and-motion-audit");
     const version = page.locator("select[name='versionId']");
     if (await version.count()) await version.selectOption({ index: Math.min(1, (await version.locator("option").count()) - 1) });
     const shuffle = page.locator("input[name='shuffleQuestions']");
@@ -175,10 +219,23 @@ function safeName(value) {
       await screenshot("exam-group-more");
       const less = page.locator(".more-chip", { hasText: "Less" }).first();
       if (await less.count()) {
+        await less.scrollIntoViewIfNeeded();
+        await check("expanded group disclosure remains inside navigator", async () => await less.evaluate((button) => {
+          const nav = button.closest(".exam-nav")?.getBoundingClientRect();
+          const rect = button.getBoundingClientRect();
+          return nav && rect.left >= nav.left && rect.right <= nav.right && rect.top >= nav.top && rect.bottom <= nav.bottom;
+        }));
+        await screenshot("exam-group-more-lower-content");
         const scrollBeforeLess = await nav.evaluate((node) => node.scrollTop);
         await less.click();
         const scrollAfterLess = await nav.evaluate((node) => node.scrollTop);
-        await check("exam navigator keeps scroll after Less", async () => Math.abs(scrollAfterLess - scrollBeforeLess) < 3);
+        await check("exam navigator collapse keeps every section reachable", async () => await nav.evaluate((node) => {
+          const bounds = node.getBoundingClientRect();
+          const groups = Array.from(node.querySelectorAll("details.question-group"));
+          const last = groups.at(-1)?.getBoundingClientRect();
+          const validScroll = node.scrollTop >= 0 && node.scrollTop <= node.scrollHeight - node.clientHeight + 1;
+          return validScroll && last && last.top >= bounds.top && last.bottom <= bounds.bottom;
+        }), `before=${scrollBeforeLess}, after=${scrollAfterLess}`);
         await screenshot("exam-group-less");
       }
       await page.locator(".exam-nav").evaluate((node) => {
@@ -279,6 +336,13 @@ function safeName(value) {
     await screenshot("practice-custom-started");
     await gotoFixture("practice");
     await page.locator("[data-practice-review-tab='mistakes']").click();
+    await check("mistake table headings have safe vertical clearance", async () => await page.locator(".mistake-table-head").evaluate((head) => {
+      const bounds = head.getBoundingClientRect();
+      return Array.from(head.children).every((label) => {
+        const rect = label.getBoundingClientRect();
+        return rect.top - bounds.top >= 12 && bounds.bottom - rect.bottom >= 12;
+      });
+    }));
     await screenshot("practice-mistakes-tab");
     await page.locator("[data-review-mistakes]").first().click();
     await screenshot("practice-mistake-answer-review");
