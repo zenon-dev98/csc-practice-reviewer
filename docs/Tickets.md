@@ -1,5 +1,26 @@
 # Tickets
 
+## T0039 - Restore V5 Mock Exam Instrument Deck
+
+Status: done
+
+Supersede T0038's compact format rail with the approved `states/v5/full_mock_setup.png` instrument treatment.
+
+Acceptance criteria:
+
+- The four facts render as one transparent deck with centered octagonal icons and vertical dividers, not filled cards or a horizontal list.
+- Values and labels match the V5 two-level hierarchy: `170 / Questions`, `3h 10m / Time Limit`, `Free / Movement`, and `Pause & / Resume`.
+- The deck ends with one horizontal divider before Exam Sections and retains the reference's generous but bounded vertical rhythm.
+- The clipboard, movement, and pause symbols match the V5 visual meaning.
+- All required desktop and mobile viewports pass containment, spacing, interaction, and live deployment checks.
+
+Completion notes:
+
+- Restored the V5 four-column instrument deck and removed the superseded compact-rail styling.
+- Added V5-matching clipboard, four-way movement, and circle-pause icons with cyan octagonal plates.
+- Split each fact into the reference's value/label hierarchy instead of wrapping feature names inside one line.
+- Added a permanent interaction assertion for exact fact content, prominent icon size, and visible dividers.
+
 ## T0038 - Compact Mock Exam Format Rail
 
 Status: done

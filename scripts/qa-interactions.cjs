@@ -184,6 +184,13 @@ function safeName(value) {
       const singleLine = Number.isFinite(lineHeight) && value.height <= lineHeight * 1.25;
       return value && contained && singleLine && (!labelNode?.textContent.trim() || (label && value.bottom <= label.top + 0.5));
     })));
+    await check("setup uses the approved V5 instrument deck", async () => await page.locator(".v5-instrument-deck").evaluate((deck) => {
+      const cells = Array.from(deck.querySelectorAll(":scope > .instrument-cell"));
+      const facts = cells.map((cell) => [cell.querySelector("strong")?.textContent.trim(), cell.querySelector(":scope > span:not(.instrument-icon)")?.textContent.trim()]);
+      const iconsAreProminent = cells.every((cell) => cell.querySelector(".instrument-icon")?.getBoundingClientRect().width >= 64);
+      const dividersAreVisible = cells.slice(0, -1).every((cell) => parseFloat(getComputedStyle(cell).borderRightWidth) >= 1);
+      return JSON.stringify(facts) === JSON.stringify([["170", "Questions"], ["3h 10m", "Time Limit"], ["Free", "Movement"], ["Pause &", "Resume"]]) && iconsAreProminent && dividersAreVisible;
+    }));
     await check("setup section typography and icons are readable", async () => await page.locator(".allocation-card").evaluateAll((cards) => cards.every((card) => {
       const icon = card.querySelector(".section-hud-icon")?.getBoundingClientRect();
       const title = card.querySelector(".allocation-copy strong");

@@ -4729,115 +4729,119 @@ html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .set
   }
 }
 
-/* T0038: compact exam-format rail replaces the oversized setup tiles. */
+/* T0039: approved V5 instrument deck from states/v5/full_mock_setup.png. */
 @media (min-width: 1100px) {
   html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main {
-    grid-template-rows: 116px minmax(0, 1fr) !important;
+    grid-template-rows: 166px minmax(0, 1fr) !important;
     gap: 20px !important;
   }
 
-  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail {
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .v5-instrument-deck {
     display: grid !important;
-    height: 116px !important;
+    height: 166px !important;
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    grid-template-rows: 114px !important;
-    border: 1px solid #29434b !important;
-    background: rgba(6, 18, 23, .82) !important;
-    padding: 0 8px !important;
+    grid-template-rows: 150px !important;
+    border: 0 !important;
+    border-bottom: 1px solid #29434b !important;
+    background: transparent !important;
+    padding: 0 8px 15px !important;
     gap: 0 !important;
     box-sizing: border-box !important;
   }
 
-  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-cell {
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .v5-instrument-deck .instrument-cell,
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .v5-instrument-deck .instrument-cell:nth-child(3),
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .v5-instrument-deck .instrument-cell:nth-child(4) {
     display: grid !important;
     min-width: 0 !important;
-    grid-template-columns: 40px minmax(0, 1fr) !important;
-    grid-template-rows: 34px 22px !important;
-    align-content: center !important;
+    height: 140px !important;
+    min-height: 0 !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 72px 39px 25px !important;
+    align-content: start !important;
     align-items: center !important;
-    justify-items: start !important;
+    justify-items: center !important;
     border: 0 !important;
     border-right: 1px solid #29434b !important;
     border-radius: 0 !important;
-    padding: 14px !important;
+    padding: 0 14px 4px !important;
     background: transparent !important;
-    gap: 0 10px !important;
+    gap: 0 !important;
     box-sizing: border-box !important;
   }
 
-  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-cell:last-child {
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .v5-instrument-deck .instrument-cell:last-child {
     border-right: 0 !important;
   }
 
-  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-icon {
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .v5-instrument-deck .instrument-icon {
     display: grid !important;
-    width: 40px !important;
-    height: 40px !important;
+    width: 68px !important;
+    height: 68px !important;
     grid-column: 1 !important;
-    grid-row: 1 / 3 !important;
-    place-items: center !important;
-    border: 1px solid #1aaeb2 !important;
-    background: rgba(15, 91, 96, .12) !important;
-  }
-
-  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-icon svg {
-    width: 23px !important;
-    height: 23px !important;
-  }
-
-  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-cell > strong {
-    display: block !important;
-    width: auto !important;
-    grid-column: 2 !important;
     grid-row: 1 !important;
-    margin: 0 !important;
-    color: #f1f6f5 !important;
-    font: 700 27px/1 var(--hud-font) !important;
-    text-align: left !important;
-    white-space: nowrap !important;
+    place-items: center !important;
+    border: 1px solid #00d5d5 !important;
+    color: #00d5d5 !important;
+    background: linear-gradient(145deg, rgba(0, 213, 213, .12), rgba(4, 20, 25, .92)) !important;
+    box-shadow: inset 0 0 14px rgba(0, 213, 213, .08), 0 0 12px rgba(0, 213, 213, .06) !important;
+    clip-path: polygon(24% 0, 76% 0, 100% 24%, 100% 76%, 76% 100%, 24% 100%, 0 76%, 0 24%) !important;
   }
 
-  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-cell:nth-child(n+3) > strong {
-    width: auto !important;
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .v5-instrument-deck .instrument-icon .local-icon {
+    width: 36px !important;
+    height: 36px !important;
+    color: #00d5d5 !important;
+    background: #00d5d5 !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .v5-instrument-deck .instrument-cell > strong,
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .v5-instrument-deck .instrument-cell:nth-child(n+3) > strong {
+    display: grid !important;
+    width: 100% !important;
     max-width: none !important;
-    font-size: 20px !important;
-    line-height: 1 !important;
+    min-height: 0 !important;
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    place-items: center !important;
+    align-self: center !important;
+    margin: 0 !important;
+    color: #f2f5f4 !important;
+    font: 600 31px/1 var(--hud-font) !important;
+    text-align: center !important;
     white-space: nowrap !important;
   }
 
-  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-cell:nth-child(3),
-  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-cell:nth-child(4) {
-    grid-template-rows: 34px 22px !important;
-  }
-
-  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-cell > span:not(.instrument-icon) {
-    width: auto !important;
-    grid-column: 2 !important;
-    grid-row: 2 !important;
-    color: #82999d !important;
-    font: 600 12px/1 var(--hud-font) !important;
-    text-align: left !important;
-    text-transform: uppercase !important;
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .v5-instrument-deck .instrument-cell > span:not(.instrument-icon) {
+    display: block !important;
+    width: 100% !important;
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+    align-self: start !important;
+    color: #a7b5b7 !important;
+    font: 500 17px/1 var(--hud-font) !important;
+    text-align: center !important;
+    text-transform: none !important;
     white-space: nowrap !important;
   }
 }
 
 @media (max-width: 1099px) {
-  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail {
+  html body main#app.app-shell section.setup-page .setup-main .v5-instrument-deck {
     display: grid !important;
     height: auto !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 0 !important;
     border: 1px solid #29434b !important;
-    background: rgba(6, 18, 23, .82) !important;
+    background: transparent !important;
   }
 
-  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail .instrument-cell {
+  html body main#app.app-shell section.setup-page .setup-main .v5-instrument-deck .instrument-cell {
     display: grid !important;
     min-width: 0 !important;
-    min-height: 78px !important;
-    grid-template-columns: 36px minmax(0, 1fr) !important;
-    grid-template-rows: 28px 18px !important;
+    min-height: 104px !important;
+    grid-template-columns: 46px minmax(0, 1fr) !important;
+    grid-template-rows: 32px 22px !important;
     align-content: center !important;
     align-items: center !important;
     justify-items: start !important;
@@ -4845,56 +4849,64 @@ html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .set
     border-right: 1px solid #29434b !important;
     border-bottom: 1px solid #29434b !important;
     border-radius: 0 !important;
-    padding: 10px 12px !important;
+    padding: 12px 14px !important;
     background: transparent !important;
-    gap: 0 9px !important;
+    gap: 0 10px !important;
     box-sizing: border-box !important;
   }
 
-  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail .instrument-cell:nth-child(2n) {
+  html body main#app.app-shell section.setup-page .setup-main .v5-instrument-deck .instrument-cell:nth-child(2n) {
     border-right: 0 !important;
   }
 
-  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail .instrument-cell:nth-last-child(-n+2) {
+  html body main#app.app-shell section.setup-page .setup-main .v5-instrument-deck .instrument-cell:nth-last-child(-n+2) {
     border-bottom: 0 !important;
   }
 
-  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail .instrument-icon {
+  html body main#app.app-shell section.setup-page .setup-main .v5-instrument-deck .instrument-icon {
     display: grid !important;
-    width: 34px !important;
-    height: 34px !important;
+    width: 44px !important;
+    height: 44px !important;
     grid-column: 1 !important;
     grid-row: 1 / 3 !important;
     place-items: center !important;
+    border: 1px solid #00d5d5 !important;
+    color: #00d5d5 !important;
+    background: rgba(0, 213, 213, .08) !important;
+    clip-path: polygon(24% 0, 76% 0, 100% 24%, 100% 76%, 76% 100%, 24% 100%, 0 76%, 0 24%) !important;
   }
 
-  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail .instrument-icon svg {
-    width: 20px !important;
-    height: 20px !important;
+  html body main#app.app-shell section.setup-page .setup-main .v5-instrument-deck .instrument-icon .local-icon {
+    width: 24px !important;
+    height: 24px !important;
+    color: #00d5d5 !important;
+    background: #00d5d5 !important;
   }
 
-  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail .instrument-cell > strong {
+  html body main#app.app-shell section.setup-page .setup-main .v5-instrument-deck .instrument-cell > strong {
     display: block !important;
     width: auto !important;
+    max-width: none !important;
     grid-column: 2 !important;
     grid-row: 1 !important;
+    align-self: end !important;
     margin: 0 !important;
-    font: 700 21px/1 var(--hud-font) !important;
+    color: #f2f5f4 !important;
+    font: 600 22px/1 var(--hud-font) !important;
     text-align: left !important;
     white-space: nowrap !important;
   }
 
-  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail .instrument-cell:nth-child(n+3) > strong {
-    font-size: 15px !important;
-  }
-
-  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail .instrument-cell > span:not(.instrument-icon) {
+  html body main#app.app-shell section.setup-page .setup-main .v5-instrument-deck .instrument-cell > span:not(.instrument-icon) {
+    display: block !important;
     width: auto !important;
     grid-column: 2 !important;
     grid-row: 2 !important;
-    font: 600 10px/1 var(--hud-font) !important;
+    align-self: start !important;
+    color: #8da2a6 !important;
+    font: 500 12px/1 var(--hud-font) !important;
     text-align: left !important;
-    text-transform: uppercase !important;
+    text-transform: none !important;
     white-space: nowrap !important;
   }
 }

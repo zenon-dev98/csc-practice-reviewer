@@ -1345,3 +1345,22 @@ Deployment:
 
 - GitHub Pages deployment succeeded from commit `9c89b9c`.
 - Changed assets are cache-busted through `20260716-05`.
+
+## 2026-07-16 - T0039 V5 Mock Exam Instrument Deck
+
+Summary:
+
+- Superseded T0038's compact rail with the approved `states/v5/full_mock_setup.png` instrument treatment.
+- Restored four centered fact columns, prominent cyan octagonal icon plates, full-height vertical separators, and one horizontal divider before Exam Sections.
+- Added V5-matching clipboard, four-way movement, and circle-pause symbols.
+- Preserved a bounded two-by-two mobile adaptation without changing setup behavior.
+
+Verification:
+
+- Local setup matrix: `7` screenshots across five desktop and two mobile viewports, zero console, overflow, visual-defect, or animation findings.
+- Local interaction suite: `49/49` checks across `75` screenshots.
+
+Evidence:
+
+- `qa/t0039-v5-instrument-release-local/`
+- `qa/t0039-v5-instrument-interactions-local/`

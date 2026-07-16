@@ -18,7 +18,7 @@ Path:
 - Screenshot-parity, desktop-density, and desktop quality-repair passes have added fixture-state QA URLs, bounded dashboard/exam/sidebar/graph/modal contracts, expandable graph subgroups, and no-scroll desktop overflow checks across every supplied state.
 - Runtime persistence is now implemented against Supabase email/password auth and online tables, with per-attempt question snapshots and timing analytics.
 - The app is deployed through GitHub Pages Actions at `https://zenon-dev98.github.io/csc-practice-reviewer/`.
-- The current live release is commit `9c89b9c` with cache key `20260716-05`; it replaces the oversized Mock Exam Setup summary cards with a compact exam-format rail and adds containment/wrapping QA for that component.
+- The pending T0039 release uses cache key `20260716-06`; it supersedes the compact Mock Exam format rail with the approved V5 four-column instrument deck and matching clipboard, movement, and pause iconography.
 - The public GitHub repository is `https://github.com/zenon-dev98/csc-practice-reviewer`.
 - The Supabase SQL/Auth Hook setup from `supabase/schema.sql` has been applied, including authenticated table grants and the `public.hook_validate_invite_code` Before User Created hook.
 - Supabase Auth email/password is enabled with email confirmation disabled for this invite-gated small-group reviewer, avoiding free email quota failures during signup.
