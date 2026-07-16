@@ -1,5 +1,26 @@
 # Tickets
 
+## T0038 - Compact Mock Exam Format Rail
+
+Status: done
+
+Replace the oversized four-tile exam summary with a compact, readable format rail that preserves the useful facts without dominating the Mock Exam Setup page.
+
+Acceptance criteria:
+
+- Questions and time limit remain prominent without oversized icon plates or filled cards.
+- Navigation and pause capabilities use familiar wording and remain single-line at desktop targets.
+- Labels, values, icons, separators, and panel edges retain deliberate clearance at every required viewport.
+- The reclaimed vertical space improves the Exam Sections hierarchy instead of becoming another dead zone.
+- Local and live Edge visual and interaction checks pass before completion.
+
+Completion notes:
+
+- Replaced the four oversized setup tiles with one compact format rail that gives Questions and Time Limit priority without four heavy card surfaces.
+- Reworded the secondary facts as `Navigate freely / Between questions` and `Pause anytime / Progress saved` so both stay readable on one line.
+- Added permanent QA for fact containment and unexpected wrapping after the first screenshot exposed a legacy selector that geometry-only checks missed.
+- Verified the setup state at all five desktop targets and both mobile targets, then ran the complete local interaction suite.
+
 ## T0037 - Study Hub Active-Run Vertical Balance
 
 Status: done

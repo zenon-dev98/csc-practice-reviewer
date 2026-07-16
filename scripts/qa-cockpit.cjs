@@ -92,12 +92,23 @@ function safeName(value) {
           visualDefects.push(`mobile content bottom ${Math.ceil(visibleContentBottom)} exceeds reachable document bottom ${reachableDocumentBottom}`);
         }
         document.querySelectorAll(".setup-facts .instrument-cell").forEach((cell, index) => {
+          const bounds = cell.getBoundingClientRect();
           const value = cell.querySelector("strong")?.getBoundingClientRect();
           const label = cell.querySelector(":scope > span:not(.instrument-icon)")?.getBoundingClientRect();
           const overlaps = value && label
             && value.left < label.right && value.right > label.left
             && value.top < label.bottom && value.bottom > label.top;
           if (overlaps) visualDefects.push(`setup fact ${index + 1} label/value collision`);
+          Array.from(cell.children).forEach((child) => {
+            const rect = child.getBoundingClientRect();
+            if (rect.left < bounds.left - 1 || rect.right > bounds.right + 1 || rect.top < bounds.top - 1 || rect.bottom > bounds.bottom + 1) {
+              visualDefects.push(`setup fact ${index + 1} '${child.textContent.trim() || child.className}' escapes its cell`);
+            }
+          });
+          if (value) {
+            const lineHeight = parseFloat(getComputedStyle(cell.querySelector("strong")).lineHeight);
+            if (Number.isFinite(lineHeight) && value.height > lineHeight * 1.25) visualDefects.push(`setup fact ${index + 1} value wraps`);
+          }
         });
         document.querySelectorAll(".mistake-table-head").forEach((head) => {
           if (getComputedStyle(head).display === "none") return;

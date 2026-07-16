@@ -1120,11 +1120,11 @@
 
         <div class="setup-grid v5-setup-grid">
           <section class="card setup-main v5-panel">
-            <div class="setup-facts instrument-grid">
+            <div class="setup-facts instrument-grid compact-format-rail" aria-label="Exam format">
               ${setupFact("notebook-tabs", "cyan", "Questions", "170")}
               ${setupFact("timer", "cyan", "Time Limit", "3h 10m")}
-              ${setupFact("brain-circuit", "cyan", "", "Free Movement")}
-              ${setupFact("circle-check", "cyan", "", "Pause & Resume")}
+              ${setupFact("brain-circuit", "cyan", "Between questions", "Navigate freely")}
+              ${setupFact("circle-check", "cyan", "Progress saved", "Pause anytime")}
             </div>
             <div class="section-list allocation-console v5-allocation-console">
               <div class="technical-title"><h2>Exam Sections</h2><span aria-hidden="true"></span></div>

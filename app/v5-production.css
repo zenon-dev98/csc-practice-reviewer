@@ -4728,3 +4728,173 @@ html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .set
     color: #71898e !important;
   }
 }
+
+/* T0038: compact exam-format rail replaces the oversized setup tiles. */
+@media (min-width: 1100px) {
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main {
+    grid-template-rows: 116px minmax(0, 1fr) !important;
+    gap: 20px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail {
+    display: grid !important;
+    height: 116px !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    grid-template-rows: 114px !important;
+    border: 1px solid #29434b !important;
+    background: rgba(6, 18, 23, .82) !important;
+    padding: 0 8px !important;
+    gap: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-cell {
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-columns: 40px minmax(0, 1fr) !important;
+    grid-template-rows: 34px 22px !important;
+    align-content: center !important;
+    align-items: center !important;
+    justify-items: start !important;
+    border: 0 !important;
+    border-right: 1px solid #29434b !important;
+    border-radius: 0 !important;
+    padding: 14px !important;
+    background: transparent !important;
+    gap: 0 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-cell:last-child {
+    border-right: 0 !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-icon {
+    display: grid !important;
+    width: 40px !important;
+    height: 40px !important;
+    grid-column: 1 !important;
+    grid-row: 1 / 3 !important;
+    place-items: center !important;
+    border: 1px solid #1aaeb2 !important;
+    background: rgba(15, 91, 96, .12) !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-icon svg {
+    width: 23px !important;
+    height: 23px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-cell > strong {
+    display: block !important;
+    width: auto !important;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    margin: 0 !important;
+    color: #f1f6f5 !important;
+    font: 700 27px/1 var(--hud-font) !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-cell:nth-child(n+3) > strong {
+    width: auto !important;
+    max-width: none !important;
+    font-size: 20px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-cell:nth-child(3),
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-cell:nth-child(4) {
+    grid-template-rows: 34px 22px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .compact-format-rail .instrument-cell > span:not(.instrument-icon) {
+    width: auto !important;
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    color: #82999d !important;
+    font: 600 12px/1 var(--hud-font) !important;
+    text-align: left !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+  }
+}
+
+@media (max-width: 1099px) {
+  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail {
+    display: grid !important;
+    height: auto !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0 !important;
+    border: 1px solid #29434b !important;
+    background: rgba(6, 18, 23, .82) !important;
+  }
+
+  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail .instrument-cell {
+    display: grid !important;
+    min-width: 0 !important;
+    min-height: 78px !important;
+    grid-template-columns: 36px minmax(0, 1fr) !important;
+    grid-template-rows: 28px 18px !important;
+    align-content: center !important;
+    align-items: center !important;
+    justify-items: start !important;
+    border: 0 !important;
+    border-right: 1px solid #29434b !important;
+    border-bottom: 1px solid #29434b !important;
+    border-radius: 0 !important;
+    padding: 10px 12px !important;
+    background: transparent !important;
+    gap: 0 9px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail .instrument-cell:nth-child(2n) {
+    border-right: 0 !important;
+  }
+
+  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail .instrument-cell:nth-last-child(-n+2) {
+    border-bottom: 0 !important;
+  }
+
+  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail .instrument-icon {
+    display: grid !important;
+    width: 34px !important;
+    height: 34px !important;
+    grid-column: 1 !important;
+    grid-row: 1 / 3 !important;
+    place-items: center !important;
+  }
+
+  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail .instrument-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail .instrument-cell > strong {
+    display: block !important;
+    width: auto !important;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    margin: 0 !important;
+    font: 700 21px/1 var(--hud-font) !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+  }
+
+  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail .instrument-cell:nth-child(n+3) > strong {
+    font-size: 15px !important;
+  }
+
+  html body main#app.app-shell section.setup-page .setup-main .compact-format-rail .instrument-cell > span:not(.instrument-icon) {
+    width: auto !important;
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    font: 600 10px/1 var(--hud-font) !important;
+    text-align: left !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+  }
+}

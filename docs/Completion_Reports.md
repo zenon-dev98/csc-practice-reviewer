@@ -1315,3 +1315,23 @@ Deployment:
 
 - GitHub Pages deployment succeeded from commit `36be015`.
 - Changed assets are cache-busted through `20260716-04`.
+
+## 2026-07-16 - T0038 Compact Mock Exam Format Rail
+
+Summary:
+
+- Replaced the four oversized Mock Exam Setup summary cards with one compact, low-noise format rail.
+- Kept question count and time limit prominent while simplifying navigation and pause details into familiar single-line wording.
+- Reclaimed vertical space for the Exam Sections choices without creating another dead zone.
+- Extended visual and interaction QA to reject escaped or unexpectedly wrapped setup facts.
+
+Verification:
+
+- Local setup matrix: `7` screenshots across five desktop and two mobile viewports, zero console, overflow, visual-defect, or animation findings.
+- Local interaction suite: `48/48` checks across `75` screenshots.
+- Repository validation and live verification are recorded in the deployment closeout.
+
+Evidence:
+
+- `qa/t0038-setup-format-final-local/`
+- `qa/t0038-setup-interactions-local/`

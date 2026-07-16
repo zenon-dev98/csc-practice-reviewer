@@ -170,11 +170,19 @@ function safeName(value) {
 
   await test("setup controls", async () => {
     await gotoFixture("setup");
-    await check("setup labels and values do not collide", async () => await page.locator(".setup-facts .instrument-cell").evaluateAll((cells) => cells.every((cell) => {
+    await check("setup facts stay contained, single-line, and separated", async () => await page.locator(".setup-facts .instrument-cell").evaluateAll((cells) => cells.every((cell) => {
+      const bounds = cell.getBoundingClientRect();
       const value = cell.querySelector("strong")?.getBoundingClientRect();
+      const valueStyle = getComputedStyle(cell.querySelector("strong"));
       const labelNode = cell.querySelector(":scope > span:not(.instrument-icon)");
       const label = labelNode?.getBoundingClientRect();
-      return value && (!labelNode?.textContent.trim() || (label && value.bottom <= label.top + 0.5));
+      const contained = Array.from(cell.children).every((child) => {
+        const rect = child.getBoundingClientRect();
+        return rect.left >= bounds.left - 1 && rect.right <= bounds.right + 1 && rect.top >= bounds.top - 1 && rect.bottom <= bounds.bottom + 1;
+      });
+      const lineHeight = parseFloat(valueStyle.lineHeight);
+      const singleLine = Number.isFinite(lineHeight) && value.height <= lineHeight * 1.25;
+      return value && contained && singleLine && (!labelNode?.textContent.trim() || (label && value.bottom <= label.top + 0.5));
     })));
     await check("setup section typography and icons are readable", async () => await page.locator(".allocation-card").evaluateAll((cards) => cards.every((card) => {
       const icon = card.querySelector(".section-hud-icon")?.getBoundingClientRect();
