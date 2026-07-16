@@ -2199,28 +2199,57 @@
     const rows = toArray(stimulus.rows);
     const series = toArray(stimulus.series);
     if (!rows.length || !series.length) return "";
-    const max = Math.max(120, ...series.flatMap((entry) => toArray(entry.values).map(Number).filter(Number.isFinite)));
+    const values = series.flatMap((entry) => toArray(entry.values).map(Number).filter(Number.isFinite));
+    const rawMax = Math.max(1, ...values);
+    const roughStep = rawMax / 6;
+    const magnitude = 10 ** Math.floor(Math.log10(roughStep));
+    const normalizedStep = roughStep / magnitude;
+    const step = (normalizedStep <= 1 ? 1 : normalizedStep <= 2 ? 2 : normalizedStep <= 5 ? 5 : 10) * magnitude;
+    const max = Math.ceil(rawMax / step) * step;
+    const ticks = Array.from({ length: Math.round(max / step) + 1 }, (_, index) => index * step).reverse();
+    const width = 560;
+    const height = 330;
+    const plot = { left: 58, right: 14, top: 24, bottom: 62 };
+    const plotWidth = width - plot.left - plot.right;
+    const plotHeight = height - plot.top - plot.bottom;
+    const plotBottom = plot.top + plotHeight;
+    const groupWidth = plotWidth / rows.length;
+    const clusterWidth = Math.min(90, groupWidth * 0.76);
+    const barGap = Math.min(6, clusterWidth * 0.06);
+    const barWidth = Math.max(4, (clusterWidth - barGap * (series.length - 1)) / series.length);
+    const formatNumber = (value) => Number.isInteger(value) ? String(value) : value.toFixed(1).replace(/\.0$/, "");
     return `
-      <div class="grouped-chart" role="img" aria-label="${escapeAttr(stimulus.alt || stimulus.title || "Grouped bar chart")}">
+      <div class="grouped-chart" role="group" aria-label="${escapeAttr(stimulus.alt || stimulus.title || "Grouped bar chart")}">
         <div class="chart-legend">${series.map((entry) => `<span><i style="background:${escapeAttr(entry.color)}"></i>${escapeHtml(entry.label)}</span>`).join("")}</div>
-        <div class="chart-plot">
-          <span class="y-label">${escapeHtml(stimulus.yLabel || "")}</span>
-          <div class="chart-scale">${[120, 100, 80, 60, 40, 20, 0].map((tick) => `<span>${tick}</span>`).join("")}</div>
-          <div class="chart-bars-vertical">
-            ${rows.map((row, rowIndex) => `
-              <div class="chart-month">
-                <div class="bar-cluster">
-                  ${series.map((entry) => {
-                    const value = Number(toArray(entry.values)[rowIndex] || 0);
-                    return `<b style="height:${Math.max(4, Math.round((value / max) * 100))}%; background:${escapeAttr(entry.color)}"><em>${value}</em></b>`;
+        <div class="grouped-chart-viewport" tabindex="0">
+          <svg class="grouped-chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" role="img"
+            aria-label="${escapeAttr(stimulus.alt || stimulus.title || "Grouped bar chart")}" data-plot-top="${plot.top}" data-plot-bottom="${plotBottom}">
+            <title>${escapeHtml(stimulus.title || "Grouped bar chart")}</title>
+            <desc>${escapeHtml(stimulus.alt || "Grouped values are labeled above each bar.")}</desc>
+            ${ticks.map((tick) => {
+              const y = plot.top + plotHeight - (tick / max) * plotHeight;
+              return `<g class="chart-grid${tick === 0 ? " baseline" : ""}" data-value="${tick}"><line x1="${plot.left}" y1="${y}" x2="${width - plot.right}" y2="${y}"></line><text x="${plot.left - 10}" y="${y + 4}" text-anchor="end">${formatNumber(tick)}</text></g>`;
+            }).join("")}
+            <text class="chart-axis-title chart-y-title" x="17" y="${plot.top + plotHeight / 2}" text-anchor="middle" transform="rotate(-90 17 ${plot.top + plotHeight / 2})">${escapeHtml(stimulus.yLabel || "")}</text>
+            ${rows.map((row, rowIndex) => {
+              const clusterX = plot.left + rowIndex * groupWidth + (groupWidth - clusterWidth) / 2;
+              return `
+                <g class="chart-group" data-row="${rowIndex}">
+                  ${series.map((entry, seriesIndex) => {
+                    const rawValue = Number(toArray(entry.values)[rowIndex]);
+                    const value = Number.isFinite(rawValue) ? Math.max(0, rawValue) : 0;
+                    const renderedHeight = value ? Math.max(2, (value / max) * plotHeight) : 0;
+                    const x = clusterX + seriesIndex * (barWidth + barGap);
+                    const y = plotBottom - renderedHeight;
+                    return `<rect class="chart-bar" data-value="${value}" data-series="${escapeAttr(entry.label)}" x="${x}" y="${y}" width="${barWidth}" height="${renderedHeight}" rx="2" fill="${escapeAttr(entry.color)}"><title>${escapeHtml(`${entry.label}, ${row[0]}: ${formatNumber(value)}`)}</title></rect><text class="chart-value" x="${x + barWidth / 2}" y="${Math.max(plot.top + 11, y - 6)}" text-anchor="middle">${formatNumber(value)}</text>`;
                   }).join("")}
-                </div>
-                <strong>${escapeHtml(row[0])}</strong>
-              </div>
-            `).join("")}
-          </div>
+                  <text class="chart-category" x="${plot.left + rowIndex * groupWidth + groupWidth / 2}" y="${plotBottom + 27}" text-anchor="middle">${escapeHtml(row[0])}</text>
+                </g>
+              `;
+            }).join("")}
+            <text class="chart-axis-title chart-x-title" x="${plot.left + plotWidth / 2}" y="${height - 8}" text-anchor="middle">${escapeHtml(stimulus.xLabel || "")}</text>
+          </svg>
         </div>
-        <small>${escapeHtml(stimulus.xLabel || "")}</small>
       </div>
     `;
   }

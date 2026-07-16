@@ -106,6 +106,31 @@ function safeName(value) {
             if (rect.top - bounds.top < 8 || bounds.bottom - rect.bottom < 8) visualDefects.push(`mistake heading '${label.textContent.trim()}' lacks vertical clearance`);
           });
         });
+        document.querySelectorAll(".grouped-chart-svg").forEach((svg, chartIndex) => {
+          const plotTop = Number(svg.dataset.plotTop);
+          const plotBottom = Number(svg.dataset.plotBottom);
+          const bars = Array.from(svg.querySelectorAll(".chart-bar"));
+          if (!bars.length) visualDefects.push(`grouped chart ${chartIndex + 1} has no bars`);
+          bars.forEach((bar, barIndex) => {
+            const y = Number(bar.getAttribute("y"));
+            const height = Number(bar.getAttribute("height"));
+            if (![y, height, plotTop, plotBottom].every(Number.isFinite)) {
+              visualDefects.push(`grouped chart ${chartIndex + 1} bar ${barIndex + 1} has invalid geometry`);
+            } else if (Math.abs(y + height - plotBottom) > 0.5) {
+              visualDefects.push(`grouped chart ${chartIndex + 1} bar ${barIndex + 1} is detached from zero baseline`);
+            } else if (y < plotTop - 0.5 || y > plotBottom + 0.5) {
+              visualDefects.push(`grouped chart ${chartIndex + 1} bar ${barIndex + 1} is outside the plot`);
+            }
+          });
+          const zeroLine = svg.querySelector('.chart-grid[data-value="0"] line');
+          if (!zeroLine || Math.abs(Number(zeroLine.getAttribute("y1")) - plotBottom) > 0.5) {
+            visualDefects.push(`grouped chart ${chartIndex + 1} zero gridline does not match the bar baseline`);
+          }
+          const viewport = svg.closest(".grouped-chart-viewport");
+          if (innerWidth >= 1100 && viewport && viewport.scrollWidth > viewport.clientWidth + 2) {
+            visualDefects.push(`grouped chart ${chartIndex + 1} overflows its desktop viewport`);
+          }
+        });
         return {
           viewport: [innerWidth, innerHeight],
           body: [document.body.scrollWidth, document.body.scrollHeight],
