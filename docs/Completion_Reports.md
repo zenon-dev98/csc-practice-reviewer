@@ -1329,9 +1329,19 @@ Verification:
 
 - Local setup matrix: `7` screenshots across five desktop and two mobile viewports, zero console, overflow, visual-defect, or animation findings.
 - Local interaction suite: `48/48` checks across `75` screenshots.
-- Repository validation and live verification are recorded in the deployment closeout.
+- Live setup matrix: `7` screenshots across five desktop and two mobile viewports, zero console, overflow, visual-defect, or animation findings.
+- Live interaction suite: `48/48` checks across `75` screenshots.
+- Maximized external Microsoft Edge at 100% zoom confirmed the live `1536x816` composition; the temporary QA window was closed after capture.
+- `npm run check`, Impeccable detection, and diff validation passed.
 
 Evidence:
 
 - `qa/t0038-setup-format-final-local/`
 - `qa/t0038-setup-interactions-local/`
+- `qa/t0038-setup-format-live/`
+- `qa/t0038-setup-interactions-live/`
+
+Deployment:
+
+- GitHub Pages deployment succeeded from commit `9c89b9c`.
+- Changed assets are cache-busted through `20260716-05`.
