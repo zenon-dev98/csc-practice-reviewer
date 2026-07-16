@@ -1281,3 +1281,37 @@ Verification:
 - Live Edge QA passed the same `14/14` matrix with zero console, document-overflow, sampled element-overflow, chart-geometry, or active-animation failures.
 - Evidence is stored under `qa/t0035-chart-responsive-baseline/`, `qa/t0035-chart-responsive-final-local/`, and `qa/t0035-chart-responsive-live/`.
 - Deployed from commit `3aed02f` with cache key `20260716-03`.
+
+## 2026-07-16 - T0036 Question Visual System And T0037 Study Hub Balance
+
+Summary:
+
+- Rebuilt shared question stimuli as type-aware passage, table, metric-bar, line-chart, and grouped-chart presentations with correct labels, exact values, accessible enlargement, and bounded scroll ownership.
+- Added long-prompt and long-choice fixtures and repaired narrow-screen choice alignment.
+- Removed the Study Hub dead zone by making the active-run body own the complete panel, vertically balancing the ring, and anchoring Resume Exam to the intended bottom inset.
+- Replaced the remaining thick one-sided review-row accent with a complete current-row outline and weight change.
+
+Verification:
+
+- `npm run check` passed for dependencies, JavaScript syntax, all `20` versions, all `3,400` questions, and the strict duplicate/content audit.
+- `npx --yes impeccable detect app` passed with no anti-pattern findings.
+- Local Study Hub matrix: `10` screenshots, zero console, overflow, geometry, or animation findings.
+- Local representative question matrix: `84` screenshots across five desktop and two mobile viewports, zero findings.
+- Local interaction suite: `48/48` checks across `75` screenshots.
+- Live combined matrix: `98` screenshots across seven viewports, zero findings.
+- Live interaction suite: `48/48` checks across `75` screenshots.
+- Maximized external Edge at 100% zoom verified the final local release assets. The final live external replay was skipped because the user's Edge window was actively in use.
+
+Evidence:
+
+- `qa/t0037-hub-spacing-final/`
+- `qa/t0036-question-visual-final/`
+- `qa/t0036-question-interactions-final/`
+- `qa/t0036-review-current-final/`
+- `qa/t0036-t0037-live-final/`
+- `qa/t0036-t0037-live-interactions-final/`
+
+Deployment:
+
+- GitHub Pages deployment succeeded from commit `36be015`.
+- Changed assets are cache-busted through `20260716-04`.

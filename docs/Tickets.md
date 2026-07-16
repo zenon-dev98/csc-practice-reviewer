@@ -2,7 +2,7 @@
 
 ## T0037 - Study Hub Active-Run Vertical Balance
 
-Status: in_progress
+Status: done
 
 Remove the accidental dead zone below the completion ring and Resume Exam control while preserving the aligned Study Hub cockpit composition.
 
@@ -14,9 +14,16 @@ Acceptance criteria:
 - The records panel and lower action dock retain their existing alignment and content.
 - Active-attempt and new-account Study Hub states pass the complete desktop viewport matrix.
 
+Completion notes:
+
+- Corrected the legacy two-row placement so the active-run body spans the complete panel instead of overflowing a 96px grid row.
+- Vertically balanced the completion ring and kept Resume Exam 18-30px above the shared panel edge without changing the records panel or action dock.
+- Local and live Edge matrices each passed all active/empty Study Hub states at the five required desktop viewports with zero console, overflow, geometry, or animation findings.
+- Deployed from commit `36be015` with the V5 stylesheet cache-busted to `20260716-04`.
+
 ## T0036 - Complete Question Visual-System Audit And Repair
 
-Status: in_progress
+Status: done
 
 Audit every production question and stimulus family, replace the chart-only shared layout with type-aware passage, table, bar, line, and grouped-chart presentations, and verify long prompts and choices across the complete Microsoft Edge viewport matrix.
 
@@ -29,6 +36,15 @@ Acceptance criteria:
 - Long prompts and choices remain readable and reachable on all required desktop and mobile viewports.
 - Permanent QA detects stimulus-region collisions, incorrect shared-set copy, clipped content, and unreachable lower content.
 - Local and live Microsoft Edge visual and interaction matrices pass after the final cache-busted deployment.
+
+Completion notes:
+
+- Added type-aware passage, table, metric-bar, line-chart, and grouped-chart stimulus renderers while retaining shared exact-value access and accessible expanded views.
+- Added deterministic long-prompt and long-choice fixtures plus permanent checks for stimulus collisions, medium-specific labels, mobile choice alignment, and reachable content.
+- The final local visual matrix passed `84/84` captures across five desktop and two mobile viewports; interaction QA passed `48/48` checks across `75` screenshots.
+- The cache-busted live visual matrix passed `98/98` captures for Study Hub and all representative question families; live interaction QA passed `48/48` checks across `75` screenshots.
+- Maximized external Edge at 100% zoom verified Study Hub, passage, table, grouped chart, expanded chart, long-choice wrapping, answer selection, and Next enablement against the local release assets. The final live external-window replay was not run because Edge was actively in use; the complete live Edge-channel automation passed instead.
+- Deployed from commit `36be015` with `app.js`, `cockpit-theme.css`, and `v5-production.css` cache-busted to `20260716-04`.
 
 ## T0035 - Responsive Grouped Chart Geometry
 
