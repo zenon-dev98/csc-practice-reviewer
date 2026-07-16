@@ -5,9 +5,10 @@
   "description": "Digitized mock Career Service Examination Professional reviewer app for a small group of examinees.",
   "type": "module",
   "scripts": {
-    "check": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-dependencies.ps1",
+    "check": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-dependencies.ps1 && node --check app/app.js && node scripts/validate-static-data.mjs && node scripts/audit-question-bank.mjs",
     "setup": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-local-deps.ps1",
     "start": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1",
-    "validate:data": "node scripts/validate-static-data.mjs"
+    "validate:data": "node scripts/validate-static-data.mjs && node scripts/audit-question-bank.mjs",
+    "audit:questions": "node scripts/audit-question-bank.mjs"
   }
 }

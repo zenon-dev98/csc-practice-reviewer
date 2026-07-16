@@ -15,7 +15,7 @@ Initial content source:
 
 Current runnable bank:
 
-- 20 generated typed Professional mock versions
+- 20 manually authored Professional mock versions
 - 170 items per version
 - 3,400 generated questions total
 - coverage-matrix validation per generated version
@@ -109,7 +109,7 @@ Store text data and analytics in Supabase. Keep heavy media outside Supabase unl
 
 ## Content Strategy
 
-The first content milestone was direct digitization of the 29 images, followed by review and topic classification. The current runnable app now uses generated typed questions for 20 complete mock versions while retaining the source-image bank as fallback.
+The first content milestone was direct digitization of the 29 images, followed by review and topic classification. The current runnable app uses 20 manually authored complete mock versions while retaining the source-image bank as an audit trail and fallback.
 
 Each question needs:
 

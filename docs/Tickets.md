@@ -1,5 +1,22 @@
 # Tickets
 
+## T0033 - Manual CSC Professional Bank Rebuild
+
+Status: in_progress
+
+Replace the repetitive generated production bank with 20 manually authored, independently sourced Professional mock versions; use scripts only for validation and audit, improve shared data-stimulus readability, integrate the authored source files, and deploy the verified static build.
+
+Acceptance criteria:
+
+- Production loads 20 authored versions with 170 stable questions each and no runtime question generator.
+- Every version satisfies the documented General, Verbal, Numerical, and Analytical coverage blueprint and a 50/90/30 difficulty split.
+- Exact prompts, normalized templates, and shuffled-choice duplicates are zero across all 3,400 questions.
+- Every item has four distinct choices, a valid answer, explanation, provenance, review status, and quality status.
+- Every version includes original reading passages and four accessible linked data sets, including at least two exact-value tables.
+- Ambiguous row-total charts are replaced with labeled per-metric visuals plus exact accessible tables.
+- Static validation, strict question audit, JavaScript syntax, local runtime smoke, and live cache-busted smoke checks pass.
+- The authored content remains clearly identified as independent practice material and unreviewed items remain marked `needs_review`.
+
 ## T0032 - V5 Interaction And Spacing Quality Repair
 
 Status: done

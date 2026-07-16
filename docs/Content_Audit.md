@@ -79,9 +79,9 @@ Sources:
 
 - `data/source_question_index.csv`: item-level source image, section, subtopic, answer, and transcription status for all 170 items.
 - `data/answer_key_set_h_v3_2026.json`: machine-readable final answer key captured from pages 26-28.
-- `app/question-data.js`: browser-ready generated question metadata for the static app.
-- `app/generated-question-bank.js`: browser-ready generated typed bank with 20 versions and 3,400 questions.
-- `data/generated_bank_audit.json`: generated coverage and stimulus-group audit for all versions.
+- `app/question-data.js`: browser-ready source-image metadata retained for audit and fallback.
+- `app/question-bank/`: manually authored production bank with 20 versions and 3,400 questions.
+- `data/question_bank_quality_audit.json`: coverage, difficulty, balance, duplicate, ambiguity, and stimulus audit for all authored versions.
 
 ## Section Boundaries
 
@@ -110,14 +110,14 @@ Missing or weak against official CSC topic expectations:
 - Analytical assumptions/conclusions are present, but many use the same repeated answer-choice pattern.
 - No visual abstract reasoning items were observed.
 
-Generated-bank coverage:
+Authored-bank coverage:
 
-- The generated typed bank adds Filipino vocabulary and usage items.
-- The generated typed bank adds data-interpretation items in both Numerical and Analytical sections.
-- The generated typed bank adds symbolic-reasoning style items using text-safe symbols/labels.
-- The generated typed bank adds shared chart/table/logic stimulus groups linked to multiple questions.
-- Every generated version preserves the Professional split of 20 General, 60 Verbal, 40 Numerical, and 50 Analytical items.
-- Every generated version is validated against a CSC skill matrix.
+- The authored bank includes Filipino vocabulary, sentence completion, error recognition, structure, paragraph organization, and reading items.
+- Every version includes 22 numerical word problems and 16 analytical data-interpretation questions.
+- Every version includes analogy, symbolic/abstract reasoning, and assumption/conclusion items.
+- Every version includes original shared passages and four linked data stimulus groups with exact tables and accessible alternatives.
+- Every version preserves the Professional split of 20 General, 60 Verbal, 40 Numerical, and 50 Analytical items.
+- All 3,400 stems are unique under exact, normalized-template, and shuffled-choice duplicate checks.
 
 ## Review Status Values
 

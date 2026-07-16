@@ -9,7 +9,7 @@
 
 - Supabase backup/export workflow is not defined yet.
 - The answer key has been captured from images but needs a second manual verification pass before scoring is considered final.
-- The source booklet is missing or weak on Filipino verbal items, chart/table data interpretation, and visual/symbolic abstract reasoning; the generated typed bank now covers these areas structurally, but its pedagogy should still be reviewed before serious use.
+- The source booklet is missing or weak on Filipino verbal items, data interpretation, and symbolic reasoning. The manually authored bank now covers every official domain with no detected duplicates, but legal nuance, Filipino usage, distractor quality, and pedagogy still need an independent human second review before the bank should be treated as high-confidence study material.
 - Stitch was used for the menu/dashboard redesign, but generated code export was not available through `Code to Clipboard`; it copied the prompt instead. Future Stitch iterations may still use Figma, MCP, or other export routes if configured.
 - Supabase email confirmation is intentionally disabled for now because signup is invite-gated and the free email sender hit rate limits during QA. Revisit if using a custom SMTP sender.
 - GitHub Actions reports a Node 20 deprecation warning for current action versions, but deployment succeeds under the forced Node 24 runner.
@@ -35,6 +35,6 @@
 - Implement the approved T0026 information architecture as a separate ticket, then run the full desktop/mobile fixture and interaction loops.
 
 - Add a Supabase backup/export ticket before public use.
-- Add a human content review ticket for generated Filipino, data-interpretation, legal/general-information, and symbolic-reasoning items.
+- Add a qualified second-review ticket for authored Filipino, data-interpretation, legal/general-information, and symbolic-reasoning items; promote individual items from `needs_review` only after that review.
 - Add a Stitch MCP/Figma export ticket if direct generated-source handoff becomes available.
 - Re-run the hardened mockup-adaptation rules whenever a new `states/` or `states/v2/` reference is added.

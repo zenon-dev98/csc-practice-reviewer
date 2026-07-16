@@ -1,0 +1,2527 @@
+{
+  "generatedAt": "2026-07-16T00:00:11.816Z",
+  "source": "app/question-bank",
+  "versionCount": 20,
+  "totalQuestions": 3400,
+  "difficultyTotals": {
+    "easy": 1000,
+    "medium": 1800,
+    "hard": 600
+  },
+  "findingTotals": {},
+  "findings": [],
+  "blockers": [],
+  "exactDuplicatePromptGroupCount": 0,
+  "templateDuplicatePromptGroupCount": 0,
+  "shuffledDuplicateGroupCount": 0,
+  "repeatedExplanationGroupCount": 1,
+  "ambiguousLogicGroups": [],
+  "exactDuplicates": [],
+  "templateDuplicates": [],
+  "shuffledDuplicates": [],
+  "repeatedExplanations": [
+    {
+      "key": "article ii, section 10 directs the state to promote social justice in all phases of national development.",
+      "count": 3,
+      "questions": [
+        {
+          "id": "v08-q003",
+          "version": 8,
+          "itemNumber": 3
+        },
+        {
+          "id": "v10-q005",
+          "version": 10,
+          "itemNumber": 5
+        },
+        {
+          "id": "v12-q001",
+          "version": 12,
+          "itemNumber": 1
+        }
+      ]
+    }
+  ],
+  "versionReports": [
+    {
+      "id": "professional-v01",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Sentence completion": 10,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 43,
+        "B": 43,
+        "C": 42,
+        "D": 42
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v01-reading-c",
+          "kind": "passage",
+          "items": [
+            47,
+            48,
+            49,
+            50
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v01-reading-a",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v01-reading-b",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v01-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v01-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v01-data-c",
+          "kind": "bar-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v01-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v02",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Environment management and protection": 4,
+        "Peace and human rights": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Paragraph organization": 8,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 43,
+        "B": 43,
+        "C": 42,
+        "D": 42
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v02-reading-c",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v02-reading-a",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v02-reading-b",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v02-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v02-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v02-data-c",
+          "kind": "bar-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v02-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v03",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Environment management and protection": 4,
+        "Peace and human rights": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Paragraph organization": 8,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 43,
+        "B": 41,
+        "C": 44,
+        "D": 42
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v03-reading-c",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v03-reading-a",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v03-reading-b",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v03-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v03-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v03-data-c",
+          "kind": "bar-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v03-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v04",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 42,
+        "B": 43,
+        "C": 42,
+        "D": 43
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v04-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v04-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v04-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v04-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v04-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v04-data-c",
+          "kind": "bar-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v04-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v05",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 43,
+        "B": 42,
+        "C": 43,
+        "D": 42
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v05-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v05-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v05-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v05-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v05-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v05-data-c",
+          "kind": "bar-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v05-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v06",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 41,
+        "B": 44,
+        "C": 41,
+        "D": 44
+      },
+      "longestAnswerRun": 1,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v06-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v06-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v06-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v06-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v06-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v06-data-c",
+          "kind": "line-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v06-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v07",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 43,
+        "B": 42,
+        "C": 43,
+        "D": 42
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v07-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v07-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v07-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v07-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v07-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v07-data-c",
+          "kind": "line-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v07-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v08",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 41,
+        "B": 44,
+        "C": 41,
+        "D": 44
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v08-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v08-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v08-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v08-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v08-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v08-data-c",
+          "kind": "line-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v08-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v09",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 43,
+        "B": 42,
+        "C": 43,
+        "D": 42
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v09-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v09-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v09-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v09-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v09-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v09-data-c",
+          "kind": "line-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v09-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v10",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 42,
+        "B": 43,
+        "C": 42,
+        "D": 43
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v10-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v10-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v10-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v10-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v10-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v10-data-c",
+          "kind": "line-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v10-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v11",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 43,
+        "B": 42,
+        "C": 43,
+        "D": 42
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v11-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v11-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v11-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v11-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v11-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v11-data-c",
+          "kind": "line-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v11-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v12",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 43,
+        "B": 43,
+        "C": 42,
+        "D": 42
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v12-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v12-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v12-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v12-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v12-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v12-data-c",
+          "kind": "line-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v12-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v13",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 43,
+        "B": 43,
+        "C": 42,
+        "D": 42
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v13-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v13-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v13-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v13-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v13-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v13-data-c",
+          "kind": "line-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v13-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v14",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 43,
+        "B": 41,
+        "C": 44,
+        "D": 42
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v14-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v14-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v14-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v14-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v14-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v14-data-c",
+          "kind": "line-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v14-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v15",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 42,
+        "B": 43,
+        "C": 42,
+        "D": 43
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v15-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v15-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v15-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v15-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v15-data-b",
+          "kind": "line-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v15-data-c",
+          "kind": "bar-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v15-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v16",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 43,
+        "B": 42,
+        "C": 43,
+        "D": 42
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v16-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v16-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v16-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v16-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v16-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v16-data-c",
+          "kind": "table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v16-data-d",
+          "kind": "line-table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v17",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 41,
+        "B": 44,
+        "C": 41,
+        "D": 44
+      },
+      "longestAnswerRun": 1,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v17-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v17-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v17-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v17-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v17-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v17-data-c",
+          "kind": "line-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v17-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v18",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 43,
+        "B": 42,
+        "C": 43,
+        "D": 42
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v18-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v18-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v18-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v18-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v18-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v18-data-c",
+          "kind": "line-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v18-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v19",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 41,
+        "B": 44,
+        "C": 41,
+        "D": 44
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v19-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v19-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v19-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v19-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v19-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v19-data-c",
+          "kind": "line-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v19-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    },
+    {
+      "id": "professional-v20",
+      "totalQuestions": 170,
+      "difficulties": {
+        "easy": 50,
+        "medium": 90,
+        "hard": 30,
+        "invalid": 0
+      },
+      "sections": {
+        "General Information": 20,
+        "Verbal Ability": 60,
+        "Numerical Ability": 40,
+        "Analytical Ability": 50
+      },
+      "skills": {
+        "Philippine Constitution": 6,
+        "RA 6713 / Code of Conduct": 6,
+        "Peace and human rights": 4,
+        "Environment management and protection": 4,
+        "Word meaning": 10,
+        "Sentence completion": 10,
+        "Error recognition": 10,
+        "Sentence structure": 10,
+        "Paragraph organization": 8,
+        "Reading comprehension": 12,
+        "Basic operations": 10,
+        "Number sequence": 8,
+        "Word problems": 22,
+        "Word analogy": 10,
+        "Symbolic logic / abstract reasoning": 10,
+        "Identifying assumptions and drawing conclusions": 14,
+        "Data interpretation": 16
+      },
+      "answerPositions": {
+        "A": 43,
+        "B": 42,
+        "C": 43,
+        "D": 42
+      },
+      "longestAnswerRun": 2,
+      "uniqueItemNumbers": 170,
+      "exactDuplicatePromptGroups": [],
+      "templateDuplicatePromptGroups": [],
+      "stimulusGroups": [
+        {
+          "id": "v20-read-a",
+          "kind": "passage",
+          "items": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v20-read-b",
+          "kind": "passage",
+          "items": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v20-read-c",
+          "kind": "passage",
+          "items": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v20-data-a",
+          "kind": "table",
+          "items": [
+            155,
+            156,
+            157,
+            158
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v20-data-b",
+          "kind": "bar-table",
+          "items": [
+            159,
+            160,
+            161,
+            162
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v20-data-c",
+          "kind": "line-table",
+          "items": [
+            163,
+            164,
+            165,
+            166
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v20-data-d",
+          "kind": "table",
+          "items": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "logicSolutionCount": null
+        }
+      ]
+    }
+  ]
+}

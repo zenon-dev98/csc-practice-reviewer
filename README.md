@@ -10,19 +10,19 @@ The workspace currently contains 29 scanned/mock exam images:
 
 - `image_01.jpg` through `image_29.jpg`
 
-The runnable app is in `app/`. It is a static browser app that uses local browser storage. It includes the original source booklet images plus a generated typed practice bank with 20 full 170-item exam versions, grouped navigation, and shared graph/table-style stimulus questions.
+The runnable app is in `app/`. It is a static browser app backed by Supabase for authenticated data, with browser storage used for recovery. It includes the original source booklet audit trail plus 20 manually authored 170-item exam versions, grouped navigation, and shared passage/table/chart stimulus questions.
 
 ## Product Direction
 
 - Professional-level mock exam.
 - 170 items.
-- 20 generated typed versions, 3,400 generated questions total.
+- 20 manually authored versions, 3,400 unique questions total.
 - CSC coverage-matrix audit for every version.
 - Grouped section navigator and compact typed-question view.
 - 3 hours and 10 minutes.
 - Multiple choice.
-- Name/email profile entry.
-- Browser local storage for the current runnable app; Supabase Free schema is prepared for a later hosted version.
+- Invite-only email/password accounts.
+- Supabase-authenticated cloud persistence with local recovery for unfinished work.
 - Pause/resume, skip/revisit, timeout submit, and post-exam score/statistics views.
 
 ## Run Locally

@@ -2065,11 +2065,9 @@
     const rows = toArray(stimulus.rows);
     const headers = toArray(stimulus.headers);
     const groupedChart = stimulus.chartType === "grouped-bars" ? renderGroupedBarChart(stimulus) : "";
-    const chartRows = rows.map((row) => {
-      const values = row.slice(1).map(Number).filter(Number.isFinite);
-      return { label: row[0], total: values.reduce((sum, value) => sum + value, 0) };
-    }).filter((row) => row.total > 0);
-    const max = chartRows.length ? Math.max(...chartRows.map((row) => row.total)) : 1;
+    const seriesChart = !groupedChart && ["bar-table", "line-table"].includes(stimulus.kind)
+      ? renderTabularSeriesChart(stimulus)
+      : "";
     return `
       <section class="stimulus-panel">
         <div class="stimulus-head">
@@ -2080,13 +2078,72 @@
           </div>
           ${reviewMode ? "" : `<button class="btn tiny" data-action="open-chart" type="button">${icon("open")} Open Larger</button>`}
         </div>
-        ${groupedChart || (chartRows.length ? `<div class="chart-bars">${chartRows.map((row) => `<div><span>${escapeHtml(row.label)}</span><i><b style="width:${Math.max(6, Math.round((row.total / max) * 100))}%"></b></i><strong>${row.total}</strong></div>`).join("")}</div>` : "")}
+        ${groupedChart || seriesChart}
         ${!groupedChart && headers.length && rows.length ? `<div class="data-table-wrap"><table><thead><tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : ""}
         <div class="linked-items">
           <strong>${escapeHtml(linked.label)}</strong>
           <div>${linked.items.map((item) => `<button class="${item.position === attempt.current_question_index ? "active" : ""}" data-goto="${item.position}" type="button">${item.display_number}</button>`).join("")}</div>
           <p>These questions are connected and use the same chart.</p>
         </div>
+      </section>
+    `;
+  }
+
+  function renderTabularSeriesChart(stimulus) {
+    const headers = toArray(stimulus.headers);
+    const rows = toArray(stimulus.rows);
+    if (headers.length < 2 || !rows.length) return "";
+    const colors = ["#20d6d0", "#2f86ff", "#58d568", "#ffb020", "#a855f7"];
+    const series = headers.slice(1).map((label, index) => ({
+      label,
+      color: colors[index % colors.length],
+      rawValues: rows.map((row) => row[index + 1]),
+      values: rows.map((row) => Number(row[index + 1])),
+    })).filter((entry) => entry.values.every(Number.isFinite));
+    if (!series.length) return "";
+
+    return `
+      <div class="series-visual-grid ${stimulus.kind}" role="group" aria-label="${escapeAttr(stimulus.alt || stimulus.title || "Data visualization")}">
+        ${series.map((entry) => stimulus.kind === "line-table"
+          ? renderSeriesLine(entry, rows)
+          : renderSeriesBars(entry, rows)).join("")}
+      </div>
+    `;
+  }
+
+  function renderSeriesBars(series, rows) {
+    const max = Math.max(1, ...series.values.map((value) => Math.abs(value)));
+    return `
+      <section class="metric-series">
+        <h3><i style="background:${escapeAttr(series.color)}"></i>${escapeHtml(series.label)}</h3>
+        <div class="metric-bars">
+          ${series.values.map((value, index) => `
+            <div><span>${escapeHtml(rows[index][0])}</span><i><b style="width:${Math.max(4, Math.round((Math.abs(value) / max) * 100))}%;background:${escapeAttr(series.color)}"></b></i><strong>${escapeHtml(series.rawValues[index])}</strong></div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderSeriesLine(series, rows) {
+    const min = Math.min(...series.values);
+    const max = Math.max(...series.values);
+    const range = max - min || 1;
+    const width = 260;
+    const points = series.values.map((value, index) => {
+      const x = series.values.length === 1 ? width / 2 : 12 + (index * (width - 24)) / (series.values.length - 1);
+      const y = 55 - ((value - min) / range) * 38;
+      return { x, y, value };
+    });
+    return `
+      <section class="metric-series line-series">
+        <h3><i style="background:${escapeAttr(series.color)}"></i>${escapeHtml(series.label)}</h3>
+        <svg viewBox="0 0 ${width} 68" role="img" aria-label="${escapeAttr(`${series.label}: ${series.values.join(", ")}`)}">
+          <line x1="12" y1="55" x2="248" y2="55"></line>
+          <polyline points="${points.map((point) => `${point.x},${point.y}`).join(" ")}" style="stroke:${escapeAttr(series.color)}"></polyline>
+          ${points.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="3.5" style="fill:${escapeAttr(series.color)}"></circle>`).join("")}
+        </svg>
+        <div class="metric-values">${series.values.map((value, index) => `<span><small>${escapeHtml(rows[index][0])}</small><strong>${escapeHtml(value)}</strong></span>`).join("")}</div>
       </section>
     `;
   }

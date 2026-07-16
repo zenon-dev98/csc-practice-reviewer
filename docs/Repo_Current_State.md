@@ -1,6 +1,6 @@
 # Repo Current State
 
-Last updated: 2026-07-14
+Last updated: 2026-07-16
 
 ## Workspace
 
@@ -13,7 +13,7 @@ Path:
 - This folder is a git repository on `main`.
 - `package.json` contains helper scripts only; it has no dependency declarations.
 - The runnable app is a static browser app in `app/`.
-- The runnable bank uses 20 generated typed Professional mock versions, 170 items each, generated from a CSC coverage matrix.
+- The runnable bank uses 20 manually authored Professional mock versions with 170 items each and a strict CSC coverage blueprint.
 - The app has been redesigned around the supplied `states/` screenshots, with approved source-backed deviations for A-D choices, section ranges, and one-profile-per-account auth in normal production mode.
 - Screenshot-parity, desktop-density, and desktop quality-repair passes have added fixture-state QA URLs, bounded dashboard/exam/sidebar/graph/modal contracts, expandable graph subgroups, and no-scroll desktop overflow checks across every supplied state.
 - Runtime persistence is now implemented against Supabase email/password auth and online tables, with per-attempt question snapshots and timing analytics.
@@ -44,14 +44,17 @@ Path:
 - `app/cockpit-theme.css`
 - `app/v5-production.css`
 - `app/question-data.js`
-- `app/generated-question-bank.js`
+- `app/question-bank/manifest.js`
+- `app/question-bank/version-01.js` through `version-20.js`
 - `app/assets/brand-shield.svg`
 - `app/assets/fonts/barlow-condensed-*.woff2` / `.ttf`
 - `app/assets/fonts/rajdhani-*-latin.ttf`
 - `app/assets/icons/*.svg`
 - `app/assets/create_profile_background.png`
 - `app/images/image_01.jpg` through `app/images/image_29.jpg`
-- `scripts/generate-question-bank.mjs`
+- `scripts/audit-question-bank.mjs`
+- `docs/Question_Bank_Authoring_Standard.md`
+- `data/question_bank_quality_audit.json`
 - `scripts/check-dependencies.ps1`
 - `scripts/setup-local-deps.ps1`
 - `scripts/start.ps1`
@@ -84,8 +87,9 @@ Current source item boundaries:
 - `python --version` returns Python 3.12.10.
 - `tesseract` is not available on PATH.
 - Content extraction used image inspection and source-page rendering.
-- The app now prefers `app/generated-question-bank.js`, which contains 20 typed generated versions and 3,400 generated questions total.
-- Generated questions include CSC skill metadata, quality status, and optional shared stimulus data.
+- The app loads `app/question-bank/manifest.js` plus 20 hand-authored version files containing 3,400 questions total.
+- The authored questions include CSC skill metadata, provenance, review and quality status, explanations, and optional shared stimulus data.
+- Strict static and quality audits enforce exact coverage and difficulty, four data groups per version, answer balance, accessible stimuli, and zero exact, normalized-template, or shuffled-choice duplicates.
 - The original image-backed `app/question-data.js` remains available as source fallback and audit trail.
 - Impeccable CLI detection has been run against `app/` and currently returns no findings.
 - Browser fixture QA has been run for `create`, `select`, `dashboard`, `setup`, `exam`, `exam-collapsed`, `graph`, `pause`, `submit`, `results`, `review`, `practice`, `recent`, and `profile-modal` at `1904x913` and `1536x816`; document/body scrollbars and sampled container overflow are clean after T0014.
@@ -117,7 +121,7 @@ Current source item boundaries:
 
 ## Current Active Ticket
 
-- None. T0032 is complete; the next planned work remains Supabase backup/export or the generated-content pedagogy/key review.
+- T0033: replace the generated production bank with the manually authored 20-version bank, validate it, integrate it, and deploy it.
 
 ## T0032 Outcome
 
@@ -189,4 +193,4 @@ Current source item boundaries:
 
 ## Next Ticket
 
-- Supabase backup/export workflow before broader public use, or a content pedagogy review pass for the generated bank after T0025.
+- Qualified independent second review of authored legal, Filipino, numerical, and analytical items, or Supabase backup/export before broader use.

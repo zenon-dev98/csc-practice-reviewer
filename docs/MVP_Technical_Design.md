@@ -4,7 +4,7 @@
 
 - Frontend: static HTML, CSS, and browser JavaScript in `app/`
 - Runtime storage: Supabase Auth + Postgres tables with RLS
-- Question bank: coverage-matrix generated typed browser data in `app/generated-question-bank.js`, with source-image fallback in `app/question-data.js`
+- Question bank: manually authored browser data in `app/question-bank/`, with source-image fallback in `app/question-data.js`
 - Optional local server: `http-server` installed outside the project folder by `scripts/setup-local-deps.ps1`
 - Backend: Supabase Free
 - Database: Supabase Postgres using `supabase/schema.sql`
