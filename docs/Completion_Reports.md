@@ -1265,3 +1265,19 @@ Verification:
 - Local and live Microsoft Edge interaction suites passed `41/41` checks across `69` screenshots each.
 - Evidence is stored under `qa/t0034-mixed-navigator/`.
 - Deployed from commit `83c0d19` with cache key `20260716-02`.
+
+## 2026-07-16 - T0035 Responsive Grouped Chart Geometry
+
+Summary:
+
+- Replaced the broken grouped-bar layout, where bars and axes used different CSS heights, with a single responsive SVG coordinate system.
+- Added a rounded data-derived y-axis, exact value labels, accessible SVG title/description content, and chart-owned mobile scrolling.
+- Extended visual QA with explicit baseline and plot-bound assertions so this defect cannot pass on overflow checks alone.
+
+Verification:
+
+- `npm run check` passed for syntax, dependencies, 20 authored versions, 3,400 questions, and the strict bank audit.
+- Local Edge QA passed `14/14` graph and chart-modal screenshots across five desktop and two mobile viewports.
+- Live Edge QA passed the same `14/14` matrix with zero console, document-overflow, sampled element-overflow, chart-geometry, or active-animation failures.
+- Evidence is stored under `qa/t0035-chart-responsive-baseline/`, `qa/t0035-chart-responsive-final-local/`, and `qa/t0035-chart-responsive-live/`.
+- Deployed from commit `3aed02f` with cache key `20260716-03`.

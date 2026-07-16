@@ -1,5 +1,29 @@
 # Tickets
 
+## T0035 - Responsive Grouped Chart Geometry
+
+Status: done
+
+Repair grouped-bar questions whose bars used a shorter CSS plot than the visible axes and grid, then verify the shared chart renderer across the complete desktop/mobile viewport matrix.
+
+Acceptance criteria:
+
+- Bars, value labels, gridlines, tick labels, and the zero baseline use one coordinate system.
+- The vertical scale is derived from the displayed data rather than fixed at 0-120.
+- Grouped charts remain contained at all desktop targets and preserve readable labels through chart-owned horizontal scrolling on phone widths.
+- The expanded-chart modal uses the same corrected renderer.
+- Permanent QA fails when a bar detaches from zero, escapes the plot, or disagrees with the zero gridline.
+- Local and live Microsoft Edge chart matrices pass at all seven required viewports.
+
+Completion notes:
+
+- Replaced independently positioned HTML bars and CSS axes with one responsive, accessible SVG plot.
+- Added data-derived rounded tick intervals, shared geometry for bars and gridlines, persistent value labels, SVG title/description text, and mobile chart-owned horizontal scrolling.
+- Added chart-baseline and plot-bound assertions to `scripts/qa-cockpit.cjs`.
+- `npm run check` passed with all 3,400 authored questions and zero bank-audit findings.
+- Local and live Edge matrices each passed `14/14` graph and expanded-chart captures across five desktop and two mobile viewports with zero console, document, sampled overflow, geometry, or animation failures.
+- Deployed from commit `3aed02f` with `app.js` and `cockpit-theme.css` cache-busted to `20260716-03`.
+
 ## T0034 - Mixed Stimulus Navigator Reachability
 
 Status: done

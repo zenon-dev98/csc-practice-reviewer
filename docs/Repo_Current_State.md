@@ -123,6 +123,15 @@ Current source item boundaries:
 
 - No implementation ticket is active. The next content gate is a qualified independent second review of the authored bank.
 
+## T0035 Outcome
+
+- Replaced the grouped-chart renderer's mismatched CSS axes and independently positioned bars with one responsive SVG coordinate system.
+- Bar bottoms now share the exact zero baseline used by the axis and grid; the vertical range uses a rounded data-derived maximum instead of a fixed 0-120 scale.
+- Desktop charts resize inside their panel without overflow, while phone layouts preserve physical label size in a bounded horizontal chart viewport.
+- The fixture harness now rejects detached bars, bars outside the plot, zero-gridline mismatch, and desktop chart overflow.
+- Local and live Edge chart matrices passed all `14` graph/modal captures across `1672x942`, `1904x913`, `1536x816`, `1536x736`, `1366x768`, `390x844`, and `412x915`.
+- GitHub Pages serves the repair from commit `3aed02f` with asset version `20260716-03`.
+
 ## T0034 Outcome
 
 - Fixed the authored-bank navigator dropping ordinary items whenever the same section also contained shared reading or data stimuli.
