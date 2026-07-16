@@ -123,6 +123,14 @@ Current source item boundaries:
 
 - No implementation ticket is active. The next content gate is a qualified independent second review of the authored bank.
 
+## T0034 Outcome
+
+- Fixed the authored-bank navigator dropping ordinary items whenever the same section also contained shared reading or data stimuli.
+- The navigator now renders individual-item ranges and shared sets in one ordered sequence with every question represented exactly once.
+- Verbal Ability exposes all 60 items from 21 through 80, including the previously missing 51-72 range, and shared passages are labeled as Reading Sets.
+- Local and live Microsoft Edge interaction suites pass `41/41` checks, including direct navigation to items 21, 51, and 80 without refresh.
+- GitHub Pages serves the fix from commit `83c0d19` with `app.js?v=20260716-02`.
+
 ## T0033 Outcome
 
 - Replaced the generated production artifact and generator with 20 manually authored question-bank source files containing 170 stable items each.

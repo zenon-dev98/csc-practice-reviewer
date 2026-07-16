@@ -1249,3 +1249,19 @@ Verification:
 Risks and follow-up:
 
 - All authored items deliberately retain `needs_review` status. A qualified independent reviewer should verify legal currency, Filipino nuance, quantitative wording, analytical uniqueness, and distractor quality before use beyond this small private group.
+
+## 2026-07-16 - T0034 Mixed Stimulus Navigator Reachability
+
+Summary:
+
+- Fixed the exam sidebar dropping ordinary questions from sections that also contained shared reading or data sets.
+- Preserved one bounded sidebar scroll owner while rendering every individual and shared-set item in source order.
+
+Verification:
+
+- Verbal Ability renders all `60` chips from item 21 through item 80 exactly once.
+- Items 21, 51, and 80 open from the navigator without a refresh.
+- Shared Verbal stimuli are labeled as Reading Sets.
+- Local and live Microsoft Edge interaction suites passed `41/41` checks across `69` screenshots each.
+- Evidence is stored under `qa/t0034-mixed-navigator/`.
+- Deployed from commit `83c0d19` with cache key `20260716-02`.

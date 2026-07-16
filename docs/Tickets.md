@@ -1,5 +1,27 @@
 # Tickets
 
+## T0034 - Mixed Stimulus Navigator Reachability
+
+Status: done
+
+Repair the authored-bank exam navigator so sections containing shared reading or data stimuli still expose every ordinary question in their full numbered range.
+
+Acceptance criteria:
+
+- Verbal Ability exposes every item from 21 through 80 exactly once even when reading sets are present.
+- Ordinary items and shared-stimulus sets remain in bank order inside one bounded sidebar scroll owner.
+- Verbal shared stimuli use reading-set labels rather than chart-set labels.
+- Items 21, 51, and 80 can each be opened without refreshing.
+- Local and live Microsoft Edge interaction regression checks pass before completion.
+
+Completion notes:
+
+- Replaced the stimulus-only section branch with an ordered mixed-block navigator containing both individual-item ranges and shared-stimulus groups.
+- Added authored-style reading stimuli to deterministic fixtures so the permanent interaction suite exercises the production grouping path.
+- Added checks for all 60 Verbal chips, item 51 presence and navigation, reading-set labeling, and the existing item 80 to item 21 return path.
+- Local and live Edge interaction suites passed `41/41` checks across `69` screenshots each; evidence is under `qa/t0034-mixed-navigator/`.
+- Deployed from commit `83c0d19` with `app.js?v=20260716-02`.
+
 ## T0033 - Manual CSC Professional Bank Rebuild
 
 Status: done
