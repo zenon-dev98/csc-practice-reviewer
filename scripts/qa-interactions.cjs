@@ -284,9 +284,17 @@ function safeName(value) {
   await test("exam full section navigation", async () => {
     await gotoFixture("exam");
     const verbalGroup = () => page.locator(".exam-nav details.question-group").filter({ has: page.getByText("Verbal Ability", { exact: true }) }).first();
-    await verbalGroup().locator(".more-chip").click();
+    const moreChip = verbalGroup().locator(".more-chip");
+    if (await moreChip.count()) await moreChip.click();
+    await check("expanded Verbal section contains all 60 questions", async () => await verbalGroup().locator("[data-goto]").count() === 60);
     await check("expanded Verbal section contains question 21", async () => await verbalGroup().locator("[data-goto='20']").count() === 1);
+    await check("expanded Verbal section contains question 51", async () => await verbalGroup().locator("[data-goto='50']").count() === 1);
     await check("expanded Verbal section contains question 80", async () => await verbalGroup().locator("[data-goto='79']").count() === 1);
+    await check("Verbal shared stimuli are labeled as reading sets", async () => await verbalGroup().getByText("Reading Set A", { exact: true }).count() === 1);
+    await verbalGroup().locator("[data-goto='50']").scrollIntoViewIfNeeded();
+    await verbalGroup().locator("[data-goto='50']").click();
+    await check("navigator opens question 51", async () => /Item 51\b/i.test(await page.locator(".question-index").innerText()));
+    await screenshot("exam-question-51-from-mixed-navigator");
     await verbalGroup().locator("[data-goto='79']").scrollIntoViewIfNeeded();
     await verbalGroup().locator("[data-goto='79']").click();
     await check("navigator opens question 80", async () => /Item 80\b/i.test(await page.locator(".question-index").innerText()));

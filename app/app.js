@@ -505,7 +505,7 @@
       correct_choice: correctChoice,
       original_correct_choice: correctChoice,
       explanation: fixtureExplanation(displayNumber, correctChoice),
-      stimulus: displayNumber >= 81 && displayNumber <= 85 ? fixtureChartStimulus() : null,
+      stimulus: fixtureStimulus(displayNumber),
       difficulty: displayNumber % 3 === 0 ? "hard" : displayNumber % 2 === 0 ? "medium" : "easy",
       selected_choice: selectedChoice,
       skipped: !completed && fixtureSkippedDisplays().has(displayNumber),
@@ -620,6 +620,25 @@
     if (displayNumber === 43) return "Each is singular, so the verb should be singular: was. This keeps subject-verb agreement consistent.";
     if (displayNumber === 82) return "The combined regional bars increase most sharply from February to March in the chart.";
     return `Choice ${correctChoice} best matches the tested CSC skill for this item.`;
+  }
+
+  function fixtureStimulus(displayNumber) {
+    if (displayNumber >= 81 && displayNumber <= 85) return fixtureChartStimulus();
+    const readingSets = [
+      { start: 47, end: 50, id: "fixture-reading-a", title: "Public information notice" },
+      { start: 73, end: 76, id: "fixture-reading-b", title: "Community preparedness passage" },
+      { start: 77, end: 80, id: "fixture-reading-c", title: "Workplace communication passage" }
+    ];
+    const set = readingSets.find((entry) => displayNumber >= entry.start && displayNumber <= entry.end);
+    if (!set) return null;
+    return {
+      id: set.id,
+      kind: "reading",
+      label: `Questions ${set.start}-${set.end} refer to the passage below.`,
+      title: set.title,
+      description: "Read the shared passage carefully before answering the connected questions.",
+      alt: "A shared reading passage used by the connected verbal questions."
+    };
   }
 
   function fixtureChartStimulus() {
@@ -2022,24 +2041,52 @@
       `;
     }
 
-    const stimulusGroups = [];
-    const seen = new Set();
+    const stimulusGroups = new Map();
     for (const answer of groupAnswers) {
       const stimulusId = answer.stimulus?.id;
-      if (!stimulusId || seen.has(stimulusId)) continue;
-      const items = groupAnswers.filter((candidate) => candidate.stimulus?.id === stimulusId);
-      if (items.length < 2) continue;
-      seen.add(stimulusId);
-      stimulusGroups.push(items);
+      if (!stimulusId) continue;
+      if (!stimulusGroups.has(stimulusId)) stimulusGroups.set(stimulusId, []);
+      stimulusGroups.get(stimulusId).push(answer);
     }
-    if (!stimulusGroups.length) return "";
+    const sharedStimulusIds = new Set(
+      [...stimulusGroups.entries()].filter(([, items]) => items.length > 1).map(([stimulusId]) => stimulusId)
+    );
+    if (!sharedStimulusIds.size) return "";
+
+    const blocks = [];
+    const renderedStimuli = new Set();
+    let individualItems = [];
+    const flushIndividualItems = () => {
+      if (!individualItems.length) return;
+      blocks.push({ type: "individual", items: individualItems });
+      individualItems = [];
+    };
+    for (const answer of groupAnswers) {
+      const stimulusId = answer.stimulus?.id;
+      if (!stimulusId || !sharedStimulusIds.has(stimulusId)) {
+        individualItems.push(answer);
+        continue;
+      }
+      flushIndividualItems();
+      if (renderedStimuli.has(stimulusId)) continue;
+      renderedStimuli.add(stimulusId);
+      blocks.push({ type: "stimulus", items: stimulusGroups.get(stimulusId) });
+    }
+    flushIndividualItems();
+
+    let stimulusIndex = 0;
     return `
       <div class="stimulus-nav">
-        ${stimulusGroups.map((items, index) => {
+        ${blocks.map((block) => {
+          const items = block.items;
           const answered = items.filter((item) => item.selected_choice).length;
+          const range = `Questions ${items[0].display_number}-${items[items.length - 1].display_number}`;
+          const label = block.type === "individual"
+            ? "Individual Items"
+            : `${group.section === "Verbal Ability" ? "Reading Set" : "Data Set"} ${String.fromCharCode(65 + stimulusIndex++)}`;
           return `
-            <section class="stimulus-set open">
-              <div class="stimulus-set-head"><strong>Chart Set ${String.fromCharCode(65 + index)}</strong><span>Questions ${items[0].display_number}-${items[items.length - 1].display_number}</span><em>${answered}/${items.length} answered</em></div>
+            <section class="stimulus-set open ${block.type === "individual" ? "individual-question-set" : "shared-question-set"}">
+              <div class="stimulus-set-head"><strong>${label}</strong><span>${range}</span><em>${answered}/${items.length} answered</em></div>
               <div class="chip-grid set-grid">${items.map((answer) => navChip(answer, attempt)).join("")}</div>
             </section>
           `;
