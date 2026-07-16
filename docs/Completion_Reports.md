@@ -1208,3 +1208,44 @@ Follow-ups:
 
 - Add Supabase backup/export workflow before broader public use.
 - Perform the human content-pedagogy review for generated Filipino, data-interpretation, legal/general-information, and symbolic-reasoning items.
+
+## 2026-07-16 - T0033 Manual CSC Professional Bank Rebuild And Deployment
+
+Summary:
+
+- Replaced the repetitive generated bank with 20 manually authored Professional mock versions containing 170 questions each.
+- Removed the production generator and generated artifact, added strict structural/content auditing, and improved linked data-stimulus readability.
+- Kept the app static-hostable and preserved existing Supabase, scoring, timing, and attempt behavior.
+
+Files changed:
+
+- `app/question-bank/manifest.js`
+- `app/question-bank/version-01.js` through `version-20.js`
+- `app/app.js`
+- `app/cockpit-theme.css`
+- `app/index.html`
+- `scripts/audit-question-bank.mjs`
+- `scripts/validate-static-data.mjs`
+- question-bank audit and architecture documentation
+
+Commands run:
+
+- `npm run check`
+- `node scripts/validate-static-data.mjs`
+- `node scripts/audit-question-bank.mjs`
+- targeted Microsoft Edge setup/graph fixture sweep
+- local and live Microsoft Edge question-bank runtime smoke tests
+- `git diff --check`
+
+Verification:
+
+- `20` versions and `3,400` total questions loaded locally and from GitHub Pages.
+- Every version contains `170` items; all `3,400` IDs are unique.
+- Difficulty totals are `1,000` easy, `1,800` medium, and `600` hard.
+- Exact-prompt, normalized-template, shuffled-choice, and ambiguous-logic findings are all zero.
+- Live bank scripts returned HTTP 200 with no page/console errors; checked graph output had exact value labels and no panel overflow.
+- The release is live from commit `0ed9ddb` with cache key `20260716-01`.
+
+Risks and follow-up:
+
+- All authored items deliberately retain `needs_review` status. A qualified independent reviewer should verify legal currency, Filipino nuance, quantitative wording, analytical uniqueness, and distractor quality before use beyond this small private group.

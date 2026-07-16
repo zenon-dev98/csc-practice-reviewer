@@ -121,7 +121,17 @@ Current source item boundaries:
 
 ## Current Active Ticket
 
-- T0033: replace the generated production bank with the manually authored 20-version bank, validate it, integrate it, and deploy it.
+- No implementation ticket is active. The next content gate is a qualified independent second review of the authored bank.
+
+## T0033 Outcome
+
+- Replaced the generated production artifact and generator with 20 manually authored question-bank source files containing 170 stable items each.
+- Preserved the documented CSC Professional scope and per-version difficulty blueprint while eliminating detected exact, normalized-template, and shuffled-choice duplicates.
+- Added a strict authored-bank audit to `npm run check` and stored its machine-readable report at `data/question_bank_quality_audit.json`.
+- Improved chart/table readability with per-metric visualization and exact values instead of aggregating unlike columns into an ambiguous total.
+- Local and live Microsoft Edge runtime checks loaded all 3,400 questions and every cache-busted bank asset without console errors or overflow in the checked setup/graph states.
+- GitHub Pages serves the authored bank from release commit `0ed9ddb` with asset version `20260716-01`.
+- All items remain `needs_review`; qualified independent second review is still required before broader use.
 
 ## T0032 Outcome
 

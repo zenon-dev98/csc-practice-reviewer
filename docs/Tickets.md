@@ -2,7 +2,7 @@
 
 ## T0033 - Manual CSC Professional Bank Rebuild
 
-Status: in_progress
+Status: done
 
 Replace the repetitive generated production bank with 20 manually authored, independently sourced Professional mock versions; use scripts only for validation and audit, improve shared data-stimulus readability, integrate the authored source files, and deploy the verified static build.
 
@@ -16,6 +16,16 @@ Acceptance criteria:
 - Ambiguous row-total charts are replaced with labeled per-metric visuals plus exact accessible tables.
 - Static validation, strict question audit, JavaScript syntax, local runtime smoke, and live cache-busted smoke checks pass.
 - The authored content remains clearly identified as independent practice material and unreviewed items remain marked `needs_review`.
+
+Completion notes:
+
+- Replaced the 121,642-line generated production artifact and its runtime generator with 20 manually authored version files under `app/question-bank/`.
+- Preserved 20 versions x 170 items with stable IDs, the documented CSC Professional coverage matrix, and a per-version 50 easy / 90 medium / 30 hard distribution.
+- The strict audit reports zero exact-prompt groups, normalized-template groups, shuffled-choice duplicates, ambiguous-logic groups, or structural blockers across all 3,400 questions.
+- Reworked shared data displays so unrelated measures are visualized independently and exact source values remain available; the existing grouped-chart state retains explicit value labels.
+- `npm run check`, local Microsoft Edge runtime checks, and cache-busted live Microsoft Edge checks pass with every question-bank asset returning HTTP 200 and no console errors.
+- Deployed the authored bank from commit `0ed9ddb` with static assets cache-busted through `v=20260716-01`.
+- Every item remains marked `needs_review` pending a qualified independent second human review; automated structural success is not represented as official CSC validation.
 
 ## T0032 - V5 Interaction And Spacing Quality Repair
 
