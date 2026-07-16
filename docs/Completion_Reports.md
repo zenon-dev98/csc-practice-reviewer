@@ -1359,8 +1359,19 @@ Verification:
 
 - Local setup matrix: `7` screenshots across five desktop and two mobile viewports, zero console, overflow, visual-defect, or animation findings.
 - Local interaction suite: `49/49` checks across `75` screenshots.
+- Live setup matrix: `7` screenshots across five desktop and two mobile viewports, zero console, overflow, visual-defect, or animation findings.
+- Live interaction suite: `49/49` checks across `75` screenshots.
+- Maximized external Microsoft Edge at 100% zoom confirmed the live `1536x816` composition; the temporary QA window was closed after capture.
 
 Evidence:
 
 - `qa/t0039-v5-instrument-release-local/`
 - `qa/t0039-v5-instrument-interactions-local/`
+- `qa/t0039-v5-instrument-live/`
+- `qa/t0039-v5-instrument-interactions-live/`
+- `qa/t0039-v5-instrument-edge-manual/`
+
+Deployment:
+
+- GitHub Pages deployment succeeded from commit `0116e5c`.
+- Changed assets are cache-busted through `20260716-06`.
