@@ -1431,8 +1431,10 @@ html body main#app.app-shell.cockpit-desktop[data-input-mode="keyboard"] .accoun
   }
 
   html body #app.cockpit-desktop .review-matrix-row.current {
-    border-left: 3px solid var(--v5-cyan) !important;
+    outline: 1px solid var(--v5-cyan) !important;
+    outline-offset: -1px !important;
     background: rgba(25, 215, 216, .08) !important;
+    font-weight: 700 !important;
   }
 
   html body #app.cockpit-desktop .review-question-panel {
@@ -1993,11 +1995,13 @@ html body main#app.app-shell.cockpit-desktop[data-input-mode="keyboard"] .accoun
   }
 
   html body #app.cockpit-desktop .stimulus-panel {
+    display: grid !important;
     min-height: 0 !important;
+    grid-template-rows: auto minmax(0, 1fr) auto !important;
     border: 1px solid #2f4d56 !important;
     padding: 16px !important;
     background: #06151b !important;
-    overflow: auto !important;
+    overflow: hidden !important;
     scrollbar-width: thin !important;
   }
 
@@ -3203,7 +3207,9 @@ html body main#app.app-shell.cockpit-desktop[data-input-mode="keyboard"] .accoun
 
   html body #app.cockpit-desktop .hub-run-body {
     display: grid !important;
+    height: 100% !important;
     min-height: 0 !important;
+    grid-row: 1 / -1 !important;
     grid-template-columns: 385px minmax(0, 1fr) !important;
   }
 
@@ -3218,6 +3224,7 @@ html body main#app.app-shell.cockpit-desktop[data-input-mode="keyboard"] .accoun
     border-radius: 50% !important;
     background:
       conic-gradient(var(--v5-cyan) var(--hub-completion), #172b32 0) border-box !important;
+    margin: 0 !important;
     padding: 13px !important;
   }
 
@@ -3263,10 +3270,12 @@ html body main#app.app-shell.cockpit-desktop[data-input-mode="keyboard"] .accoun
 
   html body #app.cockpit-desktop .hub-run-details {
     display: grid !important;
+    height: 100% !important;
     min-width: 0 !important;
-    grid-template-rows: 122px 144px 44px 70px !important;
+    grid-template-rows: 122px minmax(0, 1fr) 44px 70px !important;
     padding: 12px 30px 22px 22px !important;
     border-left: 1px solid #29424a !important;
+    box-sizing: border-box !important;
   }
 
   html body #app.cockpit-desktop .hub-time-row {
@@ -4568,5 +4577,154 @@ html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .set
     min-height: 112px !important;
     margin: 0 !important;
     flex-shrink: 0 !important;
+  }
+}
+
+/* T0036: production question-type geometry. */
+@media (min-width: 1100px) {
+  html body #app.cockpit-desktop .table-stimulus .stimulus-content > .data-table-wrap,
+  html body #app.cockpit-desktop .table-stimulus .stimulus-content > .data-table-wrap > table {
+    height: 100% !important;
+  }
+
+  html body #app.cockpit-desktop .bar-stimulus .series-visual-grid {
+    height: 100% !important;
+    grid-auto-rows: minmax(105px, 1fr) !important;
+    align-content: stretch !important;
+  }
+
+  html body #app.cockpit-desktop .bar-stimulus .metric-series:last-child:nth-child(odd) {
+    grid-column: 1 / -1 !important;
+  }
+
+  html body #app.cockpit-desktop .passage-copy {
+    min-height: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media (max-width: 1099px) {
+  html body #app .exam-body,
+  html body #app .exam-body.with-stimulus,
+  html body #app .exam-question,
+  html body #app .question-panel,
+  html body #app .stimulus-panel {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  html body #app .exam-body:not(.with-stimulus) .question-panel {
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  html body #app .choice {
+    min-height: 64px !important;
+    grid-template-columns: 38px minmax(0, 1fr) 20px !important;
+    grid-template-rows: auto !important;
+    padding: 10px !important;
+    gap: 10px !important;
+  }
+
+  html body #app .choice-letter {
+    width: 36px !important;
+    height: 36px !important;
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+  }
+
+  html body #app .choice > strong {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+  }
+
+  html body #app .choice-radio {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    justify-self: end !important;
+  }
+
+  html body #app .stimulus-panel {
+    grid-template-rows: auto auto auto !important;
+  }
+
+  html body #app .stimulus-content {
+    overflow: visible !important;
+  }
+
+  html body #app .stimulus-head {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: start !important;
+    gap: 10px 12px !important;
+  }
+
+  html body #app .stimulus-head > div {
+    display: contents !important;
+  }
+
+  html body #app .stimulus-head > div > span {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    width: fit-content !important;
+  }
+
+  html body #app .stimulus-head .btn {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    min-height: 40px !important;
+  }
+
+  html body #app .stimulus-head h2 {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    margin: 0 !important;
+    font-size: 22px !important;
+    line-height: 1.08 !important;
+    text-align: left !important;
+  }
+
+  html body #app .stimulus-head p {
+    grid-column: 1 / -1 !important;
+    grid-row: 3 !important;
+    margin: 0 !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+  }
+
+  html body #app .linked-items {
+    display: grid !important;
+    border: 0 !important;
+    border-top: 1px solid #2c454d !important;
+    border-radius: 0 !important;
+    padding: 10px 0 0 !important;
+    background: transparent !important;
+    color: #d8e4e3 !important;
+    gap: 6px !important;
+  }
+
+  html body #app .linked-items > div {
+    display: flex !important;
+    grid-template-columns: none !important;
+    gap: 6px !important;
+  }
+
+  html body #app .linked-items button {
+    width: 38px !important;
+    height: 34px !important;
+    border-radius: 0 !important;
+    background: #0a191e !important;
+    color: #a6b8ba !important;
+  }
+
+  html body #app .linked-items button.active {
+    border-color: var(--v5-cyan) !important;
+    color: var(--v5-cyan) !important;
+  }
+
+  html body #app .linked-items p {
+    color: #71898e !important;
   }
 }

@@ -324,13 +324,16 @@ function safeName(value) {
     await screenshot("exam-save-and-exit-home");
   });
 
-  await test("graph modal", async () => {
-    await gotoFixture("graph");
-    await page.locator("[data-action='open-chart']").click();
-    await screenshot("graph-expanded-modal");
-    await page.keyboard.press("Escape");
-    await check("chart escape closes", async () => await page.locator(".chart-modal").count() === 0);
-    await screenshot("graph-modal-closed");
+  await test("stimulus modals", async () => {
+    for (const [fixture, noun] of [["graph", "chart"], ["passage", "passage"], ["data-table", "table"], ["line-chart", "graph"]]) {
+      await gotoFixture(fixture);
+      await page.locator("[data-action='open-chart']").click();
+      await check(`${noun} modal keeps its visual type`, async () => await page.locator(`.chart-modal [data-stimulus-kind]`).getAttribute("data-stimulus-kind") === ({ chart: "grouped-bars", passage: "passage", table: "table", graph: "line" })[noun]);
+      await screenshot(`${noun}-expanded-modal`);
+      await page.keyboard.press("Escape");
+      await check(`${noun} escape closes`, async () => await page.locator(".chart-modal").count() === 0);
+      await screenshot(`${noun}-modal-closed`);
+    }
   });
 
   await test("practice and review tabs", async () => {

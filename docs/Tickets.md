@@ -1,5 +1,35 @@
 # Tickets
 
+## T0037 - Study Hub Active-Run Vertical Balance
+
+Status: in_progress
+
+Remove the accidental dead zone below the completion ring and Resume Exam control while preserving the aligned Study Hub cockpit composition.
+
+Acceptance criteria:
+
+- The active-run body spans the complete shared panel rather than a single legacy grid row.
+- The completion ring has optically equal top and bottom clearance.
+- Resume Exam sits between 18px and 30px above the panel bottom at desktop targets.
+- The records panel and lower action dock retain their existing alignment and content.
+- Active-attempt and new-account Study Hub states pass the complete desktop viewport matrix.
+
+## T0036 - Complete Question Visual-System Audit And Repair
+
+Status: in_progress
+
+Audit every production question and stimulus family, replace the chart-only shared layout with type-aware passage, table, bar, line, and grouped-chart presentations, and verify long prompts and choices across the complete Microsoft Edge viewport matrix.
+
+Acceptance criteria:
+
+- Deterministic fixtures cover plain, long-prompt, long-choice, passage, table, bar, line, and grouped-chart questions using representative production content.
+- Passage text has its own readable scroll region and never collides with headings, controls, dividers, or linked-item navigation.
+- Tables and charts use their authored visual type, remain contained, and expose exact values without duplicating or obscuring the question.
+- Expanded-view controls and linked-set guidance name the correct medium: passage, table, graph, or chart.
+- Long prompts and choices remain readable and reachable on all required desktop and mobile viewports.
+- Permanent QA detects stimulus-region collisions, incorrect shared-set copy, clipped content, and unreachable lower content.
+- Local and live Microsoft Edge visual and interaction matrices pass after the final cache-busted deployment.
+
 ## T0035 - Responsive Grouped Chart Geometry
 
 Status: done

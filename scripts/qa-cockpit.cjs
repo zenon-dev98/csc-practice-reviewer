@@ -9,7 +9,8 @@ const outputDir = path.resolve(process.argv[2] || "qa/t0024-cockpit-sweep");
 const states = [
   "loading", "config", "fatal", "create", "create-loading", "select", "signin-loading",
   "forgot-password", "forgot-error", "forgot-success", "dashboard", "dashboard-empty", "setup", "exam",
-  "exam-collapsed", "graph", "chart-modal", "pause", "submit", "timeout", "practice",
+  "exam-collapsed", "graph", "passage", "data-table", "metric-bars", "line-chart", "series-line", "series-bars",
+  "long-prompt", "long-choices", "chart-modal", "passage-modal", "table-modal", "line-modal", "pause", "submit", "timeout", "practice",
   "mistakes", "mistakes-empty", "flagged", "flagged-empty", "recent", "progress", "progress-empty",
   "results", "results-fail", "results-practice", "review", "review-empty", "profile-modal", "password-expanded",
   "delete-account", "delete-attempt"
@@ -131,6 +132,56 @@ function safeName(value) {
             visualDefects.push(`grouped chart ${chartIndex + 1} overflows its desktop viewport`);
           }
         });
+        document.querySelectorAll(".stimulus-panel").forEach((panel, panelIndex) => {
+          const kind = panel.dataset.stimulusKind;
+          const head = panel.querySelector(".stimulus-head")?.getBoundingClientRect();
+          const content = panel.querySelector(".stimulus-content")?.getBoundingClientRect();
+          const footer = panel.querySelector(".linked-items")?.getBoundingClientRect();
+          const bounds = panel.getBoundingClientRect();
+          if (!head || !content || !footer) {
+            visualDefects.push(`stimulus panel ${panelIndex + 1} is missing a structural region`);
+          } else {
+            if (head.bottom > content.top + 1) visualDefects.push(`stimulus panel ${panelIndex + 1} header overlaps content`);
+            if (content.bottom > footer.top + 1) visualDefects.push(`stimulus panel ${panelIndex + 1} content overlaps linked items`);
+            if (innerWidth >= 1100 && [head, content, footer].some((rect) => rect.left < bounds.left - 1 || rect.right > bounds.right + 1 || rect.top < bounds.top - 1 || rect.bottom > bounds.bottom + 1)) {
+              visualDefects.push(`stimulus panel ${panelIndex + 1} has content outside its frame`);
+            }
+          }
+          const copy = panel.textContent.toLowerCase();
+          const expected = { passage: ".passage-copy", table: ".data-table-wrap", line: ".line-chart-svg", bars: ".metric-series", "grouped-bars": ".grouped-chart-svg" }[kind];
+          if (expected && !panel.querySelector(expected)) visualDefects.push(`stimulus panel ${panelIndex + 1} ${kind} visual is missing`);
+          const expanded = Boolean(panel.closest(".chart-modal"));
+          if (kind === "passage" && (copy.includes("same chart") || (!expanded && !copy.includes("open passage")))) visualDefects.push(`stimulus panel ${panelIndex + 1} uses incorrect passage copy`);
+          if (kind === "table" && (copy.includes("same chart") || (!expanded && !copy.includes("open table")))) visualDefects.push(`stimulus panel ${panelIndex + 1} uses incorrect table copy`);
+          if (kind === "line" && !expanded && !copy.includes("open graph")) visualDefects.push(`stimulus panel ${panelIndex + 1} uses incorrect graph copy`);
+        });
+        document.querySelectorAll(".hub-run-panel").forEach((panel, index) => {
+          const bounds = panel.getBoundingClientRect();
+          const ring = panel.querySelector(".hub-ring")?.getBoundingClientRect();
+          const resume = panel.querySelector(".hub-resume-button")?.getBoundingClientRect();
+          if (innerWidth >= 1100 && ring && Math.abs((ring.top - bounds.top) - (bounds.bottom - ring.bottom)) > 3) {
+            visualDefects.push(`hub run panel ${index + 1} completion ring is not vertically balanced`);
+          }
+          if (innerWidth >= 1100 && resume) {
+            const bottomInset = Math.round(bounds.bottom - resume.bottom);
+            if (bottomInset < 18 || bottomInset > 30) visualDefects.push(`hub run panel ${index + 1} resume action bottom inset is ${bottomInset}px`);
+          }
+        });
+        document.querySelectorAll(".choice").forEach((choice, index) => {
+          if (innerWidth >= 1100) return;
+          const letter = choice.querySelector(".choice-letter")?.getBoundingClientRect();
+          const label = choice.querySelector("strong")?.getBoundingClientRect();
+          const radio = choice.querySelector(".choice-radio")?.getBoundingClientRect();
+          if (letter && label && radio && (Math.abs((letter.top + letter.bottom) / 2 - (radio.top + radio.bottom) / 2) > 3 || radio.left < label.right)) {
+            visualDefects.push(`mobile choice ${index + 1} marker alignment is invalid`);
+          }
+        });
+        if (innerWidth < 1100) {
+          document.querySelectorAll(".exam-body").forEach((body, index) => {
+            const style = getComputedStyle(body);
+            if (/hidden/.test(style.overflowY) && body.scrollHeight > body.clientHeight + 2) visualDefects.push(`mobile exam body ${index + 1} clips question content`);
+          });
+        }
         return {
           viewport: [innerWidth, innerHeight],
           body: [document.body.scrollWidth, document.body.scrollHeight],

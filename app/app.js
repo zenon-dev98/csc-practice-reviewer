@@ -49,10 +49,21 @@
     "exam",
     "exam-collapsed",
     "graph",
+    "passage",
+    "data-table",
+    "metric-bars",
+    "line-chart",
+    "series-line",
+    "series-bars",
+    "long-prompt",
+    "long-choices",
     "pause",
     "submit",
     "timeout",
     "chart-modal",
+    "passage-modal",
+    "table-modal",
+    "line-modal",
     "results",
     "results-fail",
     "results-practice",
@@ -327,6 +338,24 @@
       app.modal = fixtureState === "password-expanded" ? "password" : "profile";
       if (fixtureState === "delete-account") app.modal = "delete-account";
       return setView({ name: "dashboard" });
+    }
+    const productionFixture = {
+      passage: "v07-q069",
+      "passage-modal": "v07-q069",
+      "data-table": "v01-q155",
+      "table-modal": "v01-q155",
+      "metric-bars": "v01-q159",
+      "line-chart": "v06-q163",
+      "line-modal": "v06-q163",
+      "series-line": "v02-q163",
+      "series-bars": "v04-q167",
+      "long-prompt": "v11-q068",
+      "long-choices": "v18-q154"
+    }[fixtureState];
+    if (productionFixture) {
+      active.current_question_index = applyProductionQuestionFixture(active, productionFixture);
+      if (fixtureState.endsWith("-modal")) app.modal = "chart";
+      return setView({ name: "exam", attemptId: active.id });
     }
     if (fixtureState === "graph") {
       active.current_question_index = 81;
@@ -665,6 +694,33 @@
       ],
       alt: "Luzon rises from 70 to 110, Visayas from 50 to 70, and Mindanao from 30 to 50 across January to May."
     };
+  }
+
+  function applyProductionQuestionFixture(attempt, questionId) {
+    const source = questionsById.get(questionId);
+    if (!source) return attempt.current_question_index;
+    const related = source.stimulus?.id
+      ? questionBank.filter((question) => question.version === source.version && question.stimulus?.id === source.stimulus.id)
+      : [source];
+    for (const question of related) {
+      const target = Object.values(attempt.answers).find((answer) => answer.display_number === question.itemNumber);
+      if (!target) continue;
+      Object.assign(target, {
+        section: question.section,
+        subtopic: question.subtopic,
+        csc_skill: question.cscSkill,
+        prompt: question.prompt,
+        choices: question.choices.map((choice) => ({ ...choice })),
+        correct_choice: question.correctChoice,
+        original_correct_choice: question.correctChoice,
+        explanation: question.explanation,
+        stimulus: question.stimulus || null,
+        difficulty: question.difficulty,
+        selected_choice: null,
+        skipped: false
+      });
+    }
+    return source.itemNumber - 1;
   }
 
   function normalizeAttempt(row) {
@@ -1737,9 +1793,10 @@
 
   function chartModal(attempt, answer) {
     if (app.modal !== "chart" || !answer?.stimulus) return "";
+    const presentation = stimulusPresentation(answer.stimulus);
     return `
       <div class="modal-backdrop chart-backdrop">
-        <section class="chart-modal" role="dialog" aria-modal="true" aria-label="Expanded chart" tabindex="-1">
+        <section class="chart-modal stimulus-modal ${presentation.className}" role="dialog" aria-modal="true" aria-label="Expanded ${presentation.noun}" tabindex="-1">
           <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
           ${renderStimulusPanel(attempt, answer, linkedStimulusAnswers(attempt, answer), true)}
         </section>
@@ -2109,51 +2166,105 @@
   function renderStimulusPanel(attempt, answer, linked, reviewMode = false) {
     const stimulus = answer.stimulus;
     if (!stimulus) return "";
-    const rows = toArray(stimulus.rows);
-    const headers = toArray(stimulus.headers);
-    const groupedChart = stimulus.chartType === "grouped-bars" ? renderGroupedBarChart(stimulus) : "";
-    const seriesChart = !groupedChart && ["bar-table", "line-table"].includes(stimulus.kind)
-      ? renderTabularSeriesChart(stimulus)
+    const presentation = stimulusPresentation(stimulus);
+    const tableData = stimulusTableData(stimulus);
+    const groupedChart = presentation.visual === "grouped-bars" ? renderGroupedBarChart(stimulus) : "";
+    const seriesChart = ["bars", "line"].includes(presentation.visual) ? renderTabularSeriesChart(stimulus, presentation.visual) : "";
+    const description = stimulus.description || stimulus.altText || stimulus.alt || "";
+    const passage = presentation.visual === "passage"
+      ? `<article class="passage-copy" aria-label="Passage text">${String(description).split(/\n{2,}/).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}</article>`
       : "";
+    const directTable = presentation.visual === "table" ? renderStimulusDataTable(tableData) : "";
+    const exactValues = !["table", "passage"].includes(presentation.visual) ? renderExactValues(tableData) : "";
     return `
-      <section class="stimulus-panel">
-        <div class="stimulus-head">
+      <section class="stimulus-panel ${presentation.className}" data-stimulus-kind="${presentation.visual}">
+        <header class="stimulus-head">
           <div>
             <span>${escapeHtml(stimulus.label || linked.label)}</span>
             <h2>${escapeHtml(stimulus.title || "Shared data set")}</h2>
-            <p>${escapeHtml(stimulus.description || stimulus.alt || "")}</p>
+            ${presentation.visual === "passage" ? "" : `<p>${escapeHtml(description)}</p>`}
           </div>
-          ${reviewMode ? "" : `<button class="btn tiny" data-action="open-chart" type="button">${icon("open")} Open Larger</button>`}
+          ${reviewMode ? "" : `<button class="btn tiny" data-action="open-chart" type="button" aria-label="Open ${presentation.noun} in a larger view">${icon("open")} ${presentation.openLabel}</button>`}
+        </header>
+        <div class="stimulus-content">
+          ${passage || groupedChart || seriesChart || directTable || `<p class="stimulus-fallback">${escapeHtml(description)}</p>`}
+          ${exactValues}
         </div>
-        ${groupedChart || seriesChart}
-        ${!groupedChart && headers.length && rows.length ? `<div class="data-table-wrap"><table><thead><tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : ""}
-        <div class="linked-items">
+        <footer class="linked-items">
           <strong>${escapeHtml(linked.label)}</strong>
           <div>${linked.items.map((item) => `<button class="${item.position === attempt.current_question_index ? "active" : ""}" data-goto="${item.position}" type="button">${item.display_number}</button>`).join("")}</div>
-          <p>These questions are connected and use the same chart.</p>
-        </div>
+          <p>These questions use the same ${presentation.noun}.</p>
+        </footer>
       </section>
     `;
   }
 
-  function renderTabularSeriesChart(stimulus) {
+  function stimulusPresentation(stimulus) {
+    const kind = String(stimulus?.kind || "").toLowerCase();
+    const chartType = String(stimulus?.chartType || "").toLowerCase();
+    if (kind === "passage" || kind === "reading") return { visual: "passage", noun: "passage", openLabel: "Open Passage", className: "passage-stimulus" };
+    if (chartType === "line" || kind === "line-table") return { visual: "line", noun: "graph", openLabel: "Open Graph", className: "line-stimulus" };
+    if (chartType === "grouped-bars" || chartType === "bar") return { visual: "grouped-bars", noun: "chart", openLabel: "Open Chart", className: "grouped-stimulus" };
+    if (kind === "bar-table") return { visual: "bars", noun: "chart", openLabel: "Open Chart", className: "bar-stimulus" };
+    if (toArray(stimulus?.headers).length && toArray(stimulus?.rows).length) return { visual: "table", noun: "table", openLabel: "Open Table", className: "table-stimulus" };
+    return { visual: "reference", noun: "reference", openLabel: "Open Reference", className: "reference-stimulus" };
+  }
+
+  function stimulusTableData(stimulus) {
     const headers = toArray(stimulus.headers);
     const rows = toArray(stimulus.rows);
-    if (headers.length < 2 || !rows.length) return "";
+    if (headers.length && rows.some((row) => toArray(row).length > 1)) return { headers, rows };
+    const series = toArray(stimulus.series);
+    if (!rows.length || !series.length) return { headers: [], rows: [] };
+    return {
+      headers: [stimulus.xLabel || "Category", ...series.map((entry) => entry.label)],
+      rows: rows.map((row, index) => [row[0], ...series.map((entry) => toArray(entry.values)[index])])
+    };
+  }
+
+  function renderStimulusDataTable(tableData) {
+    if (!tableData.headers.length || !tableData.rows.length) return "";
+    return `<div class="data-table-wrap" tabindex="0"><table><thead><tr>${tableData.headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr></thead><tbody>${tableData.rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+  }
+
+  function renderExactValues(tableData) {
+    const table = renderStimulusDataTable(tableData);
+    return table ? `<details class="exact-values"><summary>Exact values</summary>${table}</details>` : "";
+  }
+
+  function stimulusSeries(stimulus) {
+    const rows = toArray(stimulus.rows);
     const colors = ["#20d6d0", "#2f86ff", "#58d568", "#ffb020", "#a855f7"];
-    const series = headers.slice(1).map((label, index) => ({
+    const authored = toArray(stimulus.series).map((entry, index) => ({
+      label: entry.label,
+      color: entry.color || colors[index % colors.length],
+      rawValues: toArray(entry.values),
+      values: toArray(entry.values).map(Number)
+    }));
+    const headers = toArray(stimulus.headers);
+    const derived = headers.slice(1).map((label, index) => ({
       label,
       color: colors[index % colors.length],
       rawValues: rows.map((row) => row[index + 1]),
-      values: rows.map((row) => Number(row[index + 1])),
-    })).filter((entry) => entry.values.every(Number.isFinite));
-    if (!series.length) return "";
+      values: rows.map((row) => Number(row[index + 1]))
+    }));
+    const valid = (authored.length ? authored : derived).filter((entry) => entry.values.length === rows.length && entry.values.every(Number.isFinite));
+    const legendLabels = toArray(stimulus.legend).map((entry) => String(entry).split(":").slice(1).join(":").trim().toLowerCase()).filter(Boolean);
+    if (!legendLabels.length) return valid;
+    const normalize = (value) => String(value).toLowerCase().replace(/\([^)]*\)/g, "").replace(/\b(line|bars?)\b/g, "").trim();
+    const matched = valid.filter((entry) => legendLabels.some((label) => normalize(entry.label).includes(normalize(label)) || normalize(label).includes(normalize(entry.label))));
+    return matched.length ? matched : valid;
+  }
+
+  function renderTabularSeriesChart(stimulus, visual) {
+    const rows = toArray(stimulus.rows);
+    const series = stimulusSeries(stimulus);
+    if (!rows.length || !series.length) return "";
+    if (visual === "line") return renderMultiLineChart(stimulus, series, rows);
 
     return `
-      <div class="series-visual-grid ${stimulus.kind}" role="group" aria-label="${escapeAttr(stimulus.alt || stimulus.title || "Data visualization")}">
-        ${series.map((entry) => stimulus.kind === "line-table"
-          ? renderSeriesLine(entry, rows)
-          : renderSeriesBars(entry, rows)).join("")}
+      <div class="series-visual-grid bar-series-grid" role="group" aria-label="${escapeAttr(stimulus.altText || stimulus.alt || stimulus.title || "Data visualization")}">
+        ${series.map((entry) => renderSeriesBars(entry, rows)).join("")}
       </div>
     `;
   }
@@ -2172,27 +2283,56 @@
     `;
   }
 
-  function renderSeriesLine(series, rows) {
-    const min = Math.min(...series.values);
-    const max = Math.max(...series.values);
-    const range = max - min || 1;
-    const width = 260;
-    const points = series.values.map((value, index) => {
-      const x = series.values.length === 1 ? width / 2 : 12 + (index * (width - 24)) / (series.values.length - 1);
-      const y = 55 - ((value - min) / range) * 38;
-      return { x, y, value };
-    });
+  function renderMultiLineChart(stimulus, series, rows) {
+    const values = series.flatMap((entry) => entry.values);
+    const rawMin = Math.min(...values);
+    const rawMax = Math.max(...values);
+    const span = Math.max(1, rawMax - rawMin);
+    const roughStep = span / 5;
+    const magnitude = 10 ** Math.floor(Math.log10(roughStep));
+    const normalizedStep = roughStep / magnitude;
+    const step = (normalizedStep <= 1 ? 1 : normalizedStep <= 2 ? 2 : normalizedStep <= 5 ? 5 : 10) * magnitude;
+    const min = Math.floor((rawMin - step * 0.35) / step) * step;
+    const max = Math.ceil((rawMax + step * 0.35) / step) * step;
+    const ticks = Array.from({ length: Math.round((max - min) / step) + 1 }, (_, index) => max - index * step);
+    const width = 620;
+    const height = 330;
+    const plot = { left: 66, right: 20, top: 30, bottom: 64 };
+    const plotWidth = width - plot.left - plot.right;
+    const plotHeight = height - plot.top - plot.bottom;
+    const formatNumber = (value) => Number.isInteger(value) ? String(value) : value.toFixed(1).replace(/\.0$/, "");
+    const xFor = (index) => rows.length === 1 ? plot.left + plotWidth / 2 : plot.left + (index * plotWidth) / (rows.length - 1);
+    const yFor = (value) => plot.top + ((max - value) / Math.max(step, max - min)) * plotHeight;
     return `
-      <section class="metric-series line-series">
-        <h3><i style="background:${escapeAttr(series.color)}"></i>${escapeHtml(series.label)}</h3>
-        <svg viewBox="0 0 ${width} 68" role="img" aria-label="${escapeAttr(`${series.label}: ${series.values.join(", ")}`)}">
-          <line x1="12" y1="55" x2="248" y2="55"></line>
-          <polyline points="${points.map((point) => `${point.x},${point.y}`).join(" ")}" style="stroke:${escapeAttr(series.color)}"></polyline>
-          ${points.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="3.5" style="fill:${escapeAttr(series.color)}"></circle>`).join("")}
-        </svg>
-        <div class="metric-values">${series.values.map((value, index) => `<span><small>${escapeHtml(rows[index][0])}</small><strong>${escapeHtml(value)}</strong></span>`).join("")}</div>
-      </section>
+      <div class="line-chart" role="group" aria-label="${escapeAttr(stimulus.altText || stimulus.alt || stimulus.title || "Line graph")}">
+        <div class="chart-legend">${series.map((entry) => `<span><i style="background:${escapeAttr(entry.color)}"></i>${escapeHtml(entry.label)}</span>`).join("")}</div>
+        <div class="line-chart-viewport" tabindex="0">
+          <svg class="line-chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" role="img">
+            <title>${escapeHtml(stimulus.title || "Line graph")}</title>
+            <desc>${escapeHtml(stimulus.altText || stimulus.alt || "Values are labeled at every point.")}</desc>
+            ${ticks.map((tick) => {
+              const y = yFor(tick);
+              return `<g class="chart-grid"><line x1="${plot.left}" y1="${y}" x2="${width - plot.right}" y2="${y}"></line><text x="${plot.left - 10}" y="${y + 4}" text-anchor="end">${formatNumber(tick)}</text></g>`;
+            }).join("")}
+            <text class="chart-axis-title chart-y-title" x="18" y="${plot.top + plotHeight / 2}" text-anchor="middle" transform="rotate(-90 18 ${plot.top + plotHeight / 2})">${escapeHtml(stimulusAxisLabel(stimulus, series))}</text>
+            ${series.map((entry) => {
+              const points = entry.values.map((value, index) => ({ x: xFor(index), y: yFor(value), value }));
+              return `<g class="line-series-path" data-series="${escapeAttr(entry.label)}"><polyline points="${points.map((point) => `${point.x},${point.y}`).join(" ")}" stroke="${escapeAttr(entry.color)}"></polyline>${points.map((point, index) => `<circle cx="${point.x}" cy="${point.y}" r="4.5" fill="${escapeAttr(entry.color)}"><title>${escapeHtml(`${entry.label}, ${rows[index][0]}: ${formatNumber(point.value)}`)}</title></circle><text class="chart-value" x="${point.x}" y="${Math.max(plot.top + 12, point.y - 9)}" text-anchor="middle">${formatNumber(point.value)}</text>`).join("")}</g>`;
+            }).join("")}
+            ${rows.map((row, index) => `<text class="chart-category" x="${xFor(index)}" y="${plot.top + plotHeight + 28}" text-anchor="middle">${escapeHtml(row[0])}</text>`).join("")}
+            <text class="chart-axis-title chart-x-title" x="${plot.left + plotWidth / 2}" y="${height - 8}" text-anchor="middle">${escapeHtml(stimulus.xLabel || "")}</text>
+          </svg>
+        </div>
+      </div>
     `;
+  }
+
+  function stimulusAxisLabel(stimulus, series) {
+    if (stimulus.yLabel) return stimulus.yLabel;
+    const unit = String(stimulus.description || "").match(/\bunit:\s*([^.;]+)/i)?.[1]?.trim();
+    if (unit) return unit;
+    const units = series.map((entry) => String(entry.label || "").match(/\(([^)]+)\)/)?.[1]?.trim()).filter(Boolean);
+    return units.length && units.every((entry) => entry === units[0]) ? units[0] : "Reported value";
   }
 
   function renderGroupedBarChart(stimulus) {
@@ -3544,8 +3684,9 @@
     const items = stimulusId
       ? Object.values(attempt.answers).filter((candidate) => candidate.stimulus?.id === stimulusId).sort(byPosition)
       : [answer];
+    const presentation = stimulusPresentation(answer.stimulus);
     return {
-      label: items.length > 1 ? `Chart for Items ${items[0].display_number}-${items[items.length - 1].display_number}` : "Reference",
+      label: answer.stimulus?.label || (items.length > 1 ? `${presentation.noun[0].toUpperCase()}${presentation.noun.slice(1)} for Items ${items[0].display_number}-${items[items.length - 1].display_number}` : "Reference"),
       items
     };
   }

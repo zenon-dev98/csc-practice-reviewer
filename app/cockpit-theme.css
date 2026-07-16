@@ -2880,25 +2880,37 @@ body::before {
 }
 #app .exam-body.with-stimulus .question-panel { height: 816px !important; }
 #app .stimulus-panel {
-  display: flex;
+  display: grid;
   min-width: 0;
   min-height: 0;
   border: 1px solid #315660 !important;
   border-radius: 0 !important;
-  flex-direction: column;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   padding: 18px !important;
-  overflow: auto;
+  overflow: hidden;
   background:
     linear-gradient(135deg, rgba(35, 128, 143, 0.16), transparent 36%),
     #07161c !important;
   box-shadow: inset 0 0 34px rgba(33, 222, 215, 0.035) !important;
   clip-path: polygon(0 10px, 10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+  gap: 12px;
 }
-#app .stimulus-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+#app .stimulus-head { display: flex; min-width: 0; align-items: flex-start; justify-content: space-between; gap: 14px; }
+#app .stimulus-head > div { min-width: 0; }
 #app .stimulus-head span { color: var(--cockpit-blue); font: 700 12px/1 var(--hud-font); text-transform: uppercase; }
-#app .stimulus-head h2 { margin: 5px 0; color: #edf6f4; font: 700 23px/1 var(--hud-font); }
-#app .stimulus-head p { margin: 0; color: #91a6aa; font: 500 13px/1.3 var(--reading-font); }
-#app .grouped-chart, #app .chart-bars, #app .data-table-wrap { min-height: 0; flex: 1; margin-top: 12px; }
+#app .stimulus-head h2 { margin: 6px 0 0; color: #edf6f4; font: 700 23px/1.08 var(--hud-font); }
+#app .stimulus-head p { max-width: 54ch; margin: 6px 0 0; color: #91a6aa; font: 500 13px/1.35 var(--reading-font); }
+#app .stimulus-head .btn { flex: none; white-space: nowrap; }
+#app .stimulus-content { min-width: 0; min-height: 0; overflow: auto; scrollbar-color: #36555d transparent; scrollbar-width: thin; }
+#app .stimulus-content::-webkit-scrollbar,
+#app .data-table-wrap::-webkit-scrollbar { width: 4px; height: 4px; }
+#app .stimulus-content::-webkit-scrollbar-thumb,
+#app .data-table-wrap::-webkit-scrollbar-thumb { background: #36555d; }
+#app .passage-copy { max-width: 68ch; border-left: 2px solid rgba(33, 222, 215, .5); padding: 4px 18px 8px; color: #c7d7d7; font: 500 16px/1.55 var(--reading-font); }
+#app .passage-copy p { margin: 0 0 14px; }
+#app .passage-copy p:last-child { margin-bottom: 0; }
+#app .stimulus-fallback { margin: 0; color: #c0d0d0; font: 500 15px/1.5 var(--reading-font); }
+#app .stimulus-data-stack { min-height: 0; }
 #app .grouped-chart { color: #cbd8d8; }
 #app .series-visual-grid {
   display: grid;
@@ -2934,15 +2946,6 @@ body::before {
 #app .metric-bars > div > i { height: 6px; background: #173039; }
 #app .metric-bars > div > i > b { display: block; min-width: 3px; height: 100%; }
 #app .metric-bars > div > strong { color: #edf7f5; text-align: right; }
-#app .line-series svg { display: block; width: 100%; height: 68px; overflow: visible; }
-#app .line-series svg line { stroke: #29464f; stroke-width: 1; }
-#app .line-series svg polyline { fill: none; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
-#app .metric-values { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
-#app .metric-values span { min-width: 0; text-align: center; }
-#app .metric-values small,
-#app .metric-values strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-#app .metric-values small { color: #789095; font: 600 9px/1.1 var(--reading-font); }
-#app .metric-values strong { margin-top: 3px; color: #dce9e8; font: 700 11px/1 var(--hud-font); }
 #app .chart-legend { display: flex; flex-wrap: wrap; justify-content: center; color: #a7b9bb; font: 600 12px/1.2 var(--reading-font); gap: 8px 18px; }
 #app .chart-legend span { display: flex; align-items: center; gap: 6px; }
 #app .chart-legend i { width: 10px; height: 10px; flex: none; }
@@ -2956,7 +2959,31 @@ body::before {
 #app .grouped-chart-svg .chart-category { fill: #a8bbbd; font-size: 13px; font-weight: 700; }
 #app .grouped-chart-svg .chart-value { fill: #f1f7f6; font-size: 11px; font-weight: 700; paint-order: stroke; stroke: #061016; stroke-width: 3px; stroke-linejoin: round; }
 #app .grouped-chart-svg .chart-bar { shape-rendering: geometricPrecision; }
-#app .linked-items { border-top: 1px solid #2c454d; margin-top: 12px; padding-top: 10px; }
+#app .line-chart { display: grid; min-height: 300px; grid-template-rows: auto minmax(0, 1fr); gap: 8px; }
+#app .line-chart-viewport { display: grid; min-width: 0; min-height: 0; place-items: center; overflow: hidden; }
+#app .line-chart-svg { display: block; width: 100%; height: 100%; min-height: 270px; max-height: 350px; font-family: var(--hud-font); }
+#app .line-chart-svg .chart-grid line { stroke: #365158; stroke-width: 1; stroke-dasharray: 3 4; vector-effect: non-scaling-stroke; }
+#app .line-chart-svg .chart-grid text { fill: #81979b; font-size: 12px; }
+#app .line-chart-svg .chart-axis-title { fill: #8ea4a8; font: 600 12px/1 var(--reading-font); }
+#app .line-chart-svg .chart-category { fill: #a8bbbd; font-size: 12px; font-weight: 700; }
+#app .line-chart-svg .chart-value { fill: #f1f7f6; font-size: 11px; font-weight: 700; paint-order: stroke; stroke: #061016; stroke-width: 3px; stroke-linejoin: round; }
+#app .line-series-path polyline { fill: none; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+#app .line-series-path circle { stroke: #061016; stroke-width: 2; vector-effect: non-scaling-stroke; }
+#app .data-table-wrap { min-width: 0; overflow: auto; border: 1px solid #2b4851; }
+#app .data-table-wrap table { width: 100%; min-width: 420px; border-collapse: collapse; color: #c8d8d8; font: 500 13px/1.25 var(--reading-font); }
+#app .data-table-wrap th,
+#app .data-table-wrap td { border-right: 1px solid #243d45; border-bottom: 1px solid #243d45; padding: 10px 12px; text-align: right; vertical-align: middle; }
+#app .data-table-wrap th:first-child,
+#app .data-table-wrap td:first-child { position: sticky; left: 0; z-index: 1; background: #09191f; text-align: left; }
+#app .data-table-wrap th { position: sticky; z-index: 2; top: 0; background: #0c2229; color: #edf6f4; font-weight: 700; }
+#app .data-table-wrap th:first-child { z-index: 3; }
+#app .data-table-wrap tr:last-child td { border-bottom: 0; }
+#app .data-table-wrap th:last-child,
+#app .data-table-wrap td:last-child { border-right: 0; }
+#app .exact-values { margin-top: 10px; border: 1px solid #29464f; background: #08181e; }
+#app .exact-values summary { cursor: pointer; padding: 9px 12px; color: var(--cockpit-cyan); font: 700 12px/1 var(--hud-font); text-transform: uppercase; }
+#app .exact-values .data-table-wrap { border-width: 1px 0 0; }
+#app .linked-items { border-top: 1px solid #2c454d; margin: 0; padding-top: 10px; }
 #app .linked-items strong { color: #d8e4e3; font-size: 13px; }
 #app .linked-items div { display: flex; margin-top: 7px; gap: 5px; }
 #app .linked-items button { width: 34px; height: 30px; border: 1px solid #3e565d; background: #0a191e; color: #a6b8ba; }
@@ -3440,7 +3467,9 @@ body::before {
   #app .mobile-nav-close { display: grid; position: absolute; top: 14px; right: 12px; }
   #app .exam-question { display: block !important; height: auto !important; min-height: calc(100vh - 112px) !important; padding: 12px !important; overflow: visible !important; }
   #app .exam-body.with-stimulus .exam-question { display: block !important; }
-  #app .stimulus-panel { min-height: 460px; margin-bottom: 12px; }
+  #app .stimulus-panel { min-height: 0; margin-bottom: 12px; overflow: visible; }
+  #app .stimulus-content { overflow: visible; }
+  #app .passage-copy { max-width: none; font-size: 16px; }
   #app .question-panel, #app .exam-body.with-stimulus .question-panel { display: block !important; height: auto !important; min-height: 620px !important; padding: 17px 14px !important; }
   #app .prompt { margin: 15px 0 !important; font-size: 17px !important; }
   #app .choices { overflow: visible; }
@@ -5279,8 +5308,10 @@ html body #app .count-segments input {
 }
 
 @media (max-width: 1099px) {
-  html body #app .grouped-chart { min-height: 310px; }
-  html body #app .grouped-chart-viewport {
+  html body #app .grouped-chart,
+  html body #app .line-chart { min-height: 310px; }
+  html body #app .grouped-chart-viewport,
+  html body #app .line-chart-viewport {
     display: block;
     place-items: start;
     overflow-x: auto;
@@ -5288,11 +5319,14 @@ html body #app .count-segments input {
     scrollbar-color: #3e5b62 transparent;
     scrollbar-width: thin;
   }
-  html body #app .grouped-chart-viewport::-webkit-scrollbar { height: 4px; }
-  html body #app .grouped-chart-viewport::-webkit-scrollbar-thumb { background: #3e5b62; }
-  html body #app .grouped-chart-svg {
-    width: 520px;
-    min-width: 520px;
+  html body #app .grouped-chart-viewport::-webkit-scrollbar,
+  html body #app .line-chart-viewport::-webkit-scrollbar { height: 4px; }
+  html body #app .grouped-chart-viewport::-webkit-scrollbar-thumb,
+  html body #app .line-chart-viewport::-webkit-scrollbar-thumb { background: #3e5b62; }
+  html body #app .grouped-chart-svg,
+  html body #app .line-chart-svg {
+    width: 620px;
+    min-width: 620px;
     height: 306px;
     min-height: 306px;
     max-height: none;
@@ -6725,7 +6759,7 @@ html body #app .count-segments input {
 
   html body #app .exam-body.with-stimulus .stimulus-panel {
     display: grid !important;
-    grid-template-rows: 94px minmax(0,1fr) 108px !important;
+    grid-template-rows: auto minmax(0,1fr) auto !important;
     border: 1px solid #3a5962 !important;
     border-radius: 0 !important;
     padding: 18px 22px !important;
