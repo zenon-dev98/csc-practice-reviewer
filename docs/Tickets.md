@@ -1,5 +1,45 @@
 # Tickets
 
+## T0040 - Enforced QA Gates And Complete V5 Rework
+
+Status: in_progress
+
+Convert the repository's visual and interaction quality rules into executable
+release gates, then implement the complete approved V5 parity, audio, avatar,
+exam, results, review, account, and responsive rework recorded in
+`docs/TEMP_V5_PARITY_REWORK_DECISIONS.md`.
+
+Acceptance criteria:
+
+- Required state and interaction coverage is declared before execution; a
+  missing required control, skipped branch, missing screenshot, or unexecuted
+  check fails the release.
+- Functional correctness, human interaction reachability, optical parity, and
+  live deployment verification produce separate verdicts and evidence.
+- Reachability tests use visible user input and never depend on DOM mutation,
+  forced scrolling, or hidden-element clicks to prove usability.
+- Approved V5 references have an explicit manifest covering page/state,
+  viewport, geometry anchors, typography, icons, colors, scroll ownership, and
+  required interactions.
+- The More/Less navigator path is exercised from a real collapsed state through
+  item 80 and back to item 21, with every intermediate state captured and no
+  silent conditional skip.
+- Every confirmed product and visual decision in the T0040 specification is
+  implemented without regressing exam, persistence, privacy, or content
+  invariants.
+- Local automated checks, the required desktop/mobile matrix, maximized
+  external Edge at 100% zoom, and the cache-busted live deployment all pass
+  against the final build.
+
+Implementation notes (2026-07-18):
+
+- Implemented the approved wall-clock timer, stable HUD digits, 1-4/numpad answer shortcuts, Enter-to-advance/final-confirmation behavior, static Practice/Review mode rail, dynamic six-insight Results selection, V5 pass/fail geometry, nickname plus staged 20-avatar selection, and complete audio controls.
+- Added six local Cafe Jazz and six local Classical tracks with source/license records, no-repeat shuffle-bag ordering, previous/next controls, independent music/effects volume, mute, and four restrained synthesized effect families. Music and effects remain off by default and playback requires user gesture.
+- Repaired Progress row/footer overlap and allowed two-line Results insight values instead of truncating section names.
+- `npm run check` passes for 20 versions and 3,400 questions with zero exact, normalized-template, shuffled-choice, ambiguous-logic, or structural findings. All production questions remain honestly marked `needs_review` pending qualified second review.
+- The archived visible interaction evidence confirms collapsed-to-More, item 80, return-to-item 21, and Less without a fixture reset. The final local Edge rerun is blocked before launch by host `spawn EPERM`; final live replay remains required before this ticket can be marked done.
+
+
 ## T0039 - Restore V5 Mock Exam Instrument Deck
 
 Status: done

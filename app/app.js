@@ -10,11 +10,31 @@
   const AUDIO_PREFS_KEY = "csc-reviewer-audio";
   const QA_TIMING_ENABLED = new URLSearchParams(location.search).get("qaTiming") === "1";
   const AVATAR_OPTIONS = [
-    ["cat", "\u{1F431}"], ["dog", "\u{1F436}"], ["cow", "\u{1F42E}"], ["fox", "\u{1F98A}"], ["panda", "\u{1F43C}"],
-    ["rabbit", "\u{1F430}"], ["bear", "\u{1F43B}"], ["tiger", "\u{1F42F}"], ["lion", "\u{1F981}"], ["koala", "\u{1F428}"],
-    ["frog", "\u{1F438}"], ["owl", "\u{1F989}"], ["penguin", "\u{1F427}"], ["duck", "\u{1F986}"], ["pig", "\u{1F437}"],
-    ["monkey", "\u{1F435}"], ["deer", "\u{1F98C}"], ["sheep", "\u{1F411}"], ["hamster", "\u{1F439}"], ["turtle", "\u{1F422}"]
+    "cat", "dog", "cow", "fox", "panda",
+    "rabbit", "bear", "tiger", "lion", "koala",
+    "frog", "owl", "penguin", "duck", "pig",
+    "monkey", "deer", "sheep", "hamster", "turtle"
   ];
+  const AVATAR_SPRITE_COLUMNS = [75.1, 80.6, 86.2, 91.7, 97.1];
+  const AVATAR_SPRITE_ROWS = [30.9, 40.7, 50.5, 60.4];
+  const MUSIC_LIBRARY = {
+    cafe: [
+      { title: "After Hours", artist: "Alex McCulloch", src: "assets/audio/music/cafe-after-hours.mp3" },
+      { title: "Blue Cup", artist: "Alex McCulloch", src: "assets/audio/music/cafe-blue-cup.mp3" },
+      { title: "Corner Table", artist: "Spring Spring", src: "assets/audio/music/cafe-corner-table.ogg" },
+      { title: "Late Morning", artist: "Alex McCulloch", src: "assets/audio/music/cafe-late-morning.mp3" },
+      { title: "Rain on Glass", artist: "Alex McCulloch", src: "assets/audio/music/cafe-rain-on-glass.mp3" },
+      { title: "Quiet Espresso", artist: "Ruskerdax", src: "assets/audio/music/cafe-quiet-espresso.mp3" }
+    ],
+    classical: [
+      { title: "Classical Pop", artist: "Alex McCulloch", src: "assets/audio/music/classical-pop.mp3" },
+      { title: "Fantasy Orchestral", artist: "Joth", src: "assets/audio/music/classical-fantasy-orchestral.mp3" },
+      { title: "Calm Theme", artist: "Pebonius", src: "assets/audio/music/classical-calm-theme.ogg" },
+      { title: "Orchestring", artist: "Tozan", src: "assets/audio/music/classical-orchestring.ogg" },
+      { title: "Forget Me Not", artist: "Kistol", src: "assets/audio/music/classical-forget-me-not.ogg" },
+      { title: "Emotional Piano", artist: "Centurion of War", src: "assets/audio/music/classical-emotional-piano.ogg" }
+    ]
+  };
   const generatedVersions = window.CSC_EXAM_VERSIONS || [];
   const generatedQuestions = generatedVersions.flatMap((version) => version.questions || []);
   const sourceQuestions = window.CSC_QUESTIONS || [];
@@ -126,12 +146,17 @@
     flushing: false,
     pendingQuestionEntry: new Map(),
     expandedNavGroups: new Set(),
+    openNavGroups: new Set(),
     reviewFilter: "all",
     recentTab: "all",
     practiceReviewTab: "practice",
     audioMenuOpen: false,
     audio: loadAudioPreferences(),
     audioElements: null,
+    audioContext: null,
+    audioUserGesture: false,
+    audioHistory: [],
+    audioShuffleBag: [],
     accountAvatarDraft: null,
     examNavScrollTop: 0,
     examNavDrag: null,
@@ -154,7 +179,6 @@
       if (document.visibilityState === "hidden") {
         recordVisibilityEvent("hidden");
         flushDirty({ immediate: true });
-        pauseBackgroundMusic();
       } else {
         recordVisibilityEvent("visible");
         syncBackgroundMusic();
@@ -164,6 +188,7 @@
     document.addEventListener("submit", handleSubmit);
     document.addEventListener("input", handleInput);
     document.addEventListener("change", handleChange);
+    document.addEventListener("toggle", handleDetailsToggle, true);
     document.addEventListener("keydown", handleKeydown);
     document.addEventListener("pointerdown", handlePointerDown, { passive: false });
     document.addEventListener("pointermove", handlePointerMove, { passive: false });
@@ -264,6 +289,7 @@
     app.recentTab = "all";
     app.practiceReviewTab = "practice";
     app.expandedNavGroups.clear();
+    app.openNavGroups.clear();
 
     const active = getAttempt("fixture-active");
     const submitted = getAttempt("fixture-submitted");
@@ -402,6 +428,10 @@
     app.profile.nickname = app.profile.nickname || user.user_metadata?.nickname || "";
     app.profile.avatar_preset = Number(app.profile.avatar_preset || user.user_metadata?.avatar_preset || 0);
     app.attempts = (attemptsResult.data || []).map(normalizeAttempt);
+    app.attempts.filter((attempt) => attempt._clockMigrated).forEach((attempt) => {
+      delete attempt._clockMigrated;
+      touchAttempt(attempt);
+    });
     app.draft = draftResult.data;
     app.updates = updatesResult.data || [];
   }
@@ -733,12 +763,17 @@
         answer_history: toArray(answer.answer_history)
       };
     }
-    return {
+    const attempt = {
       ...row,
       question_order: toArray(row.question_order),
       options: row.options || {},
       answers
     };
+    if (attempt.total_time_seconds && !attempt.options?.timerClock) {
+      ensureAttemptClock(attempt);
+      attempt._clockMigrated = true;
+    }
+    return attempt;
   }
 
   function toArray(value) {
@@ -752,7 +787,7 @@
     app.audioMenuOpen = false;
     render();
     syncBackgroundMusic();
-    if (view.name === "results" && previousView !== "results") playSound("result");
+    if (view.name === "results" && previousView !== "results") playSound("confirmation");
   }
 
   function render() {
@@ -1002,7 +1037,7 @@
       : formatDuration(TOTAL_TIME_SECONDS);
     const runCheckpoint = activeAttempt ? `Item ${activeAttempt.current_question_index + 1}` : "Ready to begin";
     root.innerHTML = authedShell(`
-      <section class="study-hub simplified-hub">
+      <section class="study-hub simplified-hub" data-motion-purpose="page-enter">
         <div class="hub-grid-pattern" aria-hidden="true"></div>
         <div class="hub-stage">
           <header class="hub-hero">
@@ -1110,7 +1145,7 @@
     const draftOptions = { ...DEFAULT_OPTIONS, ...(app.draft?.options || {}) };
     const savedVersionId = draftOptions.versionId || examVersions[0]?.id;
     root.innerHTML = authedShell(`
-      <section class="setup-page">
+      <section class="setup-page" data-motion-purpose="page-enter">
         <div class="page-title-row">
           <div>
             <h1>Mock Exam Setup</h1>
@@ -1164,6 +1199,7 @@
   function renderExam() {
     const attempt = getAttempt(app.view.attemptId);
     if (!attempt) return setView({ name: "dashboard" });
+    materializeQuestionClock(attempt);
     const current = currentAnswer(attempt);
     if (!current) return setView({ name: "dashboard" });
     const remaining = timeRemaining(attempt);
@@ -1171,25 +1207,25 @@
     const isPaused = attempt.status === "paused";
     const existingNav = root.querySelector(".exam-nav");
     if (existingNav) app.examNavScrollTop = existingNav.scrollTop;
-    attempt._lastTickMs = performance.now();
+    ensureAttemptClock(attempt);
 
     const version = examVersions.find((candidate) => candidate.id === attempt.exam_version_id);
-    const runLabel = attempt.mode === "practice" ? escapeHtml(attempt.title || "Practice") : `Mock Exam ${version ? String(version.number).padStart(2, "0") : ""}`.trim();
+    const versionNumber = app.fixtureMode ? 7 : version?.number;
+    const runLabel = attempt.mode === "practice" ? escapeHtml(attempt.title || "Practice") : `Mock Exam ${versionNumber ? String(versionNumber).padStart(2, "0") : ""}`.trim();
     root.innerHTML = cockpitFrame(`
-      <section class="exam-shell ${app.fixtureMode ? "fixture-exam" : ""} state-${escapeAttr(app.fixtureState || "live")} ${isPaused ? "is-paused" : ""} ${isPaused || app.modal === "submit" ? "exam-dimmed" : ""}">
+      <section class="exam-shell ${app.fixtureMode ? "fixture-exam" : ""} state-${escapeAttr(app.fixtureState || "live")} ${isPaused ? "is-paused" : ""} ${isPaused || app.modal === "submit" ? "exam-dimmed" : ""}" data-motion-purpose="page-enter">
         <header class="exam-topbar">
           <div class="exam-brand">${logo()}<div><strong>CSC Practice Reviewer</strong><span>Independent mock exam and review tool</span></div></div>
-          <div class="exam-status">
-            <strong>${runLabel}</strong>
-            <div>
-              <span class="exam-time">${attempt.mode === "practice" ? "Untimed Practice" : attempt.options?.showTimer === false ? "Timer hidden" : `${isPaused ? "Paused" : "Time Left:"} ${formatDuration(remaining)}`}</span>
-              <span class="exam-answered">Answered: ${answeredCount(attempt)}/${attempt.total_questions}</span>
-              ${attempt.mode === "practice" ? `<span class="exam-difficulty">${escapeHtml(statusLabel(attempt.options?.difficulty || "mixed"))} / ${attempt.total_questions} items</span>` : ""}
-            </div>
+          <div class="exam-status" aria-label="Exam status">
+            <div class="exam-hud-cell exam-run-cell"><span>Run</span><strong>${runLabel}</strong></div>
+            <div class="exam-hud-cell exam-time-cell"><span>${attempt.mode === "practice" ? "Mode" : isPaused ? "Timer" : "Time Left"}</span><strong class="exam-time"><b class="exam-time-value">${attempt.mode === "practice" ? "Untimed" : attempt.options?.showTimer === false ? "Hidden" : formatDuration(remaining)}</b></strong></div>
+            <div class="exam-hud-cell exam-answered-cell"><span>Answered</span><strong class="exam-answered"><b class="exam-answered-value">${answeredCount(attempt)}</b> / ${attempt.total_questions}</strong></div>
+            ${attempt.mode === "practice" ? `<div class="exam-hud-cell exam-difficulty"><span>Practice</span><strong>${escapeHtml(statusLabel(attempt.options?.difficulty || "mixed"))} / ${attempt.total_questions}</strong></div>` : ""}
           </div>
           <div class="exam-actions">
             <button class="btn secondary mobile-question-toggle" data-action="toggle-exam-nav" type="button">${icon("review")} Questions</button>
             <button class="btn ghost exam-exit" data-action="save-exit" type="button">${icon("back")} Exit</button>
+            <div class="exam-audio-control"><button class="icon-only header-audio-button ${app.audio.music && !app.audio.muted ? "active" : ""}" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${icon(app.audio.muted ? "volume-off" : "music")}</button>${audioPopover()}</div>
             <button class="btn secondary" data-action="pause-exam" type="button" ${attempt.options?.enablePause === false || isPaused ? "disabled" : ""}>${icon("pause")} Pause</button>
             <button class="btn danger" data-action="open-submit" type="button">${icon("submit")} ${attempt.mode === "practice" ? "Finish Practice" : "Submit Exam"}</button>
           </div>
@@ -1212,7 +1248,7 @@
 
           <main class="exam-question">
             ${current.stimulus ? renderStimulusPanel(attempt, current, linked) : ""}
-            <section class="question-panel"${app.fixtureMode ? ` data-question-id="${escapeAttr(current.question_id)}" data-question-seconds="${Number(current.time_spent_seconds || 0).toFixed(3)}"` : ""}>
+            <section class="question-panel" data-motion-purpose="question-change"${app.fixtureMode ? ` data-question-id="${escapeAttr(current.question_id)}" data-question-seconds="${Number(current.time_spent_seconds || 0).toFixed(3)}"` : ""}>
               <div class="question-title">
                 <div>
                   <span class="question-index">Item ${current.position + 1} <small>/ ${attempt.total_questions}</small></span>
@@ -1223,7 +1259,7 @@
               <p class="prompt">${escapeHtml(current.prompt)}</p>
               <div class="choices">
                 ${current.choices.map((choice) => `
-                  <button class="choice ${current.selected_choice === choice.id ? "selected" : ""}" data-choice="${choice.id}" type="button" ${attempt.status !== "in_progress" ? "disabled" : ""}>
+                  <button class="choice ${current.selected_choice === choice.id ? "selected" : ""}" data-choice="${choice.id}" data-motion-purpose="answer-selection" type="button" ${attempt.status !== "in_progress" ? "disabled" : ""}>
                     <span class="choice-letter">${choice.id}</span>
                     <strong>${escapeHtml(choice.text)}</strong>
                     <i class="choice-radio"></i>
@@ -1235,7 +1271,7 @@
                 <button class="btn ghost" data-action="clear-answer" type="button">${icon("clear")} Clear Answer</button>
                 <button class="btn ghost ${current.flagged ? "active" : ""}" data-action="toggle-flag" type="button">${icon("flag")} Flag for Review</button>
                 <button class="btn secondary" data-action="skip-question" type="button">${icon("skip")} Skip</button>
-                <button class="btn primary" data-action="next-question" type="button" ${current.position >= attempt.total_questions - 1 || !current.selected_choice ? "disabled" : ""}>Next ${icon("arrow")}</button>
+                <button class="btn primary" data-action="${current.position >= attempt.total_questions - 1 ? "open-submit" : "next-question"}" type="button" ${!current.selected_choice ? "disabled" : ""}>${current.position >= attempt.total_questions - 1 ? "Review & Submit" : "Next"} ${icon("arrow")}</button>
               </div>
             </section>
           </main>
@@ -1263,6 +1299,7 @@
     const score = scoreAttempt(attempt);
     const pct = resultPercent(attempt);
     const insights = performanceInsights(attempt);
+    const runInsights = selectRunInsights(attempt);
     const stats = sectionStats(attempt);
     const isPractice = attempt.mode === "practice";
     const orderedStats = isPractice
@@ -1270,26 +1307,20 @@
       : SECTION_GROUPS.map((group) => stats.find((stat) => stat.section === group.section) || { section: group.section, correct: 0, total: group.end - group.start + 1, percent: 0 });
     const passed = pct >= PASSING_PERCENT;
     root.innerHTML = authedShell(`
-      <section class="results-page v5-results-page ${passed ? "passed" : "needs-work"} ${isPractice ? "practice-result" : ""}">
+      <section class="results-page v5-results-page ${passed ? "passed" : "needs-work"} ${isPractice ? "practice-result" : ""}" data-motion-purpose="page-enter">
         <div class="results-command-title">
           <strong>${isPractice ? "Practice Results" : "Mock Exam Results"}</strong>
           <small>${escapeHtml(examTitle(attempt))} completed ${formatDate(attempt.submitted_at || attempt.started_at)}</small>
         </div>
 
         <div class="results-summary-grid">
-          <section class="score-gauge-panel v5-panel">
-            <div class="score-gauge" style="--score:${Math.max(0, Math.min(100, pct)) * 3.6}deg">
-              <span>Score</span><strong>${Math.round(pct)}%</strong><b>${score} / ${attempt.total_questions}</b><small>correct</small>
-              <em>${isPractice ? "Complete" : passed ? "Passed" : "Needs Work"}</em>
+          <section class="results-performance-panel v5-panel">
+            <div class="score-gauge-panel">
+              <div class="score-gauge" style="--score:${Math.max(0, Math.min(100, pct)) * 3.6}deg">
+                <span>Score</span><strong>${Math.round(pct)}%</strong><b>${score} / ${attempt.total_questions}</b><small>correct</small>
+                <em>${isPractice ? "Complete" : passed ? "Passed" : "Needs Work"}</em>
+              </div>
             </div>
-          </section>
-          <div class="results-data-stack">
-            <section class="result-metrics-rail v5-panel">
-              <metric>${localIcon("timer")}<span>Total Time</span><strong>${formatDuration(attempt.elapsed_seconds)}</strong></metric>
-              <metric>${localIcon("history")}<span>Average / Question</span><strong>${formatDuration(insights.averageTime)}</strong></metric>
-              <metric>${localIcon("target")}<span>Unanswered</span><strong>${unansweredCount(attempt)}</strong></metric>
-              <metric>${icon("flag")}<span>Flagged</span><strong>${flaggedCount(attempt)}</strong></metric>
-            </section>
             <section class="results-section-console v5-panel">
               <div class="technical-title accuracy-title"><h2>Section Accuracy</h2><small>Correct answers in this attempt</small><span aria-hidden="true"></span></div>
               <div class="results-section-grid">
@@ -1299,26 +1330,27 @@
                 }).join("")}
               </div>
             </section>
-          </div>
+          </section>
+          <section class="result-metrics-rail v5-panel">
+            <metric>${localIcon("timer")}<span>Total Time</span><strong>${formatDuration(attempt.elapsed_seconds)}</strong></metric>
+            <metric>${localIcon("history")}<span>Average / Question</span><strong>${formatDuration(insights.averageTime)}</strong></metric>
+            <metric>${localIcon("target")}<span>Unanswered</span><strong>${unansweredCount(attempt)}</strong></metric>
+            <metric>${icon("flag")}<span>Flagged</span><strong>${flaggedCount(attempt)}</strong></metric>
+          </section>
         </div>
 
         <section class="run-insights-panel v5-panel">
             <div class="technical-title"><h2>Run Insights</h2><span aria-hidden="true"></span></div>
             <div class="insight-grid">
-              ${resultInsight("timer", "Fastest Question", insights.fastest ? formatDuration(insights.fastest.time_spent_seconds) : "--", insights.fastest ? `Item ${insights.fastest.display_number}` : "No timing yet", "cyan")}
-              ${resultInsight("timer", "Longest Question", insights.slowest ? formatDuration(insights.slowest.time_spent_seconds) : "--", insights.slowest ? `Item ${insights.slowest.display_number}` : "No timing yet", "amber")}
-              ${resultInsight("trophy", "Strongest Section", insights.strongest?.section || "--", insights.strongest ? `${Math.round(insights.strongest.percent)}% accuracy` : "No data yet", "green")}
-              ${resultInsight("target", "Weakest Section", insights.weakest?.section || "--", insights.weakest ? `${Math.round(insights.weakest.percent)}% accuracy` : "No data yet", "red")}
-              ${resultInsight("brain-circuit", "Answer Changes", String(insights.changed), `${insights.wrongToCorrect} improved / ${insights.correctToWrong} lost`, "purple")}
-              ${resultInsight("notebook-tabs", "Skipped Questions", String(skippedCount(attempt)), `${unansweredCount(attempt)} unanswered`, "blue")}
+              ${runInsights.map((insight) => resultInsight(insight.icon, insight.title, insight.value, insight.detail, insight.tone)).join("")}
             </div>
         </section>
         <footer class="results-action-row">
-            <button class="result-action primary" data-action="review-answers" type="button"><span><strong>Review Answers</strong></span>${icon("arrow")}</button>
+            <button class="result-action primary" data-action="review-answers" type="button">${localIcon("notebook-tabs")}<span><strong>Review Answers</strong></span>${icon("arrow")}</button>
             ${isPractice
-              ? `<button class="result-action green" data-action="repeat-practice" type="button"><span><strong>Repeat Drill</strong></span>${icon("arrow")}</button><button class="result-action purple" data-action="change-practice" type="button"><span><strong>Change Practice</strong></span>${icon("arrow")}</button>`
-              : `<button class="result-action green" data-action="practice-weakest" type="button"><span><strong>Practice Weakest Area</strong></span>${icon("arrow")}</button><button class="result-action purple" data-action="retake-same-version" type="button"><span><strong>Retake Same Version</strong></span>${icon("arrow")}</button>`}
-            <button class="result-action neutral" data-action="dashboard" type="button"><span><strong>Back to Home</strong></span>${icon("arrow")}</button>
+              ? `<button class="result-action green" data-action="repeat-practice" type="button">${localIcon("target")}<span><strong>Repeat Drill</strong></span>${icon("arrow")}</button><button class="result-action purple" data-action="change-practice" type="button">${localIcon("settings")}<span><strong>Change Practice</strong></span>${icon("arrow")}</button>`
+              : `<button class="result-action green" data-action="practice-weakest" type="button">${localIcon("target")}<span><strong>Practice Weakest Area</strong></span>${icon("arrow")}</button><button class="result-action purple" data-action="retake-same-version" type="button">${localIcon("history")}<span><strong>Retake Same Version</strong></span>${icon("arrow")}</button>`}
+            <button class="result-action neutral" data-action="dashboard" type="button">${localIcon("home")}<span><strong>Back to Home</strong></span>${icon("arrow")}</button>
         </footer>
       </section>
     `, "results");
@@ -1334,7 +1366,7 @@
     const score = scoreAttempt(attempt);
     const navWindow = reviewNavigatorWindow(filtered, index);
     root.innerHTML = authedShell(`
-      <section class="review-page v3-review-page v5-review-page">
+      <section class="review-page v3-review-page v5-review-page" data-motion-purpose="page-enter">
         <header class="review-command-head">
           <div><h1>Answer <span>Review</span></h1><small>${escapeHtml(examTitle(attempt))}</small></div>
           <div class="review-score-strip telemetry-rail">
@@ -1395,7 +1427,7 @@
   function renderPractice() {
     const tab = app.practiceReviewTab || "practice";
     root.innerHTML = sideShell("practice", `
-      <section class="content-page practice-review-page">
+      <section class="content-page practice-review-page" data-motion-purpose="page-enter">
         <div class="page-title-row">
           <div>
             <h1>Practice <span>& Review</span></h1>
@@ -1418,7 +1450,7 @@
       .map((category) => ({ category, percent: categoryPercent(categoryStats[category.section], category.section) }))
       .sort((left, right) => left.percent - right.percent)[0];
     root.innerHTML = sideShell("recent", `
-      <section class="content-page progress-page">
+      <section class="content-page progress-page" data-motion-purpose="page-enter">
         <div class="page-title-row">
           <div>
             <h1>Progress</h1>
@@ -1627,6 +1659,7 @@
           ${routes.map(([route, label, action, iconName]) => `<button class="${activeRoute === route ? "active" : ""}" data-action="${action}" type="button" aria-label="${escapeAttr(label)}" title="${escapeAttr(label)}"><span class="nav-glyph">${localIcon(iconName)}</span><span class="nav-label">${escapeHtml(label)}</span></button>`).join("")}
         </nav>
         <div class="header-actions">
+          <div class="header-audio-control"><button class="icon-only header-audio-button ${app.audio.music && !app.audio.muted ? "active" : ""}" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${icon(app.audio.muted ? "volume-off" : "music")}</button>${audioPopover()}</div>
           <button class="account-button" data-action="account-settings" type="button">${avatar(profile)}<span>${escapeHtml(displayName(profile))}</span>${icon("chev")}</button>
         </div>
       </header>
@@ -1685,7 +1718,22 @@
 
   function avatar(profile, size = "") {
     const label = initials(profile?.name || profile?.email || "Reviewer");
-    return `<span class="avatar ${size} tone-account" aria-label="${escapeAttr(label)}">${escapeHtml(label)}</span>`;
+    const preset = avatarOption(profile?.avatar_preset);
+    if (preset) return `<span class="avatar ${size} tone-account has-preset" aria-label="${escapeAttr(`${preset.name} avatar`)}"><span class="avatar-sprite" style="--avatar-x:${preset.x}%;--avatar-y:${preset.y}%" aria-hidden="true"></span></span>`;
+    return `<span class="avatar ${size} tone-account" aria-label="Initials ${escapeAttr(label)}">${escapeHtml(label)}</span>`;
+  }
+
+  function avatarOption(value) {
+    const index = Number(value || 0) - 1;
+    const option = AVATAR_OPTIONS[index];
+    return option ? {
+      id: index + 1,
+      name: option.replace(/\b\w/g, (letter) => letter.toUpperCase()),
+      column: index % 5,
+      row: Math.floor(index / 5),
+      x: AVATAR_SPRITE_COLUMNS[index % 5],
+      y: AVATAR_SPRITE_ROWS[Math.floor(index / 5)]
+    } : null;
   }
 
   function displayName(profile) {
@@ -1695,18 +1743,24 @@
   function profileModal() {
     if (app.modal !== "profile" && !(app.modal === "password" && app.modalReturn === "profile")) return "";
     const profile = app.profile;
+    const selectedAvatar = app.accountAvatarDraft ?? Number(profile.avatar_preset || 0);
+    const previewProfile = { ...profile, avatar_preset: selectedAvatar };
     return `
       <div class="modal-backdrop drawer-backdrop">
-        <section class="profile-modal account-settings-modal command-drawer" role="dialog" aria-modal="true" aria-labelledby="account-settings-title" tabindex="-1">
+        <section class="profile-modal account-settings-modal command-drawer" role="dialog" aria-modal="true" aria-labelledby="account-settings-title" tabindex="-1" data-motion-purpose="modal-reveal">
           <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
           <div class="modal-heading">
             <h2 id="account-settings-title">Account Settings</h2>
             <p>Personalize your reviewer account and session.</p>
           </div>
           <form class="account-settings-form" data-form="profile">
-            <div class="account-identity-preview">${avatar(profile, "large")}<div><strong>${escapeHtml(displayName(profile))}</strong><small>${escapeHtml(profile.email)}</small></div></div>
+            <div class="account-identity-preview">${avatar(previewProfile, "large")}<div><strong>${escapeHtml(displayName(profile))}</strong><small>${escapeHtml(profile.email)}</small></div></div>
+            <fieldset class="avatar-picker"><legend>Choose an avatar</legend><div class="avatar-options">${AVATAR_OPTIONS.map((name, index) => {
+              const preset = avatarOption(index + 1);
+              return `<button class="avatar-option ${selectedAvatar === index + 1 ? "selected" : ""}" data-avatar-preset="${index + 1}" type="button" aria-label="Choose ${escapeAttr(name)} avatar" aria-pressed="${selectedAvatar === index + 1 ? "true" : "false"}"><span class="avatar-sprite" style="--avatar-x:${preset.x}%;--avatar-y:${preset.y}%" aria-hidden="true"></span></button>`;
+            }).join("")}</div><small>Selection is applied after Save Changes.</small></fieldset>
             <div class="account-field-grid">
-              <label>Nickname<input name="nickname" value="${escapeAttr(profile.nickname || "")}" placeholder="What should we call you?" /></label>
+              <label>Nickname<input name="nickname" value="${escapeAttr(profile.nickname || firstName(profile.name))}" maxlength="24" placeholder="What should we call you?" /></label>
               <label>Full Name<input name="name" value="${escapeAttr(profile.name)}" required /></label>
               <label>Email Address <small>(used for sign-in)</small><input name="email" value="${escapeAttr(profile.email)}" disabled /></label>
             </div>
@@ -1729,7 +1783,7 @@
     if (app.modal !== "password") return "";
     return `
       <div class="modal-backdrop account-password-backdrop">
-        <section class="password-modal" role="dialog" aria-modal="true" aria-labelledby="password-title" tabindex="-1">
+        <section class="password-modal" role="dialog" aria-modal="true" aria-labelledby="password-title" tabindex="-1" data-motion-purpose="modal-reveal">
           <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
           <p class="eyebrow">Account security</p>
           <h2 id="password-title">Change Password</h2>
@@ -1747,14 +1801,15 @@
   }
 
   function audioSettingsBlock() {
-    return `<section class="account-audio-settings"><div><strong>Audio</strong><small>Optional ambience and interface sounds</small></div><button class="audio-toggle master ${app.audio.music || app.audio.sfx ? "active" : ""}" data-action="toggle-audio-master" type="button"><span>Audio</span><b>${app.audio.music || app.audio.sfx ? "On" : "Off"}</b></button><label>Music volume<input data-audio-volume="musicVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.musicVolume)}" /></label><label>Effects volume<input data-audio-volume="sfxVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.sfxVolume)}" /></label></section>`;
+    const track = currentMusicTrack();
+    return `<section class="account-audio-settings"><div class="audio-section-head"><strong>Audio</strong><small>Music starts only after you press Play.</small></div><div class="audio-category" role="group" aria-label="Music category">${[["cafe", "Cafe Jazz"], ["classical", "Classical"]].map(([key, label]) => `<button class="${app.audio.category === key ? "active" : ""}" data-audio-category="${key}" type="button" aria-pressed="${app.audio.category === key ? "true" : "false"}">${escapeHtml(label)}</button>`).join("")}</div><label class="audio-track-select">Track<select data-audio-track>${musicTracks().map((entry, index) => `<option value="${index}" ${index === app.audio.trackIndex ? "selected" : ""}>${escapeHtml(entry.title)} - ${escapeHtml(entry.artist)}</option>`).join("")}</select></label><div class="audio-transport" aria-label="Music controls"><button data-action="audio-previous" type="button" aria-label="Previous track">${icon("back")}</button><button class="audio-play ${app.audio.music ? "active" : ""}" data-action="toggle-music" type="button" aria-label="${app.audio.music ? "Pause" : "Play"} music">${icon(app.audio.music ? "pause" : "play")}</button><button data-action="audio-next" type="button" aria-label="Next track">${icon("arrow")}</button><button class="${app.audio.shuffle ? "active" : ""}" data-action="toggle-audio-shuffle" type="button" aria-label="Toggle shuffle" aria-pressed="${app.audio.shuffle ? "true" : "false"}">${icon("shuffle")}</button><button class="${app.audio.muted ? "active" : ""}" data-action="toggle-audio-mute" type="button" aria-label="Toggle mute" aria-pressed="${app.audio.muted ? "true" : "false"}">${icon(app.audio.muted ? "volume-off" : "volume")}</button></div><p class="audio-now-playing"><span>Selected</span><strong>${escapeHtml(track.title)}</strong><small>${escapeHtml(track.artist)}</small></p><label>Music volume<input data-audio-volume="musicVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.musicVolume)}" /></label><div class="effects-control"><button class="audio-toggle ${app.audio.sfx ? "active" : ""}" data-action="toggle-sfx" type="button"><span>Interface effects<small>Navigation, selection, confirmation, warning</small></span><b>${app.audio.sfx ? "On" : "Off"}</b></button><label>Effects volume<input data-audio-volume="sfxVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.sfxVolume)}" /></label></div></section>`;
   }
 
   function pauseModal(attempt) {
     if (attempt.status !== "paused") return "";
     return `
       <div class="modal-backdrop static-backdrop" data-static-backdrop="true">
-        <section class="pause-modal" role="dialog" aria-modal="true" aria-labelledby="pause-title" tabindex="-1">
+        <section class="pause-modal" role="dialog" aria-modal="true" aria-labelledby="pause-title" tabindex="-1" data-motion-purpose="modal-reveal">
           <span class="pause-icon">${icon("pause")}</span>
           <p class="eyebrow">Checkpoint secured</p>
           <h2 id="pause-title">Exam Paused</h2>
@@ -1770,7 +1825,7 @@
     if (app.modal !== "submit") return "";
     return `
       <div class="modal-backdrop">
-        <section class="submit-modal" role="dialog" aria-modal="true" aria-labelledby="submit-title" tabindex="-1">
+        <section class="submit-modal" role="dialog" aria-modal="true" aria-labelledby="submit-title" tabindex="-1" data-motion-purpose="modal-reveal">
           <div class="submit-title-row"><span class="submit-danger-symbol">${icon("warning")}</span><div><p class="eyebrow">Final submission</p><h2 id="submit-title">Submit Exam?</h2></div></div>
           <p>You are about to submit this run. <strong>This action cannot be undone.</strong></p>
           <div class="submit-stats">
@@ -1796,7 +1851,7 @@
     const presentation = stimulusPresentation(answer.stimulus);
     return `
       <div class="modal-backdrop chart-backdrop">
-        <section class="chart-modal stimulus-modal ${presentation.className}" role="dialog" aria-modal="true" aria-label="Expanded ${presentation.noun}" tabindex="-1">
+        <section class="chart-modal stimulus-modal ${presentation.className}" role="dialog" aria-modal="true" aria-label="Expanded ${presentation.noun}" tabindex="-1" data-motion-purpose="modal-reveal">
           <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
           ${renderStimulusPanel(attempt, answer, linkedStimulusAnswers(attempt, answer), true)}
         </section>
@@ -1808,7 +1863,7 @@
     if (app.modal !== "timeout") return "";
     return `
       <div class="modal-backdrop static-backdrop timeout-backdrop" data-static-backdrop="true">
-        <section class="timeout-modal" role="alertdialog" aria-modal="true" aria-labelledby="timeout-title" tabindex="-1">
+        <section class="timeout-modal" role="alertdialog" aria-modal="true" aria-labelledby="timeout-title" tabindex="-1" data-motion-purpose="modal-reveal">
           <span class="timeout-symbol">${icon("clock")}</span>
           <h2 id="timeout-title">Time Expired</h2>
           <div class="timeout-clock"><span>Time Remaining</span><strong>0:00</strong></div>
@@ -1827,7 +1882,7 @@
     const success = app.modal === "forgot-success";
     return `
       <div class="modal-backdrop auth-dialog-backdrop">
-        <section class="reset-modal" role="dialog" aria-modal="true" aria-labelledby="reset-title" tabindex="-1">
+        <section class="reset-modal" role="dialog" aria-modal="true" aria-labelledby="reset-title" tabindex="-1" data-motion-purpose="modal-reveal">
           <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
           <span class="reset-symbol">${icon(success ? "check" : "mail")}</span>
           <p class="eyebrow">Account recovery</p>
@@ -1847,7 +1902,7 @@
     const target = deletingAccount ? app.profile?.name || "this account" : examTitle(attempt || {});
     return `
       <div class="modal-backdrop danger-backdrop">
-        <section class="confirm-modal ${deletingAccount ? "account-delete-confirm" : "attempt-delete-confirm"}" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" tabindex="-1">
+        <section class="confirm-modal ${deletingAccount ? "account-delete-confirm" : "attempt-delete-confirm"}" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" tabindex="-1" data-motion-purpose="modal-reveal">
           <span class="danger-symbol">${icon("delete")}</span>
           <p class="eyebrow">Destructive command</p>
           <h2 id="confirm-title">${deletingAccount ? "Delete Account?" : "Delete Attempt?"}</h2>
@@ -2036,9 +2091,9 @@
       const flagged = groupAnswers.filter((answer) => answer.flagged).length;
       const expandedFull = app.expandedNavGroups.has(group.section);
       const previewAnswers = expandedFull ? groupAnswers : navPreviewAnswers(groupAnswers, attempt.current_question_index);
-      const stimulusBody = renderStimulusNavigator(group, groupAnswers, attempt);
+      const stimulusBody = renderStimulusNavigator(group, groupAnswers, attempt, expandedFull);
       return `
-        <details class="question-group ${group.tone}" ${navGroupOpen(group, hasCurrent) ? "open" : ""}>
+        <details class="question-group ${group.tone}" data-nav-section="${escapeAttr(group.section)}" ${navGroupOpen(group, hasCurrent) ? "open" : ""}>
           <summary>
             <span><strong>${escapeHtml(group.section)}</strong><small>Questions ${group.range}</small></span>
             <em>${answered}/${groupAnswers.length} answered</em>
@@ -2067,15 +2122,12 @@
   }
 
   function navGroupOpen(group, hasCurrent) {
-    if (app.fixtureState === "exam") return true;
+    if (app.fixtureState === "exam") return group.section === "General Information";
     if (app.fixtureState === "graph") return group.section === "Numerical Ability";
-    if (app.fixtureState === "exam-collapsed" || app.fixtureState === "pause" || app.fixtureState === "submit") {
-      return hasCurrent || app.expandedNavGroups.has(group.section);
-    }
-    return hasCurrent || app.expandedNavGroups.has(group.section);
+    return hasCurrent || app.openNavGroups.has(group.section);
   }
 
-  function renderStimulusNavigator(group, groupAnswers, attempt) {
+  function renderStimulusNavigator(group, groupAnswers, attempt, expandedFull = false) {
     if (app.fixtureMode && app.fixtureState === "graph" && group.section === "Numerical Ability") {
       const setA = groupAnswers.filter((answer) => answer.display_number >= 81 && answer.display_number <= 85);
       const setB = groupAnswers.filter((answer) => answer.display_number >= 86 && answer.display_number <= 90);
@@ -2132,22 +2184,29 @@
     flushIndividualItems();
 
     let stimulusIndex = 0;
+    const labeledBlocks = blocks.map((block) => ({
+      ...block,
+      label: block.type === "individual"
+        ? "Individual Items"
+        : `${group.section === "Verbal Ability" ? "Reading Set" : "Data Set"} ${String.fromCharCode(65 + stimulusIndex++)}`
+    }));
+    const currentBlock = labeledBlocks.find((block) => block.items.some((item) => item.position === attempt.current_question_index)) || labeledBlocks[0];
+    const visibleBlocks = expandedFull ? labeledBlocks : currentBlock ? [currentBlock] : [];
     return `
       <div class="stimulus-nav">
-        ${blocks.map((block) => {
-          const items = block.items;
-          const answered = items.filter((item) => item.selected_choice).length;
-          const range = `Questions ${items[0].display_number}-${items[items.length - 1].display_number}`;
-          const label = block.type === "individual"
-            ? "Individual Items"
-            : `${group.section === "Verbal Ability" ? "Reading Set" : "Data Set"} ${String.fromCharCode(65 + stimulusIndex++)}`;
+        ${visibleBlocks.map((block) => {
+          const items = expandedFull ? block.items : navPreviewAnswers(block.items, attempt.current_question_index);
+          const fullItems = block.items;
+          const answered = fullItems.filter((item) => item.selected_choice).length;
+          const range = `Questions ${fullItems[0].display_number}-${fullItems[fullItems.length - 1].display_number}`;
           return `
             <section class="stimulus-set open ${block.type === "individual" ? "individual-question-set" : "shared-question-set"}">
-              <div class="stimulus-set-head"><strong>${label}</strong><span>${range}</span><em>${answered}/${items.length} answered</em></div>
+              <div class="stimulus-set-head"><strong>${block.label}</strong><span>${range}</span><em>${answered}/${fullItems.length} answered</em></div>
               <div class="chip-grid set-grid">${items.map((answer) => navChip(answer, attempt)).join("")}</div>
             </section>
           `;
         }).join("")}
+        ${groupAnswers.length > 10 ? `<button class="question-chip more-chip navigator-disclosure" data-action="toggle-nav-full" data-nav-group="${escapeAttr(group.section)}" type="button">${expandedFull ? "Less" : "More"}</button>` : ""}
       </div>
     `;
   }
@@ -2403,10 +2462,17 @@
   }
 
   function loadAudioPreferences() {
-    const defaults = { music: false, sfx: false, musicVolume: 0.28, sfxVolume: 0.46 };
+    const defaults = { music: false, sfx: false, musicVolume: 0.24, sfxVolume: 0.38, category: "cafe", trackIndex: 0, shuffle: true, muted: false };
     try {
       const saved = JSON.parse(localStorage.getItem(AUDIO_PREFS_KEY) || "null");
-      return saved ? { ...defaults, ...saved, music: Boolean(saved.music), sfx: Boolean(saved.sfx) } : defaults;
+      const preferences = saved ? { ...defaults, ...saved } : defaults;
+      preferences.music = Boolean(preferences.music);
+      preferences.sfx = Boolean(preferences.sfx);
+      preferences.shuffle = Boolean(preferences.shuffle);
+      preferences.muted = Boolean(preferences.muted);
+      preferences.category = MUSIC_LIBRARY[preferences.category] ? preferences.category : "cafe";
+      preferences.trackIndex = Math.max(0, Math.min(MUSIC_LIBRARY[preferences.category].length - 1, Number(preferences.trackIndex) || 0));
+      return preferences;
     } catch {
       return defaults;
     }
@@ -2418,14 +2484,12 @@
 
   function ensureAudioElements() {
     if (app.audioElements) return app.audioElements;
-    const music = new Audio("assets/audio/ambient-airy.mp3");
-    const ui = new Audio("assets/audio/ui-activate.mp3");
-    const result = new Audio("assets/audio/result-complete.mp3");
-    music.loop = true;
-    music.preload = "none";
-    ui.preload = "auto";
-    result.preload = "auto";
-    app.audioElements = { music, ui, result };
+    const music = new Audio();
+    music.loop = false;
+    music.preload = "metadata";
+    music.addEventListener("ended", () => nextMusicTrack(true));
+    app.audioElements = { music };
+    loadMusicTrack(false);
     updateAudioVolumes();
     return app.audioElements;
   }
@@ -2433,13 +2497,14 @@
   function updateAudioVolumes() {
     if (!app.audioElements) return;
     app.audioElements.music.volume = Math.max(0, Math.min(1, Number(app.audio.musicVolume) || 0));
-    app.audioElements.ui.volume = Math.max(0, Math.min(1, Number(app.audio.sfxVolume) || 0));
-    app.audioElements.result.volume = Math.max(0, Math.min(1, Number(app.audio.sfxVolume) || 0));
+    app.audioElements.music.muted = Boolean(app.audio.muted);
   }
 
   function syncBackgroundMusic() {
-    if (!app.audio.music || app.view.name === "exam" || document.visibilityState !== "visible") return pauseBackgroundMusic();
+    if (!app.audio.music) return pauseBackgroundMusic();
+    if (!app.audioUserGesture) return;
     const { music } = ensureAudioElements();
+    loadMusicTrack(false);
     updateAudioVolumes();
     music.play().catch(() => {});
   }
@@ -2448,11 +2513,107 @@
     app.audioElements?.music.pause();
   }
 
-  function playSound(kind = "ui") {
+  function musicTracks(category = app.audio.category) {
+    return MUSIC_LIBRARY[category] || MUSIC_LIBRARY.cafe;
+  }
+
+  function currentMusicTrack() {
+    const tracks = musicTracks();
+    return tracks[Math.max(0, Math.min(tracks.length - 1, Number(app.audio.trackIndex) || 0))] || tracks[0];
+  }
+
+  function loadMusicTrack(autoplay = false) {
+    const { music } = ensureAudioElements();
+    const track = currentMusicTrack();
+    if (music.dataset.trackSrc !== track.src) {
+      music.dataset.trackSrc = track.src;
+      music.src = track.src;
+      music.load();
+    }
+    updateAudioVolumes();
+    if (autoplay && app.audio.music && app.audioUserGesture) music.play().catch(() => {});
+  }
+
+  function setMusicCategory(category) {
+    if (!MUSIC_LIBRARY[category] || category === app.audio.category) return;
+    app.audio.category = category;
+    app.audio.trackIndex = 0;
+    app.audioHistory = [];
+    app.audioShuffleBag = [];
+    saveAudioPreferences();
+    loadMusicTrack(app.audio.music);
+    render();
+  }
+
+  function selectMusicTrack(index) {
+    const nextIndex = Math.max(0, Math.min(musicTracks().length - 1, Number(index) || 0));
+    if (nextIndex !== app.audio.trackIndex) app.audioHistory.push(app.audio.trackIndex);
+    app.audio.trackIndex = nextIndex;
+    app.audioShuffleBag = app.audioShuffleBag.filter((item) => item !== nextIndex);
+    saveAudioPreferences();
+    loadMusicTrack(app.audio.music);
+  }
+
+  function nextMusicTrack(fromEnded = false) {
+    const tracks = musicTracks();
+    const current = Number(app.audio.trackIndex) || 0;
+    app.audioHistory.push(current);
+    let next;
+    if (app.audio.shuffle) {
+      if (!app.audioShuffleBag.length) {
+        app.audioShuffleBag = tracks.map((_, index) => index).filter((index) => index !== current);
+        for (let index = app.audioShuffleBag.length - 1; index > 0; index -= 1) {
+          const swap = Math.floor(Math.random() * (index + 1));
+          [app.audioShuffleBag[index], app.audioShuffleBag[swap]] = [app.audioShuffleBag[swap], app.audioShuffleBag[index]];
+        }
+      }
+      next = app.audioShuffleBag.shift();
+    } else {
+      next = (current + 1) % tracks.length;
+    }
+    app.audio.trackIndex = next ?? ((current + 1) % tracks.length);
+    saveAudioPreferences();
+    loadMusicTrack(app.audio.music || fromEnded);
+    render();
+  }
+
+  function previousMusicTrack() {
+    const previous = app.audioHistory.pop();
+    app.audio.trackIndex = previous ?? ((Number(app.audio.trackIndex) - 1 + musicTracks().length) % musicTracks().length);
+    saveAudioPreferences();
+    loadMusicTrack(app.audio.music);
+    render();
+  }
+
+  function playSound(kind = "navigation") {
     if (!app.audio.sfx) return;
-    const sound = ensureAudioElements()[kind] || ensureAudioElements().ui;
-    sound.currentTime = 0;
-    sound.play().catch(() => {});
+    const definitions = {
+      navigation: [[420, 0.045, "sine", 0.035]],
+      selection: [[620, 0.055, "triangle", 0.04], [820, 0.045, "triangle", 0.025]],
+      confirmation: [[520, 0.07, "sine", 0.04], [780, 0.1, "sine", 0.035]],
+      warning: [[220, 0.11, "triangle", 0.045], [180, 0.13, "triangle", 0.035]]
+    };
+    const sequence = definitions[kind] || definitions.navigation;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    app.audioContext ||= new AudioContextClass();
+    const context = app.audioContext;
+    if (context.state === "suspended") context.resume().catch(() => {});
+    let offset = 0;
+    for (const [frequency, duration, type, gainValue] of sequence) {
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      const start = context.currentTime + offset;
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, start);
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, gainValue * app.audio.sfxVolume), start + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+      oscillator.connect(gain).connect(context.destination);
+      oscillator.start(start);
+      oscillator.stop(start + duration + 0.01);
+      offset += duration * 0.62;
+    }
   }
 
   function toggleAudioMaster() {
@@ -2462,7 +2623,8 @@
     saveAudioPreferences();
     render();
     if (enabled) {
-      playSound("ui");
+      app.audioUserGesture = true;
+      playSound("confirmation");
       syncBackgroundMusic();
     } else {
       pauseBackgroundMusic();
@@ -2471,10 +2633,12 @@
 
   function audioPopover() {
     if (!app.audioMenuOpen) return "";
+    const track = currentMusicTrack();
     return `
-      <section class="audio-popover" aria-label="Audio settings">
-        <div class="audio-popover-head">${icon("music")}<span><strong>Audio</strong><small>Off by default</small></span></div>
-        <button class="audio-toggle ${app.audio.music ? "active" : ""}" data-action="toggle-music" type="button"><span>Ambient music<small>Non-exam pages</small></span><b>${app.audio.music ? "On" : "Off"}</b></button>
+      <section class="audio-popover" aria-label="Audio settings" data-motion-purpose="popover-reveal">
+        <div class="audio-popover-head">${icon("music")}<span><strong>Audio</strong><small>${escapeHtml(app.audio.category === "cafe" ? "Cafe Jazz" : "Classical")}</small></span></div>
+        <p class="audio-popover-track"><strong>${escapeHtml(track.title)}</strong><small>${escapeHtml(track.artist)}</small></p>
+        <div class="audio-transport compact"><button data-action="audio-previous" type="button" aria-label="Previous track">${icon("back")}</button><button class="audio-play ${app.audio.music ? "active" : ""}" data-action="toggle-music" type="button" aria-label="${app.audio.music ? "Pause" : "Play"} music">${icon(app.audio.music ? "pause" : "play")}</button><button data-action="audio-next" type="button" aria-label="Next track">${icon("arrow")}</button><button class="${app.audio.muted ? "active" : ""}" data-action="toggle-audio-mute" type="button" aria-label="Toggle mute">${icon(app.audio.muted ? "volume-off" : "volume")}</button></div>
         <label>Music volume<input data-audio-volume="musicVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.musicVolume)}" /></label>
         <button class="audio-toggle ${app.audio.sfx ? "active" : ""}" data-action="toggle-sfx" type="button"><span>Sound effects<small>Actions and results</small></span><b>${app.audio.sfx ? "On" : "Off"}</b></button>
         <label>Effects volume<input data-audio-volume="sfxVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.sfxVolume)}" /></label>
@@ -2729,9 +2893,11 @@
     const target = event.target.closest("button");
     if (!target) return;
     const action = target.dataset.action;
+    app.audioUserGesture = true;
 
     try {
       if (app.fixtureMode && handleFixtureClick(target, action)) return;
+      if (target.dataset.audioCategory) return setMusicCategory(target.dataset.audioCategory);
       if (action === "toggle-audio-menu") {
         app.audioMenuOpen = !app.audioMenuOpen;
         render();
@@ -2747,12 +2913,26 @@
         app.audio.sfx = !app.audio.sfx;
         saveAudioPreferences();
         render();
-        if (app.audio.sfx) playSound("ui");
+        if (app.audio.sfx) playSound("confirmation");
         return;
+      }
+      if (action === "audio-previous") return previousMusicTrack();
+      if (action === "audio-next") return nextMusicTrack();
+      if (action === "toggle-audio-shuffle") {
+        app.audio.shuffle = !app.audio.shuffle;
+        app.audioShuffleBag = [];
+        saveAudioPreferences();
+        return render();
+      }
+      if (action === "toggle-audio-mute") {
+        app.audio.muted = !app.audio.muted;
+        saveAudioPreferences();
+        updateAudioVolumes();
+        return render();
       }
       if (action === "toggle-audio-master") return toggleAudioMaster();
       syncBackgroundMusic();
-      if (!target.disabled) playSound("ui");
+      if (!target.disabled && !target.dataset.choice && !["confirm-submit", "confirm-delete-account", "confirm-delete-attempt"].includes(action)) playSound("navigation");
       if (action === "reload-app") return location.reload();
       if (action === "toggle-password") return togglePasswordVisibility(target);
       if (action === "show-signin") return setView({ name: "signin" });
@@ -2875,6 +3055,11 @@
 
   function handleChange(event) {
     const input = event.target;
+    if (input.matches("[data-audio-track]")) {
+      selectMusicTrack(input.value);
+      render();
+      return;
+    }
     if (input.closest("[data-form='setup']")) saveSetupDraft(false);
     const practiceForm = input.closest("[data-form='custom-practice']");
     if (practiceForm) syncPracticeProfile(practiceForm);
@@ -2892,6 +3077,14 @@
     if (!input) return;
     const button = input.closest("[role='alertdialog']")?.querySelector("[data-action='confirm-delete-account']");
     if (button) button.disabled = input.value.trim() !== "DELETE";
+  }
+
+  function handleDetailsToggle(event) {
+    const details = event.target.closest?.("details.question-group[data-nav-section]");
+    if (!details || !event.isTrusted) return;
+    const section = details.dataset.navSection;
+    if (details.open) app.openNavGroups.add(section);
+    else app.openNavGroups.delete(section);
   }
 
   function syncPracticeProfile(form) {
@@ -2930,6 +3123,25 @@
       }
     }
     const dialog = document.querySelector("[role='dialog'], [role='alertdialog']");
+    if (!dialog && app.view.name === "exam" && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
+      const editable = event.target.closest?.("input, textarea, select, button, summary, [contenteditable='true'], .audio-popover");
+      if (!editable) {
+        const attempt = getAttempt(app.view.attemptId);
+        const answer = currentAnswer(attempt);
+        const choiceIndex = { Digit1: 0, Numpad1: 0, Digit2: 1, Numpad2: 1, Digit3: 2, Numpad3: 2, Digit4: 3, Numpad4: 3 }[event.code];
+        if (choiceIndex !== undefined && answer?.choices?.[choiceIndex] && attempt?.status === "in_progress") {
+          event.preventDefault();
+          chooseAnswer(answer.choices[choiceIndex].id);
+          return;
+        }
+        if (event.key === "Enter" && answer?.selected_choice && attempt?.status === "in_progress") {
+          event.preventDefault();
+          if (answer.position >= attempt.total_questions - 1) openModal("submit");
+          else navigateQuestion(1);
+          return;
+        }
+      }
+    }
     if (!dialog) return;
     if (event.key === "Escape") {
       const staticDialog = dialog.closest(".static-backdrop");
@@ -2968,6 +3180,7 @@
       options: {
         data: {
           display_name: data.name.trim(),
+          nickname: firstName(data.name),
           invite_code: inviteCode
         }
       }
@@ -3071,7 +3284,8 @@
     if (app.accountAvatarDraft !== null) updates.avatar_preset = app.accountAvatarDraft;
     const { data, error } = await app.client.from("profiles").update(updates).eq("user_id", app.session.user.id).select("*").single();
     if (error) throw error;
-    const nickname = String(formData.nickname || "").trim();
+    const nickname = String(formData.nickname || "").trim() || firstName(updates.name);
+    if (nickname.length > 24) throw new Error("Nickname must be 24 characters or fewer.");
     const metadata = { ...(app.session.user.user_metadata || {}), nickname, avatar_preset: app.accountAvatarDraft ?? Number(data.avatar_preset || 0), display_name: data.name };
     const authUpdate = await app.client.auth.updateUser({ data: metadata });
     if (authUpdate.error) throw authUpdate.error;
@@ -3200,6 +3414,7 @@
       total_time_seconds: totalTimeSeconds,
       options: {
         ...(options || {}),
+        timerClock: totalTimeSeconds ? { version: 1, elapsedAtAnchor: 0, anchoredAt: now } : null,
         telemetry: { version: 1, eventCount: 0, actionCounts: {}, visibility: { hiddenSeconds: 0, interruptions: 0 }, events: [] }
       },
       question_order: questionOrder
@@ -3322,6 +3537,7 @@
     const attempt = app.view.name === "exam" ? getAttempt(app.view.attemptId) : null;
     if (!attempt || attempt.status !== "in_progress") return;
     const now = performance.now();
+    if (nextState === "hidden") materializeQuestionClock(attempt, now, true);
     const telemetry = ensureTelemetry(attempt);
     if (nextState === "hidden") {
       telemetry.visibility.interruptions = Number(telemetry.visibility.interruptions || 0) + 1;
@@ -3334,40 +3550,77 @@
       recordAttemptEvent(attempt, "visibility-visible");
     }
     app.visibilityStartedAt = now;
-    attempt._lastTickMs = now;
+    attempt._lastQuestionTickMs = now;
     touchAttempt(attempt);
+  }
+
+  function ensureAttemptClock(attempt, at = Date.now()) {
+    if (!attempt) return null;
+    attempt.options = { ...(attempt.options || {}) };
+    const existing = attempt.options.timerClock;
+    if (existing && Number.isFinite(Number(existing.elapsedAtAnchor))) return existing;
+    const elapsed = Math.max(0, Number(attempt.elapsed_seconds) || 0);
+    attempt.options.timerClock = {
+      version: 1,
+      elapsedAtAnchor: elapsed,
+      anchoredAt: attempt.status === "in_progress" ? new Date(at).toISOString() : null
+    };
+    return attempt.options.timerClock;
+  }
+
+  function effectiveElapsed(attempt, at = Date.now()) {
+    if (!attempt) return 0;
+    const clock = ensureAttemptClock(attempt, at);
+    const stored = Math.max(0, Number(attempt.elapsed_seconds) || 0);
+    if (attempt.status !== "in_progress" || !clock?.anchoredAt) return stored;
+    const anchoredAt = Date.parse(clock.anchoredAt);
+    if (!Number.isFinite(anchoredAt)) return stored;
+    const elapsed = Number(clock.elapsedAtAnchor || 0) + Math.max(0, (at - anchoredAt) / 1000);
+    return Math.max(stored, elapsed);
+  }
+
+  function materializeAttemptClock(attempt, at = Date.now(), keepRunning = attempt?.status === "in_progress") {
+    if (!attempt) return 0;
+    const max = Number(attempt.total_time_seconds) || Number.POSITIVE_INFINITY;
+    const elapsed = Math.min(max, effectiveElapsed(attempt, at));
+    attempt.elapsed_seconds = elapsed;
+    attempt.options = { ...(attempt.options || {}), timerClock: { version: 1, elapsedAtAnchor: elapsed, anchoredAt: keepRunning ? new Date(at).toISOString() : null } };
+    return elapsed;
   }
 
   function tickAttempt(attemptId) {
     const attempt = getAttempt(attemptId);
     if (!attempt || attempt.status !== "in_progress") return;
-    const now = performance.now();
-    if (document.visibilityState !== "visible") {
-      attempt._lastTickMs = now;
-      return;
-    }
-    const delta = Math.max(0.2, Math.min(2.5, attempt._lastTickMs ? (now - attempt._lastTickMs) / 1000 : 1));
-    attempt._lastTickMs = now;
-    attempt.elapsed_seconds += delta;
-    const answer = currentAnswer(attempt);
-    if (answer) {
-      answer.time_spent_seconds += delta;
-      answer.last_seen_at = nowIso();
-      touchAnswer(attempt, answer.question_id);
-    }
+    const wallNow = Date.now();
+    materializeAttemptClock(attempt, wallNow, true);
+    materializeQuestionClock(attempt);
     touchAttempt(attempt);
-    if (attempt.total_time_seconds && attempt.elapsed_seconds >= attempt.total_time_seconds) {
+    if (attempt.total_time_seconds && effectiveElapsed(attempt, wallNow) >= attempt.total_time_seconds) {
       beginTimeout(attempt);
       return;
     }
     updateExamTimerDom(attempt);
   }
 
+  function materializeQuestionClock(attempt, at = performance.now(), countVisible = document.visibilityState === "visible") {
+    if (!attempt) return 0;
+    const last = Number(attempt._lastQuestionTickMs);
+    attempt._lastQuestionTickMs = at;
+    if (attempt.status !== "in_progress" || !countVisible || !Number.isFinite(last)) return 0;
+    const delta = Math.max(0, Math.min(2.5, (at - last) / 1000));
+    const answer = currentAnswer(attempt);
+    if (!answer || delta <= 0) return 0;
+    answer.time_spent_seconds += delta;
+    answer.last_seen_at = nowIso();
+    touchAnswer(attempt, answer.question_id);
+    return delta;
+  }
+
   function updateExamTimerDom(attempt) {
-    const timer = document.querySelector(".exam-time");
-    const answered = document.querySelector(".exam-answered");
-    if (timer && attempt.options?.showTimer !== false) timer.textContent = `Time Left: ${formatDuration(timeRemaining(attempt))}`;
-    if (answered) answered.textContent = `Answered: ${answeredCount(attempt)}/${attempt.total_questions}`;
+    const timer = document.querySelector(".exam-time-value");
+    const answered = document.querySelector(".exam-answered-value");
+    if (timer && attempt.options?.showTimer !== false) timer.textContent = formatDuration(timeRemaining(attempt));
+    if (answered) answered.textContent = String(answeredCount(attempt));
   }
 
   function beginTimeout(attempt) {
@@ -3395,6 +3648,7 @@
     recordAttemptEvent(attempt, "answer-selected", { choice, previousChoice: previous || null });
     touchAnswer(attempt, answer.question_id);
     touchAttempt(attempt);
+    playSound("selection");
     renderExam();
   }
 
@@ -3445,6 +3699,7 @@
   function gotoQuestion(index, source = "chip") {
     const attempt = getAttempt(app.view.attemptId);
     if (!attempt || index < 0 || index >= attempt.total_questions) return;
+    materializeQuestionClock(attempt);
     recordAttemptEvent(attempt, "navigate", { source, from: attempt.current_question_index, to: index });
     attempt.current_question_index = index;
     app.examNavOpen = false;
@@ -3462,6 +3717,8 @@
   async function pauseAttempt() {
     const attempt = getAttempt(app.view.attemptId);
     if (!attempt || attempt.options?.enablePause === false) return;
+    materializeQuestionClock(attempt);
+    materializeAttemptClock(attempt, Date.now(), false);
     attempt.status = "paused";
     attempt.paused_at = nowIso();
     touchAttempt(attempt);
@@ -3477,6 +3734,7 @@
     if (!attempt) return;
     attempt.status = "in_progress";
     attempt.paused_at = null;
+    materializeAttemptClock(attempt, Date.now(), true);
     touchAttempt(attempt);
     if (!app.fixtureMode && app.client && app.session?.user?.id) {
       await app.client.from("pause_events").update({ resumed_at: nowIso() }).eq("attempt_id", attempt.id).is("resumed_at", null);
@@ -3488,6 +3746,8 @@
   async function saveAndExit() {
     const attempt = getAttempt(app.view.attemptId);
     if (attempt && attempt.status === "in_progress") {
+      materializeQuestionClock(attempt);
+      materializeAttemptClock(attempt, Date.now(), false);
       attempt.status = "paused";
       attempt.paused_at = nowIso();
       recordAttemptEvent(attempt, "save-and-exit");
@@ -3505,6 +3765,8 @@
   }
 
   async function submitAttempt(attempt, timedOut) {
+    materializeQuestionClock(attempt);
+    materializeAttemptClock(attempt, Date.now(), false);
     attempt.status = timedOut ? "timed_out" : "submitted";
     attempt.timed_out = timedOut;
     attempt.submitted_at = nowIso();
@@ -3755,7 +4017,7 @@
 
   function timeRemaining(attempt) {
     if (!attempt.total_time_seconds) return 0;
-    return Math.max(0, attempt.total_time_seconds - attempt.elapsed_seconds);
+    return Math.max(0, attempt.total_time_seconds - effectiveElapsed(attempt));
   }
 
   function sectionStats(attempt) {
@@ -3795,6 +4057,81 @@
       correctToWrong: answers.reduce((sum, answer) => sum + (answer.changed_correct_to_wrong || 0), 0),
       recommendation: weakest ? `Practice ${sectionLabel(weakest.section)}` : "Take another full mock"
     };
+  }
+
+  function selectRunInsights(attempt) {
+    const answers = Object.values(attempt.answers).sort(byPosition);
+    const summary = performanceInsights(attempt);
+    const stats = sectionStats(attempt);
+    const topicStats = groupedAnswerStats(answers, (answer) => answer.subtopic || answer.csc_skill || "Other").filter((row) => row.total >= 3);
+    const difficultyStats = groupedAnswerStats(answers, (answer) => statusLabel(answer.difficulty || "mixed")).filter((row) => row.total >= 3);
+    const topicAscending = topicStats.slice().sort((left, right) => left.percent - right.percent || right.total - left.total || left.label.localeCompare(right.label));
+    const topicDescending = topicAscending.slice().reverse();
+    const isPractice = attempt.mode === "practice";
+    const candidates = [];
+    const add = (entry, condition = true) => {
+      if (condition && entry?.value !== undefined && entry?.value !== null && String(entry.value).trim()) candidates.push(entry);
+    };
+
+    if (isPractice) {
+      add({ icon: "target", title: "Focus Topic", value: topicAscending[0]?.label, detail: `${Math.round(topicAscending[0]?.percent || 0)}% across ${topicAscending[0]?.total || 0} items`, tone: "red" }, topicAscending.length > 1);
+      add({ icon: "trophy", title: "Strong Topic", value: topicDescending[0]?.label, detail: `${Math.round(topicDescending[0]?.percent || 0)}% across ${topicDescending[0]?.total || 0} items`, tone: "green" }, topicDescending.length > 1);
+      const difficulty = difficultyStats.slice().sort((left, right) => left.percent - right.percent || left.label.localeCompare(right.label))[0];
+      add({ icon: "brain-circuit", title: "Difficulty Check", value: difficulty?.label, detail: `${Math.round(difficulty?.percent || 0)}% across ${difficulty?.total || 0} items`, tone: "purple" }, Boolean(difficulty));
+    } else {
+      add({ icon: "target", title: "Weakest Section", value: summary.weakest?.section, detail: `${Math.round(summary.weakest?.percent || 0)}% accuracy`, tone: "red" }, Boolean(summary.weakest));
+      add({ icon: "trophy", title: "Strongest Section", value: summary.strongest?.section, detail: `${Math.round(summary.strongest?.percent || 0)}% accuracy`, tone: "green" }, Boolean(summary.strongest));
+      add({ icon: "notebook-tabs", title: "Most Missed Topic", value: topicAscending[0]?.label, detail: `${topicAscending[0]?.total - topicAscending[0]?.correct} missed of ${topicAscending[0]?.total}`, tone: "purple" }, Boolean(topicAscending[0]));
+    }
+
+    add({ icon: "timer", title: "Fastest Question", value: formatDuration(summary.fastest?.time_spent_seconds), detail: `Item ${summary.fastest?.display_number}`, tone: "cyan" }, Boolean(summary.fastest));
+    add({ icon: "timer", title: "Longest Question", value: formatDuration(summary.slowest?.time_spent_seconds), detail: `Item ${summary.slowest?.display_number}`, tone: "amber" }, Boolean(summary.slowest));
+    add({ icon: "brain-circuit", title: "Answer Changes", value: String(summary.changed), detail: `${summary.wrongToCorrect} improved / ${summary.correctToWrong} lost`, tone: "purple" });
+    add({ icon: "notebook-tabs", title: "Review Load", value: `${skippedCount(attempt) + unansweredCount(attempt) + flaggedCount(attempt)}`, detail: `${skippedCount(attempt)} skipped / ${flaggedCount(attempt)} flagged`, tone: "blue" });
+    add({ icon: "circle-check", title: "Longest Correct Streak", value: String(longestCorrectStreak(answers)), detail: "Consecutive correct answers", tone: "green" });
+    add({ icon: "target", title: "Coverage", value: `${answeredCount(attempt)} / ${attempt.total_questions}`, detail: unansweredCount(attempt) ? `${unansweredCount(attempt)} unanswered` : "Every item answered", tone: "cyan" });
+    if (attempt.total_time_seconds) {
+      const unused = Math.max(0, attempt.total_time_seconds - Number(attempt.elapsed_seconds || 0));
+      add({ icon: "timer", title: unused > 0 ? "Time Remaining" : "Time Used", value: formatDuration(unused > 0 ? unused : attempt.elapsed_seconds), detail: unused > 0 ? "Unused at submission" : "Full timer used", tone: "amber" });
+    }
+    add({ icon: "target", title: "Overall Accuracy", value: `${Math.round(resultPercent(attempt))}%`, detail: `${scoreAttempt(attempt)} of ${attempt.total_questions} correct`, tone: "cyan" });
+    add({ icon: "history", title: "Questions Visited", value: String(visitedCount(attempt)), detail: `${Math.max(0, attempt.total_questions - visitedCount(attempt))} not revisited`, tone: "blue" });
+
+    const selected = [];
+    const seen = new Set();
+    for (const candidate of candidates) {
+      if (seen.has(candidate.title)) continue;
+      seen.add(candidate.title);
+      selected.push(candidate);
+      if (selected.length === 6) break;
+    }
+    return selected;
+  }
+
+  function groupedAnswerStats(answers, labelFor) {
+    const groups = new Map();
+    for (const answer of answers) {
+      const label = String(labelFor(answer) || "Other").trim() || "Other";
+      const row = groups.get(label) || { label, total: 0, correct: 0 };
+      row.total += 1;
+      if (answer.selected_choice === answer.correct_choice) row.correct += 1;
+      groups.set(label, row);
+    }
+    return [...groups.values()].map((row) => ({ ...row, percent: row.total ? (row.correct / row.total) * 100 : 0 }));
+  }
+
+  function longestCorrectStreak(answers) {
+    let best = 0;
+    let current = 0;
+    for (const answer of answers) {
+      if (answer.selected_choice === answer.correct_choice) {
+        current += 1;
+        best = Math.max(best, current);
+      } else {
+        current = 0;
+      }
+    }
+    return best;
   }
 
   function categoryPerformance(attempts) {
@@ -3854,6 +4191,10 @@
 
   function sectionLabel(section) {
     return SECTION_GROUPS.find((group) => group.section === section)?.label || section;
+  }
+
+  function firstName(value) {
+    return String(value || "Reviewer").trim().split(/\s+/)[0] || "Reviewer";
   }
 
   function toneForSection(section) {
@@ -3993,6 +4334,7 @@
       bell: "M18 16H6l2-3V9a4 4 0 0 1 8 0v4l2 3zM10 19h4",
       volume: "M4 10h4l5-4v12l-5-4H4v-4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11",
       "volume-off": "M4 10h4l5-4v12l-5-4H4v-4zM17 9l5 5M22 9l-5 5",
+      shuffle: "M3 7h3c4 0 5 10 9 10h6M17 13l4 4-4 4M3 17h3c1.7 0 2.9-1.8 4-4M14 7c.4 0 .7 0 1 0h6M17 3l4 4-4 4",
       music: "M9 18V5l10-2v13M9 9l10-2M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM16 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
       grid: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
       clock: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 5v5l4 2",

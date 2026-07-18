@@ -365,6 +365,30 @@ Store artifacts under:
 qa/<ticket-or-date>/
 ```
 
+Every UI ticket must create a coverage manifest before release testing. Each
+required row records:
+
+- route or fixture and starting data condition
+- viewport and approved reference
+- user action and expected visible result
+- expected functional result
+- scroll owner and required lower-content evidence
+- screenshot, trace, or video filename
+- functional, reachability, and parity verdicts
+
+Required rows cannot disappear conditionally. A missing control, unexecuted
+assertion, absent screenshot, or skipped required branch is a failure. Reports
+must state expected, executed, passed, failed, blocked, and skipped counts.
+`passed + failed + blocked + skipped` must equal the expected count, and a
+release verdict requires `failed = blocked = skipped = 0`.
+
+Use four separate QA verdicts. Never collapse them into the phrase `QA passed`:
+
+1. Functional correctness: the intended state and data transition occurred.
+2. Human reachability: a user could visibly find and operate the control.
+3. Optical parity: the state meets the approved reference and quality bar.
+4. Live verification: the deployed cache-busted build repeats the smoke path.
+
 For generated-image or screenshot adaptation, follow
 `docs/Generated_Image_To_UI_Playbook.md` when available and relevant.
 
@@ -404,10 +428,34 @@ The agent must:
 10. Repeat the same smoke path on the cache-busted live deployment and verify
     that the live asset versions match the tested local build.
 
+Reachability evidence must use the same means available to a user: visible
+pointer clicks, wheel or touchpad scrolling, keyboard focus/navigation, and
+pointer dragging. During the measured user path, do not use DOM `evaluate()`
+to mutate state or scroll position, `scrollIntoViewIfNeeded()`, hidden-element
+clicks, forced accordion state, direct route/state mutation, or locator actions
+that automatically rescue an offscreen control. Deterministic setup is allowed
+only before the path begins, must be declared in the manifest, and cannot
+perform the interaction being verified.
+
+Required controls must be asserted before interaction. Constructs such as
+`if (await locator.count())` are prohibited for required coverage unless the
+missing branch explicitly records a failed check. Fixtures must reproduce the
+real production interaction structure; a fixture-only shortcut does not prove
+production reachability.
+
+For the exam navigator, permanent release coverage must start collapsed, open
+More visibly, capture the expanded state, wheel through every lower section,
+open item 80, return to item 21 without fixture reset, operate Less visibly,
+and verify sensible scroll clamping plus continued access to every section.
+
 A UI ticket is not complete when external Edge control is unavailable, the
 window was not maximized, screenshots were not saved, any interaction was
 skipped without a risk-based reason, or the last code change was not
 recaptured. Report the exact incomplete portion instead of claiming success.
+
+The first external-Edge screenshot must show the maximized application window,
+100% browser zoom, and measured content viewport. Headless Edge is regression
+evidence only and cannot satisfy the manual gate.
 
 ## Visual Parity Quality Agent
 
@@ -415,6 +463,11 @@ For screenshot or generated-image parity, use the active reference version
 named by its manifest. V5 is the active reference for states that have an
 approved V5 image; the V4 Study Hub remains authoritative only where its
 manifest or ticket explicitly says so.
+
+The active reference manifest must map every applicable state to its reference
+image, target viewport, primary panel anchors, typography roles, physical type
+and icon sizes, color ownership, scroll owner, interaction variants, and any
+approved deviation. A state without a manifest entry cannot claim parity.
 
 The agent must reject and repair:
 
@@ -428,11 +481,49 @@ The agent must reject and repair:
   hover-induced scrollbar shifts, and inaccessible expanded content
 - decorative animation without a defined state purpose, endpoint, and
   reduced-motion behavior
+- broken, open, disconnected, or visually weak clipped-corner frames
+- dynamic counters whose width changes shift neighboring HUD content
+- large unexplained empty regions or layouts permanently sized for a stimulus
+  that is absent in the current question
+- section-owned data rendered with a generic color instead of its semantic
+  General, Verbal, Numerical, or Analytical color
 - any state that passes geometry checks but remains visibly lower quality than
   its approved reference
 
 Use bounding-box metrics to locate defects and screenshots to judge optical
-quality. Passing overflow metrics alone never establishes parity.
+quality. Passing overflow metrics alone never establishes parity. Compare the
+implementation and reference at the same physical viewport using an overlay or
+side-by-side contact sheet. Record panel-anchor, type-scale, icon-scale,
+spacing, density, border-continuity, and color differences in a delta log.
+Automated pixel differences may guide inspection but cannot replace optical
+judgment.
+
+Every screenshot and report must record the git commit or worktree fingerprint,
+asset cache key, viewport, fixture/data state, and capture time. Any later code
+or style edit invalidates affected evidence. Recapture the affected route and
+rerun its interactions after the final edit.
+
+## Independent Release Auditor
+
+After implementation and before deployment, run a separate adversarial audit
+from the approved references, coverage manifest, and working application. Do
+not begin from the implementer's claimed pass list.
+
+The auditor must:
+
+- test empty, partial, typical, dense, long-text, error, loading, and submitted
+  data shapes where applicable
+- inspect every coverage row and fail missing evidence
+- compare generated contact sheets against the active references
+- report defects before summaries and distinguish functional, reachability,
+  parity, accessibility, and live-deployment findings
+- reject stale assertions that encode retired behavior or omit newly approved
+  behavior
+- require a regression assertion for every user-reported reproducible defect
+- rerun the complete affected matrix after repairs
+
+The implementer may repair findings, but the final audit must start again from
+the resulting build rather than inheriting the previous verdict.
 
 
 ## Browser targets and proportional verification
@@ -477,6 +568,17 @@ Playwright tests should use user-visible behavior, resilient locators,
 deterministic fixtures, and isolated state. Capture video or trace for
 meaningful motion or timing behavior.
 
+Interaction harnesses must declare their expected check names before execution.
+Duplicate names, missing names, unexecuted checks, and unexpected checks fail
+the run. Optional product behavior must be labeled explicitly and cannot count
+toward required coverage. A test that uses automation-assisted scrolling may
+verify DOM behavior but must be labeled `functional`, never `reachability`.
+
+Reference and test manifests must be checked for drift. Retired behavior must
+be removed from both; newly approved behavior must have coverage before release.
+Purposeful motion is verified with timing evidence and reduced-motion evidence,
+not by asserting that all active animations equal zero.
+
 Cross-user access bugs are release blockers.
 
 ## CI and deployment
@@ -506,6 +608,12 @@ A ticket is complete only when all applicable conditions are true:
 - Supabase security changes have policy verification
 - incomplete areas are explicit
 - the report lists commands, outcomes, artifacts, risks, and follow-ups
+- the coverage manifest has no failed, blocked, skipped, or unexecuted required
+  rows
+- functional, human-reachability, optical-parity, and live-deployment verdicts
+  are reported separately
+- evidence identifies the final tested build and cache key
+- an independent final audit was rerun after the last implementation edit
 
 Do not say "done" when required verification was skipped, blocked without being
 reported, or replaced with assumption.

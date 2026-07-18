@@ -1,6 +1,6 @@
 # Repo Current State
 
-Last updated: 2026-07-16
+Last updated: 2026-07-17
 
 ## Workspace
 
@@ -122,7 +122,9 @@ Current source item boundaries:
 
 ## Current Active Ticket
 
-- No implementation ticket is active. The next content gate is a qualified independent second review of the authored bank.
+- `T0040 - Enforced QA Gates And Complete V5 Rework` is active.
+- The authored bank remains unchanged; its qualified independent second review
+  is still a separate content gate.
 
 ## T0035 Outcome
 
@@ -222,3 +224,13 @@ Current source item boundaries:
 ## Next Ticket
 
 - Qualified independent second review of authored legal, Filipino, numerical, and analytical items, or Supabase backup/export before broader use.
+
+## T0040 Current Implementation
+
+- The approved V5 rework is implemented across auth, Study Hub, Setup, active exam, shared stimuli, Practice & Review, Progress, Results, Answer Review, and Account Settings.
+- Runtime audio now provides 12 local licensed tracks (six Cafe Jazz and six Classical), shuffle/previous/next/mute/category/track controls, separate music and effects volumes, and four non-hover effect families. Both music and effects default to off and require user action.
+- Exam timing uses persisted wall-clock anchors instead of interval counts; fixed-width tabular HUD values prevent counter-driven layout shift. Digit/numpad 1-4 select A-D and Enter advances only after an answer, opening confirmation rather than directly submitting item 170.
+- Account personalization stores a separate nickname and stages one of 20 V5 animal avatars until Save Changes.
+- Results preserve six insight slots with data-availability fallbacks, and full mock pass/fail screens share the approved fail-screen geometry with status-color changes only.
+- Final content validation passes 20 versions, 3,400 questions, section/difficulty blueprints, stimuli, answer-key balance, and duplicate-family checks. Every item remains `needs_review` until qualified independent review.
+- Static assets are cache-busted through `app.js?v=20260718-01` and `v5-production.css?v=20260718-01`; deployment and final live evidence are pending.

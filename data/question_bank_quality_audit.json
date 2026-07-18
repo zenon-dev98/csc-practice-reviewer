@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-16T00:00:11.816Z",
+  "generatedAt": "2026-07-18T09:58:20.025Z",
   "source": "app/question-bank",
   "versionCount": 20,
   "totalQuestions": 3400,
@@ -14,34 +14,12 @@
   "exactDuplicatePromptGroupCount": 0,
   "templateDuplicatePromptGroupCount": 0,
   "shuffledDuplicateGroupCount": 0,
-  "repeatedExplanationGroupCount": 1,
+  "repeatedExplanationGroupCount": 0,
   "ambiguousLogicGroups": [],
   "exactDuplicates": [],
   "templateDuplicates": [],
   "shuffledDuplicates": [],
-  "repeatedExplanations": [
-    {
-      "key": "article ii, section 10 directs the state to promote social justice in all phases of national development.",
-      "count": 3,
-      "questions": [
-        {
-          "id": "v08-q003",
-          "version": 8,
-          "itemNumber": 3
-        },
-        {
-          "id": "v10-q005",
-          "version": 10,
-          "itemNumber": 5
-        },
-        {
-          "id": "v12-q001",
-          "version": 12,
-          "itemNumber": 1
-        }
-      ]
-    }
-  ],
+  "repeatedExplanations": [],
   "versionReports": [
     {
       "id": "professional-v01",
