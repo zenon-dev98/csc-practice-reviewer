@@ -37,7 +37,7 @@ Implementation notes (2026-07-18):
 - Added six local Cafe Jazz and six local Classical tracks with source/license records, no-repeat shuffle-bag ordering, previous/next controls, independent music/effects volume, mute, and four restrained synthesized effect families. Music and effects remain off by default and playback requires user gesture.
 - Repaired Progress row/footer overlap and allowed two-line Results insight values instead of truncating section names.
 - `npm run check` passes for 20 versions and 3,400 questions with zero exact, normalized-template, shuffled-choice, ambiguous-logic, or structural findings. All production questions remain honestly marked `needs_review` pending qualified second review.
-- The archived visible interaction evidence confirms collapsed-to-More, item 80, return-to-item 21, and Less without a fixture reset. The final local Edge rerun is blocked before launch by host `spawn EPERM`; final live replay remains required before this ticket can be marked done.
+- The final tested fingerprint passes 240/240 desktop visual captures, 56/56 visible interaction checks, and 4/4 motion checks. Coverage includes collapsed-to-More, wheel access through lower groups, item 80, return to item 21 without reset, Less, wall-clock timer cadence, keyboard answer shortcuts, audio, dialogs, pause/resume, and submit. Cache-busted live replay and the requested hands-on maximized Edge inspection remain the final release gates.
 
 
 ## T0039 - Restore V5 Mock Exam Instrument Deck

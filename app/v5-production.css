@@ -4308,19 +4308,20 @@ html body main#app.app-shell.cockpit-desktop[data-input-mode="keyboard"] .accoun
 
   html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight {
     display: grid !important;
-    height: 83px !important;
+    height: 164px !important;
     min-height: 0 !important;
-    grid-template-columns: 64px minmax(0, 1fr) !important;
-    grid-template-rows: 1fr !important;
-    align-items: center !important;
-    padding: 8px 16px !important;
-    gap: 10px !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 52px minmax(0, 1fr) !important;
+    align-content: start !important;
+    padding: 14px !important;
+    gap: 8px !important;
   }
 
   html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight > span {
     display: grid !important;
-    width: 52px !important;
-    height: 52px !important;
+    width: 46px !important;
+    height: 46px !important;
+    justify-self: start !important;
     place-items: center !important;
     margin: 0 !important;
     border: 1px solid currentColor !important;
@@ -4335,9 +4336,9 @@ html body main#app.app-shell.cockpit-desktop[data-input-mode="keyboard"] .accoun
   html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight > div {
     display: grid !important;
     min-width: 0 !important;
-    grid-template-rows: 16px 28px 16px !important;
-    align-content: center !important;
-    gap: 2px !important;
+    grid-template-rows: 16px minmax(36px, auto) minmax(16px, auto) !important;
+    align-content: start !important;
+    gap: 4px !important;
   }
 
   html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight small,
@@ -4345,21 +4346,28 @@ html body main#app.app-shell.cockpit-desktop[data-input-mode="keyboard"] .accoun
   html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight p {
     overflow: hidden !important;
     margin: 0 !important;
-    line-height: 1 !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
+    line-height: 1.1 !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
   }
 
   html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight small {
-    font-size: 12px !important;
+    font-size: 15px !important;
   }
 
   html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight strong {
-    font-size: 22px !important;
+    display: -webkit-box !important;
+    font-size: 18px !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
   }
 
   html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight p {
-    font-size: 12px !important;
+    display: -webkit-box !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
   }
 }
 
@@ -5425,6 +5433,17 @@ html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .set
   html body #app :is(.performance-row,.result-section-card) i > em {
     transition: width 320ms cubic-bezier(.2,.75,.25,1) !important;
   }
+
+  html body #app :is(
+    .status-online i,
+    .practice-mode-card.active > .local-icon:first-child,
+    .hub-scan-lines,
+    .hub-resume-button::after,
+    .hub-hero h1 em
+  ),
+  html body #app .technical-title > span[aria-hidden]::before {
+    animation: none !important;
+  }
 }
 
 @keyframes v5-page-reveal {
@@ -5440,4 +5459,154 @@ html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .set
 @keyframes v5-selection-confirm {
   from { box-shadow: inset 4px 0 0 var(--v5-cyan), 0 0 0 rgba(25, 215, 216, 0); }
   to { box-shadow: inset 4px 0 0 var(--v5-cyan), 0 0 18px rgba(25, 215, 216, .18); }
+}
+
+/* Physical-size floor for the uniformly scaled desktop cockpit. */
+@media (min-width: 1100px) {
+  html body #app.cockpit-desktop .question-chip {
+    min-height: 46px !important;
+    font-size: 17px !important;
+  }
+
+  html body #app.cockpit-desktop .question-chip.more-chip {
+    min-height: 44px !important;
+  }
+
+  html body #app.cockpit-desktop .exam-actions .btn,
+  html body #app.cockpit-desktop .question-actions .btn,
+  html body #app.cockpit-desktop .exam-footer .btn {
+    min-height: 48px !important;
+    font-size: 17px !important;
+  }
+
+  html body #app.cockpit-desktop .progress-tabs button,
+  html body #app.cockpit-desktop .progress-page .row-actions .btn.tiny,
+  html body #app.cockpit-desktop .review-focus-cta {
+    min-height: 44px !important;
+    font-size: 17px !important;
+  }
+
+  html body #app.cockpit-desktop .results-action-row .result-action {
+    font-size: 17px !important;
+  }
+
+  html body #app.cockpit-desktop .run-insights-panel .result-insight small {
+    font-size: 15px !important;
+  }
+
+  html body #app.cockpit-desktop .run-insights-panel .result-insight p {
+    font-size: 14px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.exam-shell .question-panel .question-actions .btn,
+  html body main#app.app-shell.cockpit-desktop section.exam-shell .stimulus-head .btn.tiny,
+  html body main#app.app-shell.cockpit-desktop section.exam-shell .stimulus-question-links button,
+  html body main#app.app-shell.cockpit-desktop section.content-page.practice-review-page .flagged-table-row .btn.tiny,
+  html body main#app.app-shell.cockpit-desktop .modal-actions .btn {
+    min-height: 44px !important;
+    font-size: 17px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.exam-shell .question-panel .question-actions .btn {
+    min-height: 48px !important;
+    overflow: hidden !important;
+    padding-inline: 5px !important;
+    line-height: 1.05 !important;
+    white-space: normal !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop :is(.hub-mode,.practice-mode-card) {
+    font-size: 17px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .hub-action-dock > button.hub-mode,
+  html body main#app.app-shell.cockpit-desktop section.content-page.practice-review-page > .practice-mode-cards > button.practice-mode-card {
+    font-size: 17px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.exam-shell .linked-items button,
+  html body main#app.app-shell.cockpit-desktop .empty-state :is(.btn,button[data-action]) {
+    min-height: 44px !important;
+    font-size: 17px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop :is(.hub-mode,.practice-mode-card) small,
+  html body main#app.app-shell.cockpit-desktop :is(.mistake-table-head,.table-head) {
+    font-size: 15px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop :is(.auth-card,.profile-modal,.password-modal,.reset-modal) :is(.field-label,label) {
+    font-size: 16px !important;
+  }
+
+  /* Answer Review owns one bounded workstation row; the navigator scrolls inside it. */
+  html body main#app.app-shell.cockpit-desktop section.review-page .review-workstation {
+    height: 100% !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.review-page .review-navigator-console {
+    height: 100% !important;
+    grid-template-rows: 150px minmax(0, 1fr) !important;
+    overflow: hidden !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.review-page .review-filter-panel {
+    display: grid !important;
+    grid-template-rows: 36px minmax(0, 1fr) !important;
+    overflow: hidden !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.review-page .review-filter-panel .filter-list {
+    align-content: start !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, 44px) !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.review-page .review-filter-panel .filter-list button,
+  html body main#app.app-shell.cockpit-desktop section.review-page .review-matrix-row {
+    min-height: 44px !important;
+    height: 44px !important;
+    font-size: 17px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.review-page .review-matrix-panel,
+  html body main#app.app-shell.cockpit-desktop section.review-page .review-matrix-scroll {
+    min-height: 0 !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .chart-modal .linked-items button {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    font-size: 17px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.practice-review-page :is(.section-plate,.segment-label) {
+    font-size: 16px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop section.practice-review-page :is(.count-segments,.difficulty-segments) label,
+  html body main#app.app-shell.cockpit-desktop section.practice-review-page :is(.count-segments,.difficulty-segments) label span {
+    font-size: 16px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .progress-page .progress-empty-state > .btn,
+  html body main#app.app-shell.cockpit-desktop .technical-row-cta {
+    min-height: 44px !important;
+    font-size: 17px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .reset-modal .btn,
+  html body main#app.app-shell.cockpit-desktop .profile-modal :is(.account-command-row,.audio-category button,.audio-toggle,.account-modal-actions .btn,.account-danger-row .btn) {
+    min-height: 44px !important;
+    font-size: 17px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .profile-modal .audio-category button {
+    height: 44px !important;
+  }
+
+  html body main#app.app-shell.cockpit-desktop .confirm-modal .delete-confirm-field {
+    font-size: 16px !important;
+  }
 }

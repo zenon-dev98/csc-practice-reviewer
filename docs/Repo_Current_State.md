@@ -233,4 +233,4 @@ Current source item boundaries:
 - Account personalization stores a separate nickname and stages one of 20 V5 animal avatars until Save Changes.
 - Results preserve six insight slots with data-availability fallbacks, and full mock pass/fail screens share the approved fail-screen geometry with status-color changes only.
 - Final content validation passes 20 versions, 3,400 questions, section/difficulty blueprints, stimuli, answer-key balance, and duplicate-family checks. Every item remains `needs_review` until qualified independent review.
-- Static assets are cache-busted through `app.js?v=20260718-01` and `v5-production.css?v=20260718-01`; deployment and final live evidence are pending.
+- Static assets are cache-busted through `app.js?v=20260718-02` and `v5-production.css?v=20260718-02`. The final local release fingerprint passes 240/240 desktop visual captures, 56/56 interaction checks, and 4/4 motion checks; cache-busted live replay and hands-on Edge inspection are the remaining release gates.

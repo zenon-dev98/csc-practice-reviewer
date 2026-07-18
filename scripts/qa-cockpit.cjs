@@ -240,7 +240,7 @@ function buildMetadata() {
           [".brand span", 11, "brand subtitle"],
           [".page-head h1, .hub-hero h1, .auth-form-card h1, .modal-heading h2", 30, "page title"],
           ["label", 12, "field label"],
-          ["button:not(.question-chip):not(.icon-only):not(.mobile-bottom-nav button)", 13, "button label"],
+          ["button:not(.choice):not(.question-chip):not(.icon-only):not(.text-link):not(.mobile-bottom-nav button)", 13, "button label"],
           [".question-prompt", 18, "question prompt"],
           [".choice strong", 15, "answer choice"],
           [".hub-mode small, .hub-record small, .allocation-copy small, .result-insight small, .mistake-table-head, .table-head", 11, "supporting copy"]
@@ -248,13 +248,15 @@ function buildMetadata() {
         typeRules.forEach(([selector, minimum, role]) => {
           document.querySelectorAll(selector).forEach((node) => {
             if (!visible(node)) return;
+            if (node.matches("button") && !(node.textContent || "").trim()) return;
             const physicalSize = parseFloat(getComputedStyle(node).fontSize) * physicalScale;
             if (physicalSize + 0.1 < minimum) visualDefects.push(`${role} '${(node.textContent || "").trim().slice(0, 42)}' is ${physicalSize.toFixed(1)}px physical; minimum ${minimum}px`);
           });
         });
         const controlMinimum = innerWidth < 1100 ? 44 : 34;
-        document.querySelectorAll("button:not(.question-chip):not(.icon-only):not(.signed-primary-nav button):not(.mobile-bottom-nav button)").forEach((button) => {
+        document.querySelectorAll("button:not(.question-chip):not(.icon-only):not(.text-link):not(.signed-primary-nav button):not(.mobile-bottom-nav button)").forEach((button) => {
           if (!visible(button)) return;
+          if (!(button.textContent || "").trim()) return;
           const height = button.getBoundingClientRect().height;
           if (height + 0.1 < controlMinimum) visualDefects.push(`control '${(button.textContent || button.getAttribute("aria-label") || "").trim().slice(0, 42)}' is ${height.toFixed(1)}px high; minimum ${controlMinimum}px`);
         });

@@ -2122,7 +2122,11 @@
   }
 
   function navGroupOpen(group, hasCurrent) {
-    if (app.fixtureState === "exam") return group.section === "General Information";
+    if (app.fixtureState === "exam") {
+      return group.section === "General Information"
+        || app.openNavGroups.has(group.section)
+        || app.expandedNavGroups.has(group.section);
+    }
     if (app.fixtureState === "graph") return group.section === "Numerical Ability";
     return hasCurrent || app.openNavGroups.has(group.section);
   }

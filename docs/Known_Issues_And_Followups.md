@@ -1,7 +1,7 @@
 # Known Issues And Followups
 
 ## Open
-- T0040 local browser automation is currently blocked before Edge launch by the host `spawn EPERM` policy. Existing external-Edge evidence remains useful for unchanged states, but the final CSS repair requires cache-busted live recapture before T0040 can be marked complete.
+- T0040's final local automated release evidence is clean. The cache-busted live replay and the user's hands-on maximized Edge inspection remain required before closing the ticket; automation evidence does not replace that manual gate.
 - All 3,400 authored questions remain `needs_review`. Automated structural, duplicate, balance, and coverage checks are clean, but qualified second review is still required for legal nuance, Filipino usage, distractor strength, and pedagogy.
 
 - Future generated-image work must follow `docs/Generated_Image_To_UI_Playbook.md` and the `Generated Image Parity Agent` in `AGENTS.md`; the playbook does not itself approve the unresolved T0026 content decisions.

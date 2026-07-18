@@ -175,9 +175,17 @@ function buildMetadata() {
   }
 
   async function clickContained(locator, owner) {
-    if (!(await containedIn(locator, owner))) throw new Error(`Control is not visibly contained: ${await locator.first().getAttribute("data-action") || await locator.first().textContent()}`);
-    const target = await locator.boundingBox();
-    await page.mouse.click(target.x + target.width / 2, target.y + target.height / 2);
+    for (let attempt = 0; attempt < 6; attempt += 1) {
+      if (await containedIn(locator, owner)) {
+        const target = await locator.boundingBox();
+        if (target) {
+          await page.mouse.click(target.x + target.width / 2, target.y + target.height / 2);
+          return;
+        }
+      }
+      await page.waitForTimeout(25);
+    }
+    throw new Error(`Control is not visibly contained: ${await locator.first().getAttribute("data-action") || await locator.first().textContent()}`);
   }
 
   await test("auth controls", QA_CASES.auth, async () => {
