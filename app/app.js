@@ -1213,7 +1213,7 @@
     const versionNumber = app.fixtureMode ? 7 : version?.number;
     const runLabel = attempt.mode === "practice" ? escapeHtml(attempt.title || "Practice") : `Mock Exam ${versionNumber ? String(versionNumber).padStart(2, "0") : ""}`.trim();
     root.innerHTML = cockpitFrame(`
-      <section class="exam-shell ${app.fixtureMode ? "fixture-exam" : ""} state-${escapeAttr(app.fixtureState || "live")} ${isPaused ? "is-paused" : ""} ${isPaused || app.modal === "submit" ? "exam-dimmed" : ""}" data-motion-purpose="page-enter">
+      <section class="exam-shell ${app.fixtureMode ? "fixture-exam" : ""} state-${escapeAttr(app.fixtureState || "live")} ${isPaused ? "is-paused" : ""} ${isPaused || app.modal === "submit" ? "exam-dimmed" : ""}">
         <header class="exam-topbar">
           <div class="exam-brand">${logo()}<div><strong>CSC Practice Reviewer</strong><span>Independent mock exam and review tool</span></div></div>
           <div class="exam-status" aria-label="Exam status">

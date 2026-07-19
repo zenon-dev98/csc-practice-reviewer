@@ -48,7 +48,7 @@ async function inspectMotion(page) {
     verdict: "failed"
   };
 
-  async function runCase(name, reducedMotion, fixture, interact) {
+  async function runCase(name, reducedMotion, fixture, interact, forbiddenPurposes = []) {
     const context = await browser.newContext({
       viewport: { width: 1672, height: 942 },
       deviceScaleFactor: 1,
@@ -90,8 +90,9 @@ async function inspectMotion(page) {
     const runningReduced = reducedMotion === "reduce"
       ? metrics.animations.filter((animation) => animation.playState === "running" && animation.duration > 1)
       : [];
-    const passed = !error && !runtimeErrors.length && !missingPurpose && !endless.length && !runningReduced.length;
-    const entry = { name, reducedMotion, fixture, screenshotFile, traceFile, videoFile, metrics, runtimeErrors, error, passed };
+    const forbidden = metrics.animations.filter((animation) => forbiddenPurposes.includes(animation.targetPurpose));
+    const passed = !error && !runtimeErrors.length && !missingPurpose && !endless.length && !runningReduced.length && !forbidden.length;
+    const entry = { name, reducedMotion, fixture, screenshotFile, traceFile, videoFile, metrics, runtimeErrors, forbidden, error, passed };
     report.cases.push(entry);
     if (!passed) report.errors.push(entry);
   }
@@ -102,7 +103,7 @@ async function inspectMotion(page) {
   await runCase("normal-answer-and-modal", "no-preference", "exam-collapsed", async (page) => {
     await page.locator("[data-choice]").first().click();
     await page.locator("[data-action='pause-exam']").click();
-  });
+  }, ["page-enter"]);
   await runCase("reduced-page-transition", "reduce", "dashboard", async (page) => {
     await page.locator(".signed-primary-nav [data-action='practice-page']").click();
   });

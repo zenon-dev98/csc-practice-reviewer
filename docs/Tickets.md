@@ -1,5 +1,21 @@
 # Tickets
 
+## T0041 - Remove Exam Action Blink
+
+Status: in_progress
+
+Prevent routine exam actions from replaying the full-page entry animation when
+the exam DOM rerenders. Preserve restrained answer-selection and modal motion,
+and add a motion regression assertion that rejects `page-enter` animation on
+exam interactions.
+
+Implementation notes (2026-07-19):
+
+- Removed `data-motion-purpose="page-enter"` from the persistent exam shell.
+- The local motion matrix passes 4/4, including the explicit forbidden-motion
+  assertion, and the full interaction matrix passes 56/56 across 80 captures.
+- Live cache-busted verification remains before closure.
+
 ## T0040 - Enforced QA Gates And Complete V5 Rework
 
 Status: in_progress
@@ -38,6 +54,7 @@ Implementation notes (2026-07-18):
 - Repaired Progress row/footer overlap and allowed two-line Results insight values instead of truncating section names.
 - `npm run check` passes for 20 versions and 3,400 questions with zero exact, normalized-template, shuffled-choice, ambiguous-logic, or structural findings. All production questions remain honestly marked `needs_review` pending qualified second review.
 - The final tested fingerprint passes 240/240 desktop visual captures, 56/56 visible interaction checks, and 4/4 motion checks. Coverage includes collapsed-to-More, wheel access through lower groups, item 80, return to item 21 without reset, Less, wall-clock timer cadence, keyboard answer shortcuts, audio, dialogs, pause/resume, and submit. Cache-busted live replay and the requested hands-on maximized Edge inspection remain the final release gates.
+- Removed the exam shell's page-entry animation from routine answer and navigation rerenders. Choice confirmation and modal motion remain, while the motion harness now rejects any reintroduced full-page animation during exam controls.
 
 
 ## T0039 - Restore V5 Mock Exam Instrument Deck
