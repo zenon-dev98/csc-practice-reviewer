@@ -2,7 +2,7 @@
 
 ## T0041 - Remove Exam Action Blink
 
-Status: in_progress
+Status: done
 
 Prevent routine exam actions from replaying the full-page entry animation when
 the exam DOM rerenders. Preserve restrained answer-selection and modal motion,
@@ -12,9 +12,11 @@ exam interactions.
 Implementation notes (2026-07-19):
 
 - Removed `data-motion-purpose="page-enter"` from the persistent exam shell.
-- The local motion matrix passes 4/4, including the explicit forbidden-motion
-  assertion, and the full interaction matrix passes 56/56 across 80 captures.
-- Live cache-busted verification remains before closure.
+- The motion matrix samples Answer, Flag, Clear, Next, Previous, Skip, and Pause
+  individually and rejects any full-page entry animation. The full interaction
+  matrix passes 56/56 across 80 captures.
+- The cache-busted GitHub Pages build passes the same 4/4 motion matrix with
+  zero failures across every reported exam control.
 
 ## T0040 - Enforced QA Gates And Complete V5 Rework
 

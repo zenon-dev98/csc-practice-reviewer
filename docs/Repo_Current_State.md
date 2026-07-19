@@ -235,3 +235,4 @@ Current source item boundaries:
 - Final content validation passes 20 versions, 3,400 questions, section/difficulty blueprints, stimuli, answer-key balance, and duplicate-family checks. Every item remains `needs_review` until qualified independent review.
 - Static assets are cache-busted through `app.js?v=20260719-01` and `v5-production.css?v=20260718-02`. The final local release fingerprint passes 240/240 desktop visual captures, 56/56 interaction checks, and 4/4 motion checks; cache-busted live replay and hands-on Edge inspection are the remaining release gates.
 - Routine exam actions no longer replay page-entry motion when the exam DOM rerenders; the intentional answer-selection glow and modal reveal remain.
+- T0041 is live from commit `ef1e83a`. Local and live motion evidence explicitly covers Answer, Flag, Clear, Next, Previous, Skip, and Pause with zero full-page entry animation.

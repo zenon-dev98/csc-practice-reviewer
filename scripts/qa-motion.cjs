@@ -35,6 +35,11 @@ async function inspectMotion(page) {
   });
 }
 
+async function assertNoExamPageEntry(page, action) {
+  const count = await page.evaluate(() => document.getAnimations({ subtree: true }).filter((animation) => animation.effect?.target?.dataset?.motionPurpose === "page-enter").length);
+  if (count) throw new Error(`${action} replayed ${count} full-page entry animation(s)`);
+}
+
 (async () => {
   const browser = await chromium.launch({ channel: "msedge", headless: true });
   const report = {
@@ -102,7 +107,20 @@ async function inspectMotion(page) {
   });
   await runCase("normal-answer-and-modal", "no-preference", "exam-collapsed", async (page) => {
     await page.locator("[data-choice]").first().click();
+    await assertNoExamPageEntry(page, "Answer selection");
+    await page.locator("[data-action='toggle-flag']").click();
+    await assertNoExamPageEntry(page, "Flag for Review");
+    await page.locator("[data-action='clear-answer']").click();
+    await assertNoExamPageEntry(page, "Clear Answer");
+    await page.locator("[data-choice]").first().click();
+    await page.locator("[data-action='next-question']").click();
+    await assertNoExamPageEntry(page, "Next");
+    await page.locator("[data-action='previous-question']").click();
+    await assertNoExamPageEntry(page, "Previous");
+    await page.locator("[data-action='skip-question']").click();
+    await assertNoExamPageEntry(page, "Skip");
     await page.locator("[data-action='pause-exam']").click();
+    await assertNoExamPageEntry(page, "Pause");
   }, ["page-enter"]);
   await runCase("reduced-page-transition", "reduce", "dashboard", async (page) => {
     await page.locator(".signed-primary-nav [data-action='practice-page']").click();
