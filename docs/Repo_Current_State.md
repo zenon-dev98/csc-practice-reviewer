@@ -1,6 +1,6 @@
 # Repo Current State
 
-Last updated: 2026-07-17
+Last updated: 2026-07-21
 
 ## Workspace
 
@@ -17,8 +17,9 @@ Path:
 - The app has been redesigned around the supplied `states/` screenshots, with approved source-backed deviations for A-D choices, section ranges, and one-profile-per-account auth in normal production mode.
 - Screenshot-parity, desktop-density, and desktop quality-repair passes have added fixture-state QA URLs, bounded dashboard/exam/sidebar/graph/modal contracts, expandable graph subgroups, and no-scroll desktop overflow checks across every supplied state.
 - Runtime persistence is now implemented against Supabase email/password auth and online tables, with per-attempt question snapshots and timing analytics.
+- Mock Exam Setup now supports an optional Paper answer sheet mode with two printable OMR pages, local browser-only scan recognition, manual uncertainty correction, and grading through the existing attempt submission path.
 - The app is deployed through GitHub Pages Actions at `https://zenon-dev98.github.io/csc-practice-reviewer/`.
-- The current live release is commit `0116e5c` with cache key `20260716-06`; it supersedes the compact Mock Exam format rail with the approved V5 four-column instrument deck and matching clipboard, movement, and pause iconography.
+- The current release uses cache key `20260721-01`; it includes the approved V5 cockpit rework, audio/avatar assets, the no-blink exam controls, and Paper answer sheet scan-to-grade mode.
 - The public GitHub repository is `https://github.com/zenon-dev98/csc-practice-reviewer`.
 - The Supabase SQL/Auth Hook setup from `supabase/schema.sql` has been applied, including authenticated table grants and the `public.hook_validate_invite_code` Before User Created hook.
 - Supabase Auth email/password is enabled with email confirmation disabled for this invite-gated small-group reviewer, avoiding free email quota failures during signup.
@@ -122,9 +123,27 @@ Current source item boundaries:
 
 ## Current Active Ticket
 
+- `T0042 - Paper Exam And Scan-to-Grade Mode` is implemented and pending live
+  deployment verification.
 - `T0040 - Enforced QA Gates And Complete V5 Rework` is active.
 - The authored bank remains unchanged; its qualified independent second review
   is still a separate content gate.
+
+## T0042 Outcome
+
+- Added On-screen and Paper answer sheet modes to Mock Exam Setup. Paper mode
+  locks shuffling off and prints two version-labelled sheets for items 1-85 and
+  86-170.
+- Paper attempts retain question browsing and flags while keeping choices
+  read-only. Finishing or timing out freezes the attempt before scan review.
+- Added browser-local JPG/PNG normalization, alignment correction, 170-answer
+  recognition and correction, explicit blank confirmation, and submission of
+  extracted A-D answers through the existing scoring/persistence path.
+- Scan images never enter the Supabase payload. Paper results are labelled and
+  omit unsupported answer-change claims.
+- Local release evidence passes `npm run check`, the dedicated 31/31 paper
+  workflow matrix, and the full interaction matrix. Physical camera permission
+  capture and real two-device handoff remain hardware/account verification.
 
 ## T0035 Outcome
 

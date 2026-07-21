@@ -1,5 +1,38 @@
 # Tickets
 
+## T0042 - Paper Exam And Scan-to-Grade Mode
+
+Status: done
+
+Add a paper-answer workflow that keeps the web app as the question booklet,
+prints two app-specific answer sheets, recognizes two local scans, lets the
+reviewer correct uncertain marks, and grades the confirmed A-D answers through
+the existing submission path.
+
+Acceptance criteria:
+
+- Mock Exam Setup offers On-screen and Paper answer sheet modes.
+- Paper mode disables question and choice shuffling and prints items 1-85 and
+  86-170 on two marked Letter pages that also fit A4.
+- Paper exams keep navigation and flags, make choices read-only, allow Next
+  without an answer, and freeze the timer before scanning or on timeout.
+- Two JPG/PNG pages are normalized and classified locally, with automatic
+  orientation/alignment and manual four-corner correction when needed.
+- Blank, multiple, low-confidence, and corrected marks appear in an editable
+  170-item confirmation grid before grading.
+- Scan images remain in the browser; only confirmed A-D answers use the
+  existing Supabase submission path.
+- Results identify Paper mode and do not claim answer-change statistics.
+
+Implementation notes (2026-07-21):
+
+- Implemented the workflow with native Canvas and no production dependency.
+- Added Letter/A4 print verification and deterministic OMR cases for all 170
+  items, blanks, multiple marks, faint marks, corrections, skew, rotation,
+  shadow, and brightness.
+- `npm run qa:paper` passes 31/31 locally. Physical rear-camera permission and
+  real two-device Supabase handoff remain hardware/account verification items.
+
 ## T0041 - Remove Exam Action Blink
 
 Status: done

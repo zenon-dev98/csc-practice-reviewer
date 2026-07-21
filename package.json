@@ -13,6 +13,7 @@
     "qa:states": "node scripts/qa-cockpit.cjs qa/current-states",
     "qa:interactions": "node scripts/qa-interactions.cjs qa/current-interactions",
     "qa:motion": "node scripts/qa-motion.cjs qa/current-motion",
-    "qa:compare": "node scripts/qa-reference-report.cjs qa/current-states"
+    "qa:compare": "node scripts/qa-reference-report.cjs qa/current-states",
+    "qa:paper": "node scripts/qa-paper-mode.cjs qa/current-paper-mode"
   }
 }

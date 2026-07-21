@@ -1,6 +1,7 @@
 # Known Issues And Followups
 
 ## Open
+- T0042 automation validates camera-style image files, local-only OMR processing, frozen timeout handling, confirmation, and grading. Physical rear-camera permission capture and a real two-device Supabase handoff still require hardware/account verification and are not claimed as manually certified.
 - T0040's final local automated release evidence is clean. The cache-busted live replay and the user's hands-on maximized Edge inspection remain required before closing the ticket; automation evidence does not replace that manual gate.
 - All 3,400 authored questions remain `needs_review`. Automated structural, duplicate, balance, and coverage checks are clean, but qualified second review is still required for legal nuance, Filipino usage, distractor strength, and pedagogy.
 

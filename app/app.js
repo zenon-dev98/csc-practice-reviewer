@@ -7,6 +7,7 @@
   const PASSING_PERCENT = 80;
   const SYNC_INTERVAL_MS = 3500;
   const DEFAULT_PRACTICE_COUNT = 20;
+  const PAPER_POLL_INTERVAL_MS = 7000;
   const AUDIO_PREFS_KEY = "csc-reviewer-audio";
   const QA_TIMING_ENABLED = new URLSearchParams(location.search).get("qaTiming") === "1";
   const AVATAR_OPTIONS = [
@@ -66,6 +67,12 @@
     "dashboard",
     "dashboard-empty",
     "setup",
+    "paper-setup",
+    "paper-exam",
+    "paper-timeout",
+    "paper-scan",
+    "paper-review",
+    "paper-results",
     "exam",
     "exam-collapsed",
     "graph",
@@ -120,7 +127,9 @@
     versionId: examVersions[0]?.id || "",
     practiceCount: DEFAULT_PRACTICE_COUNT,
     practiceDifficulty: "mixed",
-    practiceCategory: "Verbal Ability"
+    practiceCategory: "Verbal Ability",
+    paperMode: false,
+    paperPhase: "answering"
   };
   const app = {
     client: null,
@@ -160,6 +169,12 @@
     accountAvatarDraft: null,
     examNavScrollTop: 0,
     examNavDrag: null,
+    paperScans: [null, null],
+    paperDetections: [],
+    paperBlankConfirmed: false,
+    paperDrag: null,
+    paperPollId: null,
+    paperSyncError: "",
     visibilityStartedAt: document.visibilityState === "visible" ? performance.now() : null,
     questionVersion: "1",
     fixtureMode: false,
@@ -290,6 +305,10 @@
     app.practiceReviewTab = "practice";
     app.expandedNavGroups.clear();
     app.openNavGroups.clear();
+    app.paperScans = [null, null];
+    app.paperDetections = [];
+    app.paperBlankConfirmed = false;
+    app.paperSyncError = "";
 
     const active = getAttempt("fixture-active");
     const submitted = getAttempt("fixture-submitted");
@@ -323,7 +342,10 @@
       } else if (fixtureState.startsWith("forgot")) app.modal = fixtureState;
       return setView({ name: "signin" });
     }
-    if (fixtureState === "setup") return setView({ name: "setup" });
+    if (fixtureState === "setup" || fixtureState === "paper-setup") {
+      if (fixtureState === "paper-setup") app.draft.options = { ...app.draft.options, paperMode: true, paperPhase: "answering" };
+      return setView({ name: "setup" });
+    }
     if (fixtureState === "practice" || fixtureState === "mistakes" || fixtureState === "flagged" || fixtureState === "flagged-empty") {
       if (fixtureState === "flagged-empty") {
         app.attempts.forEach((attempt) => Object.values(attempt.answers).forEach((answer) => { answer.flagged = false; }));
@@ -404,6 +426,22 @@
       active.elapsed_seconds = active.total_time_seconds;
       app.modal = "timeout";
       return setView({ name: "exam", attemptId: active.id });
+    }
+    if (fixtureState === "paper-timeout") {
+      active.options = { ...active.options, paperMode: true, paperPhase: "answering" };
+      active.status = "in_progress";
+      active.elapsed_seconds = active.total_time_seconds - 1;
+      return setView({ name: "exam", attemptId: active.id });
+    }
+    if (["paper-exam", "paper-scan", "paper-review"].includes(fixtureState)) {
+      active.options = { ...active.options, paperMode: true, paperPhase: fixtureState === "paper-exam" ? "answering" : fixtureState === "paper-review" ? "review" : "scanning" };
+      active.status = fixtureState === "paper-exam" ? "in_progress" : "paused";
+      if (fixtureState === "paper-review") seedPaperReviewFixture();
+      return setView({ name: "exam", attemptId: active.id });
+    }
+    if (fixtureState === "paper-results") {
+      submitted.options = { ...submitted.options, paperMode: true, paperPhase: "submitted" };
+      return setView({ name: "results", attemptId: submitted.id });
     }
     if (fixtureState === "exam" || fixtureState === "exam-collapsed") return setView({ name: "exam", attemptId: active.id });
     return setView({ name: "dashboard" });
@@ -793,6 +831,8 @@
   function render() {
     clearInterval(app.timerId);
     app.timerId = null;
+    clearInterval(app.paperPollId);
+    app.paperPollId = null;
     root.dataset.fixture = app.fixtureMode ? app.fixtureState : "";
     root.dataset.view = app.view.name;
     root.classList.toggle("fixture-mode", app.fixtureMode);
@@ -1144,6 +1184,7 @@
   function renderSetup() {
     const draftOptions = { ...DEFAULT_OPTIONS, ...(app.draft?.options || {}) };
     const savedVersionId = draftOptions.versionId || examVersions[0]?.id;
+    const paperMode = Boolean(draftOptions.paperMode);
     root.innerHTML = authedShell(`
       <section class="setup-page" data-motion-purpose="page-enter">
         <div class="page-title-row">
@@ -1178,17 +1219,23 @@
             </div>
           </section>
 
-          <form class="card setup-options run-configuration v5-panel" data-form="setup">
-            <div class="technical-title"><h2>Exam Options</h2><span aria-hidden="true"></span></div>
-            <label>Mock Version
+           <form class="card setup-options run-configuration v5-panel" data-form="setup">
+             <div class="technical-title"><h2>Exam Options</h2><span aria-hidden="true"></span></div>
+             <fieldset class="answer-mode-selector">
+               <legend>Answer Mode</legend>
+               <label class="answer-mode-card ${paperMode ? "" : "active"}"><input type="radio" name="answerMode" value="screen" ${paperMode ? "" : "checked"}><span>${localIcon("message-square")}<strong>On-screen</strong><small>Select answers in the reviewer</small></span></label>
+               <label class="answer-mode-card ${paperMode ? "active" : ""}"><input type="radio" name="answerMode" value="paper" ${paperMode ? "checked" : ""}><span>${localIcon("clipboard-list")}<strong>Paper answer sheet</strong><small>Print, mark, scan, and grade</small></span></label>
+             </fieldset>
+             <label>Mock Version
               <select name="versionId">
                 ${examVersions.map((version) => `<option value="${escapeAttr(version.id)}" ${version.id === savedVersionId ? "selected" : ""}>Mock Exam ${String(version.number).padStart(2, "0")}</option>`).join("")}
               </select>
             </label>
-            ${toggleControl("shuffleQuestions", "Shuffle Questions", draftOptions.shuffleQuestions)}
-            ${toggleControl("shuffleAnswers", "Shuffle Answer Choices", draftOptions.shuffleAnswers)}
-            <p class="setup-auto-save">${localIcon("cloud-check")} Your progress is autosaved. You can pause and resume at any time.</p>
-            <button class="btn primary technical-cta" data-action="setup-submit" type="button"><span>${icon("play")} Start Mock Exam</span>${icon("arrow")}</button>
+             ${toggleControl("shuffleQuestions", "Shuffle Questions", paperMode ? false : draftOptions.shuffleQuestions, paperMode)}
+             ${toggleControl("shuffleAnswers", "Shuffle Answer Choices", paperMode ? false : draftOptions.shuffleAnswers, paperMode)}
+             ${paperMode ? `<div class="paper-setup-note">${localIcon("clipboard-list")}<span><strong>Two printable sheets</strong><small>Page 1: Items 1-85 / Page 2: Items 86-170</small></span></div><button class="btn secondary paper-print-button" data-action="print-paper-sheets" type="button">${localIcon("clipboard-list")} Print Answer Sheets</button>` : ""}
+             <p class="setup-auto-save">${localIcon("cloud-check")} ${paperMode ? "Scans stay on this device. Only confirmed answers are saved." : "Your progress is autosaved. You can pause and resume at any time."}</p>
+             <button class="btn primary technical-cta" data-action="setup-submit" type="button"><span>${icon("play")} ${paperMode ? "Start Paper Exam" : "Start Mock Exam"}</span>${icon("arrow")}</button>
           </form>
         </div>
         <div class="setup-disclaimer">${icon("shield")}<p>These mock exams are independently created and are not affiliated with or endorsed by the Civil Service Commission.</p></div>
@@ -1199,12 +1246,14 @@
   function renderExam() {
     const attempt = getAttempt(app.view.attemptId);
     if (!attempt) return setView({ name: "dashboard" });
+    if (isPaperAttempt(attempt) && paperPhase(attempt) !== "answering") return renderPaperWorkflow(attempt);
     materializeQuestionClock(attempt);
     const current = currentAnswer(attempt);
     if (!current) return setView({ name: "dashboard" });
     const remaining = timeRemaining(attempt);
     const linked = linkedStimulusAnswers(attempt, current);
     const isPaused = attempt.status === "paused";
+    const paperMode = isPaperAttempt(attempt);
     const existingNav = root.querySelector(".exam-nav");
     if (existingNav) app.examNavScrollTop = existingNav.scrollTop;
     ensureAttemptClock(attempt);
@@ -1219,7 +1268,7 @@
           <div class="exam-status" aria-label="Exam status">
             <div class="exam-hud-cell exam-run-cell"><span>Run</span><strong>${runLabel}</strong></div>
             <div class="exam-hud-cell exam-time-cell"><span>${attempt.mode === "practice" ? "Mode" : isPaused ? "Timer" : "Time Left"}</span><strong class="exam-time"><b class="exam-time-value">${attempt.mode === "practice" ? "Untimed" : attempt.options?.showTimer === false ? "Hidden" : formatDuration(remaining)}</b></strong></div>
-            <div class="exam-hud-cell exam-answered-cell"><span>Answered</span><strong class="exam-answered"><b class="exam-answered-value">${answeredCount(attempt)}</b> / ${attempt.total_questions}</strong></div>
+            <div class="exam-hud-cell exam-answered-cell"><span>${paperMode ? "Answer Mode" : "Answered"}</span><strong class="exam-answered">${paperMode ? "Paper sheet" : `<b class="exam-answered-value">${answeredCount(attempt)}</b> / ${attempt.total_questions}`}</strong></div>
             ${attempt.mode === "practice" ? `<div class="exam-hud-cell exam-difficulty"><span>Practice</span><strong>${escapeHtml(statusLabel(attempt.options?.difficulty || "mixed"))} / ${attempt.total_questions}</strong></div>` : ""}
           </div>
           <div class="exam-actions">
@@ -1227,7 +1276,7 @@
             <button class="btn ghost exam-exit" data-action="save-exit" type="button">${icon("back")} Exit</button>
             <div class="exam-audio-control"><button class="icon-only header-audio-button ${app.audio.music && !app.audio.muted ? "active" : ""}" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${icon(app.audio.muted ? "volume-off" : "music")}</button>${audioPopover()}</div>
             <button class="btn secondary" data-action="pause-exam" type="button" ${attempt.options?.enablePause === false || isPaused ? "disabled" : ""}>${icon("pause")} Pause</button>
-            <button class="btn danger" data-action="open-submit" type="button">${icon("submit")} ${attempt.mode === "practice" ? "Finish Practice" : "Submit Exam"}</button>
+            <button class="btn ${paperMode ? "paper-finish" : "danger"}" data-action="${paperMode ? "open-paper-finish" : "open-submit"}" type="button">${icon("submit")} ${paperMode ? "Finish Answering" : attempt.mode === "practice" ? "Finish Practice" : "Submit Exam"}</button>
           </div>
         </header>
 
@@ -1257,9 +1306,9 @@
                 <span class="status-pill ${answerStatus(current)}">${statusText(current)}</span>
               </div>
               <p class="prompt">${escapeHtml(current.prompt)}</p>
-              <div class="choices">
+              <div class="choices ${paperMode ? "paper-readonly-choices" : ""}">
                 ${current.choices.map((choice) => `
-                  <button class="choice ${current.selected_choice === choice.id ? "selected" : ""}" data-choice="${choice.id}" data-motion-purpose="answer-selection" type="button" ${attempt.status !== "in_progress" ? "disabled" : ""}>
+                  <button class="choice ${current.selected_choice === choice.id ? "selected" : ""}" ${paperMode ? "aria-disabled=\"true\" tabindex=\"-1\"" : `data-choice="${choice.id}" data-motion-purpose="answer-selection"`} type="button" ${attempt.status !== "in_progress" || paperMode ? "disabled" : ""}>
                     <span class="choice-letter">${choice.id}</span>
                     <strong>${escapeHtml(choice.text)}</strong>
                     <i class="choice-radio"></i>
@@ -1268,10 +1317,10 @@
               </div>
               <div class="question-actions">
                 <button class="btn secondary" data-action="previous-question" type="button" ${current.position === 0 ? "disabled" : ""}>${icon("back")} Previous</button>
-                <button class="btn ghost" data-action="clear-answer" type="button">${icon("clear")} Clear Answer</button>
+                ${paperMode ? `<span class="paper-mark-reminder">${localIcon("clipboard-list")} Mark your printed sheet</span>` : `<button class="btn ghost" data-action="clear-answer" type="button">${icon("clear")} Clear Answer</button>`}
                 <button class="btn ghost ${current.flagged ? "active" : ""}" data-action="toggle-flag" type="button">${icon("flag")} Flag for Review</button>
-                <button class="btn secondary" data-action="skip-question" type="button">${icon("skip")} Skip</button>
-                <button class="btn primary" data-action="${current.position >= attempt.total_questions - 1 ? "open-submit" : "next-question"}" type="button" ${!current.selected_choice ? "disabled" : ""}>${current.position >= attempt.total_questions - 1 ? "Review & Submit" : "Next"} ${icon("arrow")}</button>
+                ${paperMode ? "" : `<button class="btn secondary" data-action="skip-question" type="button">${icon("skip")} Skip</button>`}
+                <button class="btn primary" data-action="${current.position >= attempt.total_questions - 1 ? paperMode ? "open-paper-finish" : "open-submit" : "next-question"}" type="button" ${!paperMode && !current.selected_choice ? "disabled" : ""}>${current.position >= attempt.total_questions - 1 ? paperMode ? "Finish Answering" : "Review & Submit" : "Next"} ${icon("arrow")}</button>
               </div>
             </section>
           </main>
@@ -1279,6 +1328,7 @@
       </section>
       ${pauseModal(attempt)}
       ${submitModal(attempt)}
+      ${paperFinishModal(attempt)}
       ${chartModal(attempt, current)}
       ${timeoutModal(attempt)}
       ${toast()}
@@ -1291,6 +1341,103 @@
       const nav = root.querySelector(".exam-nav");
       if (nav) nav.scrollTop = app.examNavScrollTop;
     });
+  }
+
+  function isPaperAttempt(attempt) {
+    return Boolean(attempt?.options?.paperMode);
+  }
+
+  function paperPhase(attempt) {
+    return attempt?.options?.paperPhase || "answering";
+  }
+
+  function paperFinishModal(attempt) {
+    if (app.modal !== "paper-finish") return "";
+    return `
+      <div class="modal-backdrop static-backdrop paper-finish-backdrop" data-static-backdrop="true">
+        <section class="submit-modal paper-finish-modal" role="dialog" aria-modal="true" aria-labelledby="paper-finish-title" tabindex="-1">
+          <div class="submit-title-row"><span class="paper-finish-symbol">${localIcon("clipboard-list")}</span><div><p class="eyebrow">Paper answer mode</p><h2 id="paper-finish-title">Finish answering?</h2></div></div>
+          <p>The exam timer will stop. You can then photograph or scan both answer sheets and confirm every detected mark.</p>
+          <div class="paper-finish-checks"><span>${localIcon("timer")}<b>Timer freezes</b></span><span>${localIcon("cloud-check")}<b>Checkpoint syncs</b></span><span>${localIcon("clipboard-list")}<b>Two sheets required</b></span></div>
+          <div class="modal-actions"><button class="btn ghost" data-action="close-modal" type="button">Keep Answering</button><button class="btn primary" data-action="confirm-paper-finish" type="button">Freeze and Scan</button></div>
+        </section>
+      </div>
+    `;
+  }
+
+  function renderPaperWorkflow(attempt) {
+    clearInterval(app.timerId);
+    app.timerId = null;
+    const review = paperPhase(attempt) === "review";
+    const detections = normalizedPaperDetections();
+    const summary = paperDetectionSummary(detections);
+    const version = examVersions.find((candidate) => candidate.id === attempt.exam_version_id);
+    const versionLabel = `Mock Exam ${String(version?.number || 1).padStart(2, "0")}`;
+    root.innerHTML = cockpitFrame(`
+      <section class="paper-workflow ${review ? "paper-review-stage" : "paper-scan-stage"}" data-motion-purpose="page-enter">
+        <header class="paper-workflow-header">
+          <div class="exam-brand">${logo()}<div><strong>CSC Practice Reviewer</strong><span>Independent mock exam and review tool</span></div></div>
+          <div class="paper-run-status"><span>${escapeHtml(versionLabel)}</span><b>${review ? "Verify detected answers" : "Scan answer sheets"}</b><small>Timer frozen at ${formatDuration(attempt.elapsed_seconds)}</small></div>
+          <div class="paper-header-actions"><button class="btn secondary" data-action="print-paper-sheets" type="button">${localIcon("clipboard-list")} Print Sheets</button><button class="btn ghost" data-action="paper-save-exit" type="button">${icon("save")} Save and Exit</button></div>
+        </header>
+        <main class="paper-workflow-body">
+          <section class="paper-stage-title">
+            <div><p class="eyebrow">Paper answer mode / ${review ? "Step 2 of 2" : "Step 1 of 2"}</p><h1>${review ? "Confirm detected answers" : "Upload both answer sheets"}</h1><p>${review ? "Resolve uncertain marks, verify blanks, then grade through the normal submission path." : "Use a CamScanner JPG, phone photo, or PNG. Processing remains on this device."}</p></div>
+            <div class="paper-privacy-badge">${icon("shield")}<span><strong>Local processing</strong><small>Images are never uploaded</small></span></div>
+          </section>
+          ${app.paperSyncError ? `<div class="paper-sync-error" role="alert">${icon("warning")}<span><strong>Cloud checkpoint not confirmed</strong>${escapeHtml(app.paperSyncError)}</span><button class="btn secondary" data-action="retry-paper-sync" type="button">Retry sync</button></div>` : ""}
+          ${review ? renderPaperConfirmation(attempt, detections, summary) : renderPaperUploadStage(attempt)}
+        </main>
+        ${toast()}
+      </section>
+    `, "paper-frame");
+    requestAnimationFrame(() => renderPaperScanCanvases());
+    syncPaperSubmissionPoll(attempt);
+  }
+
+  function renderPaperUploadStage(attempt) {
+    return `
+      <div class="paper-upload-grid">
+        ${[0, 1].map((pageIndex) => {
+          const scan = app.paperScans[pageIndex];
+          const range = pageIndex === 0 ? "Items 1-85" : "Items 86-170";
+          return `<section class="paper-upload-card ${scan ? "has-scan" : ""}">
+            <div class="paper-upload-head"><span>Page ${pageIndex + 1}</span><strong>${range}</strong><em>${scan ? scan.alignmentConfidence >= 0.55 ? "Markers found" : "Check corners" : "Required"}</em></div>
+            <div class="paper-canvas-wrap ${scan ? "" : "empty"}">
+              ${scan ? `<canvas class="paper-alignment-canvas" data-paper-canvas="${pageIndex}" aria-label="Page ${pageIndex + 1} alignment preview"></canvas><p>Drag each numbered handle onto its matching corner marker.</p>` : `<div class="paper-upload-placeholder">${localIcon("clipboard-list")}<strong>No sheet selected</strong><span>JPG or PNG / CamScanner or camera</span></div>`}
+            </div>
+            <div class="paper-upload-actions">
+              <label class="btn primary paper-file-label">${icon("open")} ${scan ? "Replace File" : "Choose File"}<input data-paper-file="${pageIndex}" type="file" accept="image/jpeg,image/png"></label>
+              <label class="btn secondary paper-file-label paper-camera-label">${icon("camera")} Use Camera<input data-paper-file="${pageIndex}" type="file" accept="image/jpeg,image/png" capture="environment"></label>
+              ${scan ? `<button class="btn secondary" data-action="rotate-paper-scan" data-paper-page="${pageIndex}" type="button">${icon("refresh")} Rotate</button><button class="btn ghost" data-action="reset-paper-corners" data-paper-page="${pageIndex}" type="button">Reset corners</button>` : ""}
+            </div>
+          </section>`;
+        }).join("")}
+      </div>
+      <section class="paper-capture-guidance"><strong>Capture checklist</strong><span>Keep all four markers visible</span><span>Avoid shadows across bubbles</span><span>Use a flat, bright surface</span><span>Confirm page numbers before analysis</span></section>
+      <footer class="paper-workflow-actions"><span>Both pages are required before recognition can begin.</span><button class="btn primary" data-action="analyze-paper-sheets" type="button" ${app.paperScans.every(Boolean) ? "" : "disabled"}>Analyze 170 Answers ${icon("arrow")}</button></footer>
+    `;
+  }
+
+  function renderPaperConfirmation(attempt, detections, summary) {
+    const unresolved = detections.filter((item) => (item.state === "multiple" || item.state === "low") && !item.reviewed).length;
+    const blanks = detections.filter((item) => !item.choice).length;
+    return `
+      <section class="paper-detection-summary" aria-label="Recognition summary">
+        <metric class="confident">${localIcon("circle-check")}<span>Confident</span><strong>${summary.confident}</strong></metric>
+        <metric class="blank">${icon("clear")}<span>Blank</span><strong>${summary.blank}</strong></metric>
+        <metric class="multiple">${icon("warning")}<span>Multiple</span><strong>${summary.multiple}</strong></metric>
+        <metric class="low">${localIcon("target")}<span>Low confidence</span><strong>${summary.low}</strong></metric>
+      </section>
+      <section class="paper-answer-review v5-panel">
+        <div class="paper-review-legend"><span><i class="confident"></i>Confident</span><span><i class="blank"></i>Blank</span><span><i class="multiple"></i>Multiple marks</span><span><i class="low"></i>Low confidence</span><small>Click A-D or Blank to correct any item.</small></div>
+        <div class="paper-answer-grid">
+          ${detections.map((item) => `<article class="paper-answer-item ${item.state} ${item.reviewed ? "reviewed" : ""}"><strong>${item.number}</strong><div>${["A", "B", "C", "D"].map((choice) => `<button class="${item.choice === choice ? "selected" : ""}" data-paper-answer="${item.number}" data-paper-choice="${choice}" type="button" aria-label="Item ${item.number}: ${choice}">${choice}</button>`).join("")}<button class="paper-blank-choice ${!item.choice ? "selected" : ""}" data-paper-answer="${item.number}" data-paper-choice="" type="button">Blank</button></div><small>${item.reviewed ? "Verified" : item.state === "confident" ? `${Math.round((item.confidence || 0) * 100)}%` : item.state.replace("low", "Check mark")}</small></article>`).join("")}
+        </div>
+      </section>
+      <label class="paper-blank-confirm ${blanks ? "" : "complete"}"><input data-paper-confirm-blanks type="checkbox" ${app.paperBlankConfirmed || !blanks ? "checked" : ""} ${blanks ? "" : "disabled"}><span><strong>${blanks ? `Confirm ${blanks} blank item${blanks === 1 ? "" : "s"}` : "No blank items detected"}</strong><small>Blank answers will be graded as unanswered.</small></span></label>
+      <footer class="paper-workflow-actions"><button class="btn secondary" data-action="paper-back-upload" type="button">${icon("back")} Recheck Images</button><span class="paper-review-readiness">${unresolved ? `${unresolved} uncertain item${unresolved === 1 ? "" : "s"} still need review` : "All uncertain marks reviewed"}</span><button class="btn primary" data-action="confirm-paper-grade" type="button" ${unresolved || (blanks && !app.paperBlankConfirmed) ? "disabled" : ""}>Confirm and Grade ${icon("submit")}</button></footer>
+    `;
   }
 
   function renderResults() {
@@ -1309,7 +1456,7 @@
     root.innerHTML = authedShell(`
       <section class="results-page v5-results-page ${passed ? "passed" : "needs-work"} ${isPractice ? "practice-result" : ""}" data-motion-purpose="page-enter">
         <div class="results-command-title">
-          <strong>${isPractice ? "Practice Results" : "Mock Exam Results"}</strong>
+          <strong>${isPractice ? "Practice Results" : "Mock Exam Results"}${isPaperAttempt(attempt) ? `<em class="paper-result-badge">Paper mode</em>` : ""}</strong>
           <small>${escapeHtml(examTitle(attempt))} completed ${formatDate(attempt.submitted_at || attempt.started_at)}</small>
         </div>
 
@@ -1408,7 +1555,7 @@
                 </div>
                 <section class="review-explanation-console">
                   <div><strong>Explanation</strong><p>${escapeHtml(answer.explanation || "No explanation provided.")}</p></div>
-                  <div class="review-metadata"><span>${localIcon("timer")}<b>Time Spent</b><strong>${formatDuration(answer.time_spent_seconds)}</strong></span><span>${localIcon("history")}<b>Visits</b><strong>${answer.visit_count || 0}</strong></span><span>${localIcon("history")}<b>Answer Changes</b><strong>${answer.answer_changes || 0}</strong></span><span>${icon("flag")}<b>Flagged</b><strong>${answer.flagged ? "Yes" : "No"}</strong></span></div>
+                  <div class="review-metadata"><span>${localIcon("timer")}<b>Time Spent</b><strong>${formatDuration(answer.time_spent_seconds)}</strong></span><span>${localIcon("history")}<b>Visits</b><strong>${answer.visit_count || 0}</strong></span>${isPaperAttempt(attempt) ? `<span>${localIcon("clipboard-list")}<b>Answer Source</b><strong>Paper sheet</strong></span>` : `<span>${localIcon("history")}<b>Answer Changes</b><strong>${answer.answer_changes || 0}</strong></span>`}<span>${icon("flag")}<b>Flagged</b><strong>${answer.flagged ? "Yes" : "No"}</strong></span></div>
                 </section>
               </div>
             ` : `<div class="review-empty-panel"><span>${icon("review")}</span><strong>No matching review items</strong><p>Change the active filter to continue reviewing this attempt.</p></div>`}
@@ -2063,10 +2210,10 @@
     `).join("") || `<p class="empty-note">No attempts yet.</p>`}</div>`;
   }
 
-  function toggleControl(name, label, checked) {
+  function toggleControl(name, label, checked, disabled = false) {
     return `
-      <label class="toggle-row">${escapeHtml(label)}
-        <input type="checkbox" name="${escapeAttr(name)}" ${checked ? "checked" : ""}>
+      <label class="toggle-row ${disabled ? "disabled" : ""}">${escapeHtml(label)}
+        <input type="checkbox" name="${escapeAttr(name)}" ${checked ? "checked" : ""} ${disabled ? "disabled" : ""}>
         <span></span>
       </label>
     `;
@@ -2652,6 +2799,29 @@
 
   function handlePointerDown(event) {
     root.dataset.inputMode = "pointer";
+    const paperCanvas = event.target.closest?.("canvas[data-paper-canvas]");
+    if (paperCanvas && event.button === 0) {
+      const pageIndex = Number(paperCanvas.dataset.paperCanvas);
+      const scan = app.paperScans[pageIndex];
+      if (!scan) return;
+      const point = paperCanvasPoint(paperCanvas, event);
+      const scale = paperCanvas.width / Math.max(1, paperCanvas.clientWidth);
+      let handle = -1;
+      let distance = Number.POSITIVE_INFINITY;
+      scan.markers.forEach((marker, index) => {
+        const candidate = Math.hypot(marker.x - point.x, marker.y - point.y);
+        if (candidate < distance && candidate <= 30 * scale) {
+          handle = index;
+          distance = candidate;
+        }
+      });
+      if (handle >= 0) {
+        event.preventDefault();
+        app.paperDrag = { pageIndex, handle, canvas: paperCanvas, pointerId: event.pointerId };
+        paperCanvas.setPointerCapture?.(event.pointerId);
+      }
+      return;
+    }
     const nav = event.target.closest(".exam-nav");
     if (!nav || event.button !== 0 || event.target.closest("button, summary, input, select, textarea, a")) return;
     app.examNavDrag = { nav, pointerId: event.pointerId, startY: event.clientY, startScroll: nav.scrollTop, moved: false };
@@ -2660,6 +2830,19 @@
   }
 
   function handlePointerMove(event) {
+    if (app.paperDrag && app.paperDrag.pointerId === event.pointerId) {
+      event.preventDefault();
+      const { pageIndex, handle, canvas } = app.paperDrag;
+      const scan = app.paperScans[pageIndex];
+      const point = paperCanvasPoint(canvas, event);
+      scan.markers[handle] = {
+        x: Math.max(0, Math.min(scan.canvas.width - 1, point.x)),
+        y: Math.max(0, Math.min(scan.canvas.height - 1, point.y))
+      };
+      scan.manuallyAdjusted = true;
+      drawPaperAlignmentCanvas(pageIndex);
+      return;
+    }
     const drag = app.examNavDrag;
     if (!drag || drag.pointerId !== event.pointerId) return;
     const delta = event.clientY - drag.startY;
@@ -2671,6 +2854,10 @@
   }
 
   function handlePointerUp(event) {
+    if (app.paperDrag && (event.pointerId === undefined || app.paperDrag.pointerId === event.pointerId)) {
+      app.paperDrag = null;
+      return;
+    }
     const drag = app.examNavDrag;
     if (!drag || (event.pointerId !== undefined && drag.pointerId !== event.pointerId)) return;
     drag.nav.classList.remove("is-dragging");
@@ -2740,7 +2927,16 @@
       app.modal = null;
       return setView({ name: "setup" }) || true;
     }
-    if (action === "setup-submit" || action === "save-setup" || action === "resume-exam") {
+    if (action === "setup-submit") {
+      const options = formOptions(target.closest("form"));
+      active.options = { ...(active.options || {}), ...options };
+      active.status = "in_progress";
+      active.current_question_index = 0;
+      app.fixtureState = options.paperMode ? "paper-exam" : "exam";
+      app.modal = null;
+      return setView({ name: "exam", attemptId: active.id }) || true;
+    }
+    if (action === "save-setup" || action === "resume-exam") {
       active.status = "in_progress";
       active.current_question_index = action === "resume-exam" ? 42 : 0;
       app.fixtureState = action === "resume-exam" ? "exam-collapsed" : "exam";
@@ -2818,7 +3014,9 @@
     if (action === "review-unanswered" || action === "review-flagged") return false;
     if (action === "review-answers") {
       app.fixtureState = "review";
-      return setView({ name: "review", attemptId: submitted.id, index: 42 }) || true;
+      const viewedAttempt = getAttempt(app.view.attemptId);
+      const reviewAttempt = isPaperAttempt(viewedAttempt) ? viewedAttempt : submitted;
+      return setView({ name: "review", attemptId: reviewAttempt.id, index: isPaperAttempt(reviewAttempt) ? 0 : 42 }) || true;
     }
     if (target.dataset.practiceReviewTab) {
       app.practiceReviewTab = target.dataset.practiceReviewTab;
@@ -2944,6 +3142,7 @@
       if (action === "signup-submit") return await runBusy("create", () => signUp(formDataFromButton(target)));
       if (action === "signin-submit") return await runBusy("signin", () => signIn(formDataFromButton(target)));
       if (action === "setup-submit") return await startFullExam(formOptions(target.closest("form")));
+      if (action === "print-paper-sheets") return printPaperSheets(target.closest("form"));
       if (action === "profile-submit") return await runBusy("profile", () => saveProfile(target.closest("form")));
       if (action === "password-submit") return await runBusy("password", () => changePassword(formDataFromButton(target)));
       if (action === "custom-practice-submit") {
@@ -2987,6 +3186,15 @@
       if (action === "resume-paused") return await resumePausedAttempt();
       if (action === "save-exit") return await saveAndExit();
       if (action === "open-submit") return openModal("submit");
+      if (action === "open-paper-finish") return openModal("paper-finish");
+      if (action === "confirm-paper-finish") return await freezePaperAttempt();
+      if (action === "paper-save-exit") return await paperSaveAndExit();
+      if (action === "retry-paper-sync") return await retryPaperSync();
+      if (action === "rotate-paper-scan") return rotatePaperScan(Number(target.dataset.paperPage));
+      if (action === "reset-paper-corners") return resetPaperCorners(Number(target.dataset.paperPage));
+      if (action === "analyze-paper-sheets") return analyzePaperSheets();
+      if (action === "paper-back-upload") return setPaperPhase("scanning");
+      if (action === "confirm-paper-grade") return await confirmPaperGrade();
       if (action === "confirm-submit") return await submitCurrentAttempt(false);
       if (action === "review-unanswered") return jumpToFirst((answer) => !answer.selected_choice);
       if (action === "review-flagged") return jumpToFirst((answer) => answer.flagged);
@@ -3023,6 +3231,7 @@
       }
 
       if (target.dataset.choice) return chooseAnswer(target.dataset.choice);
+      if (target.dataset.paperAnswer) return setPaperDetectedAnswer(Number(target.dataset.paperAnswer), target.dataset.paperChoice || null);
       if (target.dataset.goto !== undefined) return gotoQuestion(Number(target.dataset.goto));
       if (target.dataset.reviewFilter) return setReviewFilter(target.dataset.reviewFilter);
       if (target.dataset.reviewIndex !== undefined) return setView({ ...app.view, index: Number(target.dataset.reviewIndex) });
@@ -3059,12 +3268,27 @@
 
   function handleChange(event) {
     const input = event.target;
+    if (input.matches("[data-paper-file]")) return loadPaperScanFile(Number(input.dataset.paperFile), input.files?.[0]);
+    if (input.matches("[data-paper-confirm-blanks]")) {
+      app.paperBlankConfirmed = input.checked;
+      return render();
+    }
     if (input.matches("[data-audio-track]")) {
       selectMusicTrack(input.value);
       render();
       return;
     }
-    if (input.closest("[data-form='setup']")) saveSetupDraft(false);
+    if (input.closest("[data-form='setup']")) {
+      const form = input.closest("[data-form='setup']");
+      const paper = form.elements.answerMode?.value === "paper";
+      if (paper) {
+        if (form.elements.shuffleQuestions) form.elements.shuffleQuestions.checked = false;
+        if (form.elements.shuffleAnswers) form.elements.shuffleAnswers.checked = false;
+      }
+      saveSetupDraft(false).then(() => {
+        if (input.name === "answerMode") renderSetup();
+      }).catch((error) => showToast(readableError(error)));
+    }
     const practiceForm = input.closest("[data-form='custom-practice']");
     if (practiceForm) syncPracticeProfile(practiceForm);
   }
@@ -3132,15 +3356,16 @@
       if (!editable) {
         const attempt = getAttempt(app.view.attemptId);
         const answer = currentAnswer(attempt);
+        const paperMode = isPaperAttempt(attempt);
         const choiceIndex = { Digit1: 0, Numpad1: 0, Digit2: 1, Numpad2: 1, Digit3: 2, Numpad3: 2, Digit4: 3, Numpad4: 3 }[event.code];
-        if (choiceIndex !== undefined && answer?.choices?.[choiceIndex] && attempt?.status === "in_progress") {
+        if (!paperMode && choiceIndex !== undefined && answer?.choices?.[choiceIndex] && attempt?.status === "in_progress") {
           event.preventDefault();
           chooseAnswer(answer.choices[choiceIndex].id);
           return;
         }
-        if (event.key === "Enter" && answer?.selected_choice && attempt?.status === "in_progress") {
+        if (event.key === "Enter" && (paperMode || answer?.selected_choice) && attempt?.status === "in_progress") {
           event.preventDefault();
-          if (answer.position >= attempt.total_questions - 1) openModal("submit");
+          if (answer.position >= attempt.total_questions - 1) openModal(paperMode ? "paper-finish" : "submit");
           else navigateQuestion(1);
           return;
         }
@@ -3334,12 +3559,15 @@
 
   function formOptions(form) {
     const values = Object.fromEntries(new FormData(form).entries());
+    const paperMode = values.answerMode === "paper";
     return {
       versionId: values.versionId || examVersions[0]?.id,
       showTimer: true,
       enablePause: true,
-      shuffleQuestions: Boolean(values.shuffleQuestions),
-      shuffleAnswers: Boolean(values.shuffleAnswers)
+      shuffleQuestions: paperMode ? false : Boolean(values.shuffleQuestions),
+      shuffleAnswers: paperMode ? false : Boolean(values.shuffleAnswers),
+      paperMode,
+      paperPhase: "answering"
     };
   }
 
@@ -3628,10 +3856,315 @@
   }
 
   function beginTimeout(attempt) {
+    if (isPaperAttempt(attempt)) {
+      freezePaperAttempt(true);
+      return;
+    }
     if (app.modal === "timeout") return;
     app.modal = "timeout";
     renderExam();
     setTimeout(() => submitAttempt(attempt, true), 900);
+  }
+
+  async function freezePaperAttempt(timedOut = false) {
+    const attempt = getAttempt(app.view.attemptId);
+    if (!attempt || !isPaperAttempt(attempt)) return;
+    materializeQuestionClock(attempt);
+    materializeAttemptClock(attempt, Date.now(), false);
+    attempt.status = "paused";
+    attempt.paused_at = nowIso();
+    attempt.timed_out = Boolean(timedOut);
+    attempt.options = {
+      ...(attempt.options || {}),
+      paperMode: true,
+      paperPhase: "scanning",
+      paperFrozenAt: nowIso(),
+      paperTimedOut: Boolean(timedOut)
+    };
+    recordAttemptEvent(attempt, timedOut ? "paper-timeout-frozen" : "paper-finish-frozen");
+    touchAttempt(attempt);
+    app.modal = null;
+    try {
+      await flushDirty({ immediate: true, throwOnError: true });
+      app.paperSyncError = "";
+    } catch (error) {
+      app.paperSyncError = readableError(error);
+    }
+    renderExam();
+  }
+
+  async function retryPaperSync() {
+    const attempt = getAttempt(app.view.attemptId);
+    if (!attempt) return;
+    touchAttempt(attempt);
+    try {
+      await flushDirty({ immediate: true, throwOnError: true });
+      app.paperSyncError = "";
+      showToast("Frozen checkpoint saved online.");
+    } catch (error) {
+      app.paperSyncError = readableError(error);
+      render();
+    }
+  }
+
+  async function paperSaveAndExit() {
+    const attempt = getAttempt(app.view.attemptId);
+    if (attempt) {
+      touchAttempt(attempt);
+      await flushDirty({ immediate: true, throwOnError: true });
+    }
+    setView({ name: "dashboard" });
+  }
+
+  function setPaperPhase(phase) {
+    const attempt = getAttempt(app.view.attemptId);
+    if (!attempt || !isPaperAttempt(attempt)) return;
+    attempt.options = { ...(attempt.options || {}), paperPhase: phase };
+    touchAttempt(attempt);
+    renderExam();
+  }
+
+  function printPaperSheets(form) {
+    const toolkit = window.CSC_PAPER_MODE;
+    if (!toolkit) throw new Error("Paper sheet tools are unavailable.");
+    const formVersionId = form ? formOptions(form).versionId : null;
+    const attempt = app.view.name === "exam" ? getAttempt(app.view.attemptId) : null;
+    const versionId = formVersionId || attempt?.exam_version_id || app.draft?.options?.versionId;
+    const version = examVersions.find((candidate) => candidate.id === versionId) || examVersions[0];
+    const label = `Mock Exam ${String(version?.number || 1).padStart(2, "0")}`;
+    document.querySelector(".paper-print-root")?.remove();
+    const printRoot = document.createElement("section");
+    printRoot.className = "paper-print-root";
+    printRoot.setAttribute("aria-hidden", "true");
+    for (let pageIndex = 0; pageIndex < 2; pageIndex += 1) {
+      const canvas = document.createElement("canvas");
+      canvas.className = "paper-print-page";
+      toolkit.drawSheet(canvas, pageIndex, label);
+      printRoot.appendChild(canvas);
+    }
+    document.body.appendChild(printRoot);
+    const cleanup = () => {
+      window.removeEventListener("afterprint", cleanup);
+      printRoot.remove();
+    };
+    window.addEventListener("afterprint", cleanup, { once: true });
+    requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
+  }
+
+  async function loadPaperScanFile(pageIndex, file) {
+    if (!file) return;
+    if (!/^image\/(jpeg|png)$/.test(file.type)) {
+      showToast("Choose a JPG or PNG image.");
+      return;
+    }
+    if (file.size > 24 * 1024 * 1024) {
+      showToast("That image is larger than 24 MB. Export a smaller JPG or PNG.");
+      return;
+    }
+    try {
+      const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+      let canvas = document.createElement("canvas");
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      canvas.getContext("2d", { alpha: false }).drawImage(bitmap, 0, 0);
+      bitmap.close?.();
+      const orientationImage = canvas.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, canvas.width, canvas.height);
+      const orientation = window.CSC_PAPER_MODE.orientationTurns(orientationImage);
+      const turns = orientation.confidence >= 0.2 ? orientation.turns : canvas.width > canvas.height ? 1 : 0;
+      for (let turn = 0; turn < turns; turn += 1) canvas = rotateCanvasClockwise(canvas);
+      const detectionCanvas = document.createElement("canvas");
+      const scale = Math.min(1, 520 / Math.max(canvas.width, canvas.height));
+      detectionCanvas.width = Math.max(1, Math.round(canvas.width * scale));
+      detectionCanvas.height = Math.max(1, Math.round(canvas.height * scale));
+      detectionCanvas.getContext("2d", { alpha: false }).drawImage(canvas, 0, 0, detectionCanvas.width, detectionCanvas.height);
+      const detection = window.CSC_PAPER_MODE.detectMarkers(detectionCanvas.getContext("2d").getImageData(0, 0, detectionCanvas.width, detectionCanvas.height));
+      const markers = detection.points.map((point) => ({ x: point.x / scale, y: point.y / scale }));
+      app.paperScans[pageIndex] = { canvas, markers, alignmentConfidence: detection.confidence, orientationConfidence: orientation.confidence, manuallyAdjusted: false, fileName: file.name };
+      app.paperDetections = [];
+      app.paperBlankConfirmed = false;
+      render();
+    } catch (error) {
+      showToast(`Could not read that image: ${readableError(error)}`);
+    }
+  }
+
+  function rotateCanvasClockwise(source) {
+    const canvas = document.createElement("canvas");
+    canvas.width = source.height;
+    canvas.height = source.width;
+    const context = canvas.getContext("2d", { alpha: false });
+    context.translate(canvas.width, 0);
+    context.rotate(Math.PI / 2);
+    context.drawImage(source, 0, 0);
+    return canvas;
+  }
+
+  function rotatePaperScan(pageIndex) {
+    const scan = app.paperScans[pageIndex];
+    if (!scan) return;
+    scan.canvas = rotateCanvasClockwise(scan.canvas);
+    scan.markers = window.CSC_PAPER_MODE.defaultMarkers(scan.canvas.width, scan.canvas.height);
+    scan.alignmentConfidence = 0;
+    scan.manuallyAdjusted = false;
+    app.paperDetections = [];
+    render();
+  }
+
+  function resetPaperCorners(pageIndex) {
+    const scan = app.paperScans[pageIndex];
+    if (!scan) return;
+    scan.markers = window.CSC_PAPER_MODE.defaultMarkers(scan.canvas.width, scan.canvas.height);
+    scan.alignmentConfidence = 0;
+    scan.manuallyAdjusted = false;
+    drawPaperAlignmentCanvas(pageIndex);
+  }
+
+  function paperCanvasPoint(canvas, event) {
+    const rect = canvas.getBoundingClientRect();
+    const scan = app.paperScans[Number(canvas.dataset.paperCanvas)];
+    return {
+      x: ((event.clientX - rect.left) / Math.max(1, rect.width)) * scan.canvas.width,
+      y: ((event.clientY - rect.top) / Math.max(1, rect.height)) * scan.canvas.height
+    };
+  }
+
+  function renderPaperScanCanvases() {
+    app.paperScans.forEach((scan, pageIndex) => {
+      if (scan) drawPaperAlignmentCanvas(pageIndex);
+    });
+  }
+
+  function drawPaperAlignmentCanvas(pageIndex) {
+    const scan = app.paperScans[pageIndex];
+    const canvas = root.querySelector(`canvas[data-paper-canvas='${pageIndex}']`);
+    if (!scan || !canvas) return;
+    canvas.width = scan.canvas.width;
+    canvas.height = scan.canvas.height;
+    const context = canvas.getContext("2d", { alpha: false });
+    context.drawImage(scan.canvas, 0, 0);
+    context.save();
+    context.strokeStyle = "#00e6df";
+    context.fillStyle = "rgba(0, 230, 223, 0.18)";
+    context.lineWidth = Math.max(4, scan.canvas.width / 350);
+    context.beginPath();
+    scan.markers.forEach((marker, index) => index ? context.lineTo(marker.x, marker.y) : context.moveTo(marker.x, marker.y));
+    context.closePath();
+    context.fill();
+    context.stroke();
+    scan.markers.forEach((marker, index) => {
+      const radius = Math.max(18, scan.canvas.width / 60);
+      context.fillStyle = "#00e6df";
+      context.beginPath();
+      context.arc(marker.x, marker.y, radius, 0, Math.PI * 2);
+      context.fill();
+      context.fillStyle = "#001319";
+      context.font = `800 ${Math.max(18, scan.canvas.width / 62)}px Arial`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(String(index + 1), marker.x, marker.y);
+    });
+    context.restore();
+  }
+
+  function analyzePaperSheets() {
+    if (!app.paperScans.every(Boolean)) return;
+    try {
+      app.paperDetections = app.paperScans.flatMap((scan, pageIndex) => {
+        const context = scan.canvas.getContext("2d", { willReadFrequently: true });
+        const imageData = context.getImageData(0, 0, scan.canvas.width, scan.canvas.height);
+        return window.CSC_PAPER_MODE.analyze(imageData, scan.markers, pageIndex);
+      }).sort((left, right) => left.number - right.number);
+      app.paperBlankConfirmed = false;
+      setPaperPhase("review");
+    } catch (error) {
+      showToast(`Recognition could not run: ${readableError(error)}`);
+    }
+  }
+
+  function normalizedPaperDetections() {
+    const byNumber = new Map(app.paperDetections.map((item) => [item.number, item]));
+    return Array.from({ length: 170 }, (_, index) => byNumber.get(index + 1) || { number: index + 1, choice: null, state: "blank", confidence: 0, reviewed: false });
+  }
+
+  function paperDetectionSummary(detections) {
+    return detections.reduce((summary, item) => {
+      summary[item.state] = Number(summary[item.state] || 0) + 1;
+      return summary;
+    }, { confident: 0, blank: 0, multiple: 0, low: 0 });
+  }
+
+  function setPaperDetectedAnswer(number, choice) {
+    const detections = normalizedPaperDetections();
+    const item = detections[number - 1];
+    if (!item) return;
+    item.choice = choice || null;
+    item.state = choice ? "confident" : "blank";
+    item.confidence = 1;
+    item.reviewed = true;
+    app.paperDetections = detections;
+    app.paperBlankConfirmed = false;
+    render();
+  }
+
+  async function confirmPaperGrade() {
+    const attempt = getAttempt(app.view.attemptId);
+    if (!attempt || !isPaperAttempt(attempt)) return;
+    const detections = normalizedPaperDetections();
+    const unresolved = detections.filter((item) => (item.state === "multiple" || item.state === "low") && !item.reviewed);
+    const blanks = detections.filter((item) => !item.choice);
+    if (unresolved.length) throw new Error(`Review ${unresolved.length} uncertain mark${unresolved.length === 1 ? "" : "s"} before grading.`);
+    if (blanks.length && !app.paperBlankConfirmed) throw new Error("Confirm the intentional blank answers before grading.");
+    const byDisplay = new Map(Object.values(attempt.answers).map((answer) => [answer.display_number, answer]));
+    const importedAt = nowIso();
+    for (const detection of detections) {
+      const answer = byDisplay.get(detection.number);
+      if (!answer) continue;
+      answer.selected_choice = detection.choice || null;
+      answer.skipped = !detection.choice;
+      answer.first_answered_at = detection.choice ? importedAt : null;
+      answer.last_answered_at = detection.choice ? importedAt : null;
+      answer.answer_changes = 0;
+      answer.changed_wrong_to_correct = 0;
+      answer.changed_correct_to_wrong = 0;
+      answer.answer_history = [{ action: "paper-import", choice: detection.choice || null, at: importedAt }];
+      touchAnswer(attempt, answer.question_id);
+    }
+    attempt.options = { ...(attempt.options || {}), paperPhase: "submitting", paperImportedAt: importedAt, paperBlankCount: blanks.length };
+    recordAttemptEvent(attempt, "paper-answers-confirmed", { blanks: blanks.length });
+    touchAttempt(attempt);
+    await flushDirty({ immediate: true, throwOnError: true });
+    attempt.options = { ...(attempt.options || {}), paperPhase: "submitted" };
+    await submitAttempt(attempt, Boolean(attempt.options?.paperTimedOut));
+    app.paperScans = [null, null];
+    app.paperDetections = [];
+    app.paperBlankConfirmed = false;
+  }
+
+  function seedPaperReviewFixture() {
+    app.paperDetections = Array.from({ length: 170 }, (_, index) => {
+      const number = index + 1;
+      if (number % 41 === 0) return { number, choice: null, state: "multiple", confidence: 0, reviewed: false };
+      if (number % 29 === 0) return { number, choice: "B", state: "low", confidence: 0.52, reviewed: false };
+      if (number % 23 === 0) return { number, choice: null, state: "blank", confidence: 0.9, reviewed: false };
+      return { number, choice: ["A", "B", "C", "D"][number % 4], state: "confident", confidence: 0.94, reviewed: false };
+    });
+  }
+
+  function syncPaperSubmissionPoll(attempt) {
+    if (app.fixtureMode || !app.client || !app.session?.user?.id || !isPaperAttempt(attempt) || !["scanning", "review"].includes(paperPhase(attempt))) return;
+    clearInterval(app.paperPollId);
+    app.paperPollId = setInterval(async () => {
+      try {
+        const { data, error } = await app.client.from("attempts").select("status,submitted_at,score,percent,options,updated_at").eq("id", attempt.id).eq("user_id", app.session.user.id).single();
+        if (error) throw error;
+        if (data.status === "submitted" || data.status === "timed_out") {
+          await loadUserData();
+          setView({ name: "results", attemptId: attempt.id });
+        }
+      } catch {
+        // The frozen local attempt remains recoverable; the normal sync warning handles failures.
+      }
+    }, PAPER_POLL_INTERVAL_MS);
   }
 
   function chooseAnswer(choice) {
@@ -3693,7 +4226,7 @@
     const attempt = getAttempt(app.view.attemptId);
     if (!attempt) return;
     const answer = currentAnswer(attempt);
-    if (delta > 0 && answer && !answer.selected_choice) {
+    if (delta > 0 && answer && !answer.selected_choice && !isPaperAttempt(attempt)) {
       showToast("Choose an answer or use Skip.");
       return;
     }
@@ -3852,7 +4385,13 @@
   }
 
   async function flushDirty(options = {}) {
-    if (!app.client || app.flushing) return;
+    if (!app.client) return;
+    if (app.flushing) {
+      await new Promise((resolve) => {
+        const waitForFlush = () => app.flushing ? setTimeout(waitForFlush, 10) : resolve();
+        waitForFlush();
+      });
+    }
     if (!app.dirtyAttempts.size && !app.dirtyAnswers.size) return;
     app.flushing = true;
     clearTimeout(app.syncTimer);
@@ -3896,6 +4435,7 @@
       answerKeys.forEach((key) => app.dirtyAnswers.add(key));
       if (!options.immediate) scheduleFlush();
       if (!options.immediate) showToast(`Sync issue: ${readableError(error)}`);
+      if (options.throwOnError) throw error;
     } finally {
       app.flushing = false;
     }
@@ -4090,7 +4630,7 @@
 
     add({ icon: "timer", title: "Fastest Question", value: formatDuration(summary.fastest?.time_spent_seconds), detail: `Item ${summary.fastest?.display_number}`, tone: "cyan" }, Boolean(summary.fastest));
     add({ icon: "timer", title: "Longest Question", value: formatDuration(summary.slowest?.time_spent_seconds), detail: `Item ${summary.slowest?.display_number}`, tone: "amber" }, Boolean(summary.slowest));
-    add({ icon: "brain-circuit", title: "Answer Changes", value: String(summary.changed), detail: `${summary.wrongToCorrect} improved / ${summary.correctToWrong} lost`, tone: "purple" });
+    add({ icon: "brain-circuit", title: "Answer Changes", value: String(summary.changed), detail: `${summary.wrongToCorrect} improved / ${summary.correctToWrong} lost`, tone: "purple" }, !isPaperAttempt(attempt));
     add({ icon: "notebook-tabs", title: "Review Load", value: `${skippedCount(attempt) + unansweredCount(attempt) + flaggedCount(attempt)}`, detail: `${skippedCount(attempt)} skipped / ${flaggedCount(attempt)} flagged`, tone: "blue" });
     add({ icon: "circle-check", title: "Longest Correct Streak", value: String(longestCorrectStreak(answers)), detail: "Consecutive correct answers", tone: "green" });
     add({ icon: "target", title: "Coverage", value: `${answeredCount(attempt)} / ${attempt.total_questions}`, detail: unansweredCount(attempt) ? `${unansweredCount(attempt)} unanswered` : "Every item answered", tone: "cyan" });
@@ -4350,6 +4890,7 @@
       warning: "M12 3l10 18H2L12 3zm0 6v5m0 3h.01",
       more: "M5 12h.01M12 12h.01M19 12h.01",
       open: "M14 4h6v6M20 4l-9 9M5 5h6M5 5v14h14v-6",
+      camera: "M4 7h3l2-3h6l2 3h3v13H4V7zm8 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z",
       refresh: "M20 12a8 8 0 1 1-2.3-5.7M20 4v6h-6",
       building: "M4 21V5h10v16M14 9h6v12M7 8h2M7 12h2M7 16h2M16 12h2M16 16h2",
       user: "M20 21a8 8 0 0 0-16 0M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
