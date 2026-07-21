@@ -309,12 +309,6 @@ html body main#app.app-shell.cockpit-desktop[data-input-mode="keyboard"] .accoun
     grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
   }
 
-  html body #app *,
-  html body #app *::before,
-  html body #app *::after {
-    animation: none !important;
-    transition: none !important;
-  }
 }
 
 @media (min-width: 1100px) {
@@ -4061,14 +4055,6 @@ html body main#app.app-shell.cockpit-desktop[data-input-mode="keyboard"] .accoun
     height: 66px !important;
   }
 
-  html body #app.cockpit-desktop .avatar-picker { display: none !important; }
-
-  html body #app.cockpit-desktop *,
-  html body #app.cockpit-desktop *::before,
-  html body #app.cockpit-desktop *::after {
-    animation: none !important;
-    transition: none !important;
-  }
 }
 
 /* Component-level V5 ownership must remain last in this file. */
@@ -4231,13 +4217,6 @@ html body main#app.app-shell.cockpit-desktop[data-input-mode="keyboard"] .accoun
   }
 }
 
-html body #app *,
-html body #app *::before,
-html body #app *::after {
-  animation: none !important;
-  transition: none !important;
-}
-
 @media (min-width: 1100px) {
   html body main#app.app-shell.cockpit-desktop section.content-page.practice-review-page form.custom-practice.practice-console.v5-panel {
     grid-template-columns: 734px minmax(0, 1fr) !important;
@@ -4301,11 +4280,6 @@ html body #app *::after {
     width: auto !important;
     margin: 0 !important;
   }
-}
-
-html body main#app.app-shell .system-page .boot-progress i {
-  animation: none !important;
-  transition: none !important;
 }
 
 /* Final optical corrections measured against the approved V5 captures. */
@@ -4387,16 +4361,6 @@ html body main#app.app-shell .system-page .boot-progress i {
   html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight p {
     font-size: 12px !important;
   }
-}
-
-html body main#app.app-shell .system-screen .segmented-loader > i {
-  animation: none !important;
-  transition: none !important;
-}
-
-html body main#app.app-shell .segmented-loader > i {
-  animation: none !important;
-  transition: none !important;
 }
 
 html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .setup-facts .instrument-cell > span:empty {
@@ -4909,4 +4873,1180 @@ html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .set
     text-transform: none !important;
     white-space: nowrap !important;
   }
+}
+
+/* T0040: approved V5 parity, interaction, audio, and continuous-frame repair. */
+@media (min-width: 1100px) {
+  /* A CSS border is rectangular even after clip-path. Draw the real polygon
+     stroke as a masked overlay so every chamfer is visibly closed. */
+  html body #app.cockpit-desktop :is(
+    .auth-pitch,
+    .auth-card,
+    .profile-modal,
+    .password-modal,
+    .reset-modal,
+    .confirm-modal,
+    .chart-modal,
+    .pause-modal,
+    .submit-modal,
+    .timeout-modal,
+    .exam-nav,
+    .question-group,
+    .question-panel,
+    .stimulus-panel,
+    .practice-mode-card,
+    .section-plate,
+    .result-action,
+    .result-insight,
+    .v5-panel,
+    .v3-panel,
+    .hub-panel,
+    .hub-mode,
+    .allocation-card,
+    .setup-disclaimer,
+    .account-button,
+    .audio-popover
+  ) {
+    --v5-frame-stroke: #2c4c55;
+    position: relative !important;
+    border-color: transparent !important;
+  }
+
+  html body #app.cockpit-desktop :is(
+    .auth-pitch,
+    .auth-card,
+    .profile-modal,
+    .password-modal,
+    .reset-modal,
+    .confirm-modal,
+    .chart-modal,
+    .pause-modal,
+    .submit-modal,
+    .timeout-modal,
+    .exam-nav,
+    .question-group,
+    .question-panel,
+    .stimulus-panel,
+    .practice-mode-card,
+    .section-plate,
+    .result-action,
+    .result-insight,
+    .v5-panel,
+    .v3-panel,
+    .hub-panel,
+    .hub-mode,
+    .allocation-card,
+    .setup-disclaimer,
+    .account-button,
+    .audio-popover
+  )::after {
+    position: absolute !important;
+    z-index: 12 !important;
+    inset: 0 !important;
+    box-sizing: border-box !important;
+    padding: 1px !important;
+    background: var(--v5-frame-stroke) !important;
+    clip-path: inherit !important;
+    content: "" !important;
+    pointer-events: none !important;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) !important;
+    -webkit-mask-composite: xor !important;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0) !important;
+  }
+
+  html body #app.cockpit-desktop :is(.auth-pitch,.auth-card,.profile-modal,.chart-modal,.exam-nav,.question-panel,.stimulus-panel,.v5-panel,.v3-panel,.hub-panel,.account-button,.audio-popover) {
+    --v5-frame-stroke: #2a5660;
+  }
+  html body #app.cockpit-desktop :is(.pause-modal,.timeout-modal) { --v5-frame-stroke: var(--v5-amber); }
+  html body #app.cockpit-desktop :is(.submit-modal,.confirm-modal) { --v5-frame-stroke: var(--v5-red); }
+  html body #app.cockpit-desktop :is(.practice-mode-card,.section-plate,.allocation-card,.result-action,.result-insight,.hub-mode) { --v5-frame-stroke: var(--tone, var(--v5-cyan)); }
+
+  /* Deterministic V5 animal roster. */
+  html body #app.cockpit-desktop .profile-modal.command-drawer {
+    width: 520px !important;
+    padding: 24px !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #28717a transparent !important;
+  }
+
+  html body #app.cockpit-desktop .avatar-picker {
+    display: block !important;
+    margin: 0 !important;
+    border: 1px solid #2b4b54 !important;
+    padding: 12px !important;
+    background: rgba(5, 20, 26, .78) !important;
+  }
+
+  html body #app.cockpit-desktop .avatar-picker legend {
+    padding: 0 6px !important;
+    font-size: 15px !important;
+  }
+
+  html body #app.cockpit-desktop .avatar-options {
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  html body #app.cockpit-desktop .avatar-option {
+    width: 76px !important;
+    height: 70px !important;
+    padding: 3px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app.cockpit-desktop .avatar-sprite {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-image: url("assets/avatars/v5-avatar-source.png") !important;
+    background-repeat: no-repeat !important;
+    background-position: var(--avatar-x) var(--avatar-y) !important;
+    background-size: 2144% 1208% !important;
+    transform: scale(1.04) !important;
+  }
+
+  html body #app.cockpit-desktop .avatar.has-preset {
+    padding: 2px !important;
+    overflow: hidden !important;
+  }
+
+  html body #app.cockpit-desktop .avatar.has-preset .avatar-sprite {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  html body #app.cockpit-desktop .avatar-option.selected {
+    box-shadow: 0 0 0 2px var(--v5-cyan), 0 0 18px rgba(25, 215, 216, .24) !important;
+  }
+
+  /* Account audio console: complete transport, bounded within the drawer. */
+  html body #app.cockpit-desktop .account-audio-settings {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    padding: 16px !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .audio-section-head {
+    display: flex !important;
+    align-items: end !important;
+    justify-content: space-between !important;
+    border-bottom: 1px solid #29454d !important;
+    padding-bottom: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .audio-section-head strong {
+    color: var(--v5-cyan) !important;
+    font: 700 18px/1 var(--hud-font) !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #app.cockpit-desktop .audio-category {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  html body #app.cockpit-desktop .audio-category button,
+  html body #app.cockpit-desktop .audio-transport button {
+    min-height: 40px !important;
+    border: 1px solid #34515a !important;
+    background: #06151b !important;
+    color: #c7d2d2 !important;
+  }
+
+  html body #app.cockpit-desktop .audio-category button.active,
+  html body #app.cockpit-desktop .audio-transport button.active {
+    border-color: var(--v5-cyan) !important;
+    background: rgba(25, 215, 216, .12) !important;
+    color: var(--v5-cyan) !important;
+  }
+
+  html body #app.cockpit-desktop .account-audio-settings > label,
+  html body #app.cockpit-desktop .effects-control > label {
+    display: grid !important;
+    grid-template-columns: 104px minmax(0, 1fr) !important;
+    align-items: center !important;
+    grid-column: auto !important;
+    min-height: 38px !important;
+    gap: 12px !important;
+  }
+
+  html body #app.cockpit-desktop .audio-track-select select {
+    width: 100% !important;
+    height: 40px !important;
+    border: 1px solid #34515a !important;
+    padding: 0 10px !important;
+    background: #06151b !important;
+    color: #e9eeee !important;
+  }
+
+  html body #app.cockpit-desktop .audio-transport {
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+  }
+
+  html body #app.cockpit-desktop .audio-now-playing {
+    display: grid !important;
+    grid-template-columns: 66px minmax(0, 1fr) !important;
+    margin: 0 !important;
+    border-left: 3px solid var(--v5-cyan) !important;
+    padding: 8px 10px !important;
+    background: #051117 !important;
+  }
+
+  html body #app.cockpit-desktop .audio-now-playing span { grid-row: 1 / 3 !important; align-self: center !important; color: #80969a !important; text-transform: uppercase !important; }
+  html body #app.cockpit-desktop .audio-now-playing strong { overflow: hidden !important; color: #eff4f3 !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+  html body #app.cockpit-desktop .audio-now-playing small { color: #92a6aa !important; }
+
+  html body #app.cockpit-desktop .effects-control {
+    display: grid !important;
+    gap: 10px !important;
+  }
+
+  html body #app.cockpit-desktop .audio-toggle {
+    display: grid !important;
+    min-height: 50px !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    border: 1px solid #34515a !important;
+    padding: 0 12px !important;
+    background: #06151b !important;
+    color: #dbe4e3 !important;
+    text-align: left !important;
+  }
+
+  html body #app.cockpit-desktop .audio-toggle span { display: grid !important; gap: 4px !important; }
+  html body #app.cockpit-desktop .audio-toggle small { color: #82979b !important; }
+  html body #app.cockpit-desktop .audio-toggle.active b { color: var(--v5-green) !important; }
+
+  /* Fixed telemetry cells prevent timer digits from shifting Answered or actions. */
+  html body #app.cockpit-desktop .exam-shell {
+    grid-template-rows: 105px minmax(0, 1fr) !important;
+  }
+
+  html body #app.cockpit-desktop .exam-topbar {
+    height: 105px !important;
+    grid-template-columns: 390px minmax(0, 1fr) 405px !important;
+  }
+
+  html body #app.cockpit-desktop .exam-status {
+    display: grid !important;
+    width: 706px !important;
+    height: 62px !important;
+    grid-template-columns: 344px 186px 176px !important;
+    justify-self: center !important;
+    justify-items: stretch !important;
+    align-items: stretch !important;
+    border: 1px solid #294852 !important;
+    background: rgba(4, 16, 21, .88) !important;
+    clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px) !important;
+    gap: 0 !important;
+  }
+
+  html body #app.cockpit-desktop .exam-status:has(.exam-difficulty) {
+    width: 760px !important;
+    grid-template-columns: 220px 190px 165px 185px !important;
+  }
+
+  html body #app.cockpit-desktop .exam-status > .exam-hud-cell {
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-rows: 20px 27px !important;
+    align-content: center !important;
+    justify-items: center !important;
+    border-left: 1px solid #294852 !important;
+    color: #aebbbc !important;
+    gap: 2px !important;
+  }
+
+  html body #app.cockpit-desktop .exam-status > .exam-hud-cell:first-child { border-left: 0 !important; }
+  html body #app.cockpit-desktop .exam-status > .exam-hud-cell > span { color: var(--v5-cyan) !important; font: 700 13px/1 var(--hud-font) !important; text-transform: uppercase !important; }
+  html body #app.cockpit-desktop .exam-status > .exam-hud-cell > strong { color: #f2f5f4 !important; font: 700 21px/1 var(--hud-font) !important; text-transform: uppercase !important; white-space: nowrap !important; }
+  html body #app.cockpit-desktop .exam-run-cell { grid-template-rows: 1fr !important; place-items: center !important; }
+  html body #app.cockpit-desktop .exam-run-cell > span { display: none !important; }
+  html body #app.cockpit-desktop .exam-time-value { display: inline-block !important; width: 104px !important; font-variant-numeric: tabular-nums !important; text-align: center !important; }
+  html body #app.cockpit-desktop .exam-answered-value { display: inline-block !important; min-width: 32px !important; font-variant-numeric: tabular-nums !important; text-align: right !important; }
+
+  /* Ordinary questions never reserve a stimulus column. */
+  html body #app.cockpit-desktop .exam-body {
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+    padding: 18px 42px 30px 32px !important;
+  }
+  html body #app.cockpit-desktop .exam-body:not(.with-stimulus) {
+    grid-template-columns: 482px minmax(0, 1fr) !important;
+    gap: 16px !important;
+  }
+  html body #app.cockpit-desktop .exam-body > .exam-nav {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    align-self: stretch !important;
+    justify-self: stretch !important;
+  }
+  html body #app.cockpit-desktop .exam-body:not(.with-stimulus) .exam-question {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
+  html body #app.cockpit-desktop .exam-body.with-stimulus .exam-question { grid-template-columns: minmax(430px, 46%) minmax(0, 1fr) !important; }
+  html body #app.cockpit-desktop .exam-body:not(.with-stimulus) .question-panel {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  html body #app.cockpit-desktop .question-panel { padding: 22px 34px 16px !important; }
+  html body #app.cockpit-desktop .question-panel > .prompt { font-size: 24px !important; }
+  html body #app.cockpit-desktop .choice { min-height: 68px !important; padding-inline: 20px !important; }
+  html body #app.cockpit-desktop .choice > strong { font-size: 20px !important; }
+  html body #app.cockpit-desktop .exam-nav::-webkit-scrollbar,
+  html body #app.cockpit-desktop .choices::-webkit-scrollbar,
+  html body #app.cockpit-desktop .stimulus-content::-webkit-scrollbar,
+  html body #app.cockpit-desktop .profile-modal::-webkit-scrollbar { width: 4px !important; }
+  html body #app.cockpit-desktop .exam-nav::-webkit-scrollbar-thumb,
+  html body #app.cockpit-desktop .choices::-webkit-scrollbar-thumb,
+  html body #app.cockpit-desktop .stimulus-content::-webkit-scrollbar-thumb,
+  html body #app.cockpit-desktop .profile-modal::-webkit-scrollbar-thumb { background: #2c7b83 !important; }
+
+  /* Pause screen hierarchy and protected icon clearance. */
+  html body #app.cockpit-desktop .pause-modal {
+    width: 590px !important;
+    min-height: 500px !important;
+    padding: 28px 38px 32px !important;
+  }
+  html body #app.cockpit-desktop .pause-icon { flex: none !important; margin: 0 auto 12px !important; }
+  html body #app.cockpit-desktop .pause-modal > p:not(.eyebrow) {
+    display: grid !important;
+    min-height: 68px !important;
+    place-content: center !important;
+    margin: 16px 0 !important;
+    padding: 8px 16px !important;
+    background: #040e13 !important;
+    color: #d3dddd !important;
+    font: 500 16px/1.45 var(--reading-font) !important;
+  }
+  html body #app.cockpit-desktop .pause-facts b { min-height: 24px !important; font-size: 12px !important; }
+  html body #app.cockpit-desktop .pause-facts strong { font-size: 17px !important; }
+
+  /* Static Practice/Mistakes/Flagged rail uses the same geometry in every tab. */
+  html body main#app.app-shell.cockpit-desktop section.content-page.practice-review-page > .practice-mode-cards {
+    display: grid !important;
+    width: 100% !important;
+    height: 82px !important;
+    grid-column: 1 / -1 !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    margin: 0 !important;
+    gap: 0 !important;
+  }
+  html body #app.cockpit-desktop .practice-mode-card {
+    min-width: 0 !important;
+    border-left-width: 0 !important;
+    padding-inline: 28px !important;
+  }
+  html body #app.cockpit-desktop .practice-mode-card:first-child { border-left-width: 1px !important; }
+  html body #app.cockpit-desktop .practice-mode-card > span > strong { font-size: 21px !important; }
+  html body #app.cockpit-desktop .practice-mode-card > span > small { margin-top: 5px !important; font-size: 14px !important; }
+
+  /* Progress color semantics are stable across icon, label, bar, and value. */
+  html body #app.cockpit-desktop .performance-row.general { --tone: var(--v5-purple) !important; }
+  html body #app.cockpit-desktop .performance-row.verbal { --tone: var(--v5-cyan) !important; }
+  html body #app.cockpit-desktop .performance-row.numerical { --tone: var(--v5-blue) !important; }
+  html body #app.cockpit-desktop .performance-row.analytical { --tone: var(--v5-green) !important; }
+  html body #app.cockpit-desktop .performance-row :is(.section-hud-icon,strong,b) { color: var(--tone) !important; }
+  html body #app.cockpit-desktop .performance-row i > em { background: var(--tone) !important; }
+  html body #app.cockpit-desktop .performance-bars { gap: 13px !important; }
+
+  /* Results use the approved fail-screen composition for pass and fail. */
+  html body #app.cockpit-desktop .results-page {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 102px 318px 226px 72px !important;
+    padding: 22px 62px 31px !important;
+    gap: 12px !important;
+  }
+  html body #app.cockpit-desktop .results-command-title { grid-column: 1 !important; grid-row: 1 !important; }
+  html body #app.cockpit-desktop .results-summary-grid {
+    display: grid !important;
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    grid-template-columns: minmax(0, 1fr) 430px !important;
+    grid-template-rows: 318px !important;
+    gap: 16px !important;
+  }
+  html body #app.cockpit-desktop .results-performance-panel {
+    display: grid !important;
+    grid-template-columns: 380px minmax(0, 1fr) !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
+  html body #app.cockpit-desktop .results-performance-panel > .score-gauge-panel {
+    display: grid !important;
+    width: auto !important;
+    height: 100% !important;
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    border-right: 1px solid #2c4850 !important;
+    place-items: center !important;
+    overflow: hidden !important;
+  }
+  html body #app.cockpit-desktop .score-gauge { width: 292px !important; height: 292px !important; grid-template-rows: 22px 88px 28px 18px 42px !important; }
+  html body #app.cockpit-desktop .score-gauge strong { font-size: 78px !important; }
+  html body #app.cockpit-desktop .results-performance-panel > .results-section-console {
+    width: auto !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    border: 0 !important;
+    padding: 10px 18px !important;
+    background: transparent !important;
+    overflow: hidden !important;
+  }
+  html body #app.cockpit-desktop .results-performance-panel > .results-section-console::after { display: none !important; }
+  html body #app.cockpit-desktop .result-metrics-rail {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: repeat(4, minmax(0, 1fr)) !important;
+    padding: 8px 18px !important;
+  }
+  html body #app.cockpit-desktop .result-metrics-rail metric {
+    display: grid !important;
+    grid-template-columns: 52px minmax(0, 1fr) auto !important;
+    grid-template-rows: 1fr !important;
+    align-items: center !important;
+    border-bottom: 1px solid #2a444c !important;
+    padding: 0 8px !important;
+    gap: 12px !important;
+  }
+  html body #app.cockpit-desktop .result-metrics-rail metric:last-child { border-bottom: 0 !important; }
+  html body #app.cockpit-desktop .result-metrics-rail metric > .local-icon,
+  html body #app.cockpit-desktop .result-metrics-rail metric > .icon { grid-row: 1 !important; width: 34px !important; height: 34px !important; }
+  html body #app.cockpit-desktop .result-metrics-rail metric > span { grid-row: 1 !important; align-self: center !important; font-size: 16px !important; }
+  html body #app.cockpit-desktop .result-metrics-rail metric > strong { grid-row: 1 !important; color: #f1f4f2 !important; font-size: 31px !important; }
+  html body #app.cockpit-desktop .run-insights-panel {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+    height: 226px !important;
+    padding: 10px 16px 14px !important;
+  }
+  html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page > .run-insights-panel > .insight-grid {
+    display: grid !important;
+    height: 164px !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    grid-template-rows: 1fr !important;
+    gap: 10px !important;
+  }
+  html body #app.cockpit-desktop .run-insights-panel .result-insight {
+    display: grid !important;
+    height: 164px !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: 52px minmax(0, 1fr) !important;
+    align-content: start !important;
+    padding: 14px !important;
+    gap: 8px !important;
+  }
+  html body #app.cockpit-desktop .run-insights-panel .result-insight > span {
+    width: 46px !important;
+    height: 46px !important;
+    justify-self: start !important;
+  }
+  html body #app.cockpit-desktop .run-insights-panel .result-insight > div {
+    display: grid !important;
+    min-width: 0 !important;
+    grid-template-rows: 18px 29px minmax(0, 1fr) !important;
+    gap: 4px !important;
+  }
+  html body #app.cockpit-desktop .run-insights-panel .result-insight small { font-size: 12px !important; }
+  html body #app.cockpit-desktop .run-insights-panel .result-insight strong { overflow: hidden !important; font-size: 20px !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+  html body #app.cockpit-desktop .run-insights-panel .result-insight p { overflow: hidden !important; margin: 0 !important; font-size: 13px !important; line-height: 1.25 !important; }
+  html body #app.cockpit-desktop .results-action-row { grid-column: 1 !important; grid-row: 4 !important; height: 72px !important; }
+  html body #app.cockpit-desktop .results-action-row .result-action {
+    display: grid !important;
+    grid-template-columns: 42px minmax(0, 1fr) 22px !important;
+    align-items: center !important;
+    padding: 0 18px !important;
+    gap: 12px !important;
+  }
+  html body #app.cockpit-desktop .results-action-row .result-action > .local-icon { width: 30px !important; height: 30px !important; }
+  html body #app.cockpit-desktop .results-page.passed .results-command-title > strong,
+  html body #app.cockpit-desktop .results-page.passed .score-gauge > em { color: var(--v5-green) !important; }
+  html body #app.cockpit-desktop .results-page.needs-work .results-command-title > strong,
+  html body #app.cockpit-desktop .results-page.needs-work .score-gauge > em { color: var(--v5-red) !important; }
+  html body #app.cockpit-desktop .results-page.practice-result .results-command-title > strong,
+  html body #app.cockpit-desktop .results-page.practice-result .score-gauge > em { color: var(--v5-cyan) !important; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html body #app [data-motion-purpose="page-enter"] {
+    animation: v5-page-reveal 220ms cubic-bezier(.2,.75,.25,1) both !important;
+  }
+  html body #app [data-motion-purpose="modal-reveal"],
+  html body #app [data-motion-purpose="popover-reveal"] {
+    animation: v5-modal-reveal 180ms cubic-bezier(.2,.78,.24,1) both !important;
+  }
+  html body #app .choice.selected {
+    animation: v5-selection-confirm 160ms ease-out both !important;
+  }
+  html body #app :is(.btn,.result-action,.practice-mode-card,.account-button,.audio-transport button) {
+    transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease, box-shadow 150ms ease, transform 90ms ease !important;
+  }
+  html body #app :is(.btn,.result-action,.practice-mode-card,.account-button,.audio-transport button):active:not(:disabled) {
+    transform: translateY(1px) !important;
+  }
+  html body #app :is(.performance-row,.result-section-card) i > em {
+    transition: width 320ms cubic-bezier(.2,.75,.25,1) !important;
+  }
+}
+
+@keyframes v5-page-reveal {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes v5-modal-reveal {
+  from { opacity: 0; transform: translateY(8px) scale(.992); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes v5-selection-confirm {
+  from { box-shadow: inset 4px 0 0 var(--v5-cyan), 0 0 0 rgba(25, 215, 216, 0); }
+  to { box-shadow: inset 4px 0 0 var(--v5-cyan), 0 0 18px rgba(25, 215, 216, .18); }
+}
+/* Paper answer mode ------------------------------------------------------- */
+.answer-mode-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.answer-mode-selector legend {
+  grid-column: 1 / -1;
+  margin-bottom: 2px;
+  color: #b8cbd0;
+  font: 700 15px/1.1 "Rajdhani", sans-serif;
+  text-transform: uppercase;
+}
+
+.answer-mode-card {
+  position: relative;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.answer-mode-card input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.answer-mode-card > span {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  min-height: 70px;
+  padding: 12px 13px;
+  border: 1px solid #29444c;
+  background: #07171d;
+  color: #aebfc4;
+  transition: border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
+}
+
+.answer-mode-card > span::before,
+.paper-upload-card::before,
+.paper-answer-review::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  clip-path: polygon(0 12px, 12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+  border: 1px solid transparent;
+}
+
+.answer-mode-card .local-icon {
+  grid-row: 1 / 3;
+  width: 30px;
+  height: 30px;
+  align-self: center;
+}
+
+.answer-mode-card strong {
+  color: #f5f8f8;
+  font: 800 18px/1.05 "Rajdhani", sans-serif;
+}
+
+.answer-mode-card small {
+  margin-top: 4px;
+  color: #849ba2;
+  font: 600 13px/1.2 "Rajdhani", sans-serif;
+}
+
+.answer-mode-card.active > span,
+.answer-mode-card:has(input:checked) > span {
+  border-color: #00d9d2;
+  background: #08272d;
+  color: #00e6df;
+  box-shadow: inset 3px 0 #00e6df;
+}
+
+.toggle-row.disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.paper-setup-note {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 54px;
+  padding: 9px 12px;
+  border: 1px solid #2d4f56;
+  background: #061a20;
+}
+
+.paper-setup-note .local-icon,
+.paper-print-button .local-icon {
+  width: 25px;
+  height: 25px;
+  color: #00ded7;
+}
+
+.paper-setup-note span {
+  display: grid;
+  gap: 2px;
+}
+
+.paper-setup-note strong {
+  color: #ecf6f7;
+  font: 800 16px/1 "Rajdhani", sans-serif;
+}
+
+.paper-setup-note small {
+  color: #99afb5;
+  font: 600 13px/1.15 "Rajdhani", sans-serif;
+}
+
+.paper-print-button {
+  min-height: 42px;
+}
+
+html body #app.cockpit-desktop section.setup-page .run-configuration:has(input[name="answerMode"][value="paper"]:checked) {
+  grid-template-rows: 32px 66px 66px 46px 46px 46px 40px 42px 52px !important;
+  gap: 7px !important;
+  padding: 12px 28px !important;
+  align-content: start !important;
+}
+
+html body #app.cockpit-desktop section.setup-page .run-configuration:has(input[name="answerMode"][value="paper"]:checked) > label:not(.toggle-row) {
+  grid-template-rows: 20px 44px !important;
+  font-size: 14px !important;
+}
+
+html body #app.cockpit-desktop section.setup-page .run-configuration:has(input[name="answerMode"][value="paper"]:checked) select {
+  height: 44px !important;
+  font-size: 18px !important;
+}
+
+html body #app.cockpit-desktop section.setup-page .run-configuration:has(input[name="answerMode"][value="paper"]:checked) .answer-mode-card > span {
+  min-height: 47px;
+  padding-block: 5px;
+}
+
+html body #app.cockpit-desktop section.setup-page .run-configuration:has(input[name="answerMode"][value="paper"]:checked) .answer-mode-card .local-icon {
+  width: 25px;
+  height: 25px;
+}
+
+html body #app.cockpit-desktop section.setup-page .run-configuration:has(input[name="answerMode"][value="paper"]:checked) .technical-cta {
+  min-height: 52px !important;
+  font-size: 23px !important;
+}
+
+.paper-finish {
+  border-color: #f0aa18 !important;
+  background: #332207 !important;
+  color: #ffc13a !important;
+}
+
+.paper-readonly-choices .choice {
+  cursor: default;
+  opacity: 1 !important;
+}
+
+#app .paper-readonly-choices .choice:disabled {
+  cursor: default !important;
+  filter: none;
+  opacity: 1 !important;
+}
+
+.paper-readonly-choices .choice-radio {
+  display: none;
+}
+
+.paper-mark-reminder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 190px;
+  color: #f3bd39;
+  font: 800 15px/1 "Rajdhani", sans-serif;
+  text-transform: uppercase;
+}
+
+.paper-mark-reminder .local-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.paper-finish-modal {
+  border-color: #ad7b13;
+}
+
+.paper-finish-symbol {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border: 1px solid #e9a715;
+  color: #ffc13a;
+  background: #281c06;
+}
+
+.paper-finish-symbol .local-icon {
+  width: 31px;
+  height: 31px;
+}
+
+.paper-finish-checks {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 20px 0;
+  border: 1px solid #5f4b20;
+}
+
+.paper-finish-checks span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 60px;
+  border-right: 1px solid #5f4b20;
+  color: #f4d37d;
+}
+
+.paper-finish-checks span:last-child { border-right: 0; }
+.paper-finish-checks .icon,
+.paper-finish-checks .local-icon { width: 22px; height: 22px; }
+
+.paper-workflow {
+  position: relative;
+  width: 1672px;
+  height: 942px;
+  overflow: hidden;
+  color: #eef8f8;
+  background:
+    linear-gradient(rgba(0, 224, 216, .025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 224, 216, .025) 1px, transparent 1px),
+    radial-gradient(circle at 76% 18%, rgba(0, 208, 201, .08), transparent 33%),
+    #020d12;
+  background-size: 40px 40px, 40px 40px, auto, auto;
+  font-family: "Rajdhani", sans-serif;
+}
+
+.paper-workflow-header {
+  display: grid;
+  grid-template-columns: 410px 1fr 410px;
+  align-items: center;
+  height: 88px;
+  padding: 0 42px;
+  border-bottom: 1px solid #23414a;
+  background: rgba(2, 13, 18, .96);
+}
+
+.paper-run-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.paper-run-status span,
+.paper-run-status small {
+  color: #8aa1a8;
+  font: 700 15px/1 "Rajdhani", sans-serif;
+  text-transform: uppercase;
+}
+
+.paper-run-status b {
+  padding: 8px 20px;
+  border-inline: 1px solid #31515a;
+  color: #00e6df;
+  font: 800 21px/1 "Rajdhani", sans-serif;
+  text-transform: uppercase;
+}
+
+.paper-header-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.paper-header-actions .btn { min-height: 42px; }
+.paper-header-actions .local-icon { width: 20px; height: 20px; }
+
+.paper-workflow-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: calc(100% - 88px);
+  padding: 24px 42px 28px;
+}
+
+.paper-stage-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 90px;
+}
+
+.paper-stage-title h1 {
+  margin: 2px 0 4px;
+  color: #f8fbfb;
+  font: italic 800 48px/.95 "Barlow Condensed", sans-serif;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.paper-stage-title p { margin: 0; color: #abc0c5; font-size: 17px; }
+.paper-stage-title .eyebrow { color: #00e6df; font-size: 15px; }
+
+.paper-privacy-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 255px;
+  padding: 12px 16px;
+  border: 1px solid #28515a;
+  background: #061a20;
+}
+
+.paper-privacy-badge .icon { width: 27px; height: 27px; color: #00ded7; }
+.paper-privacy-badge span { display: grid; }
+.paper-privacy-badge strong { color: #eaf8f8; font-size: 16px; text-transform: uppercase; }
+.paper-privacy-badge small { color: #8fa8ae; font-size: 13px; }
+
+.paper-sync-error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 54px;
+  padding: 8px 12px;
+  border: 1px solid #a96f15;
+  background: #251b08;
+  color: #ffd269;
+}
+
+.paper-sync-error > span { display: grid; margin-right: auto; }
+.paper-sync-error .icon { width: 25px; height: 25px; }
+
+.paper-upload-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  min-height: 0;
+  flex: 1;
+}
+
+.paper-upload-card {
+  position: relative;
+  display: grid;
+  grid-template-rows: 52px minmax(0, 1fr) 58px;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid #294951;
+  background: #06161c;
+  clip-path: polygon(0 14px, 14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+}
+
+.paper-upload-card.has-scan { border-color: #00a9a4; }
+
+.paper-upload-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 0 18px;
+  border-bottom: 1px solid #294951;
+  background: #092028;
+}
+
+.paper-upload-head span { color: #00e6df; font-size: 17px; font-weight: 800; text-transform: uppercase; }
+.paper-upload-head strong { color: #ecf7f7; font-size: 16px; }
+.paper-upload-head em { color: #f0bd43; font-size: 13px; font-style: normal; text-transform: uppercase; }
+
+.paper-canvas-wrap {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  place-items: center;
+  min-height: 0;
+  padding: 10px;
+  overflow: hidden;
+  background: #020a0e;
+}
+
+.paper-canvas-wrap canvas {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  cursor: crosshair;
+  touch-action: none;
+  box-shadow: 0 0 0 1px #34525a, 0 12px 30px rgba(0, 0, 0, .38);
+}
+
+.paper-canvas-wrap > p {
+  position: static;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 7px 10px;
+  background: rgba(1, 12, 16, .88);
+  color: #dcebec;
+  text-align: center;
+  font-size: 13px;
+}
+
+.paper-upload-placeholder {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  color: #718991;
+  text-align: center;
+}
+
+.paper-upload-placeholder .local-icon { width: 58px; height: 58px; color: #37565e; }
+.paper-upload-placeholder strong { color: #b8c8cc; font-size: 20px; text-transform: uppercase; }
+.paper-upload-placeholder span { font-size: 14px; }
+
+.paper-upload-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid #294951;
+}
+
+.paper-upload-actions .btn { min-height: 40px; }
+.paper-file-label { position: relative; overflow: hidden; cursor: pointer; }
+.paper-file-label input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+.paper-capture-guidance {
+  display: grid;
+  grid-template-columns: 160px repeat(4, 1fr);
+  align-items: center;
+  min-height: 50px;
+  border-block: 1px solid #294951;
+  color: #9eb3b8;
+}
+
+.paper-capture-guidance strong,
+.paper-capture-guidance span {
+  padding: 0 16px;
+  border-right: 1px solid #294951;
+}
+
+.paper-capture-guidance strong { color: #00e6df; text-transform: uppercase; }
+.paper-capture-guidance span::before { content: "\2713"; margin-right: 7px; color: #4ddd74; }
+
+.paper-workflow-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  min-height: 54px;
+}
+
+.paper-workflow-actions > span {
+  margin-right: auto;
+  color: #94a9af;
+  font-size: 14px;
+}
+
+.paper-workflow-actions .btn { min-width: 240px; min-height: 48px; }
+
+.paper-detection-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  min-height: 72px;
+  border: 1px solid #2b4a52;
+  background: #06171d;
+}
+
+.paper-detection-summary metric {
+  display: grid;
+  grid-template-columns: 35px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-right: 1px solid #2b4a52;
+}
+
+.paper-detection-summary metric:last-child { border-right: 0; }
+.paper-detection-summary .icon,
+.paper-detection-summary .local-icon { width: 27px; height: 27px; }
+.paper-detection-summary span { color: #9db1b6; font-size: 14px; text-transform: uppercase; }
+.paper-detection-summary strong { color: #fff; font: 800 30px/1 "Barlow Condensed", sans-serif; }
+.paper-detection-summary .confident { color: #4ddd74; }
+.paper-detection-summary .blank { color: #b5c4c8; }
+.paper-detection-summary .multiple { color: #ff5e64; }
+.paper-detection-summary .low { color: #f2b72c; }
+
+.paper-answer-review {
+  display: grid;
+  grid-template-rows: 48px minmax(0, 1fr);
+  min-height: 0;
+  flex: 1;
+  padding: 0;
+  overflow: hidden;
+}
+
+.paper-review-legend {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 16px;
+  border-bottom: 1px solid #294951;
+  background: #081c22;
+  font-size: 14px;
+}
+
+.paper-review-legend > span { display: inline-flex; align-items: center; gap: 7px; color: #bed0d4; }
+.paper-review-legend i { width: 10px; height: 10px; border: 1px solid currentColor; }
+.paper-review-legend i.confident { background: #128d87; color: #00e6df; }
+.paper-review-legend i.blank { color: #778b91; }
+.paper-review-legend i.multiple { background: #6f1c24; color: #ff5e64; }
+.paper-review-legend i.low { background: #74500b; color: #f2b72c; }
+.paper-review-legend small { margin-left: auto; color: #81989f; }
+
+.paper-answer-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  min-height: 0;
+  padding: 12px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #1e7778 #051319;
+}
+
+.paper-answer-item {
+  display: grid;
+  grid-template-columns: 34px 1fr 58px;
+  align-items: center;
+  min-height: 50px;
+  border: 1px solid #29434b;
+  background: #07171d;
+}
+
+.paper-answer-item.multiple { border-color: #b4343c; background: #1f1014; }
+.paper-answer-item.low { border-color: #9a721d; background: #201a0c; }
+.paper-answer-item.reviewed { border-color: #00a9a4; }
+.paper-answer-item > strong { color: #e9f5f5; text-align: center; font-size: 15px; }
+.paper-answer-item > div { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+.paper-answer-item button {
+  min-width: 0;
+  height: 29px;
+  padding: 0;
+  border: 1px solid #37525a;
+  background: #041117;
+  color: #b9c9cc;
+  font: 800 13px/1 "Rajdhani", sans-serif;
+}
+.paper-answer-item button:hover,
+.paper-answer-item button:focus-visible { border-color: #00e6df; color: #fff; }
+.paper-answer-item button.selected { border-color: #00e6df; background: #08736f; color: #fff; }
+.paper-answer-item .paper-blank-choice { font-size: 10px; }
+.paper-answer-item > small { padding: 0 4px; color: #8fa2a7; font-size: 10px; line-height: 1.05; text-align: center; text-transform: uppercase; }
+
+.paper-blank-confirm {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 54px;
+  padding: 8px 14px;
+  border: 1px solid #805e1b;
+  background: #1d1709;
+  cursor: pointer;
+}
+
+.paper-blank-confirm.complete { border-color: #276c4a; background: #0a1d16; }
+.paper-blank-confirm input { width: 20px; height: 20px; accent-color: #00bcb5; }
+.paper-blank-confirm span { display: grid; }
+.paper-blank-confirm strong { color: #f4ca65; font-size: 15px; }
+.paper-blank-confirm.complete strong { color: #5dde84; }
+.paper-blank-confirm small { color: #9badb2; font-size: 12px; }
+.paper-review-readiness { margin-right: auto; color: #aac0c5; font-size: 14px; }
+.paper-result-badge { display: inline-block; margin-left: 14px; padding: 4px 9px; border: 1px solid #f0aa18; color: #ffc13a; font: normal 800 13px/1 "Rajdhani", sans-serif; vertical-align: middle; text-transform: uppercase; }
+
+.paper-print-root { display: none; }
+
+@media print {
+  @page { size: Letter portrait; margin: 0; }
+  html, body { width: 8.5in !important; height: auto !important; margin: 0 !important; padding: 0 !important; background: #fff !important; overflow: visible !important; }
+  body > *:not(.paper-print-root) { display: none !important; }
+  .paper-print-root { display: block !important; width: 8.5in; margin: 0; }
+  .paper-print-page { display: block; width: 8.5in; height: 11in; margin: 0; break-after: page; page-break-after: always; }
+  .paper-print-page:last-child { break-after: auto; page-break-after: auto; }
+}
+
+  @media (max-width: 1099px) {
+  .answer-mode-selector { grid-template-columns: 1fr; }
+  .paper-workflow { width: 100%; height: auto; min-height: 100dvh; overflow: visible; }
+  .paper-workflow-header { position: sticky; top: 0; z-index: 20; grid-template-columns: 1fr auto; height: auto; min-height: 68px; padding: 10px 14px; }
+  .paper-workflow-header .exam-brand { min-width: 0; }
+  .paper-run-status { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; padding-top: 8px; overflow-x: auto; }
+  .paper-run-status b { font-size: 17px; }
+  .paper-header-actions { grid-column: 2; grid-row: 1; }
+  .paper-header-actions .paper-print-button,
+  .paper-header-actions .btn:first-child { display: none; }
+  .paper-workflow-body { height: auto; min-height: calc(100dvh - 110px); padding: 18px 14px 24px; }
+  .paper-stage-title { flex-direction: column; align-items: stretch; gap: 14px; }
+  .paper-stage-title h1 { font-size: 38px; }
+  .paper-privacy-badge { width: 100%; min-width: 0; box-sizing: border-box; }
+  .paper-upload-grid { grid-template-columns: 1fr; }
+  .paper-upload-card { min-height: 560px; }
+  .paper-capture-guidance { grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px; }
+  .paper-capture-guidance strong { grid-column: 1 / -1; }
+  .paper-capture-guidance strong,
+  .paper-capture-guidance span { padding: 4px 8px; border: 0; }
+  .paper-detection-summary { grid-template-columns: 1fr 1fr; }
+  .paper-detection-summary metric:nth-child(2) { border-right: 0; }
+  .paper-detection-summary metric:nth-child(-n+2) { border-bottom: 1px solid #2b4a52; }
+  .paper-answer-review { min-height: 620px; }
+  .paper-review-legend { flex-wrap: wrap; gap: 8px 14px; min-height: 74px; padding-block: 8px; }
+  .paper-review-legend small { width: 100%; margin-left: 0; }
+  .paper-answer-grid { grid-template-columns: 1fr; }
+  .paper-answer-item { grid-template-columns: 42px 1fr 65px; min-height: 58px; }
+  .paper-answer-item button { height: 36px; }
+  .paper-workflow-actions { position: sticky; bottom: 0; z-index: 10; flex-wrap: wrap; padding: 9px; background: rgba(2, 13, 18, .96); }
+  .paper-workflow-actions .btn { flex: 1; min-width: 150px; }
+  .paper-review-readiness { width: 100%; margin: 0; text-align: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .answer-mode-card > span { transition: none; }
 }

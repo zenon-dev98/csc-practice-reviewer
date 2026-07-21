@@ -1,6 +1,6 @@
 # Repo Current State
 
-Last updated: 2026-07-16
+Last updated: 2026-07-21
 
 ## Workspace
 
@@ -14,11 +14,15 @@ Path:
 - `package.json` contains helper scripts only; it has no dependency declarations.
 - The runnable app is a static browser app in `app/`.
 - The runnable bank uses 20 manually authored Professional mock versions with 170 items each and a strict CSC coverage blueprint.
+- Full Mock Setup now includes an optional Paper answer sheet mode. It prints
+  two version-labeled sheets, freezes the timer before scan review, recognizes
+  JPG/PNG marks locally with native Canvas processing, and persists only the
+  user's confirmed A-D answers.
 - The app has been redesigned around the supplied `states/` screenshots, with approved source-backed deviations for A-D choices, section ranges, and one-profile-per-account auth in normal production mode.
 - Screenshot-parity, desktop-density, and desktop quality-repair passes have added fixture-state QA URLs, bounded dashboard/exam/sidebar/graph/modal contracts, expandable graph subgroups, and no-scroll desktop overflow checks across every supplied state.
 - Runtime persistence is now implemented against Supabase email/password auth and online tables, with per-attempt question snapshots and timing analytics.
 - The app is deployed through GitHub Pages Actions at `https://zenon-dev98.github.io/csc-practice-reviewer/`.
-- The current live release is commit `0116e5c` with cache key `20260716-06`; it supersedes the compact Mock Exam format rail with the approved V5 four-column instrument deck and matching clipboard, movement, and pause iconography.
+- The current release uses cache key `20260721-01`; it includes the approved V5 cockpit rework, audio/avatar assets, and Paper answer sheet scan-to-grade mode.
 - The public GitHub repository is `https://github.com/zenon-dev98/csc-practice-reviewer`.
 - The Supabase SQL/Auth Hook setup from `supabase/schema.sql` has been applied, including authenticated table grants and the `public.hook_validate_invite_code` Before User Created hook.
 - Supabase Auth email/password is enabled with email confirmation disabled for this invite-gated small-group reviewer, avoiding free email quota failures during signup.
@@ -122,7 +126,22 @@ Current source item boundaries:
 
 ## Current Active Ticket
 
-- No implementation ticket is active. The next content gate is a qualified independent second review of the authored bank.
+- `T0040 - Enforced QA Gates And Complete V5 Rework` is active.
+- The authored bank remains unchanged; its qualified independent second review
+  is still a separate content gate.
+
+## T0041 Outcome
+
+- Added On-screen/Paper mode selection without changing the Supabase schema or
+  introducing a production dependency.
+- Paper attempts preserve question browsing and timing, allow explicit finish
+  or timeout to freeze the run, and continue through local upload, assisted
+  alignment, 170-answer confirmation, and the existing submission pipeline.
+- Scan pixels remain in browser memory; the paper QA network audit observed no
+  image-upload request.
+- `npm run qa:paper` passes 31/31 checks. Evidence includes desktop/mobile
+  screenshots, blank print-sheet PNGs, and two-page Letter/A4 PDFs under
+  `qa/current-paper-mode/`.
 
 ## T0035 Outcome
 

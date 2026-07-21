@@ -48,5 +48,7 @@ All files below are generated visual direction, not production data. Implementat
 ## Allowed deviations
 
 - Live values may differ from references; geometry, hierarchy, shell, typography, and state semantics may not.
-- Native emoji avatars may replace image assets if their octagonal plates, size, contrast, and keyboard states match the account reference.
+- Account Settings restores the approved 20 animal choices. Existing accounts
+  retain initials until a selection is saved; the selected animal then replaces
+  initials throughout the signed-in shell.
 - Empty, partial, dense, long-text, and error fixtures are required even when the approved image shows populated content.

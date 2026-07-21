@@ -9,6 +9,11 @@
     "setup": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-local-deps.ps1",
     "start": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1",
     "validate:data": "node scripts/validate-static-data.mjs && node scripts/audit-question-bank.mjs",
-    "audit:questions": "node scripts/audit-question-bank.mjs"
+    "audit:questions": "node scripts/audit-question-bank.mjs",
+    "qa:states": "node scripts/qa-cockpit.cjs qa/current-states",
+    "qa:interactions": "node scripts/qa-interactions.cjs qa/current-interactions",
+    "qa:paper": "node scripts/qa-paper-mode.cjs qa/current-paper-mode",
+    "qa:motion": "node scripts/qa-motion.cjs qa/current-motion",
+    "qa:compare": "node scripts/qa-reference-report.cjs qa/current-states"
   }
 }

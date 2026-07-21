@@ -541,6 +541,25 @@ Headless Edge/Playwright is useful for deterministic fixture sweeps. It does not
 
 For long pages or internal scroll regions, capture multiple screenshots at meaningful scroll positions.
 
+### Evidence Must Identify The Build
+
+Every report, screenshot set, trace, and video must record a fingerprint of the
+HTML, JavaScript, and final CSS authority it tested. Evidence from an earlier
+build is stale after any meaningful visual or interaction edit. A cache query
+string alone is not proof that the displayed bytes match the local build.
+
+### Keep Verdicts Separate
+
+Never compress all QA into one `pass` label. Record independent verdicts for:
+
+- Functional correctness.
+- Visible reachability through normal user actions.
+- Optical parity with the approved reference.
+- Cache-busted live deployment.
+
+Passing one verdict must not imply another. In particular, a headless browser
+cannot sign off the required external-browser optical or live gate.
+
 ## 14. Interaction QA
 
 Press every relevant control and capture the resulting state:
@@ -562,6 +581,30 @@ Press every relevant control and capture the resulting state:
 - Destructive confirmation and cancellation.
 
 Check that controls do not move, resize, overflow, or become obscured after interaction.
+
+### Required Coverage Cannot Be Optional
+
+Maintain a machine-readable manifest of expected test cases, checks, resulting
+states, screenshots, and references. At the end of a run, compare expected and
+executed counts. Missing, blocked, unexpectedly skipped, or silently omitted
+rows fail the gate.
+
+Do not write required checks as `if the control exists, test it`. Assert the
+control exists first. Optional logic is reserved for genuinely optional
+product features documented in the manifest.
+
+### Test Reachability Without Automation Rescue
+
+Measured user paths may use pointer movement, clicks, keyboard input, and
+wheel/touch scrolling. They must not use DOM mutation, forced clicks,
+`scrollIntoView`, direct state injection, or hidden-element activation to make
+a control reachable. Those techniques can diagnose a bug, but they cannot
+prove that a real user can operate the interface.
+
+For a bounded scroll owner, verify both directions and the complete path. An
+expanded question navigator, for example, must prove that a user can expand,
+reach a deep item, return to an early item, collapse, and still reach all lower
+groups. Testing only the final click misses broken scroll ownership.
 
 ## 15. Motion Rules
 
@@ -646,6 +689,23 @@ Showing the same progress in a ring, percentage, remaining count, checkpoint row
 
 Zero overflow and zero console errors do not prove visual quality.
 
+### `Silent Skip Means Pass`
+
+Conditional test code that does nothing when a required control is missing
+turns absence into a false pass. Expected and executed coverage must be equal.
+
+### `Automation Rescue Means Reachable`
+
+Programmatically scrolling or forcing a hidden click proves that the DOM node
+exists, not that a person can reach it. Use the same visible input path as the
+target user.
+
+### `Stale Assertion Means Product Regression`
+
+When copy, routes, or controls change intentionally, update the coverage
+manifest in the same ticket. A stale test is not permission to delete coverage;
+replace it with the new requirement and preserve the behavioral intent.
+
 ### `Tested Before The Last Edit`
 
 Any meaningful change after the final screenshot invalidates that evidence. Recapture affected states.
@@ -672,6 +732,8 @@ A generated-image adaptation is done only when:
 - Desktop works at the real maximized target viewport and `100%` zoom.
 - Mobile follows its declared responsive contract.
 - Automated overflow/console checks pass.
+- Expected and executed QA coverage are equal, with no required skips.
+- Functional, reachability, optical, and live verdicts are recorded separately.
 - Manual screenshot comparison passes.
 - External target-browser QA passes when required.
 - The final deployed, cache-busted build is verified live.

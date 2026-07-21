@@ -1,5 +1,77 @@
 # Tickets
 
+## T0041 - Paper Exam And Scan-to-Grade Mode
+
+Status: done
+
+Add a paper-answer workflow that keeps the web app as the question booklet,
+prints two app-specific answer sheets, recognizes two local scans, lets the
+reviewer correct uncertain marks, and grades the confirmed A-D answers through
+the existing submission path.
+
+Acceptance criteria:
+
+- Mock Exam Setup offers On-screen and Paper answer modes; Paper mode disables
+  question and answer-choice shuffling and prints items 1-85 and 86-170 on two
+  marked sheets.
+- Paper exams keep question navigation and flags, make choices read-only, allow
+  Next without an onscreen selection, and freeze time before scanning.
+- Timeout enters the same frozen scan workflow instead of immediately scoring
+  unanswered items.
+- JPG/PNG uploads and camera captures are normalized and classified entirely in
+  the browser, with automatic orientation/alignment, manual four-corner repair,
+  and editable blank/multiple/low-confidence states.
+- Only confirmed A-D answers enter persistence; source scans are neither sent
+  to Supabase nor retained after the browser session.
+- Results identify Paper mode and omit answer-change claims that cannot be
+  measured from paper.
+- Dedicated recognition, print, timeout, privacy, desktop, and mobile checks
+  pass with saved evidence.
+
+Completion notes:
+
+- Added a native Canvas OMR implementation with no production dependency.
+- Added two-page Letter and A4-fit print artifacts, local scan review, manual
+  correction, intentional-blank confirmation, and paper-specific result/review
+  behavior.
+- `npm run qa:paper` passes 31/31 checks, including all 170 bubbles, rotated,
+  skewed, shadowed, bright, faint, corrected, blank, and multiple-mark samples.
+- The full static/content check and the 56-check interaction regression suite
+  pass. Automated screenshots and reports are stored in
+  `qa/current-paper-mode/`.
+
+## T0040 - Enforced QA Gates And Complete V5 Rework
+
+Status: in_progress
+
+Convert the repository's visual and interaction quality rules into executable
+release gates, then implement the complete approved V5 parity, audio, avatar,
+exam, results, review, account, and responsive rework recorded in
+`docs/TEMP_V5_PARITY_REWORK_DECISIONS.md`.
+
+Acceptance criteria:
+
+- Required state and interaction coverage is declared before execution; a
+  missing required control, skipped branch, missing screenshot, or unexecuted
+  check fails the release.
+- Functional correctness, human interaction reachability, optical parity, and
+  live deployment verification produce separate verdicts and evidence.
+- Reachability tests use visible user input and never depend on DOM mutation,
+  forced scrolling, or hidden-element clicks to prove usability.
+- Approved V5 references have an explicit manifest covering page/state,
+  viewport, geometry anchors, typography, icons, colors, scroll ownership, and
+  required interactions.
+- The More/Less navigator path is exercised from a real collapsed state through
+  item 80 and back to item 21, with every intermediate state captured and no
+  silent conditional skip.
+- Every confirmed product and visual decision in the T0040 specification is
+  implemented without regressing exam, persistence, privacy, or content
+  invariants.
+- Local automated checks, the required desktop/mobile matrix, maximized
+  external Edge at 100% zoom, and the cache-busted live deployment all pass
+  against the final build.
+
+
 ## T0039 - Restore V5 Mock Exam Instrument Deck
 
 Status: done
