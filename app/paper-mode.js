@@ -20,7 +20,7 @@
     if (!page) return [];
     const columns = [0, 1, 2];
     const columnLeft = [88, 598, 1108];
-    const rowStart = 430;
+    const rowStart = 460;
     const rowPitch = 52;
     const bubbleStart = 178;
     const bubblePitch = 76;
