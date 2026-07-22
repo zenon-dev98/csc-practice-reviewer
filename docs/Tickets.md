@@ -1,5 +1,37 @@
 # Tickets
 
+## T0045 - Power-Outage Attempt Recovery
+
+Status: done
+
+Prevent an active exam's answers and current question from being lost when the
+browser or computer closes unexpectedly.
+
+Implementation notes (2026-07-22):
+
+- Replaced the reset-on-every-change debounce with a bounded 3.5-second cloud
+  checkpoint schedule that cannot be postponed by one-second timer updates.
+- Added per-account browser recovery checkpoints for answer state and current
+  item, restored only when newer than Supabase and only for active attempts.
+- Added automatic recovery cleanup after successful cloud synchronization and
+  the focused `npm run check:resume` regression check.
+
+## T0044 - Read-only Administration Console
+
+Status: done
+
+Add a dedicated administrator login and read-only console for aggregate stats,
+searchable users, per-user attempt history, scores, and question-level answers.
+
+Implementation notes (2026-07-22):
+
+- Added a separate `admin.html` entry point with an independent Supabase Auth
+  storage namespace and username-based login UI.
+- Added SELECT-only administrator RLS policies and explicit administrator
+  enrollment; no privileged key is present in the static frontend.
+- Applied the additive migration and provisioned the dedicated administrator.
+- Added `npm run check:admin` to verify the frontend/security contract.
+
 ## T0043 - Lean Deployment Policy
 
 Status: done

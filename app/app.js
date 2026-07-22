@@ -9,6 +9,7 @@
   const DEFAULT_PRACTICE_COUNT = 20;
   const PAPER_POLL_INTERVAL_MS = 7000;
   const AUDIO_PREFS_KEY = "csc-reviewer-audio";
+  const ATTEMPT_RECOVERY_KEY_PREFIX = "csc-reviewer-attempt-recovery";
   const QA_TIMING_ENABLED = new URLSearchParams(location.search).get("qaTiming") === "1";
   const AVATAR_OPTIONS = [
     "cat", "dog", "cow", "fox", "panda",
@@ -189,11 +190,14 @@
     syncCockpitScale();
     window.addEventListener("resize", syncCockpitScale, { passive: true });
     window.addEventListener("beforeunload", () => {
+      persistCurrentAttemptRecovery();
       flushDirty({ immediate: true });
     });
+    window.addEventListener("pagehide", persistCurrentAttemptRecovery);
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "hidden") {
         recordVisibilityEvent("hidden");
+        persistCurrentAttemptRecovery();
         flushDirty({ immediate: true });
       } else {
         recordVisibilityEvent("visible");
@@ -505,6 +509,15 @@
     app.profile.nickname = app.profile.nickname || user.user_metadata?.nickname || "";
     app.profile.avatar_preset = Number(app.profile.avatar_preset || user.user_metadata?.avatar_preset || 0);
     app.attempts = (attemptsResult.data || []).map(normalizeAttempt);
+    const recoveredAttempts = app.attempts.filter(applyAttemptRecovery);
+    recoveredAttempts.forEach((attempt) => {
+      app.dirtyAttempts.add(attempt.id);
+      Object.keys(attempt.answers).forEach((questionId) => app.dirtyAnswers.add(`${attempt.id}|${questionId}`));
+    });
+    if (recoveredAttempts.length) {
+      app.toast = `Recovered unsynced progress for ${recoveredAttempts.length === 1 ? "your active exam" : `${recoveredAttempts.length} active exams`} from this device.`;
+      scheduleFlush();
+    }
     app.attempts.filter((attempt) => attempt._clockMigrated).forEach((attempt) => {
       delete attempt._clockMigrated;
       touchAttempt(attempt);
@@ -851,6 +864,84 @@
       attempt._clockMigrated = true;
     }
     return attempt;
+  }
+
+  function attemptRecoveryKey(attemptId) {
+    const userId = app.session?.user?.id;
+    return userId ? `${ATTEMPT_RECOVERY_KEY_PREFIX}:${userId}:${attemptId}` : "";
+  }
+
+  function persistCurrentAttemptRecovery() {
+    if (app.view.name !== "exam") return;
+    persistAttemptRecovery(getAttempt(app.view.attemptId));
+  }
+
+  function persistAttemptRecovery(attempt) {
+    const key = attemptRecoveryKey(attempt?.id);
+    if (!key || app.fixtureMode || !["in_progress", "paused"].includes(attempt.status)) return;
+    const answers = {};
+    Object.values(attempt.answers || {}).forEach((answer) => {
+      answers[answer.question_id] = {
+        selected_choice: answer.selected_choice || null,
+        skipped: Boolean(answer.skipped),
+        flagged: Boolean(answer.flagged),
+        time_spent_seconds: Number(answer.time_spent_seconds || 0),
+        visit_count: Number(answer.visit_count || 0),
+        first_seen_at: answer.first_seen_at || null,
+        last_seen_at: answer.last_seen_at || null,
+        first_answered_at: answer.first_answered_at || null,
+        last_answered_at: answer.last_answered_at || null,
+        answer_changes: Number(answer.answer_changes || 0),
+        changed_wrong_to_correct: Number(answer.changed_wrong_to_correct || 0),
+        changed_correct_to_wrong: Number(answer.changed_correct_to_wrong || 0),
+        answer_history: toArray(answer.answer_history)
+      };
+    });
+    try {
+      localStorage.setItem(key, JSON.stringify({
+        version: 1,
+        attemptId: attempt.id,
+        savedAt: nowIso(),
+        current_question_index: attempt.current_question_index,
+        answers
+      }));
+    } catch {
+      // Cloud autosave remains authoritative when browser storage is unavailable.
+    }
+  }
+
+  function applyAttemptRecovery(attempt) {
+    const key = attemptRecoveryKey(attempt?.id);
+    if (!key || !["in_progress", "paused"].includes(attempt.status)) return false;
+    try {
+      const recovery = JSON.parse(localStorage.getItem(key) || "null");
+      if (!recovery || recovery.version !== 1 || recovery.attemptId !== attempt.id) return false;
+      const recoveryTime = Date.parse(recovery.savedAt || "");
+      const cloudTime = Date.parse(attempt.updated_at || "");
+      if (!Number.isFinite(recoveryTime) || (Number.isFinite(cloudTime) && recoveryTime <= cloudTime)) return false;
+      attempt.current_question_index = Math.min(
+        Math.max(0, Number(recovery.current_question_index) || 0),
+        Math.max(0, attempt.total_questions - 1)
+      );
+      Object.entries(recovery.answers || {}).forEach(([questionId, saved]) => {
+        const answer = attempt.answers[questionId];
+        if (!answer || !saved) return;
+        Object.assign(answer, saved, { answer_history: toArray(saved.answer_history) });
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function clearAttemptRecovery(attemptId) {
+    const key = attemptRecoveryKey(attemptId);
+    if (!key) return;
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // Recovery cleanup is best-effort only.
+    }
   }
 
   function toArray(value) {
@@ -4484,12 +4575,16 @@
 
   function touchAnswer(attempt, questionId) {
     app.dirtyAnswers.add(`${attempt.id}|${questionId}`);
+    persistAttemptRecovery(attempt);
     scheduleFlush();
   }
 
   function scheduleFlush() {
-    clearTimeout(app.syncTimer);
-    app.syncTimer = setTimeout(() => flushDirty(), SYNC_INTERVAL_MS);
+    if (app.syncTimer) return;
+    app.syncTimer = setTimeout(() => {
+      app.syncTimer = null;
+      flushDirty();
+    }, SYNC_INTERVAL_MS);
   }
 
   async function flushDirty(options = {}) {
@@ -4503,8 +4598,10 @@
     if (!app.dirtyAttempts.size && !app.dirtyAnswers.size) return;
     app.flushing = true;
     clearTimeout(app.syncTimer);
+    app.syncTimer = null;
     let attemptsToSync = [];
     let answerKeys = [];
+    let syncSucceeded = false;
     try {
       attemptsToSync = Array.from(app.dirtyAttempts).map(getAttempt).filter(Boolean);
       answerKeys = Array.from(app.dirtyAnswers);
@@ -4538,6 +4635,7 @@
         const { error } = await app.client.from("attempt_answers").upsert(answersToSync.map(dbAnswerPayload), { onConflict: "attempt_id,question_id" });
         if (error) throw error;
       }
+      syncSucceeded = true;
     } catch (error) {
       attemptsToSync.forEach((attempt) => app.dirtyAttempts.add(attempt.id));
       answerKeys.forEach((key) => app.dirtyAnswers.add(key));
@@ -4546,6 +4644,18 @@
       if (options.throwOnError) throw error;
     } finally {
       app.flushing = false;
+      if (syncSucceeded) {
+        const syncedAttemptIds = new Set([
+          ...attemptsToSync.map((attempt) => attempt.id),
+          ...answerKeys.map((key) => key.split("|")[0])
+        ]);
+        syncedAttemptIds.forEach((attemptId) => {
+          const hasPendingAttempt = app.dirtyAttempts.has(attemptId);
+          const hasPendingAnswer = Array.from(app.dirtyAnswers).some((key) => key.startsWith(`${attemptId}|`));
+          if (!hasPendingAttempt && !hasPendingAnswer) clearAttemptRecovery(attemptId);
+        });
+      }
+      if (app.dirtyAttempts.size || app.dirtyAnswers.size) scheduleFlush();
     }
   }
 

@@ -19,7 +19,7 @@ Path:
 - Runtime persistence is now implemented against Supabase email/password auth and online tables, with per-attempt question snapshots and timing analytics.
 - Mock Exam Setup now supports an optional Paper answer sheet mode with two printable OMR pages, local browser-only scan recognition, manual uncertainty correction, and grading through the existing attempt submission path.
 - The app is deployed through GitHub Pages Actions at `https://zenon-dev98.github.io/csc-practice-reviewer/`.
-- The current release uses cache key `20260722-02`; it includes the approved V5 cockpit rework, audio/avatar assets, the no-blink exam controls, Paper answer sheet scan-to-grade mode, and the July 22 focused UI remediation.
+- The current release uses cache key `20260722-03`; it includes the approved V5 cockpit rework, audio/avatar assets, the no-blink exam controls, Paper answer sheet scan-to-grade mode, the July 22 focused UI remediation, and power-outage attempt recovery.
 - The public GitHub repository is `https://github.com/zenon-dev98/csc-practice-reviewer`.
 - The Supabase SQL/Auth Hook setup from `supabase/schema.sql` has been applied, including authenticated table grants and the `public.hook_validate_invite_code` Before User Created hook.
 - Supabase Auth email/password is enabled with email confirmation disabled for this invite-gated small-group reviewer, avoiding free email quota failures during signup.
@@ -33,6 +33,11 @@ Path:
   check.
 - The Pages workflow packages the static app without reinstalling Node or
   repeating question-bank validation.
+- A separate read-only administrator console is available at `admin.html`.
+  Cross-user reads require explicit administrator enrollment and are enforced
+  by Supabase RLS; the static app contains no service-role credential.
+- Active exams now checkpoint to Supabase at least every 3.5 seconds and keep a
+  per-account browser recovery snapshot for unsynced answers/current position.
 
 ## July 22 Focused UI Remediation
 

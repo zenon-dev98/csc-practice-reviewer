@@ -5,7 +5,9 @@
   "description": "Digitized mock Career Service Examination Professional reviewer app for a small group of examinees.",
   "type": "module",
   "scripts": {
-    "check": "node --check app/app.js && node --check app/paper-mode.js",
+    "check": "node --check app/app.js && node --check app/paper-mode.js && node --check app/admin.js",
+    "check:admin": "node scripts/check-admin-console.mjs",
+    "check:resume": "node scripts/check-resume-persistence.mjs",
     "setup": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-local-deps.ps1",
     "start": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start.ps1",
     "validate:data": "node scripts/validate-static-data.mjs",
