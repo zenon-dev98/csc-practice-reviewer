@@ -980,3 +980,26 @@ Completion notes:
 - Added reusable Edge screenshot and interaction harnesses in `scripts/qa-cockpit.cjs` and `scripts/qa-interactions.cjs`.
 - Final Edge fixture sweeps produced `108` desktop screenshots and `72` mobile screenshots with zero console/document failures and zero sampled element overflows; the final interaction run produced `59` screenshots with `15/15` checks passing.
 - Static assets are cache-busted through `v=20260711-01`.
+
+## T0043 - Focused UI And Attempt-Visibility Remediation
+
+Status: done locally; deployment pending
+
+Repair the confirmed July 22 defects without changing question-bank content or weakening account isolation.
+
+Acceptance criteria:
+
+- Paragraph-ordering statements render as separate aligned rows.
+- Account audio controls preserve scroll and focus; the header audio popover does not reflow the shared shell.
+- The retired Alex McCulloch playlist is absent from the runtime library.
+- Results actions support browser new-tab behavior.
+- Answer Review has five semantically colored section columns and no P/R column.
+- Active desktop containers use complete corners; Pause, Setup, Progress, and Account Settings have no reported collisions.
+- Progress identifies the active account and can refresh all attempt rows returned by Supabase.
+- Missing cross-user data is investigated through Supabase administration, never by bypassing RLS in the static frontend.
+
+Verification:
+
+- Eight affected fixture states at `1536x736`: 8/8 screenshots, zero console/document failures, zero sampled overflow, zero automated visual defects.
+- Seven focused interaction checks passed for drawer focus/scroll, header stability, native results links, review columns/colors, pause containment, and ordering rows.
+- Question-bank validation was intentionally not rerun because no bank content or scoring logic changed.

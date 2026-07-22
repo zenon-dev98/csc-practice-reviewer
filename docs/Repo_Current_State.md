@@ -19,7 +19,7 @@ Path:
 - Runtime persistence is now implemented against Supabase email/password auth and online tables, with per-attempt question snapshots and timing analytics.
 - Mock Exam Setup now supports an optional Paper answer sheet mode with two printable OMR pages, local browser-only scan recognition, manual uncertainty correction, and grading through the existing attempt submission path.
 - The app is deployed through GitHub Pages Actions at `https://zenon-dev98.github.io/csc-practice-reviewer/`.
-- The current release uses cache key `20260721-01`; it includes the approved V5 cockpit rework, audio/avatar assets, the no-blink exam controls, and Paper answer sheet scan-to-grade mode.
+- The current release uses cache key `20260722-02`; it includes the approved V5 cockpit rework, audio/avatar assets, the no-blink exam controls, Paper answer sheet scan-to-grade mode, and the July 22 focused UI remediation.
 - The public GitHub repository is `https://github.com/zenon-dev98/csc-practice-reviewer`.
 - The Supabase SQL/Auth Hook setup from `supabase/schema.sql` has been applied, including authenticated table grants and the `public.hook_validate_invite_code` Before User Created hook.
 - Supabase Auth email/password is enabled with email confirmation disabled for this invite-gated small-group reviewer, avoiding free email quota failures during signup.
@@ -33,6 +33,18 @@ Path:
   check.
 - The Pages workflow packages the static app without reinstalling Node or
   repeating question-bank validation.
+
+## July 22 Focused UI Remediation
+
+- Paragraph-organization questions now render Roman-numeral or numbered statements as separate aligned rows instead of one wrapped paragraph.
+- The user-facing Cafe Jazz and Classical libraries contain six CC0 tracks each; the former Alex McCulloch selections are retired from the runtime library.
+- Account Settings audio controls update in place, preserving drawer scroll and keyboard focus. Section dividers now follow the Audio block instead of crossing password controls.
+- The signed-in audio popover is absolutely anchored and no longer changes the brand, navigation, or account-control geometry when opened.
+- Results actions for Answer Review, weakest-area practice, and same-version retakes are real deep links, so browser context-menu and new-tab behavior work normally.
+- Answer Review uses five navigator columns (`#`, General, Verbal, Numerical, Analytical), section-owned colors, and aligned state icons. The retired P/R column is removed.
+- Clipped-corner containers were retired from the active desktop UI. Pause, Setup, Progress Section Accuracy, Attempt Records, and Account Settings received focused spacing and containment repairs.
+- Progress lists all attempts returned for the current authenticated user and now identifies that account beside a manual Refresh Records action. The client has no time-based attempt deletion or retention filter.
+- Focused final QA at the maximized Edge content viewport (`1536x736`) captured eight affected states with zero console/document failures, sampled overflows, or automated visual defects. Seven targeted interaction assertions also passed.
 - Ponytail has been installed into `C:\Users\Acer\.codex\skills\ponytail`; restart Codex to load it as a named skill in future sessions. The project `AGENTS.md` now includes a Ponytail guardrail for this repo immediately.
 
 ## Existing Files

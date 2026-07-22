@@ -1,6 +1,8 @@
 # Known Issues And Followups
 
 ## Open
+- A friend-reported attempt from the previous day is not visible in Progress. The client requests every `attempts` row owned by the current authenticated `user_id`, ordered by `started_at`, and contains no age/retention deletion path. Diagnosis therefore requires the friend's email or Auth UID and a Supabase Dashboard check of `attempts` and `attempt_answers`; likely causes include a different signed-in account, an interrupted initial save, or an explicit deletion. No production data was changed during this UI ticket.
+- Cross-user attempt access is intentionally blocked by RLS. Project-owner inspection is available in the Supabase Dashboard/SQL Editor. Any in-app aggregate statistics or admin console must be implemented later through a secured server-side/RPC design; a service-role key must never be placed in this GitHub Pages frontend.
 - T0042 automation validates camera-style image files, local-only OMR processing, frozen timeout handling, confirmation, and grading. Physical rear-camera permission capture and a real two-device Supabase handoff still require hardware/account verification and are not claimed as manually certified.
 - T0040's final local automated release evidence is clean. The cache-busted live replay and the user's hands-on maximized Edge inspection remain required before closing the ticket; automation evidence does not replace that manual gate.
 - All 3,400 authored questions remain `needs_review`. Automated structural, duplicate, balance, and coverage checks are clean, but qualified second review is still required for legal nuance, Filipino usage, distractor strength, and pedagogy.

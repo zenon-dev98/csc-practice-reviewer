@@ -26,16 +26,16 @@ Downloaded: 2026-07-17
 All six tracks are distributed under CC0 1.0. The friendly credits below are
 retained even where attribution is not legally required.
 
-- `music/cafe-after-hours.mp3`: "Public Domain Jazz" by Alex McCulloch.
-  Source: https://opengameart.org/content/public-domain-jazz
-- `music/cafe-blue-cup.mp3`: "jazz snippet" by Alex McCulloch.
-  Source: https://opengameart.org/content/jazz-snippet
+- `music/cafe-catchy-swing.ogg`: "Catchy Swing" by Doge.
+  Source: https://opengameart.org/content/catchy-swing
+- `music/cafe-fusion-jazz.ogg`: "(Basically not) Fusion Jazz" by Spring Spring.
+  Source: https://opengameart.org/content/basically-not-fusion-jazz
 - `music/cafe-corner-table.ogg`: "Jazz" by Spring Spring.
   Source: https://opengameart.org/content/jazz-1
-- `music/cafe-late-morning.mp3`: "Jazz / Pop" by Alex McCulloch.
-  Source: https://opengameart.org/content/jazz-pop
-- `music/cafe-rain-on-glass.mp3`: "short jazz" by Alex McCulloch.
-  Source: https://opengameart.org/content/short-jazz
+- `music/cafe-piano-sway.ogg`: "Piano Swap Rpg" by Tozan.
+  Source: https://opengameart.org/content/piano-swap-rpg
+- `music/cafe-jazz-brass.wav`: "Jazz n' brass loop" by Emma_MA.
+  Source: https://opengameart.org/content/jazz-n-brass-loop
 - `music/cafe-quiet-espresso.mp3`: "Moil" by Ruskerdax.
   Source: https://opengameart.org/content/moil
 
@@ -46,8 +46,8 @@ Downloaded: 2026-07-17
 All six tracks are distributed under CC0 1.0. The friendly credits below are
 retained even where attribution is not legally required.
 
-- `music/classical-pop.mp3`: "Classical Pop (Instrumental)" by Alex McCulloch.
-  Source: https://opengameart.org/content/classical-pop-instrumental
+- `music/classical-once-upon-a-time.mp3`: "Once Upon a Time (loop)" by TAD.
+  Source: https://opengameart.org/content/once-upon-a-time-loop
 - `music/classical-fantasy-orchestral.mp3`: "Fantasy Orchestral Theme" by Joth.
   Source: https://opengameart.org/content/fantasy-orchestral-theme
 - `music/classical-calm-theme.ogg`: "calm theme" by Pebonius.
@@ -59,3 +59,6 @@ retained even where attribution is not legally required.
 - `music/classical-emotional-piano.ogg`: the solo-piano version of "Emotional
   Piano" by Centurion of War.
   Source: https://opengameart.org/content/emotional-piano-0
+
+The five retired Alex McCulloch files remain in the repository only as unused
+historical assets. They are no longer reachable from the application library.

@@ -1,0 +1,67 @@
+{
+  "createdAt": "2026-07-22T04:50:14.170Z",
+  "fingerprint": "339f3e4462084998",
+  "viewport": "1536x736",
+  "browser": "Microsoft Edge",
+  "checks": [
+    {
+      "name": "account audio preserves drawer scroll and focus",
+      "passed": true,
+      "before": 660,
+      "after": 660
+    },
+    {
+      "name": "audio popover does not reflow shell",
+      "passed": true,
+      "before": {
+        ".signed-primary-nav": [
+          489.0700378417969,
+          12.110403060913086,
+          615.67724609375,
+          57.817405700683594
+        ]
+      },
+      "after": {
+        ".signed-primary-nav": [
+          489.0700378417969,
+          12.110403060913086,
+          615.67724609375,
+          57.817405700683594
+        ]
+      }
+    },
+    {
+      "name": "results expose three native deep links",
+      "passed": true,
+      "links": [
+        "http://127.0.0.1:4173/?view=review&attempt=fixture-submitted",
+        "http://127.0.0.1:4173/?view=practice&category=Numerical+Ability",
+        "http://127.0.0.1:4173/?view=setup&version=fixture-version-1"
+      ]
+    },
+    {
+      "name": "review matrix has five columns and no P/R",
+      "passed": true,
+      "tracks": 5,
+      "head": "#GeneralVerbalNumericalAnalytical",
+      "classes": [
+        "matrix-section active verbal"
+      ]
+    },
+    {
+      "name": "pause icon and facts are contained",
+      "passed": true,
+      "contained": true,
+      "logicalIcon": 68.00001121316336,
+      "facts": 3
+    },
+    {
+      "name": "ordering prompt renders separate rows",
+      "passed": true,
+      "rows": 4
+    }
+  ],
+  "expected": 6,
+  "passed": 6,
+  "failed": 0
+}

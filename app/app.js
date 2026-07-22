@@ -20,15 +20,15 @@
   const AVATAR_SPRITE_ROWS = [30.9, 40.7, 50.5, 60.4];
   const MUSIC_LIBRARY = {
     cafe: [
-      { title: "After Hours", artist: "Alex McCulloch", src: "assets/audio/music/cafe-after-hours.mp3" },
-      { title: "Blue Cup", artist: "Alex McCulloch", src: "assets/audio/music/cafe-blue-cup.mp3" },
+      { title: "Catchy Swing", artist: "Doge", src: "assets/audio/music/cafe-catchy-swing.ogg" },
+      { title: "Fusion Break", artist: "Spring Spring", src: "assets/audio/music/cafe-fusion-jazz.ogg" },
       { title: "Corner Table", artist: "Spring Spring", src: "assets/audio/music/cafe-corner-table.ogg" },
-      { title: "Late Morning", artist: "Alex McCulloch", src: "assets/audio/music/cafe-late-morning.mp3" },
-      { title: "Rain on Glass", artist: "Alex McCulloch", src: "assets/audio/music/cafe-rain-on-glass.mp3" },
+      { title: "Piano Sway", artist: "Tozan", src: "assets/audio/music/cafe-piano-sway.ogg" },
+      { title: "Jazz and Brass", artist: "Emma MA", src: "assets/audio/music/cafe-jazz-brass.wav" },
       { title: "Quiet Espresso", artist: "Ruskerdax", src: "assets/audio/music/cafe-quiet-espresso.mp3" }
     ],
     classical: [
-      { title: "Classical Pop", artist: "Alex McCulloch", src: "assets/audio/music/classical-pop.mp3" },
+      { title: "Once Upon a Time", artist: "TAD", src: "assets/audio/music/classical-once-upon-a-time.mp3" },
       { title: "Fantasy Orchestral", artist: "Joth", src: "assets/audio/music/classical-fantasy-orchestral.mp3" },
       { title: "Calm Theme", artist: "Pebonius", src: "assets/audio/music/classical-calm-theme.ogg" },
       { title: "Orchestring", artist: "Tozan", src: "assets/audio/music/classical-orchestring.ogg" },
@@ -159,6 +159,7 @@
     reviewFilter: "all",
     recentTab: "all",
     practiceReviewTab: "practice",
+    practiceCategoryDraft: null,
     audioMenuOpen: false,
     audio: loadAudioPreferences(),
     audioElements: null,
@@ -253,7 +254,7 @@
           if (!hadSession || app.view.name === "boot" || app.view.name === "create" || app.view.name === "signin") {
             await loadUserData();
             app.modal = null;
-            setView({ name: "dashboard" });
+            setView(requestedView() || { name: "dashboard" });
           }
         } else {
           app.modal = null;
@@ -264,7 +265,7 @@
       });
       if (app.session) {
         await loadUserData();
-        setView({ name: "dashboard" });
+        setView(requestedView() || { name: "dashboard" });
       } else {
         setView({ name: "create" });
       }
@@ -277,6 +278,39 @@
     const config = window.CSC_SUPABASE_CONFIG || {};
     const key = config.publishableKey || config.anonKey;
     return Boolean(config.url && key && /^https:\/\/.+\.supabase\.co\/?$/.test(config.url.replace(/\/rest\/v1\/?$/, "")));
+  }
+
+  function requestedView() {
+    const params = new URLSearchParams(location.search);
+    const view = params.get("view");
+    if (view === "review") {
+      const attemptId = params.get("attempt");
+      return getAttempt(attemptId) ? { name: "review", attemptId, index: 0 } : null;
+    }
+    if (view === "practice") {
+      const category = params.get("category");
+      app.practiceCategoryDraft = SECTION_GROUPS.some((group) => group.section === category) ? category : null;
+      app.practiceReviewTab = "practice";
+      return { name: "practice" };
+    }
+    if (view === "setup") {
+      const versionId = params.get("version");
+      if (examVersions.some((version) => version.id === versionId)) {
+        app.draft = { ...(app.draft || {}), options: { ...DEFAULT_OPTIONS, ...(app.draft?.options || {}), versionId } };
+      }
+      return { name: "setup" };
+    }
+    return null;
+  }
+
+  function routeHref(view, values = {}) {
+    const url = new URL(location.href);
+    url.search = "";
+    url.searchParams.set("view", view);
+    Object.entries(values).forEach(([key, value]) => {
+      if (value != null && value !== "") url.searchParams.set(key, value);
+    });
+    return url.href;
   }
 
   function normalizeFixtureName(value) {
@@ -386,6 +420,11 @@
       app.modal = fixtureState === "password-expanded" ? "password" : "profile";
       if (fixtureState === "delete-account") app.modal = "delete-account";
       return setView({ name: "dashboard" });
+    }
+    const requestedFixtureQuestion = new URLSearchParams(location.search).get("question");
+    if (fixtureState === "exam" && active && requestedFixtureQuestion && questionsById.has(requestedFixtureQuestion)) {
+      active.current_question_index = applyProductionQuestionFixture(active, requestedFixtureQuestion);
+      return setView({ name: "exam", attemptId: active.id });
     }
     const productionFixture = {
       passage: "v07-q069",
@@ -1305,7 +1344,7 @@
                 </div>
                 <span class="status-pill ${answerStatus(current)}">${statusText(current)}</span>
               </div>
-              <p class="prompt">${escapeHtml(current.prompt)}</p>
+              ${renderQuestionPrompt(current)}
               <div class="choices ${paperMode ? "paper-readonly-choices" : ""}">
                 ${current.choices.map((choice) => `
                   <button class="choice ${current.selected_choice === choice.id ? "selected" : ""}" ${paperMode ? "aria-disabled=\"true\" tabindex=\"-1\"" : `data-choice="${choice.id}" data-motion-purpose="answer-selection"`} type="button" ${attempt.status !== "in_progress" || paperMode ? "disabled" : ""}>
@@ -1453,6 +1492,10 @@
       ? stats.filter((stat) => stat.total > 0)
       : SECTION_GROUPS.map((group) => stats.find((stat) => stat.section === group.section) || { section: group.section, correct: 0, total: group.end - group.start + 1, percent: 0 });
     const passed = pct >= PASSING_PERCENT;
+    const weakestSection = insights.weakest?.section || "Verbal Ability";
+    const reviewHref = routeHref("review", { attempt: attempt.id });
+    const practiceHref = routeHref("practice", { category: weakestSection });
+    const retakeHref = routeHref("setup", { version: attempt.exam_version_id });
     root.innerHTML = authedShell(`
       <section class="results-page v5-results-page ${passed ? "passed" : "needs-work"} ${isPractice ? "practice-result" : ""}" data-motion-purpose="page-enter">
         <div class="results-command-title">
@@ -1493,10 +1536,10 @@
             </div>
         </section>
         <footer class="results-action-row">
-            <button class="result-action primary" data-action="review-answers" type="button">${localIcon("notebook-tabs")}<span><strong>Review Answers</strong></span>${icon("arrow")}</button>
+            <a class="result-action primary" data-action="review-answers" href="${escapeAttr(reviewHref)}">${localIcon("notebook-tabs")}<span><strong>Review Answers</strong></span>${icon("arrow")}</a>
             ${isPractice
               ? `<button class="result-action green" data-action="repeat-practice" type="button">${localIcon("target")}<span><strong>Repeat Drill</strong></span>${icon("arrow")}</button><button class="result-action purple" data-action="change-practice" type="button">${localIcon("settings")}<span><strong>Change Practice</strong></span>${icon("arrow")}</button>`
-              : `<button class="result-action green" data-action="practice-weakest" type="button">${localIcon("target")}<span><strong>Practice Weakest Area</strong></span>${icon("arrow")}</button><button class="result-action purple" data-action="retake-same-version" type="button">${localIcon("history")}<span><strong>Retake Same Version</strong></span>${icon("arrow")}</button>`}
+              : `<a class="result-action green" data-action="practice-weakest" href="${escapeAttr(practiceHref)}">${localIcon("target")}<span><strong>Practice Weakest Area</strong></span>${icon("arrow")}</a><a class="result-action purple" data-action="retake-same-version" href="${escapeAttr(retakeHref)}">${localIcon("history")}<span><strong>Retake Same Version</strong></span>${icon("arrow")}</a>`}
             <button class="result-action neutral" data-action="dashboard" type="button">${localIcon("home")}<span><strong>Back to Home</strong></span>${icon("arrow")}</button>
         </footer>
       </section>
@@ -1534,11 +1577,11 @@
             </section>
             <section class="review-matrix-panel">
               <div class="review-matrix-title"><strong>Question Navigator</strong><span>${escapeHtml(navWindow.label)}</span></div>
-              <div class="review-matrix-head" aria-hidden="true"><span>#</span><span>General</span><span>Verbal</span><span>Numerical</span><span>Analytical</span><span>P/R</span></div>
+              <div class="review-matrix-head" aria-hidden="true"><span>#</span><span>General</span><span>Verbal</span><span>Numerical</span><span>Analytical</span></div>
               <div class="review-matrix-scroll">
                 ${navWindow.items.map(({ item, itemIndex }) => {
                   const state = item.selected_choice === item.correct_choice ? "correct" : item.selected_choice ? "wrong" : "unanswered";
-                  return `<button class="review-matrix-row ${itemIndex === index ? "current" : ""} ${state} ${item.flagged ? "flagged" : ""}" data-review-index="${itemIndex}" type="button"><b>${item.display_number}</b>${SECTION_GROUPS.map((group) => `<span class="matrix-section ${item.section === group.section ? `active ${group.tone}` : ""}">${item.section === group.section ? (state === "correct" ? localIcon("circle-check") : state === "wrong" ? icon("x") : `<i></i>`) : ""}</span>`).join("")}<span class="matrix-review">${item.flagged ? icon("flag") : state === "correct" ? localIcon("circle-check") : state === "wrong" ? icon("x") : `<i></i>`}</span></button>`;
+                  return `<button class="review-matrix-row ${itemIndex === index ? "current" : ""} ${state} ${item.flagged ? "flagged" : ""}" data-review-index="${itemIndex}" type="button"><b>${item.display_number}</b>${SECTION_GROUPS.map((group) => `<span class="matrix-section ${item.section === group.section ? `active ${group.tone}` : ""}">${item.section === group.section ? (item.flagged ? icon("flag") : state === "correct" ? localIcon("circle-check") : state === "wrong" ? icon("x") : `<i></i>`) : ""}</span>`).join("")}</button>`;
                 }).join("")}
               </div>
             </section>
@@ -1549,7 +1592,7 @@
               <div class="review-question-head"><span class="question-index"><span>Question</span><b>${answer.position + 1}</b><span>of ${attempt.total_questions}</span></span><div><p class="review-topic">${escapeHtml(answer.section)} / ${escapeHtml(answer.subtopic)}</p><span class="status-pill ${correct ? "answered" : "wrong"}">${correct ? "Correct" : answer.selected_choice ? "Incorrect" : "Unanswered"}</span><span class="review-head-time">${localIcon("timer")} ${formatDuration(answer.time_spent_seconds)}</span></div></div>
               <div class="review-question-scroll">
                 ${answer.stimulus ? renderStimulusPanel(attempt, answer, linkedStimulusAnswers(attempt, answer), true) : ""}
-                <p class="prompt">${escapeHtml(answer.prompt)}</p>
+                ${renderQuestionPrompt(answer)}
                 <div class="review-choices">
                   ${answer.choices.map((choice) => `<div class="review-choice ${choice.id === answer.correct_choice ? "is-correct" : ""} ${choice.id === answer.selected_choice && choice.id !== answer.correct_choice ? "is-wrong" : ""}"><span>${choice.id}</span><strong>${escapeHtml(choice.text)}</strong><em>${choice.id === answer.correct_choice ? "Correct answer" : choice.id === answer.selected_choice ? "Your answer" : ""}</em></div>`).join("")}
                 </div>
@@ -1623,7 +1666,7 @@
         </section>
         </div>
         <section class="card attempts-table-card v3-panel">
-          <div class="attempt-table-title"><h2>Attempt Records</h2><span>${attempts.length} stored runs</span></div>
+          <div class="attempt-table-title"><div><h2>Attempt Records</h2><span>${attempts.length} stored runs for ${escapeHtml(app.profile?.email || app.session?.user?.email || "this account")}</span></div><button class="btn tiny" data-action="refresh-attempts" type="button">${localIcon("history")} Refresh records</button></div>
           <div class="tabs progress-tabs">
             ${[
               ["all", "All Attempts"],
@@ -1679,6 +1722,7 @@
 
   function practiceTabContent() {
     const categories = practiceCategoriesForDisplay();
+    const selectedCategory = app.practiceCategoryDraft || categories[0]?.section;
     return `
       <form class="custom-practice practice-console v5-panel" data-form="custom-practice">
         <section class="practice-section-picker">
@@ -1686,13 +1730,13 @@
           <fieldset class="category-plates"><legend class="sr-only">Section</legend>${categories.map((category, index) => {
             const group = SECTION_GROUPS.find((entry) => entry.section === category.section);
             const available = group ? group.end - group.start + 1 : category.poolSize;
-            return `<label class="section-plate ${category.tone}"><input type="radio" name="category" value="${escapeAttr(category.section)}" ${index === 0 ? "checked" : ""}/><span class="section-hud-icon">${localIcon(sectionIconName(category.section))}</span><span class="section-copy"><strong>${escapeHtml(category.section)}</strong><small>${available} available</small></span><i>${localIcon("chevron-right")}</i></label>`;
+            return `<label class="section-plate ${category.tone}"><input type="radio" name="category" value="${escapeAttr(category.section)}" ${category.section === selectedCategory ? "checked" : ""}/><span class="section-hud-icon">${localIcon(sectionIconName(category.section))}</span><span class="section-copy"><strong>${escapeHtml(category.section)}</strong><small>${available} available</small></span><i>${localIcon("chevron-right")}</i></label>`;
           }).join("")}</fieldset>
         </section>
         <section class="run-profile-panel">
           <div class="count-segments" role="radiogroup" aria-labelledby="practice-count-label"><p class="segment-label" id="practice-count-label">Question Count</p>${[10, 20, 30, 40].map((count) => `<label><input type="radio" name="count" value="${count}" ${count === 20 ? "checked" : ""}/><span>${count}</span></label>`).join("")}</div>
           <div class="difficulty-segments" role="radiogroup" aria-labelledby="practice-difficulty-label"><p class="segment-label" id="practice-difficulty-label">Difficulty</p>${[["mixed", "Mixed"], ["easy", "Easy"], ["medium", "Medium"], ["hard", "Hard"]].map(([value, label], index) => `<label><input type="radio" name="difficulty" value="${value}" ${index === 0 ? "checked" : ""}/><span>${label}</span></label>`).join("")}</div>
-          <div class="selected-run-profile"><span data-practice-profile-section class="selected-run-section general">${localIcon("notebook-tabs")}<strong>General selected</strong></span><b><span data-practice-count>20</span> questions / <span data-practice-difficulty>Mixed</span></b></div>
+          <div class="selected-run-profile"><span data-practice-profile-section class="selected-run-section ${toneForSection(selectedCategory)}">${localIcon(sectionIconName(selectedCategory))}<strong>${escapeHtml(sectionLabel(selectedCategory))} selected</strong></span><b><span data-practice-count>20</span> questions / <span data-practice-difficulty>Mixed</span></b></div>
           <button class="btn primary technical-cta practice-start-cta" data-action="custom-practice-submit" type="button"><span>${localIcon("target")} Start Practice</span>${icon("arrow")}</button>
         </section>
       </form>
@@ -2113,6 +2157,24 @@
         <em>${percent ? "Recorded accuracy" : "No result yet"}</em>
       </div>
     `;
+  }
+
+  function renderQuestionPrompt(answer) {
+    const prompt = String(answer?.prompt || "");
+    const organization = /paragraph organization|pag-aayos ng talata|ayos ng talata/i.test(`${answer?.csc_skill || ""} ${answer?.subtopic || ""}`);
+    if (!organization) return `<p class="prompt">${escapeHtml(prompt)}</p>`;
+    const patterns = [/(?:^|\s)(IV|VI|V|III|II|I)\.\s+/g, /(?:^|\s)\((\d+)\)\s+/g];
+    for (const pattern of patterns) {
+      const markers = [...prompt.matchAll(pattern)];
+      if (markers.length < 3) continue;
+      const instruction = prompt.slice(0, markers[0].index).trim();
+      const statements = markers.map((marker, index) => ({
+        label: pattern === patterns[1] ? `(${marker[1]})` : `${marker[1]}.`,
+        text: prompt.slice(marker.index + marker[0].length, markers[index + 1]?.index ?? prompt.length).trim()
+      }));
+      return `<div class="prompt ordering-prompt"><p>${escapeHtml(instruction)}</p><ol>${statements.map((statement) => `<li><b>${escapeHtml(statement.label)}</b><span>${escapeHtml(statement.text)}</span></li>`).join("")}</ol></div>`;
+    }
+    return `<p class="prompt">${escapeHtml(prompt)}</p>`;
   }
 
   function setupFact(iconName, tone, label, value) {
@@ -2693,7 +2755,7 @@
     app.audioShuffleBag = [];
     saveAudioPreferences();
     loadMusicTrack(app.audio.music);
-    render();
+    refreshAudioUi();
   }
 
   function selectMusicTrack(index) {
@@ -2725,7 +2787,7 @@
     app.audio.trackIndex = next ?? ((current + 1) % tracks.length);
     saveAudioPreferences();
     loadMusicTrack(app.audio.music || fromEnded);
-    render();
+    refreshAudioUi();
   }
 
   function previousMusicTrack() {
@@ -2733,7 +2795,7 @@
     app.audio.trackIndex = previous ?? ((Number(app.audio.trackIndex) - 1 + musicTracks().length) % musicTracks().length);
     saveAudioPreferences();
     loadMusicTrack(app.audio.music);
-    render();
+    refreshAudioUi();
   }
 
   function playSound(kind = "navigation") {
@@ -2772,7 +2834,7 @@
     app.audio.music = enabled;
     app.audio.sfx = enabled;
     saveAudioPreferences();
-    render();
+    refreshAudioUi();
     if (enabled) {
       app.audioUserGesture = true;
       playSound("confirmation");
@@ -2795,6 +2857,42 @@
         <label>Effects volume<input data-audio-volume="sfxVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.sfxVolume)}" /></label>
       </section>
     `;
+  }
+
+  function refreshAudioUi() {
+    const active = document.activeElement;
+    const focusAction = active?.dataset?.action || "";
+    const focusCategory = active?.dataset?.audioCategory || "";
+    const focusTrack = active?.matches?.("[data-audio-track]") || false;
+    const drawer = root.querySelector(".account-settings-modal");
+    const drawerScrollTop = drawer?.scrollTop || 0;
+    root.querySelectorAll(".header-audio-control, .exam-audio-control").forEach((container) => {
+      container.innerHTML = `<button class="icon-only header-audio-button ${app.audio.music && !app.audio.muted ? "active" : ""}" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${icon(app.audio.muted ? "volume-off" : "music")}</button>${audioPopover()}`;
+    });
+    const accountAudio = root.querySelector(".account-audio-settings");
+    if (accountAudio) accountAudio.outerHTML = audioSettingsBlock();
+    requestAnimationFrame(() => {
+      if (drawer) drawer.scrollTop = drawerScrollTop;
+      const nextFocus = focusAction
+        ? root.querySelector(`[data-action="${focusAction}"]`)
+        : focusCategory
+          ? root.querySelector(`[data-audio-category="${focusCategory}"]`)
+          : focusTrack
+            ? root.querySelector("[data-audio-track]")
+            : null;
+      nextFocus?.focus({ preventScroll: true });
+    });
+  }
+
+  function refreshAvatarUi() {
+    const selected = Number(app.accountAvatarDraft || 0);
+    root.querySelectorAll("[data-avatar-preset]").forEach((button) => {
+      const active = Number(button.dataset.avatarPreset) === selected;
+      button.classList.toggle("selected", active);
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+    const preview = root.querySelector(".account-identity-preview > .avatar");
+    if (preview) preview.outerHTML = avatar({ ...app.profile, avatar_preset: selected }, "large");
   }
 
   function handlePointerDown(event) {
@@ -3092,8 +3190,10 @@
   }
 
   async function handleClick(event) {
-    const target = event.target.closest("button");
+    const target = event.target.closest("button, a[data-action]");
     if (!target) return;
+    if (target.tagName === "A" && (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey)) return;
+    if (target.tagName === "A") event.preventDefault();
     const action = target.dataset.action;
     app.audioUserGesture = true;
 
@@ -3102,19 +3202,19 @@
       if (target.dataset.audioCategory) return setMusicCategory(target.dataset.audioCategory);
       if (action === "toggle-audio-menu") {
         app.audioMenuOpen = !app.audioMenuOpen;
-        render();
+        refreshAudioUi();
         return syncBackgroundMusic();
       }
       if (action === "toggle-music") {
         app.audio.music = !app.audio.music;
         saveAudioPreferences();
-        render();
+        refreshAudioUi();
         return syncBackgroundMusic();
       }
       if (action === "toggle-sfx") {
         app.audio.sfx = !app.audio.sfx;
         saveAudioPreferences();
-        render();
+        refreshAudioUi();
         if (app.audio.sfx) playSound("confirmation");
         return;
       }
@@ -3124,13 +3224,13 @@
         app.audio.shuffle = !app.audio.shuffle;
         app.audioShuffleBag = [];
         saveAudioPreferences();
-        return render();
+        return refreshAudioUi();
       }
       if (action === "toggle-audio-mute") {
         app.audio.muted = !app.audio.muted;
         saveAudioPreferences();
         updateAudioVolumes();
-        return render();
+        return refreshAudioUi();
       }
       if (action === "toggle-audio-master") return toggleAudioMaster();
       syncBackgroundMusic();
@@ -3161,6 +3261,11 @@
         return setView({ name: "practice" });
       }
       if (action === "recent-page") return setView({ name: "recent" });
+      if (action === "refresh-attempts") {
+        await loadUserData();
+        renderRecentAttempts();
+        return showToast("Attempt records refreshed for this account.");
+      }
       if (action === "mistakes-page") {
         app.practiceReviewTab = "mistakes";
         return setView({ name: "practice" });
@@ -3174,7 +3279,7 @@
       if (action === "open-password") return openModal("password");
       if (target.dataset.avatarPreset) {
         app.accountAvatarDraft = Number(target.dataset.avatarPreset);
-        return render();
+        return refreshAvatarUi();
       }
       if (action === "close-modal") return closeModal();
       if (action === "signout") return await signOut();
@@ -3275,7 +3380,7 @@
     }
     if (input.matches("[data-audio-track]")) {
       selectMusicTrack(input.value);
-      render();
+      refreshAudioUi();
       return;
     }
     if (input.closest("[data-form='setup']")) {
@@ -3542,7 +3647,8 @@
   async function retakeSameVersion() {
     const attempt = getAttempt(app.view.attemptId);
     if (!attempt) return;
-    return startFullExam({ ...DEFAULT_OPTIONS, ...(attempt.options || {}), versionId: attempt.exam_version_id });
+    app.draft = { ...(app.draft || {}), options: { ...DEFAULT_OPTIONS, ...(app.draft?.options || {}), ...(attempt.options || {}), versionId: attempt.exam_version_id } };
+    return setView({ name: "setup" });
   }
 
   async function repeatPractice() {
@@ -3554,7 +3660,9 @@
   async function practiceWeakestArea() {
     const attempt = getAttempt(app.view.attemptId);
     const weakest = performanceInsights(attempt).weakest?.section || "Verbal Ability";
-    return startPractice(weakest, DEFAULT_PRACTICE_COUNT, "mixed");
+    app.practiceCategoryDraft = weakest;
+    app.practiceReviewTab = "practice";
+    return setView({ name: "practice" });
   }
 
   function formOptions(form) {

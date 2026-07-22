@@ -6786,3 +6786,246 @@ html body #app.cockpit-desktop section.setup-page .run-configuration:has(input[n
 @media (prefers-reduced-motion: reduce) {
   .answer-mode-card > span { transition: none; }
 }
+
+/* 2026-07-22 interaction and filled-corner repair */
+html body #app .cockpit-frame :where(div, section, article, aside, header, footer, nav, main, form, fieldset, button, a, input, select, textarea, label, span):not(.sr-only):not(.score-gauge):not(.hub-progress-ring):not(.hub-progress-ring-fill) {
+  clip-path: none !important;
+}
+html body main#app.app-shell.cockpit-desktop *:not(.sr-only):not(.score-gauge):not(.hub-progress-ring):not(.hub-progress-ring-fill) {
+  clip-path: none !important;
+}
+html body main#app.app-shell.cockpit-desktop section.setup-page .setup-main .v5-instrument-deck .instrument-icon,
+html body main#app.app-shell.cockpit-desktop section.results-page.v5-results-page .run-insights-panel .insight-grid > article.result-insight > span {
+  clip-path: none !important;
+}
+
+html body #app .header-actions,
+html body #app .exam-actions { min-width: 0 !important; }
+html body #app .header-audio-control,
+html body #app .exam-audio-control {
+  position: relative !important;
+  width: 44px !important;
+  min-width: 44px !important;
+  flex: 0 0 44px !important;
+}
+html body #app .header-audio-button { width: 44px !important; height: 44px !important; }
+html body #app .audio-popover {
+  position: absolute !important;
+  z-index: 120 !important;
+  top: calc(100% + 9px) !important;
+  right: 0 !important;
+  width: 310px !important;
+  min-width: 310px !important;
+  margin: 0 !important;
+}
+html body #app.cockpit-desktop .header-audio-control > .audio-popover,
+html body #app.cockpit-desktop .exam-audio-control > .audio-popover {
+  position: absolute !important;
+  top: calc(100% + 9px) !important;
+  right: 0 !important;
+}
+
+html body #app .account-settings-modal {
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+}
+html body #app .account-settings-form,
+html body #app .account-settings-form:has(.account-password-panel:not([open])) {
+  display: flex !important;
+  min-height: min-content !important;
+  flex: none !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+}
+html body #app .account-settings-form > * { grid-row: auto !important; grid-column: auto !important; }
+html body #app .account-modal-actions {
+  margin-top: 2px !important;
+  border-top: 1px solid #29434b !important;
+  padding-top: 18px !important;
+}
+html body #app .account-danger-row {
+  margin-top: 0 !important;
+  border-top: 1px solid #29434b !important;
+  padding-top: 16px !important;
+}
+
+html body #app .pause-modal { overflow: visible !important; padding-top: 30px !important; }
+html body #app .pause-icon {
+  position: static !important;
+  inset: auto !important;
+  display: grid !important;
+  width: 68px !important;
+  height: 68px !important;
+  margin: 0 auto 14px !important;
+  border: 2px solid var(--v5-amber, #f2b72c) !important;
+  border-radius: 50% !important;
+  place-items: center !important;
+  background: #0b171b !important;
+}
+html body #app .pause-icon .icon { width: 30px !important; height: 30px !important; }
+html body #app .pause-modal > p:not(.eyebrow) {
+  display: grid !important;
+  min-height: 64px !important;
+  place-items: center !important;
+  margin: 14px 0 !important;
+  padding: 10px 18px !important;
+  line-height: 1.45 !important;
+  text-align: center !important;
+}
+
+html body #app .prompt.ordering-prompt { display: grid !important; gap: 14px !important; }
+html body #app .prompt.ordering-prompt > p { margin: 0 !important; }
+html body #app .prompt.ordering-prompt > ol {
+  display: grid !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+  gap: 8px !important;
+}
+html body #app .prompt.ordering-prompt li {
+  display: grid !important;
+  grid-template-columns: 34px minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 8px !important;
+}
+html body #app .prompt.ordering-prompt li b { color: var(--v5-cyan, #00d8d2) !important; }
+
+html body #app .review-matrix-head,
+html body #app .review-matrix-row {
+  grid-template-columns: 44px repeat(4, minmax(0, 1fr)) !important;
+}
+html body #app.cockpit-desktop .review-matrix-head,
+html body #app.cockpit-desktop .review-matrix-row {
+  grid-template-columns: 44px repeat(4, minmax(0, 1fr)) !important;
+}
+html body #app .review-matrix-head > span,
+html body #app .review-matrix-row > span { min-width: 0 !important; text-align: center !important; }
+html body #app .matrix-section {
+  display: grid !important;
+  width: 28px !important;
+  height: 28px !important;
+  justify-self: center !important;
+  border: 1px solid #29434b !important;
+  place-items: center !important;
+  color: #667b80 !important;
+}
+html body #app .matrix-section.active.general { border-color: var(--v5-purple, #aa55ff) !important; color: var(--v5-purple, #aa55ff) !important; background: rgba(170,85,255,.12) !important; }
+html body #app .matrix-section.active.verbal { border-color: var(--v5-cyan, #00d8d2) !important; color: var(--v5-cyan, #00d8d2) !important; background: rgba(0,216,210,.12) !important; }
+html body #app .matrix-section.active.numerical { border-color: var(--v5-blue, #2984ff) !important; color: var(--v5-blue, #2984ff) !important; background: rgba(41,132,255,.12) !important; }
+html body #app .matrix-section.active.analytical { border-color: var(--v5-green, #4ddd74) !important; color: var(--v5-green, #4ddd74) !important; background: rgba(77,221,116,.12) !important; }
+html body #app .matrix-section .icon,
+html body #app .matrix-section .local-icon { width: 16px !important; height: 16px !important; color: currentColor !important; stroke: currentColor !important; }
+
+html body #app .performance-bars { display: grid !important; gap: 13px !important; }
+html body #app .performance-row {
+  --tone: var(--v5-cyan, #00d8d2);
+  display: grid !important;
+  min-height: 48px !important;
+  height: auto !important;
+  grid-template-columns: 152px minmax(120px, 1fr) 54px 110px !important;
+  align-items: center !important;
+  gap: 14px !important;
+}
+html body #app .performance-row.general { --tone: var(--v5-purple, #aa55ff) !important; }
+html body #app .performance-row.verbal { --tone: var(--v5-cyan, #00d8d2) !important; }
+html body #app .performance-row.numerical { --tone: var(--v5-blue, #2984ff) !important; }
+html body #app .performance-row.analytical { --tone: var(--v5-green, #4ddd74) !important; }
+html body #app .performance-row > span {
+  display: grid !important;
+  grid-template-columns: 38px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 10px !important;
+  color: var(--tone) !important;
+}
+html body #app .performance-row .local-icon {
+  width: 36px !important;
+  height: 36px !important;
+  border: 1px solid currentColor !important;
+  padding: 7px !important;
+  color: var(--tone) !important;
+  stroke: currentColor !important;
+}
+html body #app .performance-row > span > b { color: var(--tone) !important; font-size: 15px !important; }
+html body #app .performance-row > i { min-width: 0 !important; }
+html body #app .performance-row > i > b { background: var(--tone) !important; }
+html body #app .performance-row > strong { color: var(--tone) !important; font-size: 22px !important; }
+html body #app .performance-row > em { display: block !important; color: #8ba0a5 !important; font-size: 11px !important; line-height: 1.15 !important; text-align: left !important; }
+
+html body #app .attempt-table-title { display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 16px !important; }
+html body #app .attempt-table-title > div { display: grid !important; gap: 3px !important; }
+html body #app .attempt-table-title > div > span { color: #8ea3a8 !important; font-size: 13px !important; }
+
+/* Final viewport-scale corrections for the July 22 remediation. */
+html body #app.cockpit-desktop section.setup-page .run-configuration {
+  grid-template-rows: 42px 84px 70px 60px 60px 54px 58px !important;
+  align-content: center !important;
+  gap: 8px !important;
+}
+html body #app.cockpit-desktop .answer-mode-selector { align-content: stretch !important; }
+html body #app.cockpit-desktop .answer-mode-card { font-size: 16px !important; }
+html body #app.cockpit-desktop .answer-mode-card > span {
+  min-height: 0 !important;
+  height: 68px !important;
+  padding: 9px 12px !important;
+}
+html body #app.cockpit-desktop .answer-mode-card strong { font-size: 19px !important; }
+html body #app.cockpit-desktop .answer-mode-card small {
+  margin-top: 3px !important;
+  font-size: 16px !important;
+  line-height: 1.05 !important;
+}
+
+html body main#app.app-shell.cockpit-desktop .pause-modal {
+  display: grid !important;
+  width: 590px !important;
+  height: auto !important;
+  min-height: 500px !important;
+  grid-template-rows: 68px 18px 42px 112px 64px 52px !important;
+  align-content: center !important;
+  gap: 8px !important;
+  padding: 26px 38px 30px !important;
+}
+html body main#app.app-shell.cockpit-desktop .pause-modal .pause-icon {
+  width: 68px !important;
+  height: 68px !important;
+  margin: 0 auto !important;
+}
+html body main#app.app-shell.cockpit-desktop .pause-modal .eyebrow {
+  align-self: center !important;
+}
+html body main#app.app-shell.cockpit-desktop .pause-modal h2 {
+  height: 42px !important;
+}
+html body main#app.app-shell.cockpit-desktop .pause-modal .pause-facts {
+  display: grid !important;
+  width: 100% !important;
+  height: 112px !important;
+  min-height: 112px !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  overflow: visible !important;
+  margin: 0 !important;
+}
+html body main#app.app-shell.cockpit-desktop .pause-modal .pause-facts > span {
+  display: grid !important;
+  height: 110px !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: 30px 24px 26px !important;
+  align-content: center !important;
+  justify-items: center !important;
+  padding: 8px 10px !important;
+  gap: 3px !important;
+}
+html body main#app.app-shell.cockpit-desktop .pause-modal > p:not(.eyebrow) {
+  height: 64px !important;
+  min-height: 64px !important;
+  margin: 0 !important;
+}
+
+html body #app .result-action {
+  text-decoration: none !important;
+}
+html body #app .attempt-table-title .btn {
+  min-height: 42px !important;
+  padding-inline: 14px !important;
+  font-size: 17px !important;
+}

@@ -1,0 +1,386 @@
+{
+  "baseUrl": "http://127.0.0.1:4173/",
+  "createdAt": "2026-07-22T04:48:51.121Z",
+  "browser": "Microsoft Edge",
+  "build": {
+    "fingerprint": "339f3e4462084998",
+    "cacheKeys": [
+      "20260713-02",
+      "20260713-02",
+      "20260716-04",
+      "20260722-02",
+      "20260713-02",
+      "20260713-02",
+      "20260716-01",
+      "20260716-01",
+      "20260716-01",
+      "20260716-01",
+      "20260716-01",
+      "20260716-01",
+      "20260716-01",
+      "20260716-01",
+      "20260718-02",
+      "20260716-01",
+      "20260718-02",
+      "20260716-01",
+      "20260716-01",
+      "20260716-01",
+      "20260716-01",
+      "20260716-01",
+      "20260716-01",
+      "20260716-01",
+      "20260716-01",
+      "20260716-01",
+      "20260716-01",
+      "20260722-01",
+      "20260722-02"
+    ],
+    "files": [
+      "app/index.html",
+      "app/app.js",
+      "app/cockpit-theme.css",
+      "app/v5-production.css"
+    ]
+  },
+  "referenceVersion": "v5",
+  "entries": [
+    {
+      "state": "dashboard",
+      "viewport": {
+        "width": 1536,
+        "height": 736,
+        "label": "edge-1536x736"
+      },
+      "file": "dashboard-edge-1536x736.png",
+      "reference": "../v4/study_hub.png",
+      "referenceApproval": "approved",
+      "contractId": "study-hub",
+      "metrics": {
+        "viewport": [
+          1536,
+          736
+        ],
+        "body": [
+          1536,
+          736
+        ],
+        "document": [
+          1536,
+          736
+        ],
+        "frame": {
+          "x": 114.81951904296875,
+          "y": 0,
+          "width": 1306.36083984375,
+          "height": 736
+        },
+        "scale": "0.7813163481953291",
+        "view": "dashboard",
+        "overflow": [],
+        "runningAnimationsUnderReducedMotion": 0,
+        "visualDefects": [],
+        "visibleContentBottom": 739.1252517700195,
+        "reachableDocumentBottom": 736
+      },
+      "errors": []
+    },
+    {
+      "state": "setup",
+      "viewport": {
+        "width": 1536,
+        "height": 736,
+        "label": "edge-1536x736"
+      },
+      "file": "setup-edge-1536x736.png",
+      "reference": "full_mock_setup.png",
+      "referenceApproval": "approved",
+      "contractId": "mock-setup",
+      "metrics": {
+        "viewport": [
+          1536,
+          736
+        ],
+        "body": [
+          1536,
+          736
+        ],
+        "document": [
+          1536,
+          736
+        ],
+        "frame": {
+          "x": 114.81951904296875,
+          "y": 0,
+          "width": 1306.36083984375,
+          "height": 736
+        },
+        "scale": "0.7813163481953291",
+        "view": "setup",
+        "overflow": [],
+        "runningAnimationsUnderReducedMotion": 0,
+        "visualDefects": [],
+        "visibleContentBottom": 739.1252517700195,
+        "reachableDocumentBottom": 736
+      },
+      "errors": []
+    },
+    {
+      "state": "exam",
+      "viewport": {
+        "width": 1536,
+        "height": 736,
+        "label": "edge-1536x736"
+      },
+      "file": "exam-edge-1536x736.png",
+      "reference": "exam_active.png",
+      "referenceApproval": "approved",
+      "contractId": "active-exam",
+      "metrics": {
+        "viewport": [
+          1536,
+          736
+        ],
+        "body": [
+          1536,
+          736
+        ],
+        "document": [
+          1536,
+          736
+        ],
+        "frame": {
+          "x": 114.81951904296875,
+          "y": 0,
+          "width": 1306.36083984375,
+          "height": 736
+        },
+        "scale": "0.7813163481953291",
+        "view": "exam",
+        "overflow": [],
+        "runningAnimationsUnderReducedMotion": 0,
+        "visualDefects": [],
+        "visibleContentBottom": 834.4458618164062,
+        "reachableDocumentBottom": 736
+      },
+      "errors": []
+    },
+    {
+      "state": "pause",
+      "viewport": {
+        "width": 1536,
+        "height": 736,
+        "label": "edge-1536x736"
+      },
+      "file": "pause-edge-1536x736.png",
+      "reference": "exam_pause.png",
+      "referenceApproval": "approved",
+      "contractId": "exam-pause",
+      "metrics": {
+        "viewport": [
+          1536,
+          736
+        ],
+        "body": [
+          1536,
+          736
+        ],
+        "document": [
+          1536,
+          736
+        ],
+        "frame": {
+          "x": 114.81951904296875,
+          "y": 0,
+          "width": 1306.36083984375,
+          "height": 736
+        },
+        "scale": "0.7813163481953291",
+        "view": "exam",
+        "overflow": [],
+        "runningAnimationsUnderReducedMotion": 0,
+        "visualDefects": [],
+        "visibleContentBottom": 835.2271728515625,
+        "reachableDocumentBottom": 736
+      },
+      "errors": []
+    },
+    {
+      "state": "results",
+      "viewport": {
+        "width": 1536,
+        "height": 736,
+        "label": "edge-1536x736"
+      },
+      "file": "results-edge-1536x736.png",
+      "reference": "results_fail.png",
+      "referenceApproval": "approved",
+      "contractId": "results-pass",
+      "metrics": {
+        "viewport": [
+          1536,
+          736
+        ],
+        "body": [
+          1536,
+          736
+        ],
+        "document": [
+          1536,
+          736
+        ],
+        "frame": {
+          "x": 114.81951904296875,
+          "y": 0,
+          "width": 1306.36083984375,
+          "height": 736
+        },
+        "scale": "0.7813163481953291",
+        "view": "results",
+        "overflow": [],
+        "runningAnimationsUnderReducedMotion": 0,
+        "visualDefects": [],
+        "visibleContentBottom": 739.1252517700195,
+        "reachableDocumentBottom": 736
+      },
+      "errors": []
+    },
+    {
+      "state": "review",
+      "viewport": {
+        "width": 1536,
+        "height": 736,
+        "label": "edge-1536x736"
+      },
+      "file": "review-edge-1536x736.png",
+      "reference": "answer_review.png",
+      "referenceApproval": "approved",
+      "contractId": "answer-review",
+      "metrics": {
+        "viewport": [
+          1536,
+          736
+        ],
+        "body": [
+          1536,
+          736
+        ],
+        "document": [
+          1536,
+          736
+        ],
+        "frame": {
+          "x": 114.81951904296875,
+          "y": 0,
+          "width": 1306.36083984375,
+          "height": 736
+        },
+        "scale": "0.7813163481953291",
+        "view": "review",
+        "overflow": [],
+        "runningAnimationsUnderReducedMotion": 0,
+        "visualDefects": [],
+        "visibleContentBottom": 739.1252517700195,
+        "reachableDocumentBottom": 736
+      },
+      "errors": []
+    },
+    {
+      "state": "recent",
+      "viewport": {
+        "width": 1536,
+        "height": 736,
+        "label": "edge-1536x736"
+      },
+      "file": "recent-edge-1536x736.png",
+      "reference": "progress.png",
+      "referenceApproval": "approved",
+      "contractId": "progress",
+      "metrics": {
+        "viewport": [
+          1536,
+          736
+        ],
+        "body": [
+          1536,
+          736
+        ],
+        "document": [
+          1536,
+          736
+        ],
+        "frame": {
+          "x": 114.81951904296875,
+          "y": 0,
+          "width": 1306.36083984375,
+          "height": 736
+        },
+        "scale": "0.7813163481953291",
+        "view": "recent",
+        "overflow": [],
+        "runningAnimationsUnderReducedMotion": 0,
+        "visualDefects": [],
+        "visibleContentBottom": 739.1252517700195,
+        "reachableDocumentBottom": 736
+      },
+      "errors": []
+    },
+    {
+      "state": "profile-modal",
+      "viewport": {
+        "width": 1536,
+        "height": 736,
+        "label": "edge-1536x736"
+      },
+      "file": "profile-modal-edge-1536x736.png",
+      "reference": "account_settings.png",
+      "referenceApproval": "approved",
+      "contractId": "account-settings",
+      "metrics": {
+        "viewport": [
+          1536,
+          736
+        ],
+        "body": [
+          1536,
+          736
+        ],
+        "document": [
+          1536,
+          736
+        ],
+        "frame": {
+          "x": 114.81951904296875,
+          "y": 0,
+          "width": 1306.36083984375,
+          "height": 736
+        },
+        "scale": "0.7813163481953291",
+        "view": "dashboard",
+        "overflow": [],
+        "runningAnimationsUnderReducedMotion": 0,
+        "visualDefects": [],
+        "visibleContentBottom": 739.1252517700195,
+        "reachableDocumentBottom": 736
+      },
+      "errors": []
+    }
+  ],
+  "errors": [],
+  "coverage": {
+    "expectedStates": 8,
+    "coveredStates": 8,
+    "expectedViewports": 1,
+    "coveredViewports": 1,
+    "expectedScreenshots": 8,
+    "capturedScreenshots": 8,
+    "missingScreenshots": 0,
+    "draftReferenceEntries": 0
+  },
+  "verdicts": {
+    "automatedGeometry": "passed",
+    "opticalParity": "pending_manual_reference_comparison",
+    "functional": "not_run",
+    "reachability": "not_run",
+    "liveDeployment": "not_run"
+  }
+}
