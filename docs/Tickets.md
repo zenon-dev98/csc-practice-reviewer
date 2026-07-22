@@ -983,7 +983,7 @@ Completion notes:
 
 ## T0043 - Focused UI And Attempt-Visibility Remediation
 
-Status: done locally; deployment pending
+Status: done and deployed
 
 Repair the confirmed July 22 defects without changing question-bank content or weakening account isolation.
 
@@ -1003,3 +1003,4 @@ Verification:
 - Eight affected fixture states at `1536x736`: 8/8 screenshots, zero console/document failures, zero sampled overflow, zero automated visual defects.
 - Seven focused interaction checks passed for drawer focus/scroll, header stability, native results links, review columns/colors, pause containment, and ordering rows.
 - Question-bank validation was intentionally not rerun because no bank content or scoring logic changed.
+- GitHub Pages deployed commit `5c01bcc`; the live cache-busted Edge smoke passed 3/3 checks with no console errors.

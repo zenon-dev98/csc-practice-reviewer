@@ -20,4 +20,4 @@
 
 Automated fixture summary: expected `8`, executed `8`, passed `8`, failed `0`, blocked `0`, skipped `0`. Focused interaction summary: expected `6`, executed `6`, passed `6`, failed `0`, blocked `0`, skipped `0`; details are in `focused-interactions.json`.
 
-Live verification is recorded separately after GitHub Pages deployment.
+Live verification: GitHub Pages deployed commit `5c01bcc`. The cache-busted Edge smoke passed 3/3 checks with no console errors; evidence is under `qa/2026-07-22-remediation-live/`.
