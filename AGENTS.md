@@ -62,6 +62,9 @@ If a referenced file is absent, follow this file and report the missing referenc
 npm run check
 npm run setup
 npm run start
+npm run validate:data
+npm run audit:questions
+npm run qa:paper
 ```
 
 Default local URL:
@@ -70,8 +73,38 @@ Default local URL:
 http://127.0.0.1:4173/index.html
 ```
 
-Do not install packages directly inside the Google Drive workspace. Use the
-repository's existing local-only scripts and dependency location.
+`npm run check` is the fast JavaScript syntax check. The remaining commands are
+triggered only when the risk table under Testing says they apply.
+
+Never install packages or create `node_modules` inside the Google Drive
+workspace. Do not run `npm install`, `npm ci`, dependency-installing `npx`, or
+equivalent package-manager commands from this repository. Use `npm run setup`,
+which installs optional tooling under `%LOCALAPPDATA%`, only when that tooling is
+actually missing. Do not recheck dependency placement during routine releases.
+
+## Lean release policy
+
+Use the smallest verification set that can detect a regression caused by the
+current change. Verification that already passed remains valid unless relevant
+code, data, configuration, or merge results changed afterward.
+
+Default release behavior:
+
+- test locally before commit
+- run only the checks triggered by the current diff
+- use Microsoft Edge at `1536x736`, 100% zoom, for relevant UI checks
+- do not run a full interaction suite, all-state screenshot matrix, motion
+  suite, mobile matrix, independent audit, or live interaction replay unless
+  the user explicitly requests it
+- merge or rebase the latest `origin/main` before push and resolve changes
+  deliberately
+- commit and push the scoped change
+- inspect one GitHub Pages deployment result
+- perform one live HTTP check that confirms the page and changed cache-busted
+  asset are available
+
+GitHub Pages deployment must package the static app only. It must not repeat
+question validation or install a Node runtime solely for validation.
 
 ## Working loop
 
@@ -125,6 +158,8 @@ When credentials, fixtures, references, services, or environments are missing:
 - Prefer native browser features, CSS, inline SVG, and existing utilities.
 - Development dependencies require justification when no equivalent path
   already exists.
+- No dependency may be installed inside the Google Drive repository. This is a
+  standing rule, not a deployment check.
 
 A dependency proposal must explain necessity, type, runtime impact, maintenance
 cost, and rollback cost.
@@ -332,7 +367,13 @@ Target WCAG 2.2 AA.
 
 ## Visual QA
 
-For UI, layout, styling, responsive, screenshot-parity, or mockup work:
+For ordinary UI, layout, or styling work, inspect only the affected route,
+state, and interaction locally at the primary Edge viewport. Capture evidence
+when it materially helps compare the changed state. Do not create a full state
+matrix or test unrelated routes by default.
+
+When the user explicitly requests full screenshot parity or a full visual
+audit:
 
 1. Start from a concrete approved reference.
 2. Identify the active target version.
@@ -365,8 +406,8 @@ Store artifacts under:
 qa/<ticket-or-date>/
 ```
 
-Every UI ticket must create a coverage manifest before release testing. Each
-required row records:
+A full visual-audit ticket must create a coverage manifest before release
+testing. Each required row records:
 
 - route or fixture and starting data condition
 - viewport and approved reference
@@ -382,21 +423,24 @@ must state expected, executed, passed, failed, blocked, and skipped counts.
 `passed + failed + blocked + skipped` must equal the expected count, and a
 release verdict requires `failed = blocked = skipped = 0`.
 
-Use four separate QA verdicts. Never collapse them into the phrase `QA passed`:
+For a requested full visual audit, use four separate QA verdicts. Never collapse
+them into the phrase `QA passed`:
 
 1. Functional correctness: the intended state and data transition occurred.
 2. Human reachability: a user could visibly find and operate the control.
 3. Optical parity: the state meets the approved reference and quality bar.
 4. Live verification: the deployed cache-busted build repeats the smoke path.
 
-For generated-image or screenshot adaptation, follow
+For explicitly requested generated-image or screenshot adaptation, follow
 `docs/Generated_Image_To_UI_Playbook.md` when available and relevant.
 
 
 ## Manual Edge State and Interaction Agent
 
-Use this agent for any change that can affect a route, control, layout, scroll
-owner, modal, menu, state transition, or deployed UI.
+This agent is opt-in. Use it only when the user explicitly requests external
+Edge takeover, a complete state/interaction walkthrough, or release-grade
+reachability evidence. Ordinary UI changes use the targeted local check defined
+under Testing.
 
 The agent must:
 
@@ -459,10 +503,11 @@ evidence only and cannot satisfy the manual gate.
 
 ## Visual Parity Quality Agent
 
-For screenshot or generated-image parity, use the active reference version
-named by its manifest. V5 is the active reference for states that have an
-approved V5 image; the V4 Study Hub remains authoritative only where its
-manifest or ticket explicitly says so.
+This agent is opt-in. Use it only when the user explicitly requests exact
+screenshot/generated-image parity or a complete parity pass. When invoked, use
+the active reference version named by its manifest. V5 is the active reference
+for states that have an approved V5 image; the V4 Study Hub remains authoritative
+only where its manifest or ticket explicitly says so.
 
 The active reference manifest must map every applicable state to its reference
 image, target viewport, primary panel anchors, typography roles, physical type
@@ -505,9 +550,10 @@ rerun its interactions after the final edit.
 
 ## Independent Release Auditor
 
-After implementation and before deployment, run a separate adversarial audit
-from the approved references, coverage manifest, and working application. Do
-not begin from the implementer's claimed pass list.
+This auditor is opt-in. Run it only when the user explicitly requests an
+independent release audit or the active ticket requires it. When invoked, run a
+separate adversarial audit from the approved references, coverage manifest, and
+working application. Do not begin from the implementer's claimed pass list.
 
 The auditor must:
 
@@ -532,9 +578,10 @@ Primary target:
 
 - latest stable Microsoft Edge
 - 100% zoom
-- maximized window
+- `1536x736` content viewport
 
-For shared-shell or major layout work, verify:
+Only when the user explicitly requests a viewport matrix, include these legacy
+desktop targets:
 
 - 1920×1080
 - 1536×816
@@ -543,26 +590,39 @@ For shared-shell or major layout work, verify:
 
 Use risk-based verification:
 
-- Local component CSS: changed state, primary viewport, relevant interaction
-- Shared shell or major layout: full desktop viewport matrix
-- Motion sequence: video or trace plus reduced-motion check
-- Responsive change: relevant mobile viewport
-- Deployment change: local checks, deployed smoke test, asset freshness
+- Local component CSS: changed state and relevant interaction only
+- Shared shell or major layout: affected routes at the primary viewport
+- Motion sequence: focused timing/reduced-motion evidence only when motion is
+  changed or explicitly requested
+- Mobile/responsive: deferred until the user requests mobile work
+- Deployment: one workflow result and one live cache-key HTTP check
 
-Do not force the full viewport matrix for trivial non-layout changes.
+Do not run a viewport matrix unless the user explicitly requests it.
 
 ## Testing
 
 Run existing relevant tests. Never claim verification that was not run.
 
-Preferred order:
+Do not rerun an unchanged check after it passed. Rerun only when relevant files,
+data, configuration, or merge results changed afterward.
 
-1. syntax, data validation, or lint
-2. focused unit tests
-3. Playwright for changed routes and states
-4. visual evidence for UI changes
-5. persistence and RLS verification for Supabase changes
-6. full relevant regression suite
+Trigger checks from the diff:
+
+- Documentation/workflow/package-script only: parse changed structured files
+  and assert the intended workflow commands; no app or content QA.
+- CSS or visual markup only: inspect the affected local state and interaction at
+  `1536x736`; do not validate the question bank.
+- Application JavaScript: `npm run check` plus focused tests for changed logic.
+- Question-bank loading, version order, answer mapping, scoring, manifests, or
+  question content: `npm run validate:data`.
+- Question text, choices, answers, explanations, difficulty, provenance, or
+  metadata: also run `npm run audit:questions`.
+- Paper scanning, paper timer/attempt flow, OMR classification, paper scoring,
+  or paper submission: `npm run qa:paper` plus focused syntax/interaction checks.
+- Supabase schema, policies, auth, or persistence: focused persistence and RLS
+  verification, including cross-user denial where applicable.
+- Full interaction, screenshot, motion, mobile, viewport-matrix, and independent
+  audit suites: only when explicitly requested.
 
 Playwright tests should use user-visible behavior, resilient locators,
 deterministic fixtures, and isolated state. Capture video or trace for
@@ -591,8 +651,12 @@ For deployment:
 - GitHub Pages serves static assets only.
 - Secrets cannot be hidden in browser code.
 - Cache-bust changed assets when necessary.
-- Verify deployed asset versions.
-- Run a deployed smoke test after deployment-related changes.
+- Do not install a validation runtime or repeat question validation in the Pages
+  deployment workflow.
+- Inspect one deployment result after push.
+- Verify the live page and changed cache-busted asset once over HTTP.
+- Do not replay local functional or visual tests against production unless the
+  user explicitly requests live QA.
 
 ## Definition of done
 
@@ -603,17 +667,17 @@ A ticket is complete only when all applicable conditions are true:
   remain intact
 - relevant docs are updated
 - required verification actually ran
-- visual evidence exists for visual work
-- meaningful motion has timing evidence
+- targeted visual evidence exists when the change is visual
+- changed motion has focused timing and reduced-motion evidence
 - Supabase security changes have policy verification
 - incomplete areas are explicit
 - the report lists commands, outcomes, artifacts, risks, and follow-ups
-- the coverage manifest has no failed, blocked, skipped, or unexecuted required
-  rows
-- functional, human-reachability, optical-parity, and live-deployment verdicts
-  are reported separately
+- any explicitly requested coverage manifest has no failed, blocked, skipped,
+  or unexecuted required rows
+- separate functional, reachability, parity, and live verdicts are required only
+  for an explicitly requested full audit
 - evidence identifies the final tested build and cache key
-- an independent final audit was rerun after the last implementation edit
+- an independent final audit ran only when explicitly required
 
 Do not say "done" when required verification was skipped, blocked without being
 reported, or replaced with assumption.

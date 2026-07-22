@@ -1,6 +1,6 @@
 # Repo Current State
 
-Last updated: 2026-07-21
+Last updated: 2026-07-22
 
 ## Workspace
 
@@ -26,6 +26,13 @@ Path:
 - Project dependencies must not be installed in this Google Drive folder.
 - Optional local server dependencies are installed under `%LOCALAPPDATA%\csc-reviewer\node-deps`.
 - Optional local QA dependencies are installed under `%LOCALAPPDATA%\csc-reviewer\qa-deps`, outside the Google Drive workspace.
+- Release verification is lean and diff-triggered: syntax and focused local
+  checks run only when relevant, question validation/auditing runs only for
+  bank-affecting changes, full visual/interaction/mobile/motion audits are
+  opt-in, and deployment uses one Actions result plus one live cache-key HTTP
+  check.
+- The Pages workflow packages the static app without reinstalling Node or
+  repeating question-bank validation.
 - Ponytail has been installed into `C:\Users\Acer\.codex\skills\ponytail`; restart Codex to load it as a named skill in future sessions. The project `AGENTS.md` now includes a Ponytail guardrail for this repo immediately.
 
 ## Existing Files

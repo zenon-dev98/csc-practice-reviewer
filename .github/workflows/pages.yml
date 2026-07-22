@@ -33,14 +33,6 @@ jobs:
           };
           EOF
 
-      - name: Validate static data
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Run data validation
-        run: node scripts/validate-static-data.mjs
-
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

@@ -1,5 +1,26 @@
 # Tickets
 
+## T0043 - Lean Deployment Policy
+
+Status: done
+
+Replace unconditional release gates with diff-triggered verification so small
+changes can be deployed without repeating unrelated content, browser, motion,
+or cross-viewport suites.
+
+Implementation notes (2026-07-22):
+
+- Made `npm run check` a fast JavaScript syntax check and separated structural
+  data validation from the full question-quality audit.
+- Removed Node setup and repeated question validation from the GitHub Pages
+  workflow; Pages now packages and deploys the static app.
+- Made external Edge takeover, complete state/parity matrices, motion/mobile
+  suites, live test replay, and independent audits opt-in.
+- Established one primary local Edge viewport (`1536x736` at 100%), one Pages
+  deployment-status check, and one live cache-key HTTP verification.
+- Reinforced the permanent rule that dependencies and `node_modules` must never
+  be installed inside the Google Drive repository.
+
 ## T0042 - Paper Exam And Scan-to-Grade Mode
 
 Status: done
