@@ -44,7 +44,7 @@ Path:
 - Answer Review uses five navigator columns (`#`, General, Verbal, Numerical, Analytical), section-owned colors, and aligned state icons. The retired P/R column is removed.
 - Clipped-corner containers were retired from the active desktop UI. Pause, Setup, Progress Section Accuracy, Attempt Records, and Account Settings received focused spacing and containment repairs.
 - Progress lists all attempts returned for the current authenticated user and now identifies that account beside a manual Refresh Records action. The client has no time-based attempt deletion or retention filter.
-- Focused final QA at the maximized Edge content viewport (`1536x736`) captured eight affected states with zero console/document failures, sampled overflows, or automated visual defects. Seven targeted interaction assertions also passed.
+- Focused final QA at the maximized Edge content viewport (`1536x736`) captured eight affected states with zero console/document failures, sampled overflows, or automated visual defects. Six final targeted interaction assertions also passed.
 - Ponytail has been installed into `C:\Users\Acer\.codex\skills\ponytail`; restart Codex to load it as a named skill in future sessions. The project `AGENTS.md` now includes a Ponytail guardrail for this repo immediately.
 
 ## Existing Files
