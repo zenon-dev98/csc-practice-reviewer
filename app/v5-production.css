@@ -6918,6 +6918,19 @@ html body #app .prompt.ordering-prompt li b {
   }
 }
 
+html body #app.cockpit-desktop .account-button .avatar.has-preset,
+html body #app.cockpit-desktop .account-identity-preview .avatar.large.has-preset,
+html body #app:not(.cockpit-desktop) .avatar.has-preset {
+  border: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html body #app .avatar.has-preset .avatar-sprite {
+  transform: scale(1.36) !important;
+}
+
 html body #app .review-matrix-head,
 html body #app .review-matrix-row {
   grid-template-columns: 44px repeat(4, minmax(0, 1fr)) !important;

@@ -1,5 +1,21 @@
 # Tickets
 
+## T0048 - Preset Avatar Double-Frame Repair
+
+Status: done
+
+Remove the generic outer avatar border from preset profile artwork so the
+avatar's intended built-in frame is shown only once.
+
+Implementation notes (2026-07-23):
+
+- Removed the redundant CSS border, padding, background, and shadow from
+  displayed preset avatars.
+- Tightened the displayed sprite crop so the avatar picker's outer tile frame
+  is not repeated around the avatar artwork.
+- Preserved initials styling, avatar selection, account data, and the source
+  avatar artwork.
+
 ## T0047 - Long Ordering Prompt Choice Visibility
 
 Status: done
