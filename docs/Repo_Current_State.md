@@ -20,7 +20,7 @@ Path:
 - Mock Exam Setup now supports an optional Paper answer sheet mode with two printable OMR pages, local browser-only scan recognition, manual uncertainty correction, and grading through the existing attempt submission path.
 - The app is deployed through GitHub Pages Actions at `https://zenon-dev98.github.io/csc-practice-reviewer/`.
 - The current release uses `app.js?v=20260723-01` and
-  `v5-production.css?v=20260723-03`; it includes the approved V5 cockpit
+  `v5-production.css?v=20260723-04`; it includes the approved V5 cockpit
   rework, audio/avatar assets, the no-blink exam controls, Paper answer sheet
   scan-to-grade mode, the July 22 focused UI remediation, power-outage attempt
   recovery, the integer-timer synchronization hotfix, and bounded long
@@ -50,7 +50,8 @@ Path:
   the statement list in a bounded internal scroller, preserving visible A-D
   choices and the fixed exam action bar at the primary desktop viewport.
 - Preset profile avatars use their built-in artwork frame without a redundant
-  generic outer avatar border.
+  generic outer avatar border. Avatar-picker buttons also remain visually
+  frameless and use an artwork glow for hover, focus, and selection.
 
 ## July 22 Focused UI Remediation
 

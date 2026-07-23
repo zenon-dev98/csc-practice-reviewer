@@ -16,6 +16,21 @@ Implementation notes (2026-07-23):
 - Preserved initials styling, avatar selection, account data, and the source
   avatar artwork.
 
+## T0049 - Avatar Picker Square Frame Removal
+
+Status: done
+
+Remove the avatar-picker button's square border and selection shadow so the
+generated avatar artwork remains the only visible frame.
+
+Implementation notes (2026-07-23):
+
+- Removed the picker button border, background, clip path, and square shadow.
+- Cropped the generated source tile past its outer option frame while
+  preserving the avatar artwork's own border.
+- Moved hover, keyboard-focus, and selected feedback to a restrained glow on
+  the avatar artwork itself.
+
 ## T0047 - Long Ordering Prompt Choice Visibility
 
 Status: done

@@ -6931,6 +6931,32 @@ html body #app .avatar.has-preset .avatar-sprite {
   transform: scale(1.36) !important;
 }
 
+html body #app .avatar-option .avatar-sprite {
+  transform: scale(1.36) !important;
+}
+
+html body #app.cockpit-desktop .avatar-option,
+html body #app:not(.cockpit-desktop) .avatar-option {
+  position: relative !important;
+  border: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  clip-path: none !important;
+}
+
+html body #app.cockpit-desktop .avatar-option:is(:hover, :focus-visible, .selected),
+html body #app:not(.cockpit-desktop) .avatar-option:is(:hover, :focus-visible, .selected) {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+html body #app .avatar-option:is(:hover, :focus-visible, .selected) .avatar-sprite {
+  filter: brightness(1.08) drop-shadow(0 0 7px rgba(25, 215, 216, .72)) !important;
+}
+
 html body #app .review-matrix-head,
 html body #app .review-matrix-row {
   grid-template-columns: 44px repeat(4, minmax(0, 1fr)) !important;
