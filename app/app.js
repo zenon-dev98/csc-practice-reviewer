@@ -4617,7 +4617,7 @@
       for (const attempt of attemptsToSync) {
         const payload = {
           status: attempt.status,
-          elapsed_seconds: attempt.elapsed_seconds,
+          elapsed_seconds: persistedSeconds(attempt.elapsed_seconds),
           current_question_index: attempt.current_question_index,
           score: attempt.score ?? null,
           percent: attempt.percent ?? null,
@@ -4680,7 +4680,7 @@
       selected_choice: answer.selected_choice,
       skipped: answer.skipped,
       flagged: answer.flagged,
-      time_spent_seconds: answer.time_spent_seconds,
+      time_spent_seconds: persistedSeconds(answer.time_spent_seconds),
       visit_count: answer.visit_count,
       first_seen_at: answer.first_seen_at || null,
       last_seen_at: answer.last_seen_at || null,
@@ -5004,6 +5004,10 @@
 
   function nowIso() {
     return new Date().toISOString();
+  }
+
+  function persistedSeconds(value) {
+    return Math.max(0, Math.floor(Number(value) || 0));
   }
 
   function formatDuration(seconds) {

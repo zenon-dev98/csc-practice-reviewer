@@ -1,6 +1,6 @@
 # Repo Current State
 
-Last updated: 2026-07-22
+Last updated: 2026-07-23
 
 ## Workspace
 
@@ -19,7 +19,7 @@ Path:
 - Runtime persistence is now implemented against Supabase email/password auth and online tables, with per-attempt question snapshots and timing analytics.
 - Mock Exam Setup now supports an optional Paper answer sheet mode with two printable OMR pages, local browser-only scan recognition, manual uncertainty correction, and grading through the existing attempt submission path.
 - The app is deployed through GitHub Pages Actions at `https://zenon-dev98.github.io/csc-practice-reviewer/`.
-- The current release uses cache key `20260722-03`; it includes the approved V5 cockpit rework, audio/avatar assets, the no-blink exam controls, Paper answer sheet scan-to-grade mode, the July 22 focused UI remediation, and power-outage attempt recovery.
+- The current release uses cache key `20260723-01`; it includes the approved V5 cockpit rework, audio/avatar assets, the no-blink exam controls, Paper answer sheet scan-to-grade mode, the July 22 focused UI remediation, power-outage attempt recovery, and the integer-timer synchronization hotfix.
 - The public GitHub repository is `https://github.com/zenon-dev98/csc-practice-reviewer`.
 - The Supabase SQL/Auth Hook setup from `supabase/schema.sql` has been applied, including authenticated table grants and the `public.hook_validate_invite_code` Before User Created hook.
 - Supabase Auth email/password is enabled with email confirmation disabled for this invite-gated small-group reviewer, avoiding free email quota failures during signup.
@@ -38,6 +38,9 @@ Path:
   by Supabase RLS; the static app contains no service-role credential.
 - Active exams now checkpoint to Supabase at least every 3.5 seconds and keep a
   per-account browser recovery snapshot for unsynced answers/current position.
+- Fractional wall-clock precision is retained in memory but converted to whole
+  seconds at the Supabase boundary, matching the existing integer columns and
+  preventing timer values from blocking answer checkpoints.
 
 ## July 22 Focused UI Remediation
 

@@ -34,6 +34,23 @@ if (!loadUserData.includes("filter(applyAttemptRecovery)")) {
   throw new Error("Startup must reconcile newer device recovery checkpoints.");
 }
 
+const flushDirty = functionBody("flushDirty");
+if (!flushDirty.includes("elapsed_seconds: persistedSeconds(attempt.elapsed_seconds)")) {
+  throw new Error("Attempt elapsed time must be converted to whole seconds before Supabase persistence.");
+}
+
+const dbAnswerPayload = functionBody("dbAnswerPayload");
+if (!dbAnswerPayload.includes("time_spent_seconds: persistedSeconds(answer.time_spent_seconds)")) {
+  throw new Error("Question time must be converted to whole seconds before Supabase persistence.");
+}
+
+const persistedSeconds = Function(`${functionBody("persistedSeconds")}; return persistedSeconds;`)();
+for (const [input, expected] of [[1013.9209999997398, 1013], [0, 0], [-2.4, 0], ["7.9", 7]]) {
+  if (persistedSeconds(input) !== expected) {
+    throw new Error(`persistedSeconds(${input}) must return ${expected}.`);
+  }
+}
+
 for (const eventName of ["beforeunload", "pagehide", "visibilitychange"]) {
   if (!source.includes(eventName)) throw new Error(`Missing ${eventName} recovery hook.`);
 }

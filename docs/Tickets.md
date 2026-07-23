@@ -1,5 +1,20 @@
 # Tickets
 
+## T0046 - Active Exam Integer-Timer Sync Hotfix
+
+Status: done
+
+Prevent fractional wall-clock values from blocking Supabase checkpoints while
+preserving every active attempt and its browser recovery state.
+
+Implementation notes (2026-07-23):
+
+- Normalized attempt and per-question elapsed time to nonnegative whole seconds
+  only at the database persistence boundary.
+- Left in-memory wall-clock precision, attempt status, current item, answers,
+  local recovery, schema, and existing Supabase records unchanged.
+- Added focused regression assertions for both integer persistence payloads.
+
 ## T0045 - Power-Outage Attempt Recovery
 
 Status: done
