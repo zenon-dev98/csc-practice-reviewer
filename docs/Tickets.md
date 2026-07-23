@@ -1,5 +1,21 @@
 # Tickets
 
+## T0047 - Long Ordering Prompt Choice Visibility
+
+Status: done
+
+Keep every answer choice visible for paragraph-ordering questions with lengthy
+Roman-numeral or numbered statements.
+
+Implementation notes (2026-07-23):
+
+- Kept the ordering instruction fixed while giving only the statement list a
+  bounded desktop scroller.
+- Preserved the complete A-D choice region and fixed exam action bar at the
+  primary Edge viewport.
+- Kept the repair CSS-only; question content, scoring, persistence, active
+  attempts, and Supabase records are unchanged.
+
 ## T0046 - Active Exam Integer-Timer Sync Hotfix
 
 Status: done

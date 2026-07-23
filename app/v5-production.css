@@ -6884,11 +6884,39 @@ html body #app .prompt.ordering-prompt > ol {
 }
 html body #app .prompt.ordering-prompt li {
   display: grid !important;
-  grid-template-columns: 34px minmax(0, 1fr) !important;
+  grid-template-columns: 44px minmax(0, 1fr) !important;
   align-items: start !important;
   gap: 8px !important;
 }
-html body #app .prompt.ordering-prompt li b { color: var(--v5-cyan, #00d8d2) !important; }
+html body #app .prompt.ordering-prompt li b {
+  color: var(--v5-cyan, #00d8d2) !important;
+  white-space: nowrap !important;
+}
+
+@media (min-width: 1100px) {
+  html body #app.cockpit-desktop .question-panel > .prompt.ordering-prompt {
+    min-height: 0 !important;
+    max-height: 236px !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    overflow: hidden !important;
+  }
+
+  html body #app.cockpit-desktop .prompt.ordering-prompt > ol {
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    padding-right: 8px !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #2c7b83 transparent !important;
+  }
+
+  html body #app.cockpit-desktop .prompt.ordering-prompt > ol::-webkit-scrollbar {
+    width: 4px !important;
+  }
+
+  html body #app.cockpit-desktop .prompt.ordering-prompt > ol::-webkit-scrollbar-thumb {
+    background: #2c7b83 !important;
+  }
+}
 
 html body #app .review-matrix-head,
 html body #app .review-matrix-row {
