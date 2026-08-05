@@ -16,11 +16,11 @@
     loading: true,
     error: "",
     notice: "",
-    resetAttemptId: "",
-    resetError: "",
-    resetReason: "",
-    resetConfirmation: "",
-    resetBusy: false
+    deleteAttemptId: "",
+    deleteError: "",
+    deleteReason: "",
+    deleteConfirmation: "",
+    deleteBusy: false
   };
 
   boot();
@@ -164,7 +164,7 @@
           <img src="assets/brand-shield.svg" alt="" />
           <p class="eyebrow">PRIVATE REVIEWER</p>
           <h1>Administration</h1>
-          <p>Private records with controlled, audited attempt resets.</p>
+          <p>Private records with controlled, audited attempt deletion.</p>
         </section>
         <form class="admin-login-card" data-form="admin-login" autocomplete="off">
           <div>
@@ -198,7 +198,7 @@
           <div class="header-actions"><button type="button" data-action="refresh">Refresh data</button><button type="button" data-action="signout">Sign out</button></div>
         </header>
         <main class="admin-main">
-          <div class="page-heading"><div><p class="eyebrow">ADMIN OVERVIEW</p><h1>Reviewer activity</h1><p>Private usage and performance records with audited reset controls.</p></div><span>Updated ${formatDateTime(new Date().toISOString())}</span></div>
+          <div class="page-heading"><div><p class="eyebrow">ADMIN OVERVIEW</p><h1>Reviewer activity</h1><p>Private usage and performance records with audited deletion controls.</p></div><span>Updated ${formatDateTime(new Date().toISOString())}</span></div>
           ${state.error ? `<p class="message error" role="alert">${escapeHtml(state.error)}</p>` : ""}
           ${state.notice && !state.selectedAttemptId ? `<p class="message success" role="status">${escapeHtml(state.notice)}</p>` : ""}
 
@@ -221,7 +221,7 @@
             <aside class="detail-panel">${selectedProfile ? userDetails(selectedProfile) : emptyDetails()}</aside>
           </section>
         </main>
-        ${state.resetAttemptId ? resetModal() : ""}
+        ${state.deleteAttemptId ? deleteModal() : ""}
 
       </div>`;
   }
@@ -256,24 +256,24 @@
     return `<article class="attempt-card ${attempt.id === state.selectedAttemptId ? "selected" : ""}">
       <div><strong>${escapeHtml(attempt.title)}</strong><small>${escapeHtml(attempt.mode === "full" ? "Mock exam" : `Practice${attempt.practice_category ? ` · ${attempt.practice_category}` : ""}`)} · ${formatDate(attempt.started_at)}</small></div>
       <div class="attempt-score"><strong>${isCompleted(attempt) ? `${numericPercent(attempt)}%` : escapeHtml(statusLabel(attempt.status))}</strong><small>${attempt.score ?? 0}/${attempt.total_questions}</small></div>
-      <div class="attempt-card-actions"><button type="button" data-attempt-id="${attempt.id}">View answers</button><button class="reset-button" type="button" data-action="open-reset" data-reset-attempt-id="${attempt.id}">Reset</button></div>
+      <div class="attempt-card-actions"><button type="button" data-attempt-id="${attempt.id}">View answers</button><button class="delete-button" type="button" data-action="open-delete" data-delete-attempt-id="${attempt.id}">Delete</button></div>
     </article>`;
   }
 
-  function resetModal() {
-    const attempt = state.attempts.find((row) => row.id === state.resetAttemptId);
+  function deleteModal() {
+    const attempt = state.attempts.find((row) => row.id === state.deleteAttemptId);
     const profile = attempt ? state.profiles.find((row) => row.user_id === attempt.user_id) : null;
     if (!attempt) return "";
     return `<div class="admin-modal-backdrop">
-      <section class="admin-reset-modal" role="dialog" aria-modal="true" aria-labelledby="reset-attempt-title" tabindex="-1">
-        <div class="reset-modal-heading"><p class="eyebrow">CONTROLLED ADMIN ACTION</p><h2 id="reset-attempt-title">Reset this attempt?</h2></div>
-        <p class="reset-warning">The original attempt, answers, and timing records will be preserved in the administrator audit log. A new blank attempt with the same configuration will be created for the user.</p>
-        <dl class="reset-facts"><div><dt>User</dt><dd>${escapeHtml(profile?.name || attempt.user_id)}</dd></div><div><dt>Attempt</dt><dd>${escapeHtml(attempt.title)}</dd></div><div><dt>Status</dt><dd>${escapeHtml(statusLabel(attempt.status))}</dd></div><div><dt>Progress</dt><dd>${escapeHtml(`${attempt.score ?? 0}/${attempt.total_questions}`)}</dd></div></dl>
-        <form data-form="reset-attempt" data-reset-attempt-id="${attempt.id}">
-          ${state.resetError ? `<p class="message error" role="alert">${escapeHtml(state.resetError)}</p>` : ""}
-          <label>Reason<textarea name="reason" rows="3" maxlength="500" placeholder="Explain why this attempt needs to be reset." required>${escapeHtml(state.resetReason)}</textarea></label>
-          <label>Type <strong>RESET ATTEMPT</strong> to confirm<input name="confirmation" value="${escapeAttr(state.resetConfirmation)}" autocomplete="off" required /></label>
-          <div class="reset-modal-actions"><button type="button" data-action="close-reset">Cancel</button><button class="primary reset-confirm-button" type="submit" ${state.resetBusy ? "disabled" : ""}>${state.resetBusy ? "Resetting..." : "Reset and Start Fresh"}</button></div>
+      <section class="admin-delete-modal" role="dialog" aria-modal="true" aria-labelledby="delete-attempt-title" tabindex="-1">
+        <div class="delete-modal-heading"><p class="eyebrow">CONTROLLED ADMIN ACTION</p><h2 id="delete-attempt-title">Delete this attempt?</h2></div>
+        <p class="delete-warning">This attempt will be removed from the live activity list. Its complete record, answers, timing, and pause history will be preserved in the administrator audit log. This cannot be undone from the reviewer.</p>
+        <dl class="delete-facts"><div><dt>User</dt><dd>${escapeHtml(profile?.name || attempt.user_id)}</dd></div><div><dt>Attempt</dt><dd>${escapeHtml(attempt.title)}</dd></div><div><dt>Status</dt><dd>${escapeHtml(statusLabel(attempt.status))}</dd></div><div><dt>Progress</dt><dd>${escapeHtml(`${attempt.score ?? 0}/${attempt.total_questions}`)}</dd></div></dl>
+        <form data-form="delete-attempt" data-delete-attempt-id="${attempt.id}">
+          ${state.deleteError ? `<p class="message error" role="alert">${escapeHtml(state.deleteError)}</p>` : ""}
+          <label>Reason<textarea name="reason" rows="3" maxlength="500" placeholder="Explain why this attempt should be deleted." required>${escapeHtml(state.deleteReason)}</textarea></label>
+          <label>Type <strong>DELETE ATTEMPT</strong> to confirm<input name="confirmation" value="${escapeAttr(state.deleteConfirmation)}" autocomplete="off" required /></label>
+          <div class="delete-modal-actions"><button type="button" data-action="close-delete">Cancel</button><button class="primary delete-confirm-button" type="submit" ${state.deleteBusy ? "disabled" : ""}>${state.deleteBusy ? "Deleting..." : "Delete Attempt"}</button></div>
         </form>
       </section>
     </div>`;
@@ -311,43 +311,43 @@
     return ({ in_progress: "In progress", paused: "Paused", submitted: "Completed", timed_out: "Timed out" })[status] || status;
   }
 
-  async function resetAttempt(attemptId, reason, confirmation) {
+  async function deleteAttempt(attemptId, reason, confirmation) {
     const normalizedReason = String(reason || "").trim();
     const normalizedConfirmation = String(confirmation || "").trim().toUpperCase();
-    state.resetReason = normalizedReason;
-    state.resetConfirmation = normalizedConfirmation;
+    state.deleteReason = normalizedReason;
+    state.deleteConfirmation = normalizedConfirmation;
     if (normalizedReason.length < 8) {
-      state.resetError = "Enter a reason with at least 8 characters.";
+      state.deleteError = "Enter a reason with at least 8 characters.";
       return renderDashboard();
     }
-    if (normalizedConfirmation !== "RESET ATTEMPT") {
-      state.resetError = "Type RESET ATTEMPT exactly to confirm.";
+    if (normalizedConfirmation !== "DELETE ATTEMPT") {
+      state.deleteError = "Type DELETE ATTEMPT exactly to confirm.";
       return renderDashboard();
     }
-    state.resetBusy = true;
-    state.resetError = "";
+    state.deleteBusy = true;
+    state.deleteError = "";
     renderDashboard();
-    const response = await state.client.rpc("admin_reset_attempt", {
+    const response = await state.client.rpc("admin_delete_attempt", {
       p_attempt_id: attemptId,
       p_reason: normalizedReason,
       p_confirmation: normalizedConfirmation
     });
     if (response.error) {
-      state.resetBusy = false;
-      state.resetError = response.error.message || "The attempt could not be reset.";
+      state.deleteBusy = false;
+      state.deleteError = response.error.message || "The attempt could not be deleted.";
       return renderDashboard();
     }
     const target = state.attempts.find((attempt) => attempt.id === attemptId);
     const title = target?.title || "Attempt";
-    state.resetBusy = false;
-    state.resetAttemptId = "";
+    state.deleteBusy = false;
+    state.deleteAttemptId = "";
     state.selectedAttemptId = "";
     state.answers = [];
     state.notice = "";
-    state.resetReason = "";
-    state.resetConfirmation = "";
+    state.deleteReason = "";
+    state.deleteConfirmation = "";
     await loadAdminData();
-    state.notice = `${title} was reset. A fresh blank attempt is ready for the user.`;
+    state.notice = `${title} was deleted. The archived record remains in the administrator audit log.`;
     renderDashboard();
   }
 
@@ -385,10 +385,10 @@
       signIn(event.target);
       return;
     }
-    if (event.target.matches('[data-form="reset-attempt"]')) {
+    if (event.target.matches('[data-form="delete-attempt"]')) {
       event.preventDefault();
       const values = Object.fromEntries(new FormData(event.target));
-      resetAttempt(event.target.dataset.resetAttemptId, values.reason, values.confirmation);
+      deleteAttempt(event.target.dataset.deleteAttemptId, values.reason, values.confirmation);
     }
   });
 
@@ -405,19 +405,19 @@
     if (button.dataset.attemptId) return loadAnswers(button.dataset.attemptId);
     if (button.dataset.action === "refresh") return loadAdminData();
     if (button.dataset.action === "signout") return signOut();
-    if (button.dataset.action === "open-reset") {
-      state.resetAttemptId = button.dataset.resetAttemptId || "";
-      state.resetError = "";
-      state.resetReason = "";
-      state.resetConfirmation = "";
+    if (button.dataset.action === "open-delete") {
+      state.deleteAttemptId = button.dataset.deleteAttemptId || "";
+      state.deleteError = "";
+      state.deleteReason = "";
+      state.deleteConfirmation = "";
       return renderDashboard();
     }
-    if (button.dataset.action === "close-reset") {
-      state.resetAttemptId = "";
-      state.resetError = "";
-      state.resetReason = "";
-      state.resetConfirmation = "";
-      state.resetBusy = false;
+    if (button.dataset.action === "close-delete") {
+      state.deleteAttemptId = "";
+      state.deleteError = "";
+      state.deleteReason = "";
+      state.deleteConfirmation = "";
+      state.deleteBusy = false;
       return renderDashboard();
     }
     if (button.dataset.action === "close-answers") {
@@ -442,13 +442,13 @@
   });
 
   root.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && state.resetAttemptId && !state.resetBusy) {
-      state.resetAttemptId = "";
-      state.resetError = "";
+    if (event.key === "Escape" && state.deleteAttemptId && !state.deleteBusy) {
+      state.deleteAttemptId = "";
+      state.deleteError = "";
       return renderDashboard();
     }
-    if (state.resetAttemptId && event.key === "Tab") {
-      const modal = root.querySelector(".admin-reset-modal");
+    if (state.deleteAttemptId && event.key === "Tab") {
+      const modal = root.querySelector(".admin-delete-modal");
       const focusable = [...modal.querySelectorAll("button, input, textarea")].filter((element) => !element.disabled);
       if (!focusable.length) return;
       const first = focusable[0];

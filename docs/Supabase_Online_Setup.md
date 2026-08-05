@@ -23,14 +23,16 @@ This creates:
 
 The public app stores the static question bank in JavaScript and stores per-attempt question snapshots in `attempt_answers`.
 
-Administrator reset controls:
+Administrator attempt deletion controls:
 
 - Run `supabase/admin_console.sql` first to create the administrator enrollment
   and read policies.
-- Run `supabase/admin_attempt_reset.sql` to add the audited reset RPC. The
-  administrator can reset either active or completed attempts only through the
-  typed-confirmation console action; the original attempt and snapshots remain
-  in `admin_attempt_resets`, and a fresh attempt is created for the user.
+- Run `supabase/admin_attempt_reset.sql` only when upgrading an older deployment
+  that used the retired reset-and-replace action, then run
+  `supabase/admin_attempt_delete.sql`. The current administrator console can
+  delete either active or completed attempts only through the typed-confirmation
+  action; the complete attempt, answer, timing, and pause snapshots remain in
+  `admin_attempt_deletions`, and no replacement attempt is created.
 - Never grant the browser a service-role key or direct cross-user delete access.
 
 ## Auth

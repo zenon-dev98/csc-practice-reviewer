@@ -1,5 +1,26 @@
 # Tickets
 
+## T0050 - Archive Before Administrator Attempt Deletion
+
+Status: done
+
+Give the administrator a Delete action for active and completed attempts while
+preserving the collected attempt data in a private audit table. Deletion must
+require a reason and exact typed confirmation, must not create a replacement
+attempt, and must not grant the browser direct cross-user delete access.
+
+Implementation notes (2026-08-05):
+
+- Replaced the admin UI Reset action with Delete for active, paused, submitted,
+  and timed-out attempts.
+- Added `supabase/admin_attempt_delete.sql`, applied it to the production
+  Supabase project, and verified `Success. No rows returned` in the SQL Editor.
+- The migration snapshots the attempt row, every answer row, and pause events
+  into `admin_attempt_deletions` before the live attempt is deleted. It retires
+  the older reset-and-replace RPC while retaining any historical reset audit.
+- The browser only calls the authenticated `admin_delete_attempt` RPC; it has
+  no direct cross-user delete permission and no service-role credential.
+
 ## T0048 - Preset Avatar Double-Frame Repair
 
 Status: done
@@ -1006,11 +1027,13 @@ Acceptance criteria:
 - Exam sidebar hover/scroll behavior is visually stable and does not shift the layout.
 - Maximized Microsoft Edge screenshots and interaction checks are captured after implementation, and visible defects are iterated before completion.
 
-## Admin Attempt Reset
+## Admin Attempt Reset (superseded)
 
-Status: done
+Status: superseded
 
-Add a controlled administrator reset action for active and completed attempts.
+Historical implementation: add a controlled administrator reset action for
+active and completed attempts. The later T0050 deletion workflow retires this
+replacement behavior.
 The original attempt and answer snapshots remain in an audit table, the action
 requires a reason and exact typed confirmation, and a fresh blank attempt is
 created with the same configuration. The browser client never receives a
@@ -1018,7 +1041,8 @@ service-role credential or direct cross-user delete permission.
 
 Completion notes:
 
-- Applied `supabase/admin_attempt_reset.sql` to the production Supabase project.
+- Applied `supabase/admin_attempt_reset.sql` to the production Supabase project
+  before the replacement behavior was retired.
 - Verified the SQL editor returned `Success. No rows returned` after applying the
   audited reset table, private helper, and authenticated RPC.
 

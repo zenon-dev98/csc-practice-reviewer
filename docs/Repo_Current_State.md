@@ -41,9 +41,10 @@ Path:
 - A separate administrator console is available at `admin.html`. Cross-user
   reads require explicit administrator enrollment and are enforced by Supabase
   RLS; the static app contains no service-role credential. Administrators can
-  perform a typed-confirmation attempt reset through a server-checked RPC. The
-  original attempt, answers, pauses, administrator ID, reason, and timestamp
-  are preserved in the reset audit table, and a fresh blank attempt is created.
+  perform a typed-confirmation attempt deletion through a server-checked RPC.
+  The original attempt, answers, pauses, administrator ID, reason, and
+  timestamp are preserved in the deletion audit table; no replacement attempt
+  is created. The production migration is `supabase/admin_attempt_delete.sql`.
 - Active exams now checkpoint to Supabase at least every 3.5 seconds and keep a
   per-account browser recovery snapshot for unsynced answers/current position.
 - Fractional wall-clock precision is retained in memory but converted to whole
