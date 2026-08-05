@@ -1006,7 +1006,21 @@ Acceptance criteria:
 - Exam sidebar hover/scroll behavior is visually stable and does not shift the layout.
 - Maximized Microsoft Edge screenshots and interaction checks are captured after implementation, and visible defects are iterated before completion.
 
+## Admin Attempt Reset
+
+Status: done
+
+Add a controlled administrator reset action for active and completed attempts.
+The original attempt and answer snapshots remain in an audit table, the action
+requires a reason and exact typed confirmation, and a fresh blank attempt is
+created with the same configuration. The browser client never receives a
+service-role credential or direct cross-user delete permission.
+
 Completion notes:
+
+- Applied `supabase/admin_attempt_reset.sql` to the production Supabase project.
+- Verified the SQL editor returned `Success. No rows returned` after applying the
+  audited reset table, private helper, and authenticated RPC.
 
 - Retired signed-in Switch Profile, Edit Profile, preset profile photos, and the signed-in header disclaimer pill.
 - Replaced Manage Profile with Account Settings, opened from the upper-right account control and side-nav account row.

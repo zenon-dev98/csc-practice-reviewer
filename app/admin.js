@@ -15,7 +15,12 @@
     search: "",
     loading: true,
     error: "",
-    notice: ""
+    notice: "",
+    resetAttemptId: "",
+    resetError: "",
+    resetReason: "",
+    resetConfirmation: "",
+    resetBusy: false
   };
 
   boot();
@@ -159,7 +164,7 @@
           <img src="assets/brand-shield.svg" alt="" />
           <p class="eyebrow">PRIVATE REVIEWER</p>
           <h1>Administration</h1>
-          <p>Read-only access to account activity, attempts, scores, and answer records.</p>
+          <p>Private records with controlled, audited attempt resets.</p>
         </section>
         <form class="admin-login-card" data-form="admin-login" autocomplete="off">
           <div>
@@ -193,8 +198,10 @@
           <div class="header-actions"><button type="button" data-action="refresh">Refresh data</button><button type="button" data-action="signout">Sign out</button></div>
         </header>
         <main class="admin-main">
-          <div class="page-heading"><div><p class="eyebrow">READ-ONLY OVERVIEW</p><h1>Reviewer activity</h1><p>Private usage and performance records for the invited study group.</p></div><span>Updated ${formatDateTime(new Date().toISOString())}</span></div>
+          <div class="page-heading"><div><p class="eyebrow">ADMIN OVERVIEW</p><h1>Reviewer activity</h1><p>Private usage and performance records with audited reset controls.</p></div><span>Updated ${formatDateTime(new Date().toISOString())}</span></div>
           ${state.error ? `<p class="message error" role="alert">${escapeHtml(state.error)}</p>` : ""}
+          ${state.notice && !state.selectedAttemptId ? `<p class="message success" role="status">${escapeHtml(state.notice)}</p>` : ""}
+
           <section class="metric-grid" aria-label="General statistics">
             ${metric("Registered users", state.profiles.length, "Profiles in the reviewer")}
             ${metric("Total attempts", state.attempts.length, `${active.length} currently active`)}
@@ -214,6 +221,8 @@
             <aside class="detail-panel">${selectedProfile ? userDetails(selectedProfile) : emptyDetails()}</aside>
           </section>
         </main>
+        ${state.resetAttemptId ? resetModal() : ""}
+
       </div>`;
   }
 
@@ -247,8 +256,27 @@
     return `<article class="attempt-card ${attempt.id === state.selectedAttemptId ? "selected" : ""}">
       <div><strong>${escapeHtml(attempt.title)}</strong><small>${escapeHtml(attempt.mode === "full" ? "Mock exam" : `Practice${attempt.practice_category ? ` · ${attempt.practice_category}` : ""}`)} · ${formatDate(attempt.started_at)}</small></div>
       <div class="attempt-score"><strong>${isCompleted(attempt) ? `${numericPercent(attempt)}%` : escapeHtml(statusLabel(attempt.status))}</strong><small>${attempt.score ?? 0}/${attempt.total_questions}</small></div>
-      <button type="button" data-attempt-id="${attempt.id}">View answers</button>
+      <div class="attempt-card-actions"><button type="button" data-attempt-id="${attempt.id}">View answers</button><button class="reset-button" type="button" data-action="open-reset" data-reset-attempt-id="${attempt.id}">Reset</button></div>
     </article>`;
+  }
+
+  function resetModal() {
+    const attempt = state.attempts.find((row) => row.id === state.resetAttemptId);
+    const profile = attempt ? state.profiles.find((row) => row.user_id === attempt.user_id) : null;
+    if (!attempt) return "";
+    return `<div class="admin-modal-backdrop">
+      <section class="admin-reset-modal" role="dialog" aria-modal="true" aria-labelledby="reset-attempt-title" tabindex="-1">
+        <div class="reset-modal-heading"><p class="eyebrow">CONTROLLED ADMIN ACTION</p><h2 id="reset-attempt-title">Reset this attempt?</h2></div>
+        <p class="reset-warning">The original attempt, answers, and timing records will be preserved in the administrator audit log. A new blank attempt with the same configuration will be created for the user.</p>
+        <dl class="reset-facts"><div><dt>User</dt><dd>${escapeHtml(profile?.name || attempt.user_id)}</dd></div><div><dt>Attempt</dt><dd>${escapeHtml(attempt.title)}</dd></div><div><dt>Status</dt><dd>${escapeHtml(statusLabel(attempt.status))}</dd></div><div><dt>Progress</dt><dd>${escapeHtml(`${attempt.score ?? 0}/${attempt.total_questions}`)}</dd></div></dl>
+        <form data-form="reset-attempt" data-reset-attempt-id="${attempt.id}">
+          ${state.resetError ? `<p class="message error" role="alert">${escapeHtml(state.resetError)}</p>` : ""}
+          <label>Reason<textarea name="reason" rows="3" maxlength="500" placeholder="Explain why this attempt needs to be reset." required>${escapeHtml(state.resetReason)}</textarea></label>
+          <label>Type <strong>RESET ATTEMPT</strong> to confirm<input name="confirmation" value="${escapeAttr(state.resetConfirmation)}" autocomplete="off" required /></label>
+          <div class="reset-modal-actions"><button type="button" data-action="close-reset">Cancel</button><button class="primary reset-confirm-button" type="submit" ${state.resetBusy ? "disabled" : ""}>${state.resetBusy ? "Resetting..." : "Reset and Start Fresh"}</button></div>
+        </form>
+      </section>
+    </div>`;
   }
 
   function answerDetails() {
@@ -283,6 +311,46 @@
     return ({ in_progress: "In progress", paused: "Paused", submitted: "Completed", timed_out: "Timed out" })[status] || status;
   }
 
+  async function resetAttempt(attemptId, reason, confirmation) {
+    const normalizedReason = String(reason || "").trim();
+    const normalizedConfirmation = String(confirmation || "").trim().toUpperCase();
+    state.resetReason = normalizedReason;
+    state.resetConfirmation = normalizedConfirmation;
+    if (normalizedReason.length < 8) {
+      state.resetError = "Enter a reason with at least 8 characters.";
+      return renderDashboard();
+    }
+    if (normalizedConfirmation !== "RESET ATTEMPT") {
+      state.resetError = "Type RESET ATTEMPT exactly to confirm.";
+      return renderDashboard();
+    }
+    state.resetBusy = true;
+    state.resetError = "";
+    renderDashboard();
+    const response = await state.client.rpc("admin_reset_attempt", {
+      p_attempt_id: attemptId,
+      p_reason: normalizedReason,
+      p_confirmation: normalizedConfirmation
+    });
+    if (response.error) {
+      state.resetBusy = false;
+      state.resetError = response.error.message || "The attempt could not be reset.";
+      return renderDashboard();
+    }
+    const target = state.attempts.find((attempt) => attempt.id === attemptId);
+    const title = target?.title || "Attempt";
+    state.resetBusy = false;
+    state.resetAttemptId = "";
+    state.selectedAttemptId = "";
+    state.answers = [];
+    state.notice = "";
+    state.resetReason = "";
+    state.resetConfirmation = "";
+    await loadAdminData();
+    state.notice = `${title} was reset. A fresh blank attempt is ready for the user.`;
+    renderDashboard();
+  }
+
   function initials(name) {
     return String(name || "A").split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
   }
@@ -312,9 +380,16 @@
   }
 
   root.addEventListener("submit", (event) => {
-    if (!event.target.matches('[data-form="admin-login"]')) return;
-    event.preventDefault();
-    signIn(event.target);
+    if (event.target.matches('[data-form="admin-login"]')) {
+      event.preventDefault();
+      signIn(event.target);
+      return;
+    }
+    if (event.target.matches('[data-form="reset-attempt"]')) {
+      event.preventDefault();
+      const values = Object.fromEntries(new FormData(event.target));
+      resetAttempt(event.target.dataset.resetAttemptId, values.reason, values.confirmation);
+    }
   });
 
   root.addEventListener("click", async (event) => {
@@ -330,6 +405,21 @@
     if (button.dataset.attemptId) return loadAnswers(button.dataset.attemptId);
     if (button.dataset.action === "refresh") return loadAdminData();
     if (button.dataset.action === "signout") return signOut();
+    if (button.dataset.action === "open-reset") {
+      state.resetAttemptId = button.dataset.resetAttemptId || "";
+      state.resetError = "";
+      state.resetReason = "";
+      state.resetConfirmation = "";
+      return renderDashboard();
+    }
+    if (button.dataset.action === "close-reset") {
+      state.resetAttemptId = "";
+      state.resetError = "";
+      state.resetReason = "";
+      state.resetConfirmation = "";
+      state.resetBusy = false;
+      return renderDashboard();
+    }
     if (button.dataset.action === "close-answers") {
       state.selectedAttemptId = "";
       state.answers = [];
@@ -352,6 +442,26 @@
   });
 
   root.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && state.resetAttemptId && !state.resetBusy) {
+      state.resetAttemptId = "";
+      state.resetError = "";
+      return renderDashboard();
+    }
+    if (state.resetAttemptId && event.key === "Tab") {
+      const modal = root.querySelector(".admin-reset-modal");
+      const focusable = [...modal.querySelectorAll("button, input, textarea")].filter((element) => !element.disabled);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+      return;
+    }
     const row = event.target.closest("tr[data-user-id]");
     if (!row || !["Enter", " "].includes(event.key)) return;
     event.preventDefault();
