@@ -151,7 +151,16 @@ function validateVersion(version, allIds, allPrompts) {
       const stimulus = question.stimulus;
       if (!compact(stimulus.id) || !compact(stimulus.label) || !compact(stimulus.title)) problems.push(`${question.id} stimulus is missing identity or labels.`);
       if (!compact(stimulus.alt || stimulus.altText || stimulus.description)) problems.push(`${question.id} stimulus lacks an accessible text alternative.`);
-      if (!["passage", "table", "bar-table", "line-table", "logic-grid"].includes(stimulus.kind)) problems.push(`${question.id} stimulus kind is invalid: ${stimulus.kind}.`);
+      if (!["passage", "table", "bar-table", "line-table", "logic-grid", "figures"].includes(stimulus.kind)) problems.push(`${question.id} stimulus kind is invalid: ${stimulus.kind}.`);
+      if (stimulus.kind === "figures") {
+        // A figure series belongs to one question: 3-6 drawn cells, and a drawing for every choice text.
+        const cells = Array.isArray(stimulus.cells) ? stimulus.cells : [];
+        if (cells.length < 3 || cells.length > 6 || cells.some((cell) => !compact(cell))) problems.push(`${question.id} figure series needs 3-6 non-empty cells.`);
+        const options = stimulus.options && typeof stimulus.options === "object" ? stimulus.options : {};
+        if (!Array.isArray(question.choices) || question.choices.some((choice) => !compact(options[choice.text]))) problems.push(`${question.id} figure series is missing a drawing for a choice.`);
+        if (new Set(Object.values(options).map(compact)).size !== Object.keys(options).length) problems.push(`${question.id} figure series has two identical choice drawings.`);
+        continue;
+      }
       const group = stimulusGroups.get(stimulus.id) || { stimulus, items: [] };
       group.items.push(question.itemNumber);
       stimulusGroups.set(stimulus.id, group);

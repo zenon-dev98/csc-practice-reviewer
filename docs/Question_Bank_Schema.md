@@ -38,7 +38,7 @@ Each question has:
 - `expectedSeconds`: initial expected answer time estimate
 - `reviewStatus`: extraction/review state
 - `qualityStatus`: authored-content review status
-- `stimulus`: optional shared table/chart/logic setup for linked questions
+- `stimulus`: optional shared table/chart/logic setup for linked questions. Kind `figures` is a single-question drawn figure series: `cells` (3-6 drawing specs) and `options` (a drawing spec for each choice text). Spec tokens are `shape[:position][:degrees][:f|o][:L|M|S]`; shapes tri, sq, dia, pent, hex, hept, oct, circ, dot, star, arrow, line, cross; positions c, tl, tr, bl, br, t, b, l, r.
 
 ## Validation Rules
 

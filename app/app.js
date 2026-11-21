@@ -1350,6 +1350,10 @@
       };
     }
     const shortChoices = current.choices.every((choice) => String(choice.text).length <= 28);
+    if (current.stimulus?.kind === "figures") {
+      const cells = toArray(current.stimulus.cells);
+      return { html: `<h1 class="gx-lead">${escapeHtml(prompt)}</h1><div class="gx-figrow" role="group" aria-label="${escapeAttr(current.stimulus.description || prompt)}">${cells.map((cell, index) => `<div class="gx-tile gx-figtile">${gxFigure(cell, `Figure ${index + 1}`)}</div>`).join("")}<div class="gx-tile gx-figtile is-blank">?</div></div>`, grid: true };
+    }
     if (!/number sequence|abstract reasoning/i.test(current.csc_skill || "")) {
       return { html: `<h1 class="gx-prompt ${prompt.length > 160 ? "is-long" : ""}">${escapeHtml(prompt)}</h1>`, grid: shortChoices && !current.stimulus };
     }
@@ -1379,6 +1383,42 @@
     return { html: `<h1 class="gx-prompt ${prompt.length > 160 ? "is-long" : ""}">${escapeHtml(prompt)}</h1>`, grid: shortChoices && !current.stimulus };
   }
 
+  // Figure-series questions: each cell is a hand-authored spec such as "arrow:90 dot:tl:f".
+  // Token = shape[:position][:degrees][:f|o][:L|M|S]; unknown shapes draw nothing.
+  function gxFigure(spec, label) {
+    const POS = { c: [50, 50], tl: [25, 25], tr: [75, 25], bl: [25, 75], br: [75, 75], t: [50, 22], b: [50, 78], l: [22, 50], r: [78, 50] };
+    const SIZE = { L: 30, M: 19, S: 8 };
+    const POS_EDGE = { tl: [13, 13], tr: [87, 13], bl: [13, 87], br: [87, 87], t: [50, 11], b: [50, 89], l: [11, 50], r: [89, 50] };
+    const SIDES = { tri: 3, dia: 4, pent: 5, hex: 6, hept: 7, oct: 8 };
+    const xy = (angle, radius) => { const a = angle * Math.PI / 180; return `${(radius * Math.cos(a)).toFixed(2)},${(radius * Math.sin(a)).toFixed(2)}`; };
+    const shapes = String(spec || "").trim().split(/\s+/).map((token) => {
+      const [shape, ...mods] = token.split(":");
+      let pos = "c", rot = 0, fill = "o", size = "";
+      for (const mod of mods) {
+        if (POS[mod]) pos = mod;
+        else if (/^-?\d+$/.test(mod)) rot = Number(mod);
+        else if (mod === "f" || mod === "o") fill = mod;
+        else if (SIZE[mod]) size = mod;
+      }
+      const r = SIZE[size || (pos === "c" && shape !== "dot" ? "L" : "S")];
+      // Small marks sit near the tile edge so they never touch a large center shape.
+      const at = r === SIZE.S && pos !== "c" ? POS_EDGE[pos] : POS[pos];
+      const paint = fill === "f" ? 'fill="currentColor"' : 'fill="none"';
+      let body = "";
+      if (SIDES[shape]) body = `<polygon points="${Array.from({ length: SIDES[shape] }, (_, i) => xy(-90 + (i * 360) / SIDES[shape], r)).join(" ")}" ${paint}/>`;
+      else if (shape === "circ") body = `<circle r="${r}" ${paint}/>`;
+      else if (shape === "dot") body = `<circle r="${r}" fill="currentColor"/>`;
+      else if (shape === "sq") body = `<rect x="${-r * 0.82}" y="${-r * 0.82}" width="${r * 1.64}" height="${r * 1.64}" ${paint}/>`;
+      else if (shape === "star") body = `<polygon points="${Array.from({ length: 10 }, (_, i) => xy(-90 + i * 36, i % 2 ? r * 0.45 : r)).join(" ")}" ${paint}/>`;
+      else if (shape === "arrow") body = `<path d="M0 ${r}V${-r}M${-r * 0.55} ${-r * 0.42}L0 ${-r}L${r * 0.55} ${-r * 0.42}" fill="none" stroke-linecap="round"/>`;
+      else if (shape === "line") body = `<path d="M0 ${-r}V${r}" stroke-linecap="round"/>`;
+      else if (shape === "cross") body = `<path d="M0 ${-r}V${r}M${-r} 0H${r}" stroke-linecap="round"/>`;
+      else return "";
+      return `<g transform="translate(${at[0]} ${at[1]}) rotate(${rot})" stroke="currentColor" stroke-width="${r > 20 ? 4.5 : 3.5}" stroke-linejoin="round">${body}</g>`;
+    }).join("");
+    return `<svg class="gx-figure" viewBox="0 0 100 100" role="img" aria-label="${escapeAttr(label)}">${shapes}</svg>`;
+  }
+
   // Shapes and arrows are drawn, not left to font fallback, so every glyph has the same size and weight.
   const GX_SHAPES = {
     "■": `<rect x="4" y="4" width="16" height="16" rx="1.5" fill="currentColor"/>`, "□": `<rect x="4.5" y="4.5" width="15" height="15" rx="1.5" fill="none" stroke="currentColor" stroke-width="2.2"/>`,
@@ -1396,8 +1436,10 @@
     });
   }
 
-  function gxChoiceText(text) {
+  function gxChoiceText(text, stimulus) {
     const value = String(text);
+    const figure = stimulus?.kind === "figures" ? stimulus.options?.[value] : null;
+    if (figure) return `<span class="gx-figchoice">${gxFigure(figure, value)}</span>`;
     if (/^\s*[\dIVX]+(\s*-\s*[\dIVX]+){2,}\s*$/.test(value) || /^\s*[A-F](\s*-\s*[A-F]){2,}\s*$/.test(value)) {
       return `<span class="gx-seq">${value.split(/\s*-\s*/).map((part) => escapeHtml(part.trim())).join("<i>›</i>")}</span>`;
     }
@@ -1441,7 +1483,7 @@
 
   function gxStimulus(attempt, current, linked) {
     const stimulus = current.stimulus;
-    if (!stimulus) return "";
+    if (!stimulus || stimulus.kind === "figures") return "";
     const presentation = stimulusPresentation(stimulus);
     const tableData = stimulusTableData(stimulus);
     const description = String(stimulus.description || stimulus.altText || stimulus.alt || "");
@@ -1547,7 +1589,7 @@
     const timerValue = attempt.mode === "practice" ? "Untimed" : attempt.options?.showTimer === false ? "Hidden" : formatDuration(remaining);
     return `
       <div class="gx" data-theme="${theme}">
-        <section class="gx-exam ${isPaused ? "is-paused" : ""} ${current.stimulus ? "has-stim" : ""}">
+        <section class="gx-exam ${isPaused ? "is-paused" : ""} ${current.stimulus && current.stimulus.kind !== "figures" ? "has-stim" : ""}">
           <header class="gx-top">
             <button class="gx-icon-btn is-bare" data-action="save-exit" type="button" aria-label="Save and exit">${gxIcon("x", 24)}</button>
             <div class="gx-progress">
@@ -1576,7 +1618,7 @@
                 <div class="gx-choices ${body.grid ? "is-grid" : ""}" role="radiogroup" aria-label="Answer choices">
                   ${current.choices.map((choice) => `
                     <button class="gx-choice ${checked ? (choice.id === current.correct_choice ? "is-correct" : current.selected_choice === choice.id ? "is-wrong" : "is-dim") : current.selected_choice === choice.id ? "is-selected" : ""}" ${paperMode ? "aria-disabled=\"true\" tabindex=\"-1\"" : `data-choice="${choice.id}"`} role="radio" aria-checked="${current.selected_choice === choice.id ? "true" : "false"}" type="button" ${locked ? "disabled" : ""}>
-                      <span class="gx-key">${escapeHtml(choice.id)}</span><span>${gxChoiceText(choice.text)}</span>
+                      <span class="gx-key">${escapeHtml(choice.id)}</span><span>${gxChoiceText(choice.text, current.stimulus)}</span>
                     </button>`).join("")}
                 </div>
               </div>
@@ -1923,7 +1965,7 @@
       const body = gxQuestionBody(answer);
       const stimulus = answer.stimulus ? gxStimulus(attempt, answer, { ...linkedStimulusAnswers(attempt, answer), items: [] }) : "";
       question = `
-        <div class="gx-main gx-review-main ${answer.stimulus ? "has-stim" : ""}">
+        <div class="gx-main gx-review-main ${answer.stimulus && answer.stimulus.kind !== "figures" ? "has-stim" : ""}">
           ${stimulus}
           <div class="gx-qcol">
             <div class="gx-meta">
@@ -1936,7 +1978,7 @@
               ${answer.choices.map((choice) => {
                 const cls = choice.id === answer.correct_choice ? "is-correct" : choice.id === answer.selected_choice ? "is-wrong" : "is-dim";
                 const note = choice.id === answer.correct_choice ? "Correct answer" : choice.id === answer.selected_choice ? "Your answer" : "";
-                return `<div class="gx-choice ${cls}"><span class="gx-key">${escapeHtml(choice.id)}</span><span>${gxChoiceText(choice.text)}</span>${note ? `<em class="gx-choice-note">${note}</em>` : ""}</div>`;
+                return `<div class="gx-choice ${cls}"><span class="gx-key">${escapeHtml(choice.id)}</span><span>${gxChoiceText(choice.text, answer.stimulus)}</span>${note ? `<em class="gx-choice-note">${note}</em>` : ""}</div>`;
               }).join("")}
             </div>
             <section class="gx-explain">

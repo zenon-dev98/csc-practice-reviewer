@@ -622,3 +622,19 @@ a.gx-btn { text-decoration: none; }
   .gx-matrix { grid-template-columns: repeat(var(--cols, 3), 68px); }
 }
 .gx-seqrow .gx-tile, .gx-matrix .gx-tile { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; }
+
+/* ---- Drawn figure series ---- */
+.gx-figrow { display: flex; flex-wrap: wrap; gap: 10px; }
+.gx-figtile { width: 104px; height: 104px; min-height: 0; padding: 8px; }
+.gx-figtile.is-blank { font-size: 32px; }
+.gx-figure { display: block; width: 100%; height: 100%; color: var(--text); }
+.gx-figchoice { display: block; width: 72px; height: 72px; }
+.gx-choice .gx-figchoice .gx-figure { color: currentColor; }
+@media (max-width: 900px) {
+  .gx-figrow { gap: 6px; }
+  .gx-figtile { width: 68px; height: 68px; padding: 5px; }
+  .gx-figchoice { width: 56px; height: 56px; }
+}
+@media (max-width: 900px) {
+  .gx-choices.is-grid:has(.gx-figchoice) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-21T11:01:43.833Z",
+  "generatedAt": "2026-11-21T11:16:14.346Z",
   "source": "app/question-bank",
   "versionCount": 20,
   "totalQuestions": 3400,
@@ -96,6 +96,14 @@
             78,
             79,
             80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v01-q132-fig",
+          "kind": "figures",
+          "items": [
+            132
           ],
           "logicSolutionCount": null
         },
@@ -224,6 +232,22 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v02-q132-fig",
+          "kind": "figures",
+          "items": [
+            132
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v02-q137-fig",
+          "kind": "figures",
+          "items": [
+            137
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v02-data-a",
           "kind": "table",
           "items": [
@@ -344,6 +368,22 @@
             78,
             79,
             80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v03-q132-fig",
+          "kind": "figures",
+          "items": [
+            132
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v03-q137-fig",
+          "kind": "figures",
+          "items": [
+            137
           ],
           "logicSolutionCount": null
         },
@@ -472,6 +512,22 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v04-q133-fig",
+          "kind": "figures",
+          "items": [
+            133
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v04-q134-fig",
+          "kind": "figures",
+          "items": [
+            134
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v04-data-a",
           "kind": "table",
           "items": [
@@ -592,6 +648,22 @@
             78,
             79,
             80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v05-q132-fig",
+          "kind": "figures",
+          "items": [
+            132
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v05-q133-fig",
+          "kind": "figures",
+          "items": [
+            133
           ],
           "logicSolutionCount": null
         },
@@ -720,6 +792,22 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v06-q131-fig",
+          "kind": "figures",
+          "items": [
+            131
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v06-q132-fig",
+          "kind": "figures",
+          "items": [
+            132
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v06-data-a",
           "kind": "table",
           "items": [
@@ -840,6 +928,14 @@
             78,
             79,
             80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v07-q134-fig",
+          "kind": "figures",
+          "items": [
+            134
           ],
           "logicSolutionCount": null
         },
@@ -968,6 +1064,22 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v08-q132-fig",
+          "kind": "figures",
+          "items": [
+            132
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v08-q133-fig",
+          "kind": "figures",
+          "items": [
+            133
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v08-data-a",
           "kind": "table",
           "items": [
@@ -1088,6 +1200,14 @@
             78,
             79,
             80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v09-q132-fig",
+          "kind": "figures",
+          "items": [
+            132
           ],
           "logicSolutionCount": null
         },
@@ -1216,6 +1336,14 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v10-q131-fig",
+          "kind": "figures",
+          "items": [
+            131
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v10-data-a",
           "kind": "table",
           "items": [
@@ -1336,6 +1464,22 @@
             78,
             79,
             80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v11-q132-fig",
+          "kind": "figures",
+          "items": [
+            132
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v11-q136-fig",
+          "kind": "figures",
+          "items": [
+            136
           ],
           "logicSolutionCount": null
         },
@@ -1464,6 +1608,14 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v12-q137-fig",
+          "kind": "figures",
+          "items": [
+            137
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v12-data-a",
           "kind": "table",
           "items": [
@@ -1588,6 +1740,14 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v13-q137-fig",
+          "kind": "figures",
+          "items": [
+            137
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v13-data-a",
           "kind": "table",
           "items": [
@@ -1708,6 +1868,14 @@
             78,
             79,
             80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v14-q137-fig",
+          "kind": "figures",
+          "items": [
+            137
           ],
           "logicSolutionCount": null
         },
@@ -1960,6 +2128,14 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v16-q137-fig",
+          "kind": "figures",
+          "items": [
+            137
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v16-data-a",
           "kind": "table",
           "items": [
@@ -2080,6 +2256,14 @@
             78,
             79,
             80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v17-q132-fig",
+          "kind": "figures",
+          "items": [
+            132
           ],
           "logicSolutionCount": null
         },
@@ -2208,6 +2392,14 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v18-q137-fig",
+          "kind": "figures",
+          "items": [
+            137
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v18-data-a",
           "kind": "table",
           "items": [
@@ -2332,6 +2524,14 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v19-q132-fig",
+          "kind": "figures",
+          "items": [
+            132
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v19-data-a",
           "kind": "table",
           "items": [
@@ -2452,6 +2652,14 @@
             78,
             79,
             80
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v20-q137-fig",
+          "kind": "figures",
+          "items": [
+            137
           ],
           "logicSolutionCount": null
         },

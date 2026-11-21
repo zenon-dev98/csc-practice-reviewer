@@ -251,6 +251,8 @@ for (const version of versionReports) {
   const requiredSkills = ["Philippine Constitution", "RA 6713 / Code of Conduct", "Peace and human rights", "Environment management and protection", "Word meaning", "Sentence completion", "Error recognition", "Sentence structure", "Paragraph organization", "Reading comprehension", "Basic operations", "Number sequence", "Word problems", "Word analogy", "Symbolic logic / abstract reasoning", "Identifying assumptions and drawing conclusions", "Data interpretation"];
   for (const skill of requiredSkills) if (!version.skills[skill]) blockers.push(`${version.id} is missing required CSC skill '${skill}'.`);
   for (const group of version.stimulusGroups) {
+    // A drawn figure series belongs to a single question; shared passages and data sets link 3-5.
+    if (group.kind === "figures") continue;
     if (group.items.length < 3 || group.items.length > 5) blockers.push(`${version.id} stimulus ${group.id} links ${group.items.length} questions; expected 3-5.`);
   }
 }
