@@ -639,3 +639,106 @@ a.gx-btn { text-decoration: none; }
   .gx-choices.is-grid:has(.gx-figchoice) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 #app .gx .gx-passage p + p { margin-top: .9em; }
+
+/* ---- Motion layer (2026-11-21) ----
+   Triggers come from gxAfterRender in app.js: .is-entering = new screen, .is-next = new question,
+   .is-popping = new pick or flag, .is-just-checked = practice answer checked. Every animation is one-shot,
+   uses transform/opacity, and is skipped under prefers-reduced-motion. */
+@keyframes gx-in-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes gx-in-right { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+@keyframes gx-pop { 0% { transform: scale(1); } 40% { transform: scale(1.035); } 100% { transform: scale(1); } }
+@keyframes gx-key-pop { 0% { transform: scale(.6); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
+@keyframes gx-shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(7px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(3px); } }
+@keyframes gx-bounce { 0% { transform: scale(1); } 35% { transform: scale(1.06); } 65% { transform: scale(.98); } 100% { transform: scale(1); } }
+@keyframes gx-grow-x { from { transform: scaleX(0); } }
+@keyframes gx-ring { from { stroke-dasharray: 0 400; } }
+@keyframes gx-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes gx-fade { from { opacity: 0; } }
+@keyframes gx-modal-in { from { opacity: 0; transform: translateY(18px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes gx-stamp { 0% { opacity: 0; transform: scale(1.5) rotate(-12deg); } 60% { opacity: 1; transform: scale(.94) rotate(2deg); } 100% { transform: none; } }
+@keyframes gx-confetti { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 100% { opacity: 0; transform: translate(calc(var(--x) * 260px), calc(var(--y) * 240px)) rotate(var(--r)); } }
+@keyframes gx-timer-pulse { 0% { transform: scale(1); } 30% { transform: scale(1.08); } 100% { transform: scale(1); } }
+@keyframes gx-flame { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(1.12) rotate(-4deg); } }
+@keyframes gx-pop-in { 0% { opacity: 0; transform: scale(.4); } 70% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
+
+/* Press feel for every tappable 3D surface: the face drops into its own bottom edge, height preserved. */
+.gx-btn, .gx-choice, .gx-version, .gx-choicecard, .gx-segment b, .gx-icon-btn, .gx-cell, .gx-filters button, .gx-linked button, .gx-navlinks button {
+  transition: transform .12s ease, border-bottom-width .12s ease, margin-bottom .12s ease, background-color .18s ease, border-color .18s ease, color .18s ease, filter .18s ease;
+}
+@media (hover: hover) {
+  /* Hover never moves the element itself (it would slide out from under the pointer); it only brightens. */
+  .gx-btn:not(:disabled):hover, .gx-choice:not(:disabled):hover, .gx-version:hover, .gx-choicecard:hover, .gx-icon-btn:not(:disabled):hover, .gx-cell:hover { filter: brightness(1.08); }
+}
+.gx-btn:not(:disabled):active, .gx-choice:not(:disabled):active, .gx-version:active, .gx-choicecard:active {
+  transform: translateY(3px); border-bottom-width: 2px; margin-bottom: 3px; filter: none;
+}
+.gx-icon-btn:not(:disabled):active, .gx-cell:active, .gx-filters button:active, .gx-linked button:active { transform: scale(.94); }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* New screen: content rises in, in reading order. */
+  .gx.is-entering .gx-home > *, .gx.is-entering .gx-auth > *, .gx.is-entering .gx-system, .gx.is-entering .gx-qcol, .gx.is-entering .gx-stim, .gx.is-entering .gx-rail, .gx.is-entering .gx-review-main > * {
+    animation: gx-in-up .42s cubic-bezier(.22, 1, .36, 1) both;
+  }
+  .gx.is-entering .gx-home > :nth-child(2), .gx.is-entering .gx-auth > :nth-child(2), .gx.is-entering .gx-qcol { animation-delay: .06s; }
+  .gx.is-entering .gx-home > :nth-child(3), .gx.is-entering .gx-rail { animation-delay: .12s; }
+  .gx.is-entering .gx-home > :nth-child(4) { animation-delay: .18s; }
+  .gx.is-entering .gx-home > :nth-child(n + 5) { animation-delay: .24s; }
+
+  /* Bars, meters, rings and chart lines fill in on arrival. */
+  .gx.is-entering .gx-meter-bar i, .gx.is-entering .gx-bars i, .gx.is-entering .gx-seg i {
+    transform-origin: left center; animation: gx-grow-x .9s cubic-bezier(.22, 1, .36, 1) .2s both;
+  }
+  .gx.is-entering svg g[transform^="rotate(-90"] circle:not([stroke-opacity]) { animation: gx-ring 1.1s cubic-bezier(.22, 1, .36, 1) .15s both; }
+  .gx.is-entering .gx-draw, .gx-stim.is-next .gx-draw { stroke-dasharray: 1; animation: gx-draw 1s cubic-bezier(.45, 0, .2, 1) .2s both; }
+  .gx.is-entering .gx-line circle, .gx-stim.is-next .gx-line circle, .gx.is-entering .gx-line .gx-line-value, .gx-stim.is-next .gx-line .gx-line-value { animation: gx-fade .4s ease 1s both; }
+  .gx.is-entering .gx-seal-chip.is-earned { animation: gx-pop-in .45s cubic-bezier(.34, 1.4, .64, 1) .3s both; }
+  .gx.is-entering .gx-seal-chip.is-earned:nth-child(odd) { animation-delay: .4s; }
+  .gx.is-entering .gx-avatar, .gx.is-entering .gx-brand svg { animation: gx-pop-in .5s cubic-bezier(.34, 1.4, .64, 1) .1s both; }
+
+  /* Next question: the question column slides in; choices and tiles follow one by one. */
+  .gx-qcol.is-next, .gx-review-main.is-next { animation: gx-in-right .32s cubic-bezier(.22, 1, .36, 1) both; }
+  .gx-stim.is-next { animation: gx-in-up .36s cubic-bezier(.22, 1, .36, 1) both; }
+  .gx-qcol.is-next .gx-choice, .gx.is-entering .gx-qcol .gx-choice { animation: gx-in-up .3s cubic-bezier(.22, 1, .36, 1) both; }
+  .gx-qcol.is-next .gx-choice:nth-child(2), .gx.is-entering .gx-qcol .gx-choice:nth-child(2) { animation-delay: .04s; }
+  .gx-qcol.is-next .gx-choice:nth-child(3), .gx.is-entering .gx-qcol .gx-choice:nth-child(3) { animation-delay: .08s; }
+  .gx-qcol.is-next .gx-choice:nth-child(4), .gx.is-entering .gx-qcol .gx-choice:nth-child(4) { animation-delay: .12s; }
+  .gx-qcol.is-next .gx-tile, .gx.is-entering .gx-qcol .gx-tile { animation: gx-pop-in .34s cubic-bezier(.34, 1.4, .64, 1) both; }
+  .gx-qcol.is-next .gx-tile:nth-child(2) { animation-delay: .05s; }
+  .gx-qcol.is-next .gx-tile:nth-child(3) { animation-delay: .1s; }
+  .gx-qcol.is-next .gx-tile:nth-child(4) { animation-delay: .15s; }
+  .gx-qcol.is-next .gx-tile:nth-child(n + 5) { animation-delay: .2s; }
+
+  /* Picking an answer or flagging gives a small pop. */
+  .gx-choice.is-popping { animation: gx-pop .24s ease-out; }
+  .gx-choice.is-popping .gx-key { animation: gx-key-pop .3s cubic-bezier(.34, 1.6, .64, 1); }
+  .gx-btn.is-flag.is-popping svg { animation: gx-key-pop .32s cubic-bezier(.34, 1.6, .64, 1); }
+
+  /* Practice check: right answer bounces, wrong pick shakes. */
+  .is-just-checked .gx-choice.is-correct { animation: gx-bounce .5s cubic-bezier(.34, 1.4, .64, 1); }
+  .is-just-checked .gx-choice.is-wrong { animation: gx-shake .42s ease-in-out; }
+  .gx-streak svg { transform-origin: 50% 80%; }
+  .gx.is-entering .gx-streak svg { animation: gx-flame .6s ease-in-out .3s 2; }
+
+  /* Pop-ups and toasts. */
+  .gx-backdrop.is-entering { animation: gx-fade .2s ease both; }
+  .gx-backdrop.is-entering .gx-modal { animation: gx-modal-in .32s cubic-bezier(.22, 1, .36, 1) both; }
+  .toast.is-entering { animation: gx-in-up .3s cubic-bezier(.22, 1, .36, 1) both; }
+
+  /* Earned seal: the ring stamps down and confetti bursts from it. Timer pulses once per minute near the end. */
+  .gx.is-entering .gx-result-hero.is-passed > svg { animation: gx-stamp .7s cubic-bezier(.34, 1.3, .64, 1) .35s both; }
+  .gx-timer.is-pulse { animation: gx-timer-pulse .5s ease-out; }
+}
+.gx-result-hero { position: relative; overflow: visible; }
+.gx-confetti { position: absolute; left: 120px; top: 110px; width: 0; height: 0; pointer-events: none; z-index: 2; }
+.gx-confetti i { position: absolute; width: 10px; height: 14px; border-radius: 3px; animation: gx-confetti 1.6s cubic-bezier(.2, .7, .3, 1) var(--d) both; }
+.gx-timer { transition: border-color .3s ease, background-color .3s ease; }
+.gx-timer.is-low { border-color: var(--warn); }
+.gx-timer.is-low .exam-time-value { color: var(--warn); }
+.gx-timer.is-critical { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, var(--surface)); }
+.gx-timer.is-critical .exam-time-value { color: var(--bad); }
+@media (max-width: 900px) { .gx-confetti { left: 50%; top: 100px; } }
+@media (prefers-reduced-motion: reduce) {
+  /* Gentler path: no movement, but arrivals and feedback still fade so changes stay legible. */
+  .gx.is-entering .gx-home > *, .gx.is-entering .gx-qcol, .gx.is-entering .gx-stim, .gx-qcol.is-next, .gx-review-main.is-next, .gx-stim.is-next, .gx-backdrop.is-entering .gx-modal, .toast.is-entering { animation: gx-fade .18s ease both; }
+  .gx-btn:active, .gx-choice:active, .gx-version:active, .gx-choicecard:active { transform: none; }
+}

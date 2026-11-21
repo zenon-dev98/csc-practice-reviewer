@@ -186,6 +186,7 @@
   };
 
   const root = document.getElementById("app");
+  new MutationObserver(() => gxAfterRender()).observe(root, { childList: true });
   root.dataset.inputMode = "pointer";
 
   function boot() {
@@ -1468,7 +1469,7 @@
     pad.left = Math.max(pad.left, 22 + Math.max(...ticks.map((tick) => fmt(tick).length)) * 13);
     return `<svg class="gx-line" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeAttr(stimulus.alt || stimulus.altText || stimulus.title || "Line graph")}">
       ${ticks.map((tick) => `<line class="gx-line-grid" x1="${pad.left}" x2="${width - pad.right}" y1="${y(tick)}" y2="${y(tick)}"/><text x="${pad.left - 8}" y="${y(tick) + 4}" text-anchor="end">${fmt(tick)}</text>`).join("")}
-      ${series.map((entry, seriesIndex) => `<polyline fill="none" stroke="${entry.color}" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" points="${entry.values.map((value, index) => `${x(index)},${y(value)}`).join(" ")}"/>
+      ${series.map((entry, seriesIndex) => `<polyline class="gx-draw" pathLength="1" fill="none" stroke="${entry.color}" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" points="${entry.values.map((value, index) => `${x(index)},${y(value)}`).join(" ")}"/>
         ${entry.values.map((value, index) => {
           const other = series[seriesIndex === 0 ? 1 : 0]?.values[index];
           const below = series.length > 1 && other !== undefined && (seriesIndex === 0 ? value < other : value <= other);
@@ -1551,7 +1552,7 @@
     recordAttemptEvent(attempt, "answer-checked", { choice: answer.selected_choice, correct });
     touchAnswer(attempt, answer.question_id);
     touchAttempt(attempt);
-    playSound(correct ? "confirmation" : "warning");
+    playSound(correct ? "correct" : "wrong");
     renderExam();
   }
 
@@ -1645,6 +1646,91 @@
   }
 
   // ---- Game-style signed-in screens (stage 3): shared shell, Home, Results, Review. ----
+  // ---- Motion: animate real changes only (new screen, question, pick, check, pop-up), never routine re-renders. ----
+  function gxReducedMotion() {
+    return Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
+  }
+
+  function gxAfterRender() {
+    const gx = root.querySelector(".gx");
+    if (!gx) return;
+    const view = app.view || {};
+    const attempt = view.attemptId ? getAttempt(view.attemptId) : null;
+    const motion = app.gxMotion || (app.gxMotion = {});
+    const screen = [view.name, view.attemptId || "", app.practiceReviewTab || "", app.recentTab || "", view.name === "review" ? app.reviewFilter : ""].join("|");
+    const current = view.name === "exam" && attempt ? currentAnswer(attempt) : null;
+    const question = current ? current.question_id : view.name === "review" ? String(view.index || 0) : "";
+    if (screen !== motion.screen) {
+      gx.classList.add("is-entering");
+      gxCountUp(gx);
+      if (view.name === "results") gxCelebrate(gx);
+    } else if (question && question !== motion.question) {
+      gx.querySelector(".gx-qcol, .gx-review-main")?.classList.add("is-next");
+      const stimulus = current?.stimulus?.id || "";
+      if (stimulus && stimulus !== motion.stimulus) gx.querySelector(".gx-stim")?.classList.add("is-next");
+    }
+    if (current) {
+      const sameQuestion = question === motion.question;
+      if (sameQuestion && current.selected_choice && current.selected_choice !== motion.choice) gx.querySelector(`.gx-choice[data-choice="${current.selected_choice}"]`)?.classList.add("is-popping");
+      const checked = attempt.mode === "practice" && gxChecked(current);
+      if (checked && !(sameQuestion && motion.checked)) gx.querySelector(".gx-qcol")?.classList.add("is-just-checked");
+      if (sameQuestion && current.flagged !== motion.flagged) gx.querySelector(".gx-btn.is-flag")?.classList.add("is-popping");
+      motion.choice = current.selected_choice;
+      motion.checked = checked;
+      motion.flagged = current.flagged;
+      motion.stimulus = current.stimulus?.id || "";
+    }
+    if (app.modal && app.modal !== motion.modal) gx.querySelector(".gx-backdrop")?.classList.add("is-entering");
+    if (app.toast && app.toast !== motion.toast) gx.querySelector(".toast")?.classList.add("is-entering");
+    // Safety net: if the browser pauses animations (background tab, throttled pane), never leave content hidden.
+    clearTimeout(motion.cleanup);
+    motion.cleanup = setTimeout(() => gx.querySelectorAll(".is-entering, .is-next, .is-popping, .is-just-checked").forEach((element) => element.classList.remove("is-entering", "is-next", "is-popping", "is-just-checked")) || gx.classList.remove("is-entering"), 1700);
+    motion.modal = app.modal;
+    motion.toast = app.toast;
+    motion.screen = screen;
+    motion.question = question;
+  }
+
+  // Counts plain numbers ("87%", "12", "3 of 20") up from zero; times like 1:23:45 are left alone.
+  function gxCountUp(scope) {
+    if (gxReducedMotion()) return;
+    const targets = scope.querySelectorAll(".gx-stats strong, .gx-meter > strong, .gx-seal-num, .gx-streak b, [data-count]");
+    targets.forEach((element) => {
+      const node = [...element.childNodes].find((child) => child.nodeType === 3 && /\d/.test(child.nodeValue));
+      const match = node?.nodeValue.match(/^(\D*?)(\d[\d,]*)(\D*)$/);
+      if (!match) return;
+      const end = Number(match[2].replace(/,/g, ""));
+      if (!Number.isFinite(end) || end < 2) return;
+      const started = performance.now();
+      const duration = 700 + Math.min(500, end * 4);
+      const step = (now) => {
+        const t = Math.min(1, (now - started) / duration);
+        const value = Math.round(end * (1 - (1 - t) ** 3));
+        node.nodeValue = `${match[1]}${value.toLocaleString("en-US")}${match[3]}`;
+        if (t < 1 && node.isConnected) requestAnimationFrame(step);
+      };
+      // Start from the first painted frame, and always land on the true value even if frames are throttled.
+      const finalText = node.nodeValue;
+      requestAnimationFrame(step);
+      setTimeout(() => { if (node.isConnected) node.nodeValue = finalText; }, duration + 150);
+    });
+  }
+
+  // A passed mock earns its seal: stamp the ring, burst confetti once, play the fanfare.
+  function gxCelebrate(scope) {
+    const hero = scope.querySelector(".gx-result-hero.is-passed");
+    if (!hero) return;
+    playSound("fanfare");
+    if (gxReducedMotion()) return;
+    const colors = ["var(--primary)", "var(--general)", "var(--verbal)", "var(--numerical)", "var(--analytical)"];
+    const burst = document.createElement("div");
+    burst.className = "gx-confetti";
+    burst.setAttribute("aria-hidden", "true");
+    burst.innerHTML = Array.from({ length: 36 }, (_, i) => `<i style="--x: ${(Math.random() * 2 - 1).toFixed(2)}; --y: ${(0.6 + Math.random() * 0.8).toFixed(2)}; --r: ${Math.round(Math.random() * 720 - 360)}deg; --d: ${(Math.random() * 0.25).toFixed(2)}s; background: ${colors[i % colors.length]}"></i>`).join("");
+    hero.appendChild(burst);
+    setTimeout(() => burst.remove(), 2200);
+  }
+
   function gxStudyStreak() {
     const days = new Set();
     for (const attempt of app.attempts || []) {
@@ -2040,7 +2126,7 @@
       ${[0, 50, 100].map((tick) => `<line class="gx-line-grid" x1="${pad.left}" x2="${width - pad.right}" y1="${y(tick)}" y2="${y(tick)}"/><text x="${pad.left - 8}" y="${y(tick) + 4}" text-anchor="end">${tick}%</text>`).join("")}
       <line x1="${pad.left}" x2="${width - pad.right}" y1="${y(PASSING_PERCENT)}" y2="${y(PASSING_PERCENT)}" stroke="var(--primary)" stroke-width="2" stroke-dasharray="6 6"/>
       <text x="${width - pad.right}" y="${y(PASSING_PERCENT) - 6}" text-anchor="end" fill="var(--primary)">80% pass</text>
-      <polyline fill="none" stroke="var(--select)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" points="${points.map((point) => `${point.x},${point.y}`).join(" ")}"/>
+      <polyline class="gx-draw" pathLength="1" fill="none" stroke="var(--select)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" points="${points.map((point) => `${point.x},${point.y}`).join(" ")}"/>
       ${points.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="6" fill="${point.practice ? "var(--surface)" : "var(--select)"}" stroke="var(--select)" stroke-width="3"/><text class="gx-line-value" x="${point.x}" y="${point.y - 12}" text-anchor="middle">${point.value}</text>`).join("")}
     </svg>
     <p class="gx-muted">Filled dots are mock exams, hollow dots are practice sets. Last ${runs.length} runs.</p>`;
@@ -3183,7 +3269,7 @@
   }
 
   function loadAudioPreferences() {
-    const defaults = { music: false, sfx: false, musicVolume: 0.24, sfxVolume: 0.38, category: "cafe", trackIndex: 0, shuffle: true, muted: false };
+    const defaults = { music: false, sfx: true, musicVolume: 0.24, sfxVolume: 0.38, category: "cafe", trackIndex: 0, shuffle: true, muted: false };
     try {
       const saved = JSON.parse(localStorage.getItem(AUDIO_PREFS_KEY) || "null");
       const preferences = saved ? { ...defaults, ...saved } : defaults;
@@ -3312,7 +3398,11 @@
       navigation: [[420, 0.045, "sine", 0.035]],
       selection: [[620, 0.055, "triangle", 0.04], [820, 0.045, "triangle", 0.025]],
       confirmation: [[520, 0.07, "sine", 0.04], [780, 0.1, "sine", 0.035]],
-      warning: [[220, 0.11, "triangle", 0.045], [180, 0.13, "triangle", 0.035]]
+      warning: [[220, 0.11, "triangle", 0.045], [180, 0.13, "triangle", 0.035]],
+      correct: [[660, 0.07, "triangle", 0.05], [880, 0.08, "triangle", 0.05], [1175, 0.16, "sine", 0.04]],
+      wrong: [[196, 0.12, "square", 0.025], [147, 0.2, "triangle", 0.04]],
+      pop: [[900, 0.04, "sine", 0.03]],
+      fanfare: [[523, 0.12, "triangle", 0.05], [659, 0.12, "triangle", 0.05], [784, 0.12, "triangle", 0.05], [1047, 0.35, "sine", 0.05]]
     };
     const sequence = definitions[kind] || definitions.navigation;
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -4497,7 +4587,20 @@
   function updateExamTimerDom(attempt) {
     const timer = document.querySelector(".exam-time-value");
     const answered = document.querySelector(".exam-answered-value");
-    if (timer && attempt.options?.showTimer !== false) timer.textContent = formatDuration(timeRemaining(attempt));
+    if (timer && attempt.options?.showTimer !== false) {
+      const remaining = Math.max(0, Math.floor(timeRemaining(attempt)));
+      timer.textContent = formatDuration(remaining);
+      const box = timer.closest(".gx-timer");
+      if (box && attempt.total_time_seconds) {
+        box.classList.toggle("is-low", remaining <= 600);
+        box.classList.toggle("is-critical", remaining <= 120);
+        if (remaining <= 600 && remaining % 60 === 0) {
+          box.classList.remove("is-pulse");
+          void box.offsetWidth;
+          box.classList.add("is-pulse");
+        }
+      }
+    }
     if (answered) answered.textContent = String(answeredCount(attempt));
   }
 
@@ -4865,6 +4968,7 @@
     const answer = currentAnswer(attempt);
     if (!answer) return;
     answer.flagged = !answer.flagged;
+    playSound("pop");
     recordAttemptEvent(attempt, answer.flagged ? "flag" : "unflag");
     touchAnswer(attempt, answer.question_id);
     renderExam();

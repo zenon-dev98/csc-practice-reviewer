@@ -56,3 +56,7 @@
 - Abstract reasoning still has many quick letter/number code items; only the 26 word-described figure puzzles became drawn figure series.
 - Answer leak (correct choice is the longest 58% of the time), joke distractors, and cross-mock near-duplicates (audit Q3-Q6) are still open.
 - Pipe/work problems reuse the same number pairs across mocks (10 and 15 days, 12 and 18 hours).
+
+## Motion follow-ups (2026-11-21)
+
+- Motion timing was verified by class triggers and end states only: the in-app browser pane was hidden, so animation frames were throttled, and Playwright (needed for impeccable motion-capture or qa:motion) is not installed. Watch it once in a visible browser, including with reduced motion turned on in the OS.
