@@ -616,7 +616,7 @@
       mode: "full",
       title: "Mock Exam",
       practice_category: null,
-      exam_version_id: "fixture-version-1",
+      exam_version_id: examVersions[6]?.id || "fixture-version-1",
       status: options.status,
       started_at: "2026-07-04T06:00:00.000Z",
       submitted_at: completed ? "2026-07-04T08:54:00.000Z" : null,
@@ -1185,151 +1185,6 @@
     `);
   }
 
-  function renderDashboard() {
-    const attempts = app.attempts;
-    const completed = completedAttempts();
-    const activeAttempt = attempts.find((attempt) => attempt.status === "in_progress" || attempt.status === "paused");
-    const totalFlagged = attempts.reduce((sum, attempt) => sum + flaggedCount(attempt), 0);
-    const totalMistakes = wrongAnswerCount(completed);
-    const fullMocks = completed.filter((attempt) => attempt.mode === "full");
-    const bestFull = fullMocks.reduce((best, attempt) => Math.max(best, resultPercent(attempt)), 0);
-    const latestCompleted = completed.slice().sort((a, b) => new Date(b.submitted_at || b.started_at) - new Date(a.submitted_at || a.started_at))[0];
-    const hubSections = [
-      { section: "General Information", label: "General", tone: "general", icon: "book-open-text" },
-      { section: "Verbal Ability", label: "Verbal", tone: "verbal", icon: "message-square" },
-      { section: "Numerical Ability", label: "Numerical", tone: "numerical", icon: "calculator" },
-      { section: "Analytical Ability", label: "Analytical", tone: "analytical", icon: "brain-circuit" }
-    ];
-    const activeAnswers = activeAttempt ? Object.values(activeAttempt.answers) : [];
-    const activeAnswered = activeAttempt ? answeredCount(activeAttempt) : 0;
-    const activeTotal = activeAttempt?.total_questions || 170;
-    const completion = activeTotal ? Math.round((activeAnswered / activeTotal) * 100) : 0;
-    const sectionRows = hubSections.map((entry) => {
-      const related = activeAnswers.filter((answer) => answer.section === entry.section);
-      const answered = related.filter((answer) => answer.selected_choice).length;
-      const group = SECTION_GROUPS.find((candidate) => candidate.section === entry.section);
-      const total = related.length || (group ? group.end - group.start + 1 : 0);
-      return { ...entry, answered, total, progress: total ? Math.round((answered / total) * 100) : 0 };
-    });
-    const firstName = String(displayName(app.profile) || "Reviewer").trim().split(/\s+/)[0] || "Reviewer";
-    const activeVersion = activeAttempt ? examVersions.find((version) => version.id === activeAttempt.exam_version_id) : null;
-    const activeVersionNumber = app.fixtureMode ? 7 : activeVersion?.number;
-    const runTitle = activeAttempt?.mode === "practice"
-      ? "Practice"
-      : activeAttempt && activeVersionNumber
-        ? `Mock Exam ${String(activeVersionNumber).padStart(2, "0")}`
-        : activeAttempt ? examTitle(activeAttempt) : "Mock Exam";
-    const runAction = activeAttempt ? "resume-exam" : "open-setup";
-    const runActionLabel = activeAttempt ? "Resume Exam" : "Start New Mock Exam";
-    const runTime = activeAttempt
-      ? activeAttempt.total_time_seconds ? formatDuration(timeRemaining(activeAttempt)) : "Untimed"
-      : formatDuration(TOTAL_TIME_SECONDS);
-    const runCheckpoint = activeAttempt ? `Item ${activeAttempt.current_question_index + 1}` : "Ready to begin";
-    root.innerHTML = authedShell(`
-      <section class="study-hub simplified-hub" data-motion-purpose="page-enter">
-        <div class="hub-grid-pattern" aria-hidden="true"></div>
-        <div class="hub-stage">
-          <header class="hub-hero">
-            <h1><span>Lock in.</span> <em>Keep moving.</em></h1>
-            <p>Welcome back, ${escapeHtml(firstName)}.</p>
-          </header>
-
-          <div class="hub-primary-grid">
-            <section class="hub-panel hub-run-panel">
-              <div class="hub-panel-title hub-run-title">
-                ${localIcon("target")}
-                <div><span>${activeAttempt ? "Active Mock Exam" : "Ready for a Mock Exam"}</span><h2>${escapeHtml(runTitle)}</h2></div>
-                <span class="hub-scan-lines" aria-hidden="true"></span>
-              </div>
-              <div class="hub-run-body">
-                <div class="hub-ring" style="--hub-completion:${completion * 3.6}deg" aria-label="${activeAnswered} of ${activeTotal} questions answered" tabindex="0">
-                  <span class="hub-ring-progress" aria-hidden="true"></span>
-                  <div class="hub-ring-core">
-                    <strong>${activeAnswered}</strong>
-                    <span>/ ${activeTotal}</span>
-                    <small>questions<br />completed</small>
-                  </div>
-                </div>
-                <div class="hub-run-details">
-                  <div class="hub-time-row">
-                    ${localIcon("timer")}
-                    <span>${activeAttempt?.total_time_seconds === null ? "Practice mode" : "Time remaining"}</span>
-                    <strong>${escapeHtml(runTime)}</strong>
-                  </div>
-                  <div class="hub-checkpoints">
-                    <div class="hub-section-context">
-                      <strong>Exam Sections</strong>
-                      <small>Current attempt completion</small>
-                    </div>
-                    ${sectionRows.map((entry) => `
-                      <div class="hub-checkpoint ${entry.tone}">
-                        <span class="hub-checkpoint-icon">${localIcon(entry.icon)}</span>
-                        ${entry.answered ? `<i class="hub-checkpoint-check">${localIcon("circle-check")}</i>` : ""}
-                        <strong>${escapeHtml(entry.label)}</strong>
-                        <small>${entry.total ? `${entry.answered} / ${entry.total}` : "No items"}</small>
-                      </div>
-                    `).join("")}
-                  </div>
-                  <div class="hub-run-status"><span>Current checkpoint <strong>${escapeHtml(runCheckpoint)}</strong></span></div>
-                  <button class="hub-resume-button" data-action="${runAction}" type="button">
-                    <i aria-hidden="true"></i>
-                    <span>${escapeHtml(runActionLabel)}</span>
-                    <span class="hub-chevron-stack" aria-hidden="true">${localIcon("chevron-right")}${localIcon("chevron-right")}${localIcon("chevron-right")}</span>
-                  </button>
-                </div>
-              </div>
-            </section>
-
-            <section class="hub-panel hub-records-panel">
-              <div class="hub-panel-title">
-                ${localIcon("target")}
-                <h2>Your Records</h2>
-                <span class="hub-scan-lines" aria-hidden="true"></span>
-              </div>
-              <div class="hub-record-list">
-                <span class="hub-record-rail" aria-hidden="true"></span>
-                <div class="hub-record teal">
-                  <span>${localIcon("trophy")}</span>
-                  <p><strong>Best Mock Score</strong><small>${fullMocks.length ? "Across completed mock exams" : "Complete a mock exam"}</small></p>
-                  <b>${fullMocks.length ? `${Math.round(bestFull)}%` : "--"}</b>
-                </div>
-                <div class="hub-record blue">
-                  <span>${localIcon("history")}</span>
-                  <p><strong>Latest Mock Score</strong><small>${latestCompleted ? escapeHtml(examTitle(latestCompleted)) : "No completed attempt"}</small></p>
-                  <b>${latestCompleted ? `${Math.round(resultPercent(latestCompleted))}%` : "--"}</b>
-                </div>
-                <div class="hub-record green">
-                  <span>${localIcon("circle-check")}</span>
-                  <p><strong>Completed Sessions</strong><small>Mock exams and practice</small></p>
-                  <b>${completed.length}</b>
-                </div>
-              </div>
-              <button class="hub-record-foot" data-action="recent-page" type="button">${localIcon("history")} View Progress ${localIcon("chevron-right")}</button>
-            </section>
-          </div>
-
-          <section class="hub-action-dock" aria-label="Choose your next mode">
-            <button class="hub-mode full" data-action="open-setup" type="button">
-              ${localIcon("target")}
-              <span><strong>Start New Mock Exam</strong><small>170 questions / 3 hours 10 minutes</small></span>
-              <span class="hub-chevron-stack" aria-hidden="true">${localIcon("chevron-right")}${localIcon("chevron-right")}</span>
-            </button>
-            <button class="hub-mode practice" data-action="practice-page" type="button">
-              ${localIcon("brain-circuit")}
-              <span><strong>Practice</strong><small>Choose a section, length, and difficulty</small></span>
-              <span class="hub-chevron-stack" aria-hidden="true">${localIcon("chevron-right")}${localIcon("chevron-right")}</span>
-            </button>
-            <button class="hub-mode mistakes" data-action="mistakes-page" type="button">
-              ${localIcon("notebook-tabs")}
-              <span><strong>Review</strong><small>${totalMistakes} mistakes / ${totalFlagged} flagged</small></span>
-              <span class="hub-chevron-stack" aria-hidden="true">${localIcon("chevron-right")}${localIcon("chevron-right")}</span>
-            </button>
-          </section>
-        </div>
-      </section>
-    `, "dashboard");
-  }
-
   function renderSetup() {
     const draftOptions = { ...DEFAULT_OPTIONS, ...(app.draft?.options || {}) };
     const savedVersionId = draftOptions.versionId || examVersions[0]?.id;
@@ -1776,6 +1631,377 @@
       </div>`;
   }
 
+  // ---- Game-style signed-in screens (stage 3): shared shell, Home, Results, Review. ----
+  function gxStudyStreak() {
+    const days = new Set();
+    for (const attempt of app.attempts || []) {
+      for (const stamp of [attempt.started_at, attempt.submitted_at, attempt.updated_at]) {
+        if (!stamp) continue;
+        const date = new Date(stamp);
+        if (!Number.isNaN(date.getTime())) days.add(date.toDateString());
+      }
+    }
+    const cursor = new Date();
+    if (!days.has(cursor.toDateString())) cursor.setDate(cursor.getDate() - 1);
+    let streak = 0;
+    while (days.has(cursor.toDateString())) {
+      streak += 1;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    return streak;
+  }
+
+  function gxShell(content, active = "dashboard") {
+    const route = active === "results" || active === "review" ? "recent" : active;
+    const routes = [
+      ["dashboard", "Home", "dashboard"],
+      ["setup", "Mock exams", "setup-page"],
+      ["practice", "Practice", "practice-page"],
+      ["recent", "Progress", "recent-page"]
+    ];
+    const theme = gxTheme();
+    const streak = gxStudyStreak();
+    const name = displayName(app.profile) || "Reviewer";
+    const preset = avatarOption(app.profile?.avatar_preset);
+    const tabIcons = {
+      dashboard: `<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>`,
+      setup: `<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>`,
+      practice: `<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>`,
+      recent: `<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>`
+    };
+    return `
+      <div class="gx" data-theme="${theme}">
+        <div class="gx-page">
+          <header class="gx-appbar">
+            <strong class="gx-brand"><svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="var(--primary)"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="var(--on-primary)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>CSC Reviewer</span></strong>
+            <nav class="gx-navlinks" aria-label="Main">
+              ${routes.map(([key, label, action]) => `<button class="${route === key ? "is-active" : ""}" data-action="${action}" type="button" ${route === key ? "aria-current=\"page\"" : ""}>${label}</button>`).join("")}
+            </nav>
+            <div class="gx-appbar-end">
+              ${streak > 0 ? `<span class="gx-streak" title="Days in a row with practice"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5 .2 2 1 3 2 3.5C11 9 11 5.5 12 2z"/></svg>${streak}-day streak</span>` : ""}
+              <button class="gx-icon-btn" data-action="toggle-theme" type="button" aria-label="Switch to ${theme === "light" ? "dark" : "light"} theme">${gxIcon(theme === "light" ? "moon" : "sun")}</button>
+              <div class="header-audio-control"><button class="gx-icon-btn header-audio-button" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${gxIcon("music")}</button>${audioPopover()}</div>
+              <button class="gx-avatar" data-action="account-settings" type="button" aria-label="Account settings for ${escapeAttr(name)}">${preset ? `<span class="gx-avatar-sprite" style="--avatar-x: ${preset.x}%; --avatar-y: ${preset.y}%" aria-hidden="true"></span>` : escapeHtml(name.trim().charAt(0).toUpperCase() || "R")}</button>
+            </div>
+          </header>
+          <main class="gx-pagebody">${content}</main>
+          <nav class="gx-tabbar" aria-label="Main">
+            ${routes.map(([key, label, action]) => `<button class="${route === key ? "is-active" : ""}" data-action="${action}" type="button" ${route === key ? "aria-current=\"page\"" : ""}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${tabIcons[key]}</svg><span>${label === "Mock exams" ? "Exams" : label}</span></button>`).join("")}
+          </nav>
+        </div>
+        ${profileModal()}${passwordModal()}${confirmationModal()}${toast()}
+      </div>`;
+  }
+
+  function gxSealRing(segments, size, center) {
+    const r = 60;
+    const circumference = 2 * Math.PI * r;
+    const total = segments.reduce((sum, segment) => sum + segment.total, 0) || 1;
+    let offset = 0;
+    const rings = segments.map((segment) => {
+      const length = (segment.total / total) * circumference;
+      const done = (segment.done / Math.max(1, segment.total)) * length;
+      const gap = segments.length > 1 ? 2 : 0;
+      const tone = `var(--${gxTone(segment.section)})`;
+      const out = `<circle cx="80" cy="80" r="${r}" stroke="${tone}" stroke-opacity=".22" stroke-dasharray="${Math.max(0, length - gap).toFixed(1)} 400" stroke-dashoffset="${(-offset).toFixed(1)}"/>`
+        + (done > 0 ? `<circle cx="80" cy="80" r="${r}" stroke="${tone}" stroke-dasharray="${Math.max(0, Math.min(done, length - gap)).toFixed(1)} 400" stroke-dashoffset="${(-offset).toFixed(1)}"/>` : "");
+      offset += length;
+      return out;
+    }).join("");
+    return `<svg width="${size}" height="${size}" viewBox="0 0 160 160" aria-hidden="true">
+      <circle cx="80" cy="80" r="74" fill="none" stroke="var(--line-strong)" stroke-width="3" stroke-dasharray="3 6"/>
+      <g transform="rotate(-90 80 80)" fill="none" stroke-width="14">${rings}</g>
+      ${center}
+    </svg>`;
+  }
+
+  function gxSealShelf() {
+    const fullAttempts = completedAttempts().filter((attempt) => attempt.mode === "full");
+    const active = (app.attempts || []).find((attempt) => (attempt.status === "in_progress" || attempt.status === "paused") && attempt.mode === "full");
+    const versions = examVersions.map((version, index) => {
+      const runs = fullAttempts.filter((attempt) => attempt.exam_version_id === version.id);
+      const best = runs.reduce((max, attempt) => Math.max(max, resultPercent(attempt)), 0);
+      return { id: version.id, number: version.number || index + 1, runs: runs.length, best, earned: runs.length > 0 && best >= PASSING_PERCENT, active: active?.exam_version_id === version.id };
+    });
+    const earned = versions.filter((version) => version.earned);
+    return { versions, earned };
+  }
+
+  function gxSectionTotals() {
+    const totals = new Map(SECTION_GROUPS.map((group) => [group.section, { section: group.section, label: group.label, correct: 0, total: 0 }]));
+    for (const attempt of completedAttempts()) {
+      for (const stat of sectionStats(attempt)) {
+        const row = totals.get(stat.section);
+        if (!row) continue;
+        row.correct += stat.correct;
+        row.total += stat.total;
+      }
+    }
+    return [...totals.values()].map((row) => ({ ...row, percent: row.total ? (row.correct / row.total) * 100 : null }));
+  }
+
+  function renderDashboard() {
+    const attempts = app.attempts || [];
+    const active = attempts.find((attempt) => attempt.status === "in_progress" || attempt.status === "paused");
+    const completed = completedAttempts();
+    const firstName = String(displayName(app.profile) || "Reviewer").trim().split(/\s+/)[0] || "Reviewer";
+    const shelf = gxSealShelf();
+    const sections = gxSectionTotals();
+    const measured = sections.filter((row) => row.percent !== null);
+    const weakest = measured.slice().sort((a, b) => a.percent - b.percent)[0];
+    const mistakes = wrongAnswerCount(completed);
+    const flagged = attempts.reduce((sum, attempt) => sum + flaggedCount(attempt), 0);
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+
+    let hero;
+    if (active) {
+      const version = examVersions.find((candidate) => candidate.id === active.exam_version_id);
+      const title = active.mode === "practice" ? escapeHtml(active.title || "Practice set") : `Mock Exam ${String(app.fixtureMode ? 7 : version?.number || 1).padStart(2, "0")}`;
+      const groups = gxSectionGroups(active);
+      const answered = answeredCount(active);
+      const current = Object.values(active.answers).find((answer) => answer.position === active.current_question_index);
+      const center = `<circle cx="80" cy="80" r="44" fill="var(--surface-2)"/><text x="80" y="80" text-anchor="middle" font-weight="900" font-size="30" fill="var(--text)">${answered}</text><text x="80" y="100" text-anchor="middle" font-weight="800" font-size="13" fill="var(--muted)">of ${active.total_questions}</text>`;
+      hero = `
+        <section class="gx-card gx-hero">
+          ${gxSealRing(groups.map((group) => ({ section: group.section, total: group.answers.length, done: group.answers.filter((answer) => answer.selected_choice).length })), 184, center)}
+          <div class="gx-hero-text">
+            <h1>Finish ${title}</h1>
+            <p>You stopped at question ${active.current_question_index + 1}${current ? ` in ${escapeHtml(current.section)}` : ""}${active.total_time_seconds ? ` with ${formatDuration(timeRemaining(active))} left on the clock` : ""}.${active.mode === "practice" ? "" : " Score 80% to earn this seal."}</p>
+            <div class="gx-row">
+              <button class="gx-btn is-primary" data-action="resume-exam" type="button">RESUME</button>
+              <button class="gx-btn" data-action="open-setup" type="button">New mock exam</button>
+            </div>
+          </div>
+        </section>`;
+    } else {
+      const center = `<circle cx="80" cy="80" r="44" fill="var(--primary)"/><text x="80" y="88" text-anchor="middle" font-weight="900" font-size="26" fill="var(--on-primary)">170</text>`;
+      hero = `
+        <section class="gx-card gx-hero">
+          ${gxSealRing(SECTION_GROUPS.map((group) => ({ section: group.section, total: group.end - group.start + 1, done: 0 })), 184, center)}
+          <div class="gx-hero-text">
+            <h1>${completed.length ? "Ready for your next mock?" : "Start your first mock exam"}</h1>
+            <p>170 questions in 3 hours 10 minutes, just like the Professional exam. Score 80% or more to earn the seal for that mock.</p>
+            <div class="gx-row">
+              <button class="gx-btn is-primary" data-action="open-setup" type="button">START MOCK EXAM</button>
+              <button class="gx-btn" data-action="practice-page" type="button">Quick practice</button>
+            </div>
+          </div>
+        </section>`;
+    }
+
+    const content = `
+      <div class="gx-home">
+        <h1 class="gx-greeting">${greeting}, ${escapeHtml(firstName)}</h1>
+        <div class="gx-split">
+          ${hero}
+          <section class="gx-card gx-shelf" aria-label="Your seals">
+            <div class="gx-card-head"><h2>Your seals</h2><strong class="gx-accent">${shelf.earned.length} of ${shelf.versions.length}</strong></div>
+            <div class="gx-shelf-grid">
+              ${shelf.versions.map((version) => {
+                const label = String(version.number).padStart(2, "0");
+                const state = version.earned ? "is-earned" : version.active ? "is-active" : version.runs ? "is-tried" : "";
+                const title = version.earned ? `Mock ${label}: earned with ${Math.round(version.best)}%` : version.active ? `Mock ${label}: in progress` : version.runs ? `Mock ${label}: best ${Math.round(version.best)}%, not yet 80%` : `Mock ${label}: not taken`;
+                return `<a class="gx-seal-chip ${state}" href="${escapeAttr(routeHref("setup", { version: version.id }))}" title="${escapeAttr(title)}" aria-label="${escapeAttr(title)}"><span>${label}</span></a>`;
+              }).join("")}
+            </div>
+            <p class="gx-muted">${shelf.earned.length ? `Earned: ${shelf.versions.filter((version) => version.earned).map((version) => `${Math.round(version.best)}%`).join(", ")}.` : "Pass a mock with 80% or more to earn its seal."} Tap a seal to take that mock.</p>
+          </section>
+        </div>
+
+        <div class="gx-split">
+          <section class="gx-card">
+            <div class="gx-card-head"><h2>Your sections</h2><span class="gx-muted">Pass line 80%</span></div>
+            <div class="gx-meters">
+              ${sections.map((row) => {
+                const pct = row.percent === null ? null : Math.round(row.percent);
+                const isWeak = weakest && row.section === weakest.section && pct !== null && pct < PASSING_PERCENT;
+                return `<div class="gx-meter" style="${gxToneStyle(row.section)}">
+                  <span class="gx-meter-label">${escapeHtml(row.label)}</span>
+                  <div class="gx-meter-bar"><i style="width: ${pct ?? 0}%"></i><b style="left: ${PASSING_PERCENT}%"></b></div>
+                  <strong class="${pct !== null && pct < PASSING_PERCENT ? "is-warn" : ""}">${pct === null ? "–" : `${pct}%`}</strong>
+                  <button class="gx-btn ${isWeak ? "is-tone" : ""}" data-practice-category="${escapeAttr(row.section)}" type="button">Practice</button>
+                </div>`;
+              }).join("")}
+            </div>
+            <p class="gx-muted">${measured.length ? `From ${completed.length} completed run${completed.length === 1 ? "" : "s"}.${weakest && weakest.percent < PASSING_PERCENT ? ` ${escapeHtml(weakest.label)} needs the most work.` : ""}` : "Finish a mock or practice set to see your section scores."}</p>
+          </section>
+
+          <section class="gx-card gx-sidecard">
+            <div class="gx-card-head"><h2>Review mistakes</h2></div>
+            <p>${mistakes ? `<strong>${mistakes}</strong> wrong answer${mistakes === 1 ? "" : "s"} and <strong>${flagged}</strong> flagged question${flagged === 1 ? "" : "s"} to revisit.` : "No mistakes to review yet."}</p>
+            <button class="gx-btn" data-action="mistakes-page" type="button" ${mistakes || flagged ? "" : "disabled"}>Open review</button>
+            <hr />
+            <div class="gx-card-head"><h2>Take it on paper</h2></div>
+            <p>Print the answer sheet, shade it like exam day, then scan both pages. The app checks every answer.</p>
+            <button class="gx-btn" data-action="gx-paper-setup" type="button">Set up a paper exam</button>
+          </section>
+        </div>
+        <p class="gx-note">Independent practice tool. Not affiliated with or endorsed by the Civil Service Commission.</p>
+      </div>`;
+    root.innerHTML = gxShell(content, "dashboard");
+  }
+
+  function gxSlowTypes(attempt) {
+    const target = attempt.total_time_seconds ? attempt.total_time_seconds / Math.max(1, attempt.total_questions) : TOTAL_TIME_SECONDS / 170;
+    const groups = new Map();
+    for (const answer of Object.values(attempt.answers)) {
+      const key = answer.subtopic || answer.section;
+      const row = groups.get(key) || { label: key, count: 0, wrong: 0, time: 0 };
+      row.count += 1;
+      row.time += answer.time_spent_seconds || 0;
+      if (answer.selected_choice !== answer.correct_choice) row.wrong += 1;
+      groups.set(key, row);
+    }
+    const rows = [...groups.values()].filter((row) => row.count >= 2).map((row) => ({ ...row, average: row.time / row.count }));
+    return { target, rows: rows.sort((a, b) => b.average - a.average).slice(0, 3) };
+  }
+
+  function renderResults() {
+    const attempt = getAttempt(app.view.attemptId);
+    if (!attempt) return setView({ name: "dashboard" });
+    const score = scoreAttempt(attempt);
+    const pct = resultPercent(attempt);
+    const isPractice = attempt.mode === "practice";
+    const passed = pct >= PASSING_PERCENT;
+    const insights = performanceInsights(attempt);
+    const weakestSection = insights.weakest?.section || "Verbal Ability";
+    const stats = sectionStats(attempt);
+    const ordered = isPractice ? stats.filter((stat) => stat.total > 0) : SECTION_GROUPS.map((group) => stats.find((stat) => stat.section === group.section) || { section: group.section, correct: 0, total: group.end - group.start + 1, averageTime: 0 });
+    const version = examVersions.find((candidate) => candidate.id === attempt.exam_version_id);
+    const versionLabel = String(app.fixtureMode ? 7 : version?.number || 1).padStart(2, "0");
+    const previous = completedAttempts()
+      .filter((other) => other.id !== attempt.id && other.mode === attempt.mode && new Date(other.submitted_at || other.started_at) < new Date(attempt.submitted_at || attempt.started_at))
+      .sort((a, b) => new Date(b.submitted_at || b.started_at) - new Date(a.submitted_at || a.started_at))[0];
+    const delta = previous ? Math.round(pct - resultPercent(previous)) : null;
+    const shelf = gxSealShelf();
+    const spare = attempt.total_time_seconds ? Math.max(0, attempt.total_time_seconds - (attempt.elapsed_seconds || 0)) : null;
+    const slow = gxSlowTypes(attempt);
+    const segments = ordered.map((stat) => ({ section: stat.section, total: stat.total, done: stat.correct }));
+    const center = passed && !isPractice
+      ? `<circle cx="80" cy="80" r="44" fill="var(--primary)"/><path d="M62 81l12 12 24-26" fill="none" stroke="var(--on-primary)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>`
+      : `<circle cx="80" cy="80" r="44" fill="var(--surface-2)"/><text x="80" y="90" text-anchor="middle" font-weight="900" font-size="30" fill="var(--text)">${Math.round(pct)}%</text>`;
+    const title = isPractice ? "Practice complete" : passed ? `Seal ${versionLabel} earned!` : "So close. Keep going!";
+    const subtitle = isPractice
+      ? `${score} of ${attempt.total_questions} correct in ${escapeHtml(attempt.practice_category || attempt.title || "this set")}.`
+      : passed ? `You passed Mock Exam ${versionLabel} with ${Math.round(pct)}%. The real exam needs 80%.` : `You scored ${Math.round(pct)}% on Mock Exam ${versionLabel}. ${Math.max(1, Math.ceil(attempt.total_questions * PASSING_PERCENT / 100) - score)} more correct answers would have earned the seal.`;
+    const reviewHref = routeHref("review", { attempt: attempt.id });
+    const practiceHref = routeHref("practice", { category: weakestSection });
+    const retakeHref = routeHref("setup", { version: attempt.exam_version_id });
+    const content = `
+      <div class="gx-home">
+        <section class="gx-card gx-hero gx-result-hero ${passed && !isPractice ? "is-passed" : ""}">
+          ${gxSealRing(segments, 200, center)}
+          <div class="gx-hero-text">
+            <h1>${title}${isPaperAttempt(attempt) ? ` <span class="gx-tag">Paper</span>` : ""}</h1>
+            <p>${subtitle}</p>
+            <div class="gx-stats">
+              <div><strong>${score}<small>/${attempt.total_questions}</small></strong><span>correct</span></div>
+              <div><strong>${formatDuration(attempt.elapsed_seconds || 0)}</strong><span>${spare !== null ? `${Math.round(spare / 60)} min to spare` : "time used"}</span></div>
+              ${delta !== null ? `<div><strong class="${delta >= 0 ? "is-good" : "is-warn"}">${delta >= 0 ? "+" : ""}${delta}%</strong><span>vs. your last ${isPractice ? "set" : "mock"}</span></div>` : ""}
+              ${isPractice ? "" : `<div><strong class="gx-accent">${shelf.earned.length} of ${shelf.versions.length}</strong><span>seals collected</span></div>`}
+            </div>
+          </div>
+        </section>
+
+        <div class="gx-split">
+          <section class="gx-card">
+            <div class="gx-card-head"><h2>How each section went</h2></div>
+            <div class="gx-meters">
+              ${ordered.map((stat) => {
+                const percent = Math.round((stat.correct / Math.max(1, stat.total)) * 100);
+                return `<div class="gx-meter" style="${gxToneStyle(stat.section)}">
+                  <span class="gx-meter-label">${escapeHtml(stat.section.replace(" Information", "").replace(" Ability", ""))}</span>
+                  <div class="gx-meter-bar"><i style="width: ${percent}%"></i><b style="left: ${PASSING_PERCENT}%"></b></div>
+                  <strong class="${percent < PASSING_PERCENT ? "is-warn" : ""}">${stat.correct}/${stat.total}</strong>
+                  <span class="gx-muted">${formatDuration(stat.averageTime || 0)}</span>
+                </div>`;
+              }).join("")}
+            </div>
+            <p class="gx-muted">White line = 80% pass mark. Last column = average time per question.</p>
+          </section>
+          <section class="gx-card gx-sidecard">
+            <div class="gx-card-head"><h2>Where your time went</h2></div>
+            ${slow.rows.length ? slow.rows.map((row) => `<div class="gx-timerow"><span><b>${escapeHtml(row.label)}</b><small>${row.count} items · ${row.wrong} wrong</small></span><strong class="${row.average > slow.target ? "is-warn" : ""}">${formatDuration(row.average)} each</strong></div>`).join("") : `<p class="gx-muted">Not enough timing data in this run.</p>`}
+            <p class="gx-muted">Target pace is about ${formatDuration(slow.target)} per question.</p>
+          </section>
+        </div>
+
+        <div class="gx-row">
+          <a class="gx-btn is-primary" data-action="review-answers" href="${escapeAttr(reviewHref)}">REVIEW ${attempt.total_questions - score} MISTAKE${attempt.total_questions - score === 1 ? "" : "S"}</a>
+          ${isPractice
+            ? `<button class="gx-btn" data-action="repeat-practice" type="button">Repeat this set</button><button class="gx-btn" data-action="change-practice" type="button">Change practice</button>`
+            : `<a class="gx-btn" data-action="practice-weakest" href="${escapeAttr(practiceHref)}">Practice ${escapeHtml(weakestSection.replace(" Information", "").replace(" Ability", ""))}</a><a class="gx-btn" data-action="retake-same-version" href="${escapeAttr(retakeHref)}">Retake this mock</a>`}
+          <button class="gx-btn is-quiet" data-action="dashboard" type="button">Back to home</button>
+        </div>
+      </div>`;
+    root.innerHTML = gxShell(content, "results");
+  }
+
+  function renderReview() {
+    const attempt = getAttempt(app.view.attemptId);
+    if (!attempt) return setView({ name: "dashboard" });
+    const filtered = filteredReviewAnswers(attempt, app.reviewFilter);
+    const index = Math.min(app.view.index || 0, Math.max(0, filtered.length - 1));
+    const answer = filtered[index];
+    const score = scoreAttempt(attempt);
+    const state = (item) => item.selected_choice === item.correct_choice ? "is-right" : item.selected_choice ? "is-wrong" : "is-blank";
+    let question = `<div class="gx-card gx-empty"><h2>Nothing here</h2><p>No questions match this filter. Pick another filter above.</p></div>`;
+    if (answer) {
+      const correct = answer.selected_choice === answer.correct_choice;
+      const body = gxQuestionBody(answer);
+      const stimulus = answer.stimulus ? gxStimulus(attempt, answer, { ...linkedStimulusAnswers(attempt, answer), items: [] }) : "";
+      question = `
+        <div class="gx-main gx-review-main ${answer.stimulus ? "has-stim" : ""}">
+          ${stimulus}
+          <div class="gx-qcol">
+            <div class="gx-meta">
+              <span class="gx-pill" style="${gxToneStyle(answer.section)}">${escapeHtml(answer.section.replace(" Information", "").replace(" Ability", ""))} · ${escapeHtml(answer.subtopic)}</span>
+              <span class="gx-qnum">Question ${answer.display_number || answer.position + 1}</span>
+              <span class="gx-verdict ${state(answer)}">${correct ? "Correct" : answer.selected_choice ? "Wrong" : "Not answered"}</span>
+            </div>
+            ${body.html}
+            <div class="gx-choices ${body.grid ? "is-grid" : ""}">
+              ${answer.choices.map((choice) => {
+                const cls = choice.id === answer.correct_choice ? "is-correct" : choice.id === answer.selected_choice ? "is-wrong" : "is-dim";
+                const note = choice.id === answer.correct_choice ? "Correct answer" : choice.id === answer.selected_choice ? "Your answer" : "";
+                return `<div class="gx-choice ${cls}"><span class="gx-key">${escapeHtml(choice.id)}</span><span>${gxChoiceText(choice.text)}</span>${note ? `<em class="gx-choice-note">${note}</em>` : ""}</div>`;
+              }).join("")}
+            </div>
+            <section class="gx-explain">
+              <h2>Why</h2>
+              <p>${escapeHtml(answer.explanation || "No explanation provided.")}</p>
+              <div class="gx-explain-meta">
+                <span>Time spent <b>${formatDuration(answer.time_spent_seconds || 0)}</b></span>
+                <span>${isPaperAttempt(attempt) ? "Answered on <b>paper</b>" : `Answer changes <b>${answer.answer_changes || 0}</b>`}</span>
+                ${answer.flagged ? `<span class="gx-accent">Flagged</span>` : ""}
+              </div>
+            </section>
+          </div>
+        </div>`;
+    }
+    const content = `
+      <div class="gx-home gx-review">
+        <div class="gx-review-head">
+          <div><h1>Answer review</h1><p class="gx-muted">${escapeHtml(examTitle(attempt))} · ${Math.round(resultPercent(attempt))}% · ${score} of ${attempt.total_questions} correct</p></div>
+          <div class="gx-filters" role="tablist" aria-label="Filter questions">
+            ${["all", "wrong", "correct", "flagged"].map((filter) => `<button role="tab" aria-selected="${app.reviewFilter === filter}" class="${app.reviewFilter === filter ? "is-active" : ""}" data-review-filter="${filter}" type="button">${filterLabel(filter)} <small>${filteredReviewAnswers(attempt, filter).length}</small></button>`).join("")}
+          </div>
+        </div>
+        <div class="gx-review-strip" aria-label="Questions">
+          ${filtered.map((item, itemIndex) => `<button class="gx-cell ${state(item)} ${itemIndex === index ? "is-current" : ""} ${item.flagged ? "is-flagged" : ""}" style="${gxToneStyle(item.section)}" data-review-index="${itemIndex}" type="button" aria-label="Question ${item.display_number}, ${item.selected_choice === item.correct_choice ? "correct" : item.selected_choice ? "wrong" : "not answered"}" ${itemIndex === index ? "aria-current=\"step\"" : ""}>${item.display_number}</button>`).join("")}
+        </div>
+        ${question}
+        <div class="gx-row gx-review-nav">
+          <button class="gx-btn" data-action="review-prev" type="button" ${index <= 0 ? "disabled" : ""}>${gxIcon("back", 18)}BACK</button>
+          <button class="gx-btn is-quiet" data-action="back-results" type="button">Results</button>
+          <button class="gx-btn is-primary" data-action="review-next" type="button" ${index >= filtered.length - 1 ? "disabled" : ""}>NEXT</button>
+        </div>
+      </div>`;
+    root.innerHTML = gxShell(content, "review");
+    requestAnimationFrame(() => root.querySelector(".gx-review-strip .is-current")?.scrollIntoView({ block: "nearest", inline: "center" }));
+  }
+
   function isPaperAttempt(attempt) {
     return Boolean(attempt?.options?.paperMode);
   }
@@ -1873,141 +2099,6 @@
       <label class="paper-blank-confirm ${blanks ? "" : "complete"}"><input data-paper-confirm-blanks type="checkbox" ${app.paperBlankConfirmed || !blanks ? "checked" : ""} ${blanks ? "" : "disabled"}><span><strong>${blanks ? `Confirm ${blanks} blank item${blanks === 1 ? "" : "s"}` : "No blank items detected"}</strong><small>Blank answers will be graded as unanswered.</small></span></label>
       <footer class="paper-workflow-actions"><button class="btn secondary" data-action="paper-back-upload" type="button">${icon("back")} Recheck Images</button><span class="paper-review-readiness">${unresolved ? `${unresolved} uncertain item${unresolved === 1 ? "" : "s"} still need review` : "All uncertain marks reviewed"}</span><button class="btn primary" data-action="confirm-paper-grade" type="button" ${unresolved || (blanks && !app.paperBlankConfirmed) ? "disabled" : ""}>Confirm and Grade ${icon("submit")}</button></footer>
     `;
-  }
-
-  function renderResults() {
-    const attempt = getAttempt(app.view.attemptId);
-    if (!attempt) return setView({ name: "dashboard" });
-    const score = scoreAttempt(attempt);
-    const pct = resultPercent(attempt);
-    const insights = performanceInsights(attempt);
-    const runInsights = selectRunInsights(attempt);
-    const stats = sectionStats(attempt);
-    const isPractice = attempt.mode === "practice";
-    const orderedStats = isPractice
-      ? stats.filter((stat) => stat.total > 0)
-      : SECTION_GROUPS.map((group) => stats.find((stat) => stat.section === group.section) || { section: group.section, correct: 0, total: group.end - group.start + 1, percent: 0 });
-    const passed = pct >= PASSING_PERCENT;
-    const weakestSection = insights.weakest?.section || "Verbal Ability";
-    const reviewHref = routeHref("review", { attempt: attempt.id });
-    const practiceHref = routeHref("practice", { category: weakestSection });
-    const retakeHref = routeHref("setup", { version: attempt.exam_version_id });
-    root.innerHTML = authedShell(`
-      <section class="results-page v5-results-page ${passed ? "passed" : "needs-work"} ${isPractice ? "practice-result" : ""}" data-motion-purpose="page-enter">
-        <div class="results-command-title">
-          <strong>${isPractice ? "Practice Results" : "Mock Exam Results"}${isPaperAttempt(attempt) ? `<em class="paper-result-badge">Paper mode</em>` : ""}</strong>
-          <small>${escapeHtml(examTitle(attempt))} completed ${formatDate(attempt.submitted_at || attempt.started_at)}</small>
-        </div>
-
-        <div class="results-summary-grid">
-          <section class="results-performance-panel v5-panel">
-            <div class="score-gauge-panel">
-              <div class="score-gauge" style="--score:${Math.max(0, Math.min(100, pct)) * 3.6}deg">
-                <span>Score</span><strong>${Math.round(pct)}%</strong><b>${score} / ${attempt.total_questions}</b><small>correct</small>
-                <em>${isPractice ? "Complete" : passed ? "Passed" : "Needs Work"}</em>
-              </div>
-            </div>
-            <section class="results-section-console v5-panel">
-              <div class="technical-title accuracy-title"><h2>Section Accuracy</h2><small>Correct answers in this attempt</small><span aria-hidden="true"></span></div>
-              <div class="results-section-grid">
-                ${orderedStats.map((stat) => {
-                  const percent = Math.round((stat.correct / Math.max(1, stat.total)) * 100);
-                  return `<article class="result-section-card ${toneForSection(stat.section)}"><span class="section-hud-icon">${localIcon(sectionIconName(stat.section))}</span><strong>${escapeHtml(stat.section)}</strong><i><em style="width:${percent}%"></em></i><small>${stat.correct} / ${stat.total}</small><b>${percent}%</b></article>`;
-                }).join("")}
-              </div>
-            </section>
-          </section>
-          <section class="result-metrics-rail v5-panel">
-            <metric>${localIcon("timer")}<span>Total Time</span><strong>${formatDuration(attempt.elapsed_seconds)}</strong></metric>
-            <metric>${localIcon("history")}<span>Average / Question</span><strong>${formatDuration(insights.averageTime)}</strong></metric>
-            <metric>${localIcon("target")}<span>Unanswered</span><strong>${unansweredCount(attempt)}</strong></metric>
-            <metric>${icon("flag")}<span>Flagged</span><strong>${flaggedCount(attempt)}</strong></metric>
-          </section>
-        </div>
-
-        <section class="run-insights-panel v5-panel">
-            <div class="technical-title"><h2>Run Insights</h2><span aria-hidden="true"></span></div>
-            <div class="insight-grid">
-              ${runInsights.map((insight) => resultInsight(insight.icon, insight.title, insight.value, insight.detail, insight.tone)).join("")}
-            </div>
-        </section>
-        <footer class="results-action-row">
-            <a class="result-action primary" data-action="review-answers" href="${escapeAttr(reviewHref)}">${localIcon("notebook-tabs")}<span><strong>Review Answers</strong></span>${icon("arrow")}</a>
-            ${isPractice
-              ? `<button class="result-action green" data-action="repeat-practice" type="button">${localIcon("target")}<span><strong>Repeat Drill</strong></span>${icon("arrow")}</button><button class="result-action purple" data-action="change-practice" type="button">${localIcon("settings")}<span><strong>Change Practice</strong></span>${icon("arrow")}</button>`
-              : `<a class="result-action green" data-action="practice-weakest" href="${escapeAttr(practiceHref)}">${localIcon("target")}<span><strong>Practice Weakest Area</strong></span>${icon("arrow")}</a><a class="result-action purple" data-action="retake-same-version" href="${escapeAttr(retakeHref)}">${localIcon("history")}<span><strong>Retake Same Version</strong></span>${icon("arrow")}</a>`}
-            <button class="result-action neutral" data-action="dashboard" type="button">${localIcon("home")}<span><strong>Back to Home</strong></span>${icon("arrow")}</button>
-        </footer>
-      </section>
-    `, "results");
-  }
-
-  function renderReview() {
-    const attempt = getAttempt(app.view.attemptId);
-    if (!attempt) return setView({ name: "dashboard" });
-    const filtered = filteredReviewAnswers(attempt, app.reviewFilter);
-    const index = Math.min(app.view.index || 0, Math.max(0, filtered.length - 1));
-    const answer = filtered[index] || Object.values(attempt.answers).sort(byPosition)[0];
-    const correct = answer?.selected_choice === answer?.correct_choice;
-    const score = scoreAttempt(attempt);
-    const navWindow = reviewNavigatorWindow(filtered, index);
-    root.innerHTML = authedShell(`
-      <section class="review-page v3-review-page v5-review-page" data-motion-purpose="page-enter">
-        <header class="review-command-head">
-          <div><h1>Answer <span>Review</span></h1><small>${escapeHtml(examTitle(attempt))}</small></div>
-          <div class="review-score-strip telemetry-rail">
-            ${telemetryMetric("target", "Score", `${Math.round(resultPercent(attempt))}%`)}
-            ${telemetryMetric("circle-check", "Correct", score)}
-            ${telemetryMetric("notebook-tabs", "Needs Review", attempt.total_questions - score)}
-            ${telemetryMetric("target", "Flagged", flaggedCount(attempt))}
-          </div>
-        </header>
-
-        <div class="review-workstation v5-review-workstation">
-          <aside class="review-navigator-console v5-panel">
-            <section class="review-filter-panel">
-              <div class="technical-title"><h2>Filter</h2><span aria-hidden="true"></span></div>
-              <div class="filter-list">
-                ${["all", "wrong", "correct", "flagged"].map((filter) => `<button class="${app.reviewFilter === filter ? "active" : ""}" data-review-filter="${filter}" type="button">${filterLabel(filter)}<small>${filteredReviewAnswers(attempt, filter).length}</small></button>`).join("")}
-              </div>
-            </section>
-            <section class="review-matrix-panel">
-              <div class="review-matrix-title"><strong>Question Navigator</strong><span>${escapeHtml(navWindow.label)}</span></div>
-              <div class="review-matrix-head" aria-hidden="true"><span>#</span><span>General</span><span>Verbal</span><span>Numerical</span><span>Analytical</span></div>
-              <div class="review-matrix-scroll">
-                ${navWindow.items.map(({ item, itemIndex }) => {
-                  const state = item.selected_choice === item.correct_choice ? "correct" : item.selected_choice ? "wrong" : "unanswered";
-                  return `<button class="review-matrix-row ${itemIndex === index ? "current" : ""} ${state} ${item.flagged ? "flagged" : ""}" data-review-index="${itemIndex}" type="button"><b>${item.display_number}</b>${SECTION_GROUPS.map((group) => `<span class="matrix-section ${item.section === group.section ? `active ${group.tone}` : ""}">${item.section === group.section ? (item.flagged ? icon("flag") : state === "correct" ? localIcon("circle-check") : state === "wrong" ? icon("x") : `<i></i>`) : ""}</span>`).join("")}</button>`;
-                }).join("")}
-              </div>
-            </section>
-          </aside>
-
-          <main class="review-question-panel v5-panel">
-            ${answer && filtered.length ? `
-              <div class="review-question-head"><span class="question-index"><span>Question</span><b>${answer.position + 1}</b><span>of ${attempt.total_questions}</span></span><div><p class="review-topic">${escapeHtml(answer.section)} / ${escapeHtml(answer.subtopic)}</p><span class="status-pill ${correct ? "answered" : "wrong"}">${correct ? "Correct" : answer.selected_choice ? "Incorrect" : "Unanswered"}</span><span class="review-head-time">${localIcon("timer")} ${formatDuration(answer.time_spent_seconds)}</span></div></div>
-              <div class="review-question-scroll">
-                ${answer.stimulus ? renderStimulusPanel(attempt, answer, linkedStimulusAnswers(attempt, answer), true) : ""}
-                ${renderQuestionPrompt(answer)}
-                <div class="review-choices">
-                  ${answer.choices.map((choice) => `<div class="review-choice ${choice.id === answer.correct_choice ? "is-correct" : ""} ${choice.id === answer.selected_choice && choice.id !== answer.correct_choice ? "is-wrong" : ""}"><span>${choice.id}</span><strong>${escapeHtml(choice.text)}</strong><em>${choice.id === answer.correct_choice ? "Correct answer" : choice.id === answer.selected_choice ? "Your answer" : ""}</em></div>`).join("")}
-                </div>
-                <section class="review-explanation-console">
-                  <div><strong>Explanation</strong><p>${escapeHtml(answer.explanation || "No explanation provided.")}</p></div>
-                  <div class="review-metadata"><span>${localIcon("timer")}<b>Time Spent</b><strong>${formatDuration(answer.time_spent_seconds)}</strong></span><span>${localIcon("history")}<b>Visits</b><strong>${answer.visit_count || 0}</strong></span>${isPaperAttempt(attempt) ? `<span>${localIcon("clipboard-list")}<b>Answer Source</b><strong>Paper sheet</strong></span>` : `<span>${localIcon("history")}<b>Answer Changes</b><strong>${answer.answer_changes || 0}</strong></span>`}<span>${icon("flag")}<b>Flagged</b><strong>${answer.flagged ? "Yes" : "No"}</strong></span></div>
-                </section>
-              </div>
-            ` : `<div class="review-empty-panel"><span>${icon("review")}</span><strong>No matching review items</strong><p>Change the active filter to continue reviewing this attempt.</p></div>`}
-          </main>
-        </div>
-
-        <footer class="review-footer">
-          <button class="btn secondary" data-action="review-prev" type="button" ${index <= 0 ? "disabled" : ""}>${icon("back")} Previous</button>
-          <button class="btn secondary" data-action="back-results" type="button">${icon("review")} Return to Results</button>
-          <button class="btn primary" data-action="review-next" type="button" ${index >= filtered.length - 1 ? "disabled" : ""}>Next ${icon("arrow")}</button>
-        </footer>
-      </section>
-    `, "review");
   }
 
   function renderPractice() {
@@ -3716,13 +3807,17 @@
       }
       if (action === "toggle-theme") return gxToggleTheme();
       if (action === "gx-check") return gxCheckAnswer();
+      if (action === "gx-paper-setup") {
+        app.draft = { ...(app.draft || {}), options: { ...DEFAULT_OPTIONS, ...(app.draft?.options || {}), paperMode: true, paperPhase: "answering" } };
+        return setView({ name: "setup" });
+      }
       if (action === "gx-open-section") {
         app.gxOpenSection = target.dataset.section || null;
         return renderExam();
       }
       if (action === "gx-series") {
         app.gxSeries = { ...(app.gxSeries || {}), [target.dataset.stimulus]: Number(target.dataset.series) || 0 };
-        return renderExam();
+        return render();
       }
       if (action === "review-answers") return setView({ name: "review", attemptId: app.view.attemptId, index: 0 });
       if (action === "back-results") return setView({ name: "results", attemptId: app.view.attemptId });
