@@ -1391,93 +1391,324 @@
     const linked = linkedStimulusAnswers(attempt, current);
     const isPaused = attempt.status === "paused";
     const paperMode = isPaperAttempt(attempt);
-    const existingNav = root.querySelector(".exam-nav");
+    const existingNav = root.querySelector(".gx-rail");
     if (existingNav) app.examNavScrollTop = existingNav.scrollTop;
     ensureAttemptClock(attempt);
 
     const version = examVersions.find((candidate) => candidate.id === attempt.exam_version_id);
     const versionNumber = app.fixtureMode ? 7 : version?.number;
     const runLabel = attempt.mode === "practice" ? escapeHtml(attempt.title || "Practice") : `Mock Exam ${versionNumber ? String(versionNumber).padStart(2, "0") : ""}`.trim();
-    root.innerHTML = cockpitFrame(`
-      <section class="exam-shell ${app.fixtureMode ? "fixture-exam" : ""} state-${escapeAttr(app.fixtureState || "live")} ${isPaused ? "is-paused" : ""} ${isPaused || app.modal === "submit" ? "exam-dimmed" : ""}">
-        <header class="exam-topbar">
-          <div class="exam-brand">${logo()}<div><strong>CSC Practice Reviewer</strong><span>Independent mock exam and review tool</span></div></div>
-          <div class="exam-status" aria-label="Exam status">
-            <div class="exam-hud-cell exam-run-cell"><span>Run</span><strong>${runLabel}</strong></div>
-            <div class="exam-hud-cell exam-time-cell"><span>${attempt.mode === "practice" ? "Mode" : isPaused ? "Timer" : "Time Left"}</span><strong class="exam-time"><b class="exam-time-value">${attempt.mode === "practice" ? "Untimed" : attempt.options?.showTimer === false ? "Hidden" : formatDuration(remaining)}</b></strong></div>
-            <div class="exam-hud-cell exam-answered-cell"><span>${paperMode ? "Answer Mode" : "Answered"}</span><strong class="exam-answered">${paperMode ? "Paper sheet" : `<b class="exam-answered-value">${answeredCount(attempt)}</b> / ${attempt.total_questions}`}</strong></div>
-            ${attempt.mode === "practice" ? `<div class="exam-hud-cell exam-difficulty"><span>Practice</span><strong>${escapeHtml(statusLabel(attempt.options?.difficulty || "mixed"))} / ${attempt.total_questions}</strong></div>` : ""}
-          </div>
-          <div class="exam-actions">
-            <button class="btn secondary mobile-question-toggle" data-action="toggle-exam-nav" type="button">${icon("review")} Questions</button>
-            <button class="btn ghost exam-exit" data-action="save-exit" type="button">${icon("back")} Exit</button>
-            <div class="exam-audio-control"><button class="icon-only header-audio-button ${app.audio.music && !app.audio.muted ? "active" : ""}" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${icon(app.audio.muted ? "volume-off" : "music")}</button>${audioPopover()}</div>
-            <button class="btn secondary" data-action="pause-exam" type="button" ${attempt.options?.enablePause === false || isPaused ? "disabled" : ""}>${icon("pause")} Pause</button>
-            <button class="btn ${paperMode ? "paper-finish" : "danger"}" data-action="${paperMode ? "open-paper-finish" : "open-submit"}" type="button">${icon("submit")} ${paperMode ? "Finish Answering" : attempt.mode === "practice" ? "Finish Practice" : "Submit Exam"}</button>
-          </div>
-        </header>
-
-        <div class="exam-body ${current.stimulus ? "with-stimulus" : ""}">
-          <aside class="exam-nav ${app.examNavOpen ? "mobile-open" : ""}">
-            <div class="nav-title">
-              <h2>Questions</h2>
-              <button class="icon-only mobile-nav-close" data-action="toggle-exam-nav" type="button" aria-label="Close question navigator">${icon("x")}</button>
-              <div class="legend">
-                <span><i class="legend-dot answered"></i>Answered</span>
-                <span><i class="legend-dot unanswered"></i>Unanswered</span>
-                <span><i class="legend-dot skipped"></i>Skipped</span>
-                <span><i class="legend-dot flagged"></i>Flagged</span>
-              </div>
-            </div>
-            ${groupNavigator(attempt)}
-          </aside>
-
-          <main class="exam-question">
-            ${current.stimulus ? renderStimulusPanel(attempt, current, linked) : ""}
-            <section class="question-panel" data-motion-purpose="question-change"${app.fixtureMode ? ` data-question-id="${escapeAttr(current.question_id)}" data-question-seconds="${Number(current.time_spent_seconds || 0).toFixed(3)}"` : ""}>
-              <div class="question-title">
-                <div>
-                  <span class="question-index">Item ${current.position + 1} <small>/ ${attempt.total_questions}</small></span>
-                  <p class="topic-pill">${escapeHtml(current.section)} - ${escapeHtml(current.subtopic)}</p>
-                </div>
-                <span class="status-pill ${answerStatus(current)}">${statusText(current)}</span>
-              </div>
-              ${renderQuestionPrompt(current)}
-              <div class="choices ${paperMode ? "paper-readonly-choices" : ""}">
-                ${current.choices.map((choice) => `
-                  <button class="choice ${current.selected_choice === choice.id ? "selected" : ""}" ${paperMode ? "aria-disabled=\"true\" tabindex=\"-1\"" : `data-choice="${choice.id}" data-motion-purpose="answer-selection"`} type="button" ${attempt.status !== "in_progress" || paperMode ? "disabled" : ""}>
-                    <span class="choice-letter">${choice.id}</span>
-                    <strong>${escapeHtml(choice.text)}</strong>
-                    <i class="choice-radio"></i>
-                  </button>
-                `).join("")}
-              </div>
-              <div class="question-actions">
-                <button class="btn secondary" data-action="previous-question" type="button" ${current.position === 0 ? "disabled" : ""}>${icon("back")} Previous</button>
-                ${paperMode ? `<span class="paper-mark-reminder">${localIcon("clipboard-list")} Mark your printed sheet</span>` : `<button class="btn ghost" data-action="clear-answer" type="button">${icon("clear")} Clear Answer</button>`}
-                <button class="btn ghost ${current.flagged ? "active" : ""}" data-action="toggle-flag" type="button">${icon("flag")} Flag for Review</button>
-                ${paperMode ? "" : `<button class="btn secondary" data-action="skip-question" type="button">${icon("skip")} Skip</button>`}
-                <button class="btn primary" data-action="${current.position >= attempt.total_questions - 1 ? paperMode ? "open-paper-finish" : "open-submit" : "next-question"}" type="button" ${!paperMode && !current.selected_choice ? "disabled" : ""}>${current.position >= attempt.total_questions - 1 ? paperMode ? "Finish Answering" : "Review & Submit" : "Next"} ${icon("arrow")}</button>
-              </div>
-            </section>
-          </main>
-        </div>
-      </section>
-      ${pauseModal(attempt)}
-      ${submitModal(attempt)}
-      ${paperFinishModal(attempt)}
-      ${chartModal(attempt, current)}
-      ${timeoutModal(attempt)}
-      ${toast()}
-    `, "exam-frame");
+    root.innerHTML = gxExamScreen(attempt, current, linked, { remaining, isPaused, paperMode, runLabel });
 
     if ((!app.fixtureMode || QA_TIMING_ENABLED) && attempt.status === "in_progress" && app.modal !== "timeout") {
       app.timerId = setInterval(() => tickAttempt(attempt.id), 1000);
     }
     requestAnimationFrame(() => {
-      const nav = root.querySelector(".exam-nav");
+      const nav = root.querySelector(".gx-rail");
       if (nav) nav.scrollTop = app.examNavScrollTop;
     });
+  }
+
+  // ---- Game-style exam screen (game.css). Reuses the existing data-action / data-choice / data-goto wiring. ----
+  const GX_THEME_KEY = "csc-reviewer-theme";
+  const GX_TONES = { "General Information": "general", "Verbal Ability": "verbal", "Numerical Ability": "numerical", "Analytical Ability": "analytical" };
+
+  function gxTheme() {
+    try {
+      return localStorage.getItem(GX_THEME_KEY) === "light" ? "light" : "dark";
+    } catch {
+      return "dark";
+    }
+  }
+
+  function gxToggleTheme() {
+    const next = gxTheme() === "light" ? "dark" : "light";
+    try {
+      localStorage.setItem(GX_THEME_KEY, next);
+    } catch {
+      // Storage can be blocked; the toggle then lasts until reload.
+    }
+    root.querySelectorAll(".gx").forEach((node) => node.setAttribute("data-theme", next));
+  }
+
+  function gxTone(section) {
+    return GX_TONES[section] || "numerical";
+  }
+
+  function gxToneStyle(section) {
+    const tone = gxTone(section);
+    return `--tone: var(--${tone}); --tone-ink: var(--${tone}-ink); --seg-color: var(--${tone});`;
+  }
+
+  function gxIcon(name, size = 20) {
+    const paths = {
+      x: `<path d="M6 6l12 12M18 6L6 18"/>`,
+      sun: `<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>`,
+      moon: `<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>`,
+      pause: `<path d="M9 5v14M15 5v14"/>`,
+      flag: `<path d="M5 21V4h13l-3 4.5 3 4.5H5"/>`,
+      menu: `<path d="M4 6h16M4 12h16M4 18h16"/>`,
+      clock: `<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/>`,
+      music: `<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>`,
+      back: `<path d="M15 18l-6-6 6-6"/>`
+    };
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || ""}</svg>`;
+  }
+
+  function gxSectionGroups(attempt) {
+    const answers = Object.values(attempt.answers).sort(byPosition);
+    if (attempt.mode === "practice") {
+      const section = answers[0]?.section || "Practice";
+      return [{ section, label: attempt.practice_category || "Practice", start: 1, end: answers.length, answers }];
+    }
+    return SECTION_GROUPS.map((group) => ({ ...group, answers: answers.filter((answer) => answer.display_number >= group.start && answer.display_number <= group.end) }))
+      .filter((group) => group.answers.length);
+  }
+
+  function gxPace(attempt, remaining) {
+    if (attempt.mode === "practice" || !attempt.total_time_seconds || attempt.options?.showTimer === false) return null;
+    const perItem = attempt.total_time_seconds / Math.max(1, attempt.total_questions);
+    const left = attempt.total_questions - answeredCount(attempt);
+    const minutes = Math.round((remaining - left * perItem) / 60);
+    if (Math.abs(minutes) < 1) return { text: "On pace", tone: "is-ahead" };
+    return minutes > 0 ? { text: `${minutes} min ahead of pace`, tone: "is-ahead" } : { text: `${-minutes} min behind pace`, tone: "is-behind" };
+  }
+
+  function gxSealSvg(groups, total, size = 140) {
+    const r = 60;
+    const circumference = 2 * Math.PI * r;
+    let offset = 0;
+    const rings = groups.map((group) => {
+      const length = (group.answers.length / total) * circumference;
+      const done = (group.answers.filter((answer) => answer.selected_choice).length / Math.max(1, group.answers.length)) * length;
+      const tone = gxTone(group.section);
+      const gap = groups.length > 1 ? 2 : 0;
+      const out = `<circle cx="80" cy="80" r="${r}" stroke="var(--${tone})" stroke-opacity=".22" stroke-dasharray="${Math.max(0, length - gap).toFixed(1)} 400" stroke-dashoffset="${(-offset).toFixed(1)}"/>`
+        + (done > 0 ? `<circle cx="80" cy="80" r="${r}" stroke="var(--${tone})" stroke-dasharray="${Math.max(0, Math.min(done, length - gap)).toFixed(1)} 400" stroke-dashoffset="${(-offset).toFixed(1)}"/>` : "");
+      offset += length;
+      return out;
+    }).join("");
+    const answered = groups.reduce((sum, group) => sum + group.answers.filter((answer) => answer.selected_choice).length, 0);
+    return `<svg width="${size}" height="${size}" viewBox="0 0 160 160" role="img" aria-label="${answered} of ${total} answered">
+      <circle cx="80" cy="80" r="74" fill="none" stroke="var(--line-strong)" stroke-width="3" stroke-dasharray="3 6"/>
+      <g transform="rotate(-90 80 80)" fill="none" stroke-width="14">${rings}</g>
+      <circle cx="80" cy="80" r="44" fill="var(--surface-2)"/>
+      <text x="80" y="80" text-anchor="middle" font-weight="900" font-size="28" fill="var(--text)">${answered}</text>
+      <text x="80" y="100" text-anchor="middle" font-weight="800" font-size="13" fill="var(--muted)">of ${total}</text>
+    </svg>`;
+  }
+
+  function gxProgressBar(attempt, current, groups) {
+    const segments = groups.map((group) => {
+      const answered = group.answers.filter((answer) => answer.selected_choice).length;
+      const isCurrent = group.answers.some((answer) => answer.position === current.position);
+      return `<div class="gx-seg ${isCurrent ? "is-current" : ""}" style="flex: ${group.answers.length}; ${gxToneStyle(group.section)}"><i style="width: ${(answered / Math.max(1, group.answers.length)) * 100}%; background: var(--${gxTone(group.section)})"></i></div>`;
+    }).join("");
+    return `<div class="gx-segs" role="img" aria-label="${groups.map((group) => `${group.label || group.section} ${group.answers.filter((answer) => answer.selected_choice).length} of ${group.answers.length}`).join(", ")}">${segments}</div>`;
+  }
+
+  function gxRail(attempt, current, groups) {
+    const openSection = app.gxOpenSection && groups.some((group) => group.section === app.gxOpenSection) ? app.gxOpenSection : current.section;
+    const open = groups.find((group) => group.section === openSection) || groups[0];
+    const sealLabel = attempt.mode === "practice" ? "Practice set" : "Your seal";
+    const sealNote = attempt.mode === "practice" ? "Fills as you answer." : "Fills as you answer. Earned when you score 80% or more.";
+    return `
+      <aside class="gx-rail ${app.examNavOpen ? "is-open" : ""}" aria-label="Seal and question map">
+        <div class="gx-seal">${gxSealSvg(groups, attempt.total_questions)}<p><strong>${sealLabel}</strong>${sealNote}</p></div>
+        ${groups.length > 1 ? `<div class="gx-secs">${groups.map((group) => `
+          <button class="gx-sec ${group.section === open.section ? "is-open" : ""}" style="${gxToneStyle(group.section)}" data-action="gx-open-section" data-section="${escapeAttr(group.section)}" type="button" aria-pressed="${group.section === open.section}">
+            <span>${escapeHtml(group.label || group.section)}</span><strong>${group.answers.filter((answer) => answer.selected_choice).length}<small>/${group.answers.length}</small></strong>
+          </button>`).join("")}</div>` : ""}
+        <div class="gx-grid-head"><span>${escapeHtml(open.label || open.section)} · ${open.answers[0]?.display_number || 1}–${open.answers[open.answers.length - 1]?.display_number || attempt.total_questions}</span>${app.examNavOpen ? `<button class="gx-icon-btn is-bare" data-action="toggle-exam-nav" type="button" aria-label="Close question map">${gxIcon("x")}</button>` : ""}</div>
+        <div class="gx-grid" style="${gxToneStyle(open.section)}">
+          ${open.answers.map((answer) => {
+            const states = [answer.selected_choice ? "is-answered" : "", answer.skipped && !answer.selected_choice ? "is-skipped" : "", answer.flagged ? "is-flagged" : "", answer.position === current.position ? "is-current" : ""].join(" ");
+            const label = `Question ${answer.display_number}${answer.selected_choice ? ", answered" : answer.skipped ? ", skipped" : ", not answered"}${answer.flagged ? ", flagged" : ""}`;
+            return `<button class="gx-cell ${states}" data-goto="${answer.position}" type="button" aria-label="${escapeAttr(label)}" ${answer.position === current.position ? "aria-current=\"step\"" : ""}>${answer.display_number}</button>`;
+          }).join("")}
+        </div>
+        <div class="gx-key-legend"><span><i style="background: var(--${gxTone(open.section)})"></i>Answered</span><span><i style="border: 2px solid var(--line-strong)"></i>Skipped</span><span><i style="background: var(--flag); border-radius: 50%"></i>Flagged</span></div>
+        <button class="gx-btn gx-rail-theme" data-action="${isPaperAttempt(attempt) ? "open-paper-finish" : "open-submit"}" type="button">${isPaperAttempt(attempt) ? "Finish answering" : attempt.mode === "practice" ? "Finish practice" : "Submit exam"}</button>
+        <button class="gx-btn gx-rail-theme" data-action="toggle-theme" type="button">${gxIcon(gxTheme() === "light" ? "moon" : "sun", 18)}${gxTheme() === "light" ? "Dark theme" : "Light theme"}</button>
+        <p class="gx-note">Independent practice tool. Not affiliated with the Civil Service Commission.</p>
+      </aside>`;
+  }
+
+  function gxOrderingParts(prompt) {
+    const patterns = [/(?:^|\s)(IV|VI|V|III|II|I)\.\s+/g, /(?:^|\s)\((\d+)\)\s+/g];
+    for (const pattern of patterns) {
+      const markers = [...prompt.matchAll(pattern)];
+      if (markers.length < 3) continue;
+      return {
+        instruction: prompt.slice(0, markers[0].index).trim(),
+        statements: markers.map((marker, index) => ({ label: marker[1], text: prompt.slice(marker.index + marker[0].length, markers[index + 1]?.index ?? prompt.length).trim() }))
+      };
+    }
+    return null;
+  }
+
+  function gxQuestionBody(current) {
+    const prompt = String(current.prompt || "");
+    const selected = current.choices.find((choice) => choice.id === current.selected_choice);
+    const analogy = prompt.match(/^(.+?)\s+is to\s+(.+?)\s+as\s+(.+?)\s+is to\s+_{2,}\.?\s*$/i);
+    if (analogy) {
+      return {
+        html: `<h1 class="gx-lead">Which word completes the pair?</h1>
+          <div class="gx-analogy" role="group" aria-label="${escapeAttr(prompt)}">
+            <div class="gx-tile">${escapeHtml(analogy[1])}</div><span class="gx-isto">is to</span><div class="gx-tile">${escapeHtml(analogy[2])}</div>
+            <div class="gx-tile"><span><small>as</small>${escapeHtml(analogy[3])}</span></div><span class="gx-isto">is to</span>
+            <div class="gx-tile is-blank ${selected ? "is-filled" : ""}">${selected ? escapeHtml(selected.text).toUpperCase() : "?"}</div>
+          </div>`,
+        grid: true
+      };
+    }
+    const ordering = /paragraph organization|pag-aayos ng talata|ayos ng talata|paragraph order/i.test(`${current.csc_skill || ""} ${current.subtopic || ""}`) ? gxOrderingParts(prompt) : null;
+    if (ordering) {
+      return {
+        html: `<h1 class="gx-lead">${escapeHtml(ordering.instruction || "Arrange the sentences.")}</h1>
+          <ol class="gx-order" style="${gxToneStyle(current.section)}">${ordering.statements.map((statement) => `<li><b>${escapeHtml(statement.label)}</b><span>${escapeHtml(statement.text)}</span></li>`).join("")}</ol>`,
+        grid: false
+      };
+    }
+    const shortChoices = current.choices.every((choice) => String(choice.text).length <= 28);
+    return { html: `<h1 class="gx-prompt ${prompt.length > 160 ? "is-long" : ""}">${escapeHtml(prompt)}</h1>`, grid: shortChoices && !current.stimulus };
+  }
+
+  function gxChoiceText(text) {
+    const value = String(text);
+    if (/^\s*[\dIVX]+(\s*-\s*[\dIVX]+){2,}\s*$/.test(value)) {
+      return `<span class="gx-seq">${value.split(/\s*-\s*/).map((part) => escapeHtml(part.trim())).join("<i>›</i>")}</span>`;
+    }
+    return escapeHtml(value);
+  }
+
+  function gxLineChart(stimulus, series, rows) {
+    const width = 640;
+    const height = 300;
+    const pad = { left: 48, right: 24, top: 26, bottom: 40 };
+    const values = series.flatMap((entry) => entry.values);
+    const min = Math.min(0, ...values);
+    const max = Math.max(...values) * 1.1 || 1;
+    const x = (index) => rows.length === 1 ? width / 2 : pad.left + (index * (width - pad.left - pad.right)) / (rows.length - 1);
+    const y = (value) => pad.top + ((max - value) / (max - min || 1)) * (height - pad.top - pad.bottom);
+    const ticks = [0, 0.25, 0.5, 0.75, 1].map((t) => min + t * (max - min));
+    const fmt = (value) => Number.isInteger(value) ? String(value) : value.toFixed(1).replace(/\.0$/, "");
+    return `<svg class="gx-line" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeAttr(stimulus.alt || stimulus.altText || stimulus.title || "Line graph")}">
+      ${ticks.map((tick) => `<line class="gx-line-grid" x1="${pad.left}" x2="${width - pad.right}" y1="${y(tick)}" y2="${y(tick)}"/><text x="${pad.left - 8}" y="${y(tick) + 4}" text-anchor="end">${fmt(Math.round(tick))}</text>`).join("")}
+      ${series.map((entry) => `<polyline fill="none" stroke="${entry.color}" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" points="${entry.values.map((value, index) => `${x(index)},${y(value)}`).join(" ")}"/>
+        ${entry.values.map((value, index) => `<circle cx="${x(index)}" cy="${y(value)}" r="5" fill="${entry.color}"/>`).join("")}`).join("")}
+      ${rows.map((row, index) => `<text x="${x(index)}" y="${height - 12}" text-anchor="middle">${escapeHtml(row[0])}</text>`).join("")}
+    </svg>`;
+  }
+
+  function gxStimulus(attempt, current, linked) {
+    const stimulus = current.stimulus;
+    if (!stimulus) return "";
+    const presentation = stimulusPresentation(stimulus);
+    const tableData = stimulusTableData(stimulus);
+    const description = String(stimulus.description || stimulus.altText || stimulus.alt || "");
+    const palette = ["var(--numerical)", "var(--verbal)", "var(--analytical)", "var(--general)", "var(--primary)"];
+    let visual = "";
+    if (presentation.visual === "passage") {
+      visual = `<div class="gx-passage">${description.split(/\n{2,}/).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}</div>`;
+    } else if (["bars", "grouped-bars", "line"].includes(presentation.visual)) {
+      const series = stimulusSeries(stimulus).map((entry, index) => ({ ...entry, color: palette[index % palette.length] }));
+      const rows = toArray(stimulus.rows);
+      if (series.length && presentation.visual === "line") {
+        visual = `<div class="gx-legend">${series.map((entry) => `<span><i style="background: ${entry.color}"></i>${escapeHtml(entry.label)}</span>`).join("")}</div>${gxLineChart(stimulus, series, rows)}`;
+      } else if (series.length) {
+        const active = Math.min(Number(app.gxSeries?.[stimulus.id] || 0), series.length - 1);
+        const entry = series[active];
+        const max = Math.max(1, ...entry.values.map((value) => Math.abs(value)));
+        visual = `${series.length > 1 ? `<div class="gx-linked" role="tablist" aria-label="Chart measure">${series.map((item, index) => `<button role="tab" aria-selected="${index === active}" class="${index === active ? "is-current" : ""}" style="--tone: ${item.color}; --tone-ink: var(--text)" data-action="gx-series" data-stimulus="${escapeAttr(stimulus.id)}" data-series="${index}" type="button">${escapeHtml(item.label)}</button>`).join("")}</div>` : ""}
+          <figure class="gx-bars" style="margin: 0"><figcaption>${escapeHtml(entry.label)}</figcaption>
+            ${entry.values.map((value, index) => `<div class="gx-bar"><span>${escapeHtml(rows[index]?.[0] ?? "")}</span><div><i style="width: ${Math.max(2, (Math.abs(value) / max) * 100)}%; background: ${entry.color}"></i></div><strong>${escapeHtml(entry.rawValues[index])}</strong></div>`).join("")}
+          </figure>`;
+      }
+    }
+    const table = presentation.visual !== "passage" && tableData.headers.length
+      ? `<div class="gx-tablewrap"><table class="gx-table"><thead><tr>${tableData.headers.map((header) => `<th scope="col">${escapeHtml(header)}</th>`).join("")}</tr></thead><tbody>${tableData.rows.map((row) => `<tr>${toArray(row).map((cell, index) => index === 0 ? `<th scope="row">${escapeHtml(cell)}</th>` : `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`
+      : "";
+    return `
+      <section class="gx-stim" style="${gxToneStyle(current.section)}" aria-label="${escapeAttr(linked.label)}">
+        <div class="gx-stim-head">
+          <span class="gx-pill">${escapeHtml(linked.label)}</span>
+          <div class="gx-linked" aria-label="Questions using this ${presentation.noun}">${linked.items.map((item) => `<button class="${item.position === attempt.current_question_index ? "is-current" : item.selected_choice ? "is-done" : ""}" data-goto="${item.position}" type="button">${item.display_number}</button>`).join("")}</div>
+        </div>
+        <h2>${escapeHtml(stimulus.title || "Shared data")}</h2>
+        ${presentation.visual === "passage" ? "" : description ? `<p class="gx-stim-desc">${escapeHtml(description)}</p>` : ""}
+        ${visual}
+        ${table}
+        ${!visual && !table ? `<p class="gx-stim-desc">${escapeHtml(description)}</p>` : ""}
+      </section>`;
+  }
+
+  function gxExamScreen(attempt, current, linked, { remaining, isPaused, paperMode, runLabel }) {
+    const groups = gxSectionGroups(attempt);
+    const pace = gxPace(attempt, remaining);
+    const body = gxQuestionBody(current);
+    const isLast = current.position >= attempt.total_questions - 1;
+    const locked = attempt.status !== "in_progress" || paperMode;
+    const theme = gxTheme();
+    const primary = paperMode
+      ? (isLast ? { action: "open-paper-finish", label: "FINISH ANSWERING" } : { action: "next-question", label: "NEXT" })
+      : isLast ? { action: "open-submit", label: "REVIEW & SUBMIT" }
+        : current.selected_choice ? { action: "next-question", label: "NEXT" } : { action: "skip-question", label: "SKIP" };
+    const timerValue = attempt.mode === "practice" ? "Untimed" : attempt.options?.showTimer === false ? "Hidden" : formatDuration(remaining);
+    return `
+      <div class="gx" data-theme="${theme}">
+        <section class="gx-exam ${isPaused ? "is-paused" : ""} ${current.stimulus ? "has-stim" : ""}">
+          <header class="gx-top">
+            <button class="gx-icon-btn is-bare" data-action="save-exit" type="button" aria-label="Save and exit">${gxIcon("x", 24)}</button>
+            <div class="gx-progress">
+              ${gxProgressBar(attempt, current, groups)}
+              <div class="gx-progress-meta"><span>${escapeHtml(runLabel)}</span><span>${paperMode ? "Paper answer sheet" : `<strong class="exam-answered-value">${answeredCount(attempt)}</strong> of ${attempt.total_questions} answered`}</span></div>
+            </div>
+            <div class="gx-timer">${gxIcon("clock", 24)}<div><strong class="exam-time-value">${escapeHtml(timerValue)}</strong>${pace ? `<small class="${pace.tone}">${pace.text}</small>` : `<small>${isPaused ? "Paused" : attempt.mode === "practice" ? "Practice" : "Time left"}</small>`}</div></div>
+            <button class="gx-icon-btn gx-nav-toggle" data-action="toggle-exam-nav" type="button" aria-label="Open question map" aria-expanded="${app.examNavOpen ? "true" : "false"}">${gxIcon("menu")}</button>
+            <button class="gx-icon-btn gx-top-theme" data-action="toggle-theme" type="button" aria-label="Switch to ${theme === "light" ? "dark" : "light"} theme">${gxIcon(theme === "light" ? "moon" : "sun")}</button>
+            <div class="exam-audio-control"><button class="gx-icon-btn header-audio-button" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${gxIcon("music")}</button>${audioPopover()}</div>
+            <button class="gx-btn" data-action="pause-exam" type="button" ${attempt.options?.enablePause === false || isPaused ? "disabled" : ""}>${gxIcon("pause", 18)}<span class="gx-label">Pause</span></button>
+            <button class="gx-btn is-quiet gx-top-submit" data-action="${paperMode ? "open-paper-finish" : "open-submit"}" type="button">${paperMode ? "Finish" : attempt.mode === "practice" ? "Finish" : "Submit"}</button>
+          </header>
+
+          <div class="gx-body">
+            <div class="gx-main">
+              ${gxStimulus(attempt, current, linked)}
+              <div class="gx-qcol" data-motion-purpose="question-change"${app.fixtureMode ? ` data-question-id="${escapeAttr(current.question_id)}" data-question-seconds="${Number(current.time_spent_seconds || 0).toFixed(3)}"` : ""}>
+                <div class="gx-meta">
+                  <span class="gx-pill" style="${gxToneStyle(current.section)}">${escapeHtml(current.section.replace(" Information", "").replace(" Ability", ""))} · ${escapeHtml(current.subtopic)}</span>
+                  <span class="gx-qnum">Question ${current.display_number || current.position + 1}</span>
+                  <button class="gx-btn is-flag" data-action="toggle-flag" type="button" aria-pressed="${current.flagged ? "true" : "false"}">${gxIcon("flag", 16)}${current.flagged ? "Flagged" : "Flag"}</button>
+                </div>
+                ${body.html}
+                <div class="gx-choices ${body.grid ? "is-grid" : ""}" role="radiogroup" aria-label="Answer choices">
+                  ${current.choices.map((choice) => `
+                    <button class="gx-choice ${current.selected_choice === choice.id ? "is-selected" : ""}" ${paperMode ? "aria-disabled=\"true\" tabindex=\"-1\"" : `data-choice="${choice.id}"`} role="radio" aria-checked="${current.selected_choice === choice.id ? "true" : "false"}" type="button" ${locked ? "disabled" : ""}>
+                      <span class="gx-key">${escapeHtml(choice.id)}</span><span>${gxChoiceText(choice.text)}</span>
+                    </button>`).join("")}
+                </div>
+              </div>
+            </div>
+            ${gxRail(attempt, current, groups)}
+          </div>
+
+          <footer class="gx-foot">
+            <div class="gx-foot-left">
+              <button class="gx-btn" data-action="previous-question" type="button" ${current.position === 0 ? "disabled" : ""}>${gxIcon("back", 18)}BACK</button>
+              ${!paperMode && current.selected_choice ? `<button class="gx-btn is-quiet" data-action="clear-answer" type="button">CLEAR</button>` : ""}
+            </div>
+            <span class="gx-hint">${paperMode ? "Mark your printed answer sheet" : `<kbd>A</kbd>–<kbd>D</kbd> answer · <kbd>Enter</kbd> next · <kbd>F</kbd> flag`}</span>
+            <button class="gx-btn is-primary" data-action="${primary.action}" type="button">${primary.label}</button>
+          </footer>
+        </section>
+        ${pauseModal(attempt)}
+        ${submitModal(attempt)}
+        ${paperFinishModal(attempt)}
+        ${chartModal(attempt, current)}
+        ${timeoutModal(attempt)}
+        ${toast()}
+      </div>`;
   }
 
   function isPaperAttempt(attempt) {
@@ -3411,6 +3642,15 @@
         app.examNavOpen = !app.examNavOpen;
         return renderExam();
       }
+      if (action === "toggle-theme") return gxToggleTheme();
+      if (action === "gx-open-section") {
+        app.gxOpenSection = target.dataset.section || null;
+        return renderExam();
+      }
+      if (action === "gx-series") {
+        app.gxSeries = { ...(app.gxSeries || {}), [target.dataset.stimulus]: Number(target.dataset.series) || 0 };
+        return renderExam();
+      }
       if (action === "review-answers") return setView({ name: "review", attemptId: app.view.attemptId, index: 0 });
       if (action === "back-results") return setView({ name: "results", attemptId: app.view.attemptId });
       if (action === "review-prev") return moveReview(-1);
@@ -3560,7 +3800,12 @@
         const attempt = getAttempt(app.view.attemptId);
         const answer = currentAnswer(attempt);
         const paperMode = isPaperAttempt(attempt);
-        const choiceIndex = { Digit1: 0, Numpad1: 0, Digit2: 1, Numpad2: 1, Digit3: 2, Numpad3: 2, Digit4: 3, Numpad4: 3 }[event.code];
+        const choiceIndex = { Digit1: 0, Numpad1: 0, KeyA: 0, Digit2: 1, Numpad2: 1, KeyB: 1, Digit3: 2, Numpad3: 2, KeyC: 2, Digit4: 3, Numpad4: 3, KeyD: 3 }[event.code];
+        if (event.code === "KeyF" && attempt?.status === "in_progress") {
+          event.preventDefault();
+          toggleFlag();
+          return;
+        }
         if (!paperMode && choiceIndex !== undefined && answer?.choices?.[choiceIndex] && attempt?.status === "in_progress") {
           event.preventDefault();
           chooseAnswer(answer.choices[choiceIndex].id);

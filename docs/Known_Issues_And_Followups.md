@@ -43,3 +43,11 @@
 - Add a qualified second-review ticket for authored Filipino, data-interpretation, legal/general-information, and symbolic-reasoning items; promote individual items from `needs_review` only after that review.
 - Add a Stitch MCP/Figma export ticket if direct generated-source handoff becomes available.
 - Re-run the hardened mockup-adaptation rules whenever a new `states/` or `states/v2/` reference is added.
+
+## Redesign follow-ups (2026-11-21)
+
+- Exam pop-ups (pause, submit, timeout, paper finish, chart) still render in the legacy cockpit style inside the new exam screen.
+- Home, setup, practice, results, review, progress and account screens are not yet converted to the game style.
+- Practice mode does not yet give instant per-question feedback (CHECK, correct/incorrect banner, streak) as in the approved mockup.
+- 15 of 80 chart/table sets label rows with bare A–D, which collides with answer letters; renaming them is a question-content change that needs approval.
+- `npm run qa:paper` was not run for stage 1: Playwright is not installed on this machine (`npm run setup` installs it). Paper scan/review screens were not changed.
