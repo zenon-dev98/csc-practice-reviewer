@@ -8020,3 +8020,22 @@ html body #app .attempt-table-title .btn {
     font-size: 14px !important;
   }
 }
+/* Phones: fit charts to the card instead of a 620px canvas that hides later categories behind a sideways scroll. */
+@media (max-width: 600px) {
+  html body #app .line-chart-viewport,
+  html body #app .grouped-chart-viewport { overflow: visible !important; }
+  html body #app .line-chart-svg,
+  html body #app .grouped-chart-svg {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  html body #app .line-chart,
+  html body #app .grouped-chart { min-height: 0 !important; }
+  /* SVG text scales down with the chart (~0.5x at 375px), so double it to stay ~10px on screen. */
+  html body #app .line-chart-svg text,
+  html body #app .grouped-chart-svg text { font-size: 21px !important; }
+  html body #app .line-chart-svg .chart-value,
+  html body #app .grouped-chart-svg .chart-value { stroke-width: 5px !important; }
+}

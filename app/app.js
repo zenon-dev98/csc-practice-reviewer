@@ -107,6 +107,7 @@
     "progress-empty",
     "profile-modal",
     "password-expanded",
+    "password-recovery",
     "delete-account",
     "delete-attempt"
   ]);
@@ -242,6 +243,8 @@
       return;
     }
 
+    // Reset-email links carry type=recovery in the hash; supabase-js consumes it (and fires PASSWORD_RECOVERY) before our listener exists.
+    app.passwordRecovery = /(^|[#&])type=recovery(&|$)/.test(location.hash);
     try {
       app.client = window.supabase.createClient(
         window.CSC_SUPABASE_CONFIG.url.replace(/\/rest\/v1\/?$/, ""),
@@ -254,12 +257,14 @@
       app.client.auth.onAuthStateChange(async (event, session) => {
         const hadSession = Boolean(app.session);
         app.session = session;
+        if (event === "PASSWORD_RECOVERY") app.passwordRecovery = true;
         if (session) {
           if (!hadSession || app.view.name === "boot" || app.view.name === "create" || app.view.name === "signin") {
             await loadUserData();
             app.modal = null;
             setView(requestedView() || { name: "dashboard" });
           }
+          if (app.passwordRecovery && app.modal !== "password") openModal("password");
         } else {
           app.modal = null;
           app.profile = null;
@@ -270,6 +275,7 @@
       if (app.session) {
         await loadUserData();
         setView(requestedView() || { name: "dashboard" });
+        if (app.passwordRecovery) openModal("password");
       } else {
         setView({ name: "create" });
       }
@@ -420,8 +426,9 @@
       }
       return setView({ name: "review", attemptId: submitted.id, index: fixtureState === "review" ? 42 : 0 });
     }
-    if (fixtureState === "profile-modal" || fixtureState === "password-expanded" || fixtureState === "delete-account") {
-      app.modal = fixtureState === "password-expanded" ? "password" : "profile";
+    if (fixtureState === "profile-modal" || fixtureState === "password-expanded" || fixtureState === "password-recovery" || fixtureState === "delete-account") {
+      app.passwordRecovery = fixtureState === "password-recovery";
+      app.modal = fixtureState === "password-expanded" || fixtureState === "password-recovery" ? "password" : "profile";
       if (fixtureState === "delete-account") app.modal = "delete-account";
       return setView({ name: "dashboard" });
     }
@@ -2068,11 +2075,11 @@
         <section class="password-modal" role="dialog" aria-modal="true" aria-labelledby="password-title" tabindex="-1" data-motion-purpose="modal-reveal">
           <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
           <p class="eyebrow">Account security</p>
-          <h2 id="password-title">Change Password</h2>
-          <p>Use your current password to confirm this change.</p>
+          <h2 id="password-title">${app.passwordRecovery ? "Set a New Password" : "Change Password"}</h2>
+          <p>${app.passwordRecovery ? "You opened a password reset link. Choose a new password for this account." : "Use your current password to confirm this change."}</p>
           ${app.dialogError ? `<p class="form-error" role="alert">${escapeHtml(app.dialogError)}</p>` : ""}
           <form data-form="change-password" class="password-change-form">
-            <label>Current Password<div class="field-with-icon has-toggle">${icon("key")}<input name="currentPassword" type="password" autocomplete="current-password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
+            ${app.passwordRecovery ? "" : `<label>Current Password<div class="field-with-icon has-toggle">${icon("key")}<input name="currentPassword" type="password" autocomplete="current-password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>`}
             <label>New Password<div class="field-with-icon has-toggle">${icon("key")}<input name="newPassword" type="password" minlength="8" autocomplete="new-password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
             <label>Confirm New Password<div class="field-with-icon has-toggle">${icon("key")}<input name="confirmNewPassword" type="password" minlength="8" autocomplete="new-password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
             <div class="modal-actions"><button class="btn secondary" data-action="close-modal" type="button">Cancel</button><button class="btn primary" data-action="password-submit" type="button" ${app.busyAction === "password" ? "disabled" : ""}>${app.busyAction === "password" ? "Updating..." : "Update Password"}</button></div>
@@ -3689,10 +3696,17 @@
     if (data.confirmNewPassword !== undefined && newPassword !== data.confirmNewPassword) {
       throw new Error("New passwords do not match.");
     }
-    const signInResult = await app.client.auth.signInWithPassword({ email, password: currentPassword });
-    if (signInResult.error) throw signInResult.error;
+    // A reset-link session already proves email ownership; the forgotten current password cannot be asked for.
+    if (!app.passwordRecovery) {
+      const signInResult = await app.client.auth.signInWithPassword({ email, password: currentPassword });
+      if (signInResult.error) throw signInResult.error;
+    }
     const { error } = await app.client.auth.updateUser({ password: newPassword });
     if (error) throw error;
+    if (app.passwordRecovery) {
+      app.passwordRecovery = false;
+      closeModal(false);
+    }
     showToast("Password changed.");
   }
 
@@ -4971,12 +4985,13 @@
     app.audioMenuOpen = false;
     if (name === "profile") app.accountAvatarDraft = Number(app.profile?.avatar_preset || 0);
     if (name === "password") app.dialogError = "";
-    app.modalReturn = name === "password" ? "profile" : null;
+    app.modalReturn = name === "password" && !app.passwordRecovery ? "profile" : null;
     app.modal = name;
     render();
   }
 
   function closeModal(rerender = true) {
+    if (app.modal === "password") app.passwordRecovery = false;
     if (app.modalReturn && app.modal === "password") {
       app.modal = app.modalReturn;
       app.modalReturn = null;

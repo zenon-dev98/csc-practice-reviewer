@@ -1,6 +1,6 @@
 # Repo Current State
 
-Last updated: 2026-07-23
+Last updated: 2026-11-21
 
 ## Workspace
 
@@ -25,6 +25,8 @@ Path:
   scan-to-grade mode, the July 22 focused UI remediation, power-outage attempt
   recovery, the integer-timer synchronization hotfix, and bounded long
   ordering prompts.
+- 2026-11-21: 69 question explanations no longer cite a choice letter (56 named the wrong one, and all broke under answer shuffling); phone-width charts now fit the card instead of a 620px sideways-scroll canvas (`v5-production.css?v=20261121-01`). See `docs/Audit_UX_And_Questions_2026-11-21.md` for the full audit and open items.
+- 2026-11-21: Password reset links now open a "Set a New Password" dialog without the current-password field (`app.js?v=20261121-01`). Before, the link only signed the user in and Change Password still demanded the forgotten password. QA fixture: `?fixture=password-recovery`.
 - The public GitHub repository is `https://github.com/zenon-dev98/csc-practice-reviewer`.
 - The Supabase SQL/Auth Hook setup from `supabase/schema.sql` has been applied, including authenticated table grants and the `public.hook_validate_invite_code` Before User Created hook.
 - Supabase Auth email/password is enabled with email confirmation disabled for this invite-gated small-group reviewer, avoiding free email quota failures during signup.
