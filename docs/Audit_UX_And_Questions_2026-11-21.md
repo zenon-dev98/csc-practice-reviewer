@@ -148,3 +148,9 @@ Real bank items of every type were opened in the exam screen (`?fixture=exam&que
 - Q11 fixed: all 60 passages were lengthened from 73-111 words (average 90) to 146-247 words (average 182). Each keeps its original sentences word for word; a new opening paragraph adds background (who is affected, why it matters) and a middle paragraph adds detail or viewpoints. Neither adds an action, so all 240 existing questions keep the same single correct answer. A before/after diff confirmed that only passage text changed.
 - Q10 fixed: reading items in versions 1-13 now expect 95 seconds, so reading averages 87 seconds against 78 for data interpretation. Versions 14-20 derive time from difficulty and were left unchanged.
 - Still open: most passages share one template (a problem, a pilot, a result, more monitoring), and so do many of their questions. Real exam reading covers more genres.
+
+### Guessable reading answers (2026-11-21)
+
+- Q3, reading comprehension part fixed: in 234 of the 240 reading questions, the three wrong choices were rewritten as believable misreadings of the passage (a detail swapped in, a cause reversed, a later step presented as the first, true but not what was asked) at about the same length as the correct answer. Correct answers, answer letters and explanations are unchanged; a before/after diff confirmed nothing else moved. The six NOT-type questions (v04-q072, v06-q072, v06-q074, v16-q074, v18-q073, v19-q080) keep their true-statement choices.
+- Result: the correct answer is the longest choice in 28% of reading questions (was 94%; 25% is pure chance), and correct and wrong choices now average the same length (ratio 1.02, was 1.97). Bank-wide, correct is the unique longest in 28% of all items.
+- Still open: General Information (correct is longest in 73-89%, many joke wrong choices) and assumptions/conclusions (54%).
