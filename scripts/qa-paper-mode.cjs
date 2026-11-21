@@ -44,7 +44,7 @@ const expectedChecks = [
 ];
 
 function buildMetadata() {
-  const files = ["app/index.html", "app/app.js", "app/paper-mode.js", "app/v5-production.css"];
+  const files = ["app/index.html", "app/app.js", "app/paper-mode.js", "app/game.css"];
   const hash = crypto.createHash("sha256");
   files.forEach((file) => hash.update(fs.readFileSync(path.resolve(file))));
   return { fingerprint: hash.digest("hex").slice(0, 16), files };
@@ -54,8 +54,9 @@ function pngBuffer(dataUrl) {
   return Buffer.from(dataUrl.slice(dataUrl.indexOf(",") + 1), "base64");
 }
 
+let browser;
 (async () => {
-  const browser = await chromium.launch({ channel: "msedge", headless: true });
+  browser = await chromium.launch({ channel: "msedge", headless: true });
   const context = await browser.newContext({ viewport: { width: 1536, height: 816 }, deviceScaleFactor: 1 });
   const page = await context.newPage();
   page.setDefaultTimeout(10000);
@@ -233,30 +234,31 @@ function pngBuffer(dataUrl) {
   await page.evaluate(() => document.fonts.ready);
   await shot("paper-setup");
   check("paper setup locks both shuffle controls", await page.locator("input[name='shuffleQuestions']:disabled, input[name='shuffleAnswers']:disabled").count() === 2);
-  check("paper setup exposes two-page print action", await page.getByRole("button", { name: /Print Answer Sheets/i }).isVisible() && (await page.locator(".paper-setup-note").innerText()).includes("Items 86-170"));
-  await page.getByRole("button", { name: /Start Paper Exam/i }).click();
-  await page.locator(".paper-readonly-choices").waitFor();
+  check("paper setup exposes two-page print action", await page.getByRole("button", { name: /Print answer sheets/i }).isVisible() && await page.getByText(/items 86[–-]170/i).isVisible());
+  await page.getByRole("button", { name: /Start paper exam/i }).click();
+  await page.locator(".gx-choices .gx-choice").first().waitFor();
   await shot("paper-exam");
-  const paperChoiceCount = await page.locator(".paper-readonly-choices .choice").count();
-  check("paper exam choices are read-only", paperChoiceCount > 0 && await page.locator(".paper-readonly-choices .choice:disabled").count() === paperChoiceCount, `${paperChoiceCount} choices`);
-  const beforeItem = await page.locator(".question-item-number").innerText().catch(() => page.locator(".question-index").innerText());
+  const paperChoiceCount = await page.locator(".gx-choices .gx-choice").count();
+  check("paper exam choices are read-only", paperChoiceCount > 0 && await page.locator(".gx-choices .gx-choice:disabled").count() === paperChoiceCount, `${paperChoiceCount} choices`);
+  const beforeItem = await page.locator(".gx-qnum").innerText();
   await page.getByRole("button", { name: /^Next/i }).click();
-  const afterItem = await page.locator(".question-item-number").innerText().catch(() => page.locator(".question-index").innerText());
+  const afterItem = await page.locator(".gx-qnum").innerText();
   check("paper exam next works without an onscreen answer", beforeItem !== afterItem, `${beforeItem} -> ${afterItem}`);
-  await page.getByRole("button", { name: /Finish Answering/i }).first().click();
-  check("paper finish requires confirmation", await page.getByRole("dialog", { name: /Finish answering/i }).isVisible());
+  // The top-bar Finish button is always visible; the rail copy is hidden when the question map is collapsed.
+  await page.getByRole("button", { name: /^Finish( answering)?$/i }).first().click();
+  check("paper finish requires confirmation", await page.getByRole("dialog", { name: /Done with the paper sheet/i }).isVisible());
   await shot("paper-finish-confirmation");
-  await page.getByRole("button", { name: /Freeze and Scan/i }).click();
-  await page.getByRole("heading", { name: /Upload both answer sheets/i }).waitFor();
-  check("paper finish opens local upload stage", await page.getByText(/Timer frozen at/i).isVisible());
-  check("upload stage separates file and camera controls", await page.getByText("Choose File", { exact: true }).count() === 2 && await page.getByText("Use Camera", { exact: true }).count() === 2);
+  await page.getByRole("button", { name: /Stop and scan/i }).click();
+  await page.getByRole("heading", { name: /Scan both answer sheets/i }).waitFor();
+  check("paper finish opens local upload stage", await page.getByText(/Timer stopped at/i).isVisible());
+  check("upload stage separates file and camera controls", await page.getByText("Choose file", { exact: true }).count() === 2 && await page.getByText("Take photo", { exact: true }).count() === 2);
   await shot("paper-upload-empty");
 
   const timeoutPage = await context.newPage();
   timeoutPage.setDefaultTimeout(10000);
   await timeoutPage.goto(`${baseUrl}?fixture=paper-timeout&qaTiming=1&qa=paper-timeout`, { waitUntil: "networkidle" });
-  await timeoutPage.getByRole("heading", { name: /Upload both answer sheets/i }).waitFor({ timeout: 6000 });
-  check("paper timeout freezes and opens local upload stage", await timeoutPage.getByText(/Timer frozen at 3:10:00/i).isVisible());
+  await timeoutPage.getByRole("heading", { name: /Scan both answer sheets/i }).waitFor({ timeout: 6000 });
+  check("paper timeout freezes and opens local upload stage", await timeoutPage.getByText(/Timer stopped at 3:10:00/i).isVisible());
   await timeoutPage.screenshot({ path: path.join(outputDir, "paper-timeout-scan.png") });
   report.screenshots.push({ name: "paper-timeout-scan", file: "paper-timeout-scan.png", viewport: timeoutPage.viewportSize() });
   await timeoutPage.close();
@@ -266,29 +268,31 @@ function pngBuffer(dataUrl) {
     if (!["document", "script", "stylesheet", "image", "font"].includes(request.resourceType())) scanRequests.push({ method: request.method(), url: request.url(), type: request.resourceType() });
   });
   await page.locator("input[data-paper-file='0']").first().setInputFiles({ name: "page-1.png", mimeType: "image/png", buffer: pngBuffer(omr.uploadDataUrls[0]) });
-  await page.locator(".paper-upload-card.has-scan").waitFor();
+  await page.locator("canvas[data-paper-canvas='0']").waitFor();
   await page.locator("input[data-paper-file='1']").first().setInputFiles({ name: "page-2.png", mimeType: "image/png", buffer: pngBuffer(omr.uploadDataUrls[1]) });
-  await page.locator(".paper-upload-card.has-scan").nth(1).waitFor();
-  await page.getByRole("button", { name: /Analyze 170 Answers/i }).waitFor({ state: "visible" });
+  await page.locator("canvas[data-paper-canvas='1']").waitFor();
+  await page.getByRole("button", { name: /Read 170 answers/i }).waitFor({ state: "visible" });
   await page.waitForFunction(() => !document.querySelector('[data-action="analyze-paper-sheets"]')?.disabled);
-  check("both uploaded pages enable recognition", await page.getByRole("button", { name: /Analyze 170 Answers/i }).isEnabled());
+  check("both uploaded pages enable recognition", await page.getByRole("button", { name: /Read 170 answers/i }).isEnabled());
   await shot("paper-upload-aligned");
-  await page.getByRole("button", { name: /Analyze 170 Answers/i }).click();
-  await page.getByRole("heading", { name: /Confirm detected answers/i }).waitFor();
-  check("recognition produces 170 editable items", await page.locator(".paper-answer-item").count() === 170);
+  await page.getByRole("button", { name: /Read 170 answers/i }).click();
+  await page.getByRole("heading", { name: /Confirm the answers we read/i }).waitFor();
+  check("recognition produces 170 editable items", await page.locator(".gx-paper-item").count() === 170);
   await shot("paper-review-grid");
   await page.locator("[data-paper-answer='1'][data-paper-choice='D']").click();
-  check("manual answer correction is applied", await page.locator("[data-paper-answer='1'][data-paper-choice='D']").getAttribute("class").then((value) => value.includes("selected")));
+  check("manual answer correction is applied", await page.locator("[data-paper-answer='1'][data-paper-choice='D']").getAttribute("class").then((value) => value.includes("is-selected")));
   await page.locator("[data-paper-answer='2'][data-paper-choice='']").click();
-  check("intentional blank requires confirmation", await page.getByRole("button", { name: /Confirm and Grade/i }).isDisabled() && await page.locator("[data-paper-confirm-blanks]").isVisible());
-  await page.locator("[data-paper-confirm-blanks]").check();
-  await page.getByRole("button", { name: /Confirm and Grade/i }).click();
-  await page.locator(".results-page").waitFor();
-  check("confirmed paper answers reach results", await page.locator(".results-page").isVisible());
-  check("paper result is labeled", await page.getByText("Paper mode", { exact: true }).isVisible());
+  check("intentional blank requires confirmation", await page.getByRole("button", { name: /Grade my sheet/i }).isDisabled() && await page.locator("[data-paper-confirm-blanks]").count() === 1);
+  // The checkbox is visually replaced by a styled switch, so the user clicks its label.
+  await page.locator("label:has([data-paper-confirm-blanks])").click();
+  await page.getByRole("button", { name: /Grade my sheet/i }).click();
+  await page.locator(".gx-result-hero").waitFor();
+  check("confirmed paper answers reach results", await page.locator(".gx-result-hero").isVisible());
+  check("paper result is labeled", await page.locator(".gx-result-hero h1 .gx-tag").innerText().then((text) => /paper/i.test(text)));
   await shot("paper-results");
-  await page.getByRole("button", { name: /Review Answers/i }).click();
-  check("paper review omits answer-change claims", await page.getByText("Answer Source", { exact: true }).isVisible() && await page.getByText("Answer Changes", { exact: true }).count() === 0);
+  await page.locator("[data-action='review-answers']").click();
+  await page.locator(".gx-explain-meta").first().waitFor();
+  check("paper review omits answer-change claims", await page.getByText(/Answered on paper/i).first().isVisible() && await page.getByText(/Answer changes/i).count() === 0);
   await shot("paper-answer-review");
   report.requestsAfterScan = scanRequests;
   check("scan images trigger no upload request", scanRequests.every((request) => !/supabase|storage|upload/i.test(request.url)), JSON.stringify(scanRequests));
@@ -330,7 +334,9 @@ function pngBuffer(dataUrl) {
   fs.writeFileSync(path.join(outputDir, "manifest.md"), `# Paper Mode QA\n\n- Build: \`${report.build.fingerprint}\`\n- Expected: ${report.expected}\n- Executed: ${report.executed}\n- Passed: ${report.passed}\n- Failed: ${report.failed}\n- Runtime errors: ${report.runtimeErrors.length}\n\n${report.checks.map((item) => `- [${item.passed ? "x" : " "}] ${item.name}${item.details ? `: ${item.details}` : ""}`).join("\n")}\n`);
   await browser.close();
   if (report.failed || report.runtimeErrors.length) process.exitCode = 1;
-})().catch((error) => {
+})().catch(async (error) => {
   console.error(error);
   process.exitCode = 1;
+  // Without this an early failure leaves Edge open and the run never exits.
+  if (browser) await browser.close().catch(() => {});
 });

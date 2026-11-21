@@ -1,0 +1,124 @@
+{
+  "createdAt": "2026-11-21T18:15:10.983Z",
+  "baseUrl": "http://127.0.0.1:4174/",
+  "browser": "Microsoft Edge (headless)",
+  "buildFingerprint": "0b980907f630beb6",
+  "expected": 13,
+  "checks": [
+    {
+      "name": "home entry animates on load",
+      "passed": true,
+      "details": "15 animations"
+    },
+    {
+      "name": "home entry animations are finite and end before cleanup",
+      "passed": true,
+      "details": "[]"
+    },
+    {
+      "name": "home entry ends with content fully visible",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "answer pick pops only the chosen choice",
+      "passed": true,
+      "details": "[\"button.gx-choice.is-selected.is-popping\",\"button.gx-choice.is-selected.is-popping\",\"button.gx-choice.is-selected.is-popping\",\"button.gx-choice.is-selected.is-popping\",\"button.gx-choice.is-selected.is-popping\",\"button.gx-choice.is-selected.is-popping\",\"span.gx-key\"]"
+    },
+    {
+      "name": "answer pick does not replay the page entry",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "next question slides in the question column",
+      "passed": true,
+      "details": "Question 43 -> Question 44"
+    },
+    {
+      "name": "next question does not replay the page entry",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "pause opens its modal with an entry animation",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "exam motion ends with no running animations",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "reduced motion home uses short fades only",
+      "passed": true,
+      "details": "[]"
+    },
+    {
+      "name": "reduced motion home ends with content fully visible",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "reduced motion next question uses short fades only",
+      "passed": true,
+      "details": "[]"
+    },
+    {
+      "name": "no runtime errors",
+      "passed": true,
+      "details": "[]"
+    }
+  ],
+  "screenshots": [
+    {
+      "case": "normal-home",
+      "label": "060ms",
+      "file": "normal-home-060ms.png"
+    },
+    {
+      "case": "normal-home",
+      "label": "300ms",
+      "file": "normal-home-300ms.png"
+    },
+    {
+      "case": "normal-home",
+      "label": "2100ms",
+      "file": "normal-home-2100ms.png"
+    },
+    {
+      "case": "normal-exam",
+      "label": "pick-040ms",
+      "file": "normal-exam-pick-040ms.png"
+    },
+    {
+      "case": "normal-exam",
+      "label": "next-060ms",
+      "file": "normal-exam-next-060ms.png"
+    },
+    {
+      "case": "normal-exam",
+      "label": "pause-060ms",
+      "file": "normal-exam-pause-060ms.png"
+    },
+    {
+      "case": "normal-exam",
+      "label": "pause-settled",
+      "file": "normal-exam-pause-settled.png"
+    },
+    {
+      "case": "reduced-home",
+      "label": "040ms",
+      "file": "reduced-home-040ms.png"
+    },
+    {
+      "case": "reduced-exam",
+      "label": "next-040ms",
+      "file": "reduced-exam-next-040ms.png"
+    }
+  ],
+  "runtimeErrors": [],
+  "passed": 13,
+  "failed": 0
+}

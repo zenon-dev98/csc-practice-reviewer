@@ -47,14 +47,14 @@
 ## Redesign follow-ups (2026-11-21)
 
 - Fixed 2026-11-22: the 15 chart/table sets that labelled rows A–D now use real names (North, Malinis, Riverside...) in the table, alt text, questions, choices and explanations, so row names no longer collide with answer letters. The 48 v15-v20 paragraph-ordering items now label sentences I-IV.
-- `npm run qa:paper` was not run for stage 1: Playwright is not installed on this machine (`npm run setup` installs it). Stage 5 restyled the paper scan/review screens (markup and data hooks only) and qa:paper has still not run.
+- Fixed 2026-11-22: `scripts/qa-paper-mode.cjs` was updated to the game-style paper screens (it still targeted the old cockpit markup and hung) and now passes 31/31 in headless Edge; evidence in `qa/2026-11-22-paper-mode/`. Playwright lives in `%LOCALAPPDATA%\csc-reviewer\qa-deps` (installed with `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1`; the scripts use the installed Edge). `npm run setup` does not install it.
 
 ## Question bank follow-ups (2026-11-21)
 
-- Reading passages are now 146-247 words, but nearly all follow one template (problem, pilot, result, keep monitoring). More varied genres (argument, narrative, explanation) would test reading more like the real exam.
-- Abstract reasoning still has many quick letter/number code items; only the 26 word-described figure puzzles became drawn figure series.
+- Fixed 2026-11-22: each mock now has one non-report passage (science explanation, history, opinion essay, editorial, short fiction, letter, economics, language and culture), 20 new passages with 80 new questions. The other two passages per mock are still government pilot reports.
+- Fixed 2026-11-22: every mock now has 3 drawn figure-series items (34 new, replacing defined-operator and symbol-value items, 14 of them hard with two or three interacting rules). The other 7 abstract-reasoning items per mock are still letter, number and symbol codes.
 - Answer leak and joke choices: fixed for reading comprehension (correct longest in 28%, was 94%), General Information (23-41%, was 73-89%) and assumptions/conclusions (19%, was 54%); bank-wide 19.9%. The rewritten GI choices should get a legal spot-check by a human reviewer. Near-identical cross-mock copies were replaced (137 to 51 remaining matches, all reviewed as same-type rather than copies). Same-type repetition (for example several work-rate problems with different numbers) remains by design, as in the real exam.
 
 ## Motion follow-ups (2026-11-21)
 
-- Motion timing was verified by class triggers and end states only: the in-app browser pane was hidden, so animation frames were throttled, and Playwright (needed for impeccable motion-capture or qa:motion) is not installed. Watch it once in a visible browser, including with reduced motion turned on in the OS.
+- 2026-11-22: `scripts/qa-motion.cjs` was rewritten for the game-style motion layer (it tested the retired cockpit motion) and passes 13/13 in headless Edge at 1536x736: entry, answer pop, next-question slide and pause-modal triggers, every animation finite and ending before the 1.7 s cleanup, content fully visible afterwards, and reduced motion limited to fades of 200 ms or less. Evidence in `qa/2026-11-22-motion/` (traces kept locally, not committed). It found and fixed one bug: the pause dialog never animated in, because it follows the attempt status rather than `app.modal`. Headless timing is regression evidence only; a human look in a visible Edge window is still the way to judge feel.

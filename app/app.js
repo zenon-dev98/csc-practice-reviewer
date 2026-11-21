@@ -1680,12 +1680,14 @@
       motion.flagged = current.flagged;
       motion.stimulus = current.stimulus?.id || "";
     }
-    if (app.modal && app.modal !== motion.modal) gx.querySelector(".gx-backdrop")?.classList.add("is-entering");
+    // The pause dialog follows the attempt's status rather than app.modal.
+    const modal = app.modal || (attempt?.status === "paused" ? "paused" : "");
+    if (modal && modal !== motion.modal) gx.querySelector(".gx-backdrop")?.classList.add("is-entering");
     if (app.toast && app.toast !== motion.toast) gx.querySelector(".toast")?.classList.add("is-entering");
     // Safety net: if the browser pauses animations (background tab, throttled pane), never leave content hidden.
     clearTimeout(motion.cleanup);
     motion.cleanup = setTimeout(() => gx.querySelectorAll(".is-entering, .is-next, .is-popping, .is-just-checked").forEach((element) => element.classList.remove("is-entering", "is-next", "is-popping", "is-just-checked")) || gx.classList.remove("is-entering"), 1700);
-    motion.modal = app.modal;
+    motion.modal = modal;
     motion.toast = app.toast;
     motion.screen = screen;
     motion.question = question;

@@ -1,0 +1,406 @@
+{
+  "createdAt": "2026-11-21T18:23:42.390Z",
+  "baseUrl": "http://127.0.0.1:4174/",
+  "browser": "Microsoft Edge",
+  "build": {
+    "fingerprint": "287e448f0fe370a6",
+    "files": [
+      "app/index.html",
+      "app/app.js",
+      "app/paper-mode.js",
+      "app/game.css"
+    ]
+  },
+  "expected": 31,
+  "checks": [
+    {
+      "name": "paper tools load",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "two print pages cover 1-170",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "all 170 patterned bubbles recognize correctly",
+      "passed": true,
+      "details": "[]"
+    },
+    {
+      "name": "all unmarked bubbles recognize as blank",
+      "passed": true,
+      "details": "[]"
+    },
+    {
+      "name": "double mark is reported as multiple",
+      "passed": true,
+      "details": "{\"number\":1,\"choice\":null,\"state\":\"multiple\",\"confidence\":0,\"scores\":[254.99999999999997,254.99999999999997,2.842170943040401e-14,2.842170943040401e-14],\"reviewed\":false}"
+    },
+    {
+      "name": "faint mark is reported for review",
+      "passed": true,
+      "details": "{\"number\":1,\"choice\":\"C\",\"state\":\"low\",\"confidence\":0.62,\"scores\":[2.842170943040401e-14,2.842170943040401e-14,31,2.842170943040401e-14],\"reviewed\":false}"
+    },
+    {
+      "name": "corrected mark favors the final dark choice",
+      "passed": true,
+      "details": "{\"number\":1,\"choice\":\"D\",\"state\":\"confident\",\"confidence\":0.99,\"scores\":[31,2.842170943040401e-14,2.842170943040401e-14,254.99999999999997],\"reviewed\":false}"
+    },
+    {
+      "name": "skewed sheet recognizes correctly",
+      "passed": true,
+      "details": "0 errors"
+    },
+    {
+      "name": "shadowed sheet recognizes correctly",
+      "passed": true,
+      "details": "0 errors"
+    },
+    {
+      "name": "brightened sheet recognizes correctly",
+      "passed": true,
+      "details": "0 errors"
+    },
+    {
+      "name": "rotated sheet normalizes and recognizes correctly",
+      "passed": true,
+      "details": "{\"errors\":0,\"orientation\":{\"turns\":3,\"confidence\":0.7316654192181197,\"scores\":[2.842170943040401e-14,126.01593825042885,29.750000000000018,33.81443396226415]}}"
+    },
+    {
+      "name": "automatic markers locate all four corners",
+      "passed": true,
+      "details": "{\"points\":[{\"x\":13,\"y\":13},{\"x\":393,\"y\":13},{\"x\":393,\"y\":514},{\"x\":13,\"y\":514}],\"confidence\":0.9790570175438597}"
+    },
+    {
+      "name": "Letter and A4 print outputs contain two pages",
+      "passed": true,
+      "details": "Letter: 2 pages; A4: 2 pages"
+    },
+    {
+      "name": "paper setup locks both shuffle controls",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "paper setup exposes two-page print action",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "paper exam choices are read-only",
+      "passed": true,
+      "details": "5 choices"
+    },
+    {
+      "name": "paper exam next works without an onscreen answer",
+      "passed": true,
+      "details": "Question 1 -> Question 2"
+    },
+    {
+      "name": "paper finish requires confirmation",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "paper finish opens local upload stage",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "upload stage separates file and camera controls",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "paper timeout freezes and opens local upload stage",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "both uploaded pages enable recognition",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "recognition produces 170 editable items",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "manual answer correction is applied",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "intentional blank requires confirmation",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "confirmed paper answers reach results",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "paper result is labeled",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "paper review omits answer-change claims",
+      "passed": true,
+      "details": ""
+    },
+    {
+      "name": "scan images trigger no upload request",
+      "passed": true,
+      "details": "[]"
+    },
+    {
+      "name": "paper desktop states have no document overflow",
+      "passed": true,
+      "details": "[]"
+    },
+    {
+      "name": "paper mobile states remain reachable",
+      "passed": true,
+      "details": "[]"
+    }
+  ],
+  "screenshots": [
+    {
+      "name": "print-page-1",
+      "file": "print-page-1.png",
+      "source": "native 1632x2112 canvas"
+    },
+    {
+      "name": "print-page-2",
+      "file": "print-page-2.png",
+      "source": "native 1632x2112 canvas"
+    },
+    {
+      "name": "letter-print",
+      "file": "answer-sheets-letter.pdf"
+    },
+    {
+      "name": "a4-fit-print",
+      "file": "answer-sheets-a4-fit.pdf"
+    },
+    {
+      "name": "paper-setup",
+      "file": "05-paper-setup.png",
+      "viewport": {
+        "width": 1536,
+        "height": 816
+      }
+    },
+    {
+      "name": "paper-exam",
+      "file": "06-paper-exam.png",
+      "viewport": {
+        "width": 1536,
+        "height": 816
+      }
+    },
+    {
+      "name": "paper-finish-confirmation",
+      "file": "07-paper-finish-confirmation.png",
+      "viewport": {
+        "width": 1536,
+        "height": 816
+      }
+    },
+    {
+      "name": "paper-upload-empty",
+      "file": "08-paper-upload-empty.png",
+      "viewport": {
+        "width": 1536,
+        "height": 816
+      }
+    },
+    {
+      "name": "paper-timeout-scan",
+      "file": "paper-timeout-scan.png",
+      "viewport": {
+        "width": 1536,
+        "height": 816
+      }
+    },
+    {
+      "name": "paper-upload-aligned",
+      "file": "10-paper-upload-aligned.png",
+      "viewport": {
+        "width": 1536,
+        "height": 816
+      }
+    },
+    {
+      "name": "paper-review-grid",
+      "file": "11-paper-review-grid.png",
+      "viewport": {
+        "width": 1536,
+        "height": 816
+      }
+    },
+    {
+      "name": "paper-results",
+      "file": "12-paper-results.png",
+      "viewport": {
+        "width": 1536,
+        "height": 816
+      }
+    },
+    {
+      "name": "paper-answer-review",
+      "file": "13-paper-answer-review.png",
+      "viewport": {
+        "width": 1536,
+        "height": 816
+      }
+    },
+    {
+      "name": "desktop-paper-setup",
+      "file": "14-desktop-paper-setup.png",
+      "viewport": {
+        "width": 1536,
+        "height": 816
+      }
+    },
+    {
+      "name": "desktop-paper-exam",
+      "file": "15-desktop-paper-exam.png",
+      "viewport": {
+        "width": 1536,
+        "height": 816
+      }
+    },
+    {
+      "name": "desktop-paper-scan",
+      "file": "16-desktop-paper-scan.png",
+      "viewport": {
+        "width": 1536,
+        "height": 816
+      }
+    },
+    {
+      "name": "desktop-paper-review",
+      "file": "17-desktop-paper-review.png",
+      "viewport": {
+        "width": 1536,
+        "height": 816
+      }
+    },
+    {
+      "name": "desktop-paper-results",
+      "file": "18-desktop-paper-results.png",
+      "viewport": {
+        "width": 1536,
+        "height": 816
+      }
+    },
+    {
+      "name": "mobile-paper-setup",
+      "file": "19-mobile-paper-setup.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "mobile-paper-exam",
+      "file": "20-mobile-paper-exam.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "mobile-paper-scan",
+      "file": "21-mobile-paper-scan.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "mobile-paper-review",
+      "file": "22-mobile-paper-review.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "mobile-paper-results",
+      "file": "23-mobile-paper-results.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    }
+  ],
+  "requestsAfterScan": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4174/assets/brand-shield.svg?v=20260713-02",
+      "type": "other"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4174/assets/brand-shield.svg?v=20260713-02",
+      "type": "other"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4174/assets/brand-shield.svg?v=20260713-02",
+      "type": "other"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4174/assets/brand-shield.svg?v=20260713-02",
+      "type": "other"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4174/assets/brand-shield.svg?v=20260713-02",
+      "type": "other"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4174/assets/brand-shield.svg?v=20260713-02",
+      "type": "other"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4174/assets/brand-shield.svg?v=20260713-02",
+      "type": "other"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4174/assets/brand-shield.svg?v=20260713-02",
+      "type": "other"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4174/assets/brand-shield.svg?v=20260713-02",
+      "type": "other"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:4174/assets/brand-shield.svg?v=20260713-02",
+      "type": "other"
+    }
+  ],
+  "runtimeErrors": [],
+  "executed": 31,
+  "passed": 31,
+  "failed": 0,
+  "verdicts": {
+    "functional": "pass",
+    "reachability": "pass",
+    "optical": "needs-human-review",
+    "privacy": "pass"
+  }
+}
