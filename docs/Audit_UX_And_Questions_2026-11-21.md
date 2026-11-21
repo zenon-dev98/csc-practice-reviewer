@@ -140,7 +140,7 @@ Real bank items of every type were opened in the exam screen (`?fixture=exam&que
 | D4 | "Row 1: ... Row 2: ... Row 3: ..." matrices and "[2, 5, 7], [4, 3, 7], [6, ?, 10]" rows were plain text you had to picture. | Fixed: both render as grids. |
 | D5 | Paragraph-ordering items in v14-v20 label sentences "A. B. C. D." and showed as one dense paragraph; choices like "A-C-D-B" were not drawn as steps. | Fixed: all 160 ordering items now parse into a numbered list, and letter orders render as steps. |
 | D6 | Movement puzzles in words ("a marker moves two corners clockwise on every turn") make you imagine the figure, and the same ↑ → ↓ ← rotation item repeats in nearly every mock. | Fixed: all 26 word-described figure puzzles are replaced by drawn figure series (new `figures` stimulus kind). Each concept appears once; easy items use one rule, medium items combine two. Original answer letters and difficulty are kept. |
-| D7 | Ordering items and 15 chart sets use A-D as statement or row labels, which collide with the A-D answer letters. | Open: content change. |
+| D7 | Ordering items and 15 chart sets use A-D as statement or row labels, which collide with the A-D answer letters. | Chart sets fixed 2026-11-22 (rows renamed, 60 items). |
 | D8 | Bar charts with several measures show one measure at a time behind tabs; the exact table below has all of them. | Open, minor. |
 
 ### Reading passages (2026-11-21)

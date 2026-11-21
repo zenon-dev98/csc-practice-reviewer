@@ -46,8 +46,7 @@
 
 ## Redesign follow-ups (2026-11-21)
 
-- Sign-in, create-account, the paper scan/confirm workflow and the loading/config/error screens are not yet converted to the game style.
-- 15 of 80 chart/table sets label rows with bare A–D, which collides with answer letters; renaming them is a question-content change that needs approval.
+- Fixed 2026-11-22: the 15 chart/table sets that labelled rows A–D now use real names (North, Malinis, Riverside...) in the table, alt text, questions, choices and explanations, so row names no longer collide with answer letters.
 - `npm run qa:paper` was not run for stage 1: Playwright is not installed on this machine (`npm run setup` installs it). Stage 5 restyled the paper scan/review screens (markup and data hooks only) and qa:paper has still not run.
 
 ## Question bank follow-ups (2026-11-21)
@@ -55,7 +54,6 @@
 - Reading passages are now 146-247 words, but nearly all follow one template (problem, pilot, result, keep monitoring). More varied genres (argument, narrative, explanation) would test reading more like the real exam.
 - Abstract reasoning still has many quick letter/number code items; only the 26 word-described figure puzzles became drawn figure series.
 - Answer leak and joke choices: fixed for reading comprehension (correct longest in 28%, was 94%), General Information (23-41%, was 73-89%) and assumptions/conclusions (19%, was 54%); bank-wide 19.9%. The rewritten GI choices should get a legal spot-check by a human reviewer. Near-identical cross-mock copies were replaced (137 to 51 remaining matches, all reviewed as same-type rather than copies). Same-type repetition (for example several work-rate problems with different numbers) remains by design, as in the real exam.
-- Pipe/work problems reuse the same number pairs across mocks (10 and 15 days, 12 and 18 hours).
 
 ## Motion follow-ups (2026-11-21)
 
