@@ -1189,62 +1189,47 @@
     const draftOptions = { ...DEFAULT_OPTIONS, ...(app.draft?.options || {}) };
     const savedVersionId = draftOptions.versionId || examVersions[0]?.id;
     const paperMode = Boolean(draftOptions.paperMode);
-    root.innerHTML = authedShell(`
-      <section class="setup-page" data-motion-purpose="page-enter">
-        <div class="page-title-row">
-          <div>
-            <h1>Mock Exam Setup</h1>
-            <p>Choose a version and begin a 170-item timed exam.</p>
-          </div>
+    const shelf = gxSealShelf();
+    const content = `
+      <form class="gx-home" data-form="setup">
+        <div class="gx-review-head">
+          <div><h1>Mock exam setup</h1><p class="gx-muted">170 questions · 3 hours 10 minutes · pause and resume anytime</p></div>
         </div>
-
-        <div class="setup-grid v5-setup-grid">
-          <section class="card setup-main v5-panel">
-            <div class="setup-facts instrument-grid v5-instrument-deck" aria-label="Exam format">
-              ${setupFact("clipboard-list", "cyan", "Questions", "170")}
-              ${setupFact("timer", "cyan", "Time Limit", "3h 10m")}
-              ${setupFact("move", "cyan", "Movement", "Free")}
-              ${setupFact("circle-pause", "cyan", "Resume", "Pause &")}
+        <div class="gx-split">
+          <fieldset class="gx-card gx-fieldset">
+            <legend class="gx-card-head"><h2>Pick a mock</h2></legend>
+            <div class="gx-version-grid">
+              ${shelf.versions.map((version) => {
+                const label = String(version.number).padStart(2, "0");
+                const note = version.earned ? `Seal earned · ${Math.round(version.best)}%` : version.active ? "In progress" : version.runs ? `Best ${Math.round(version.best)}%` : "Not taken";
+                return `<label class="gx-version ${version.earned ? "is-earned" : ""}"><input type="radio" name="versionId" value="${escapeAttr(version.id)}" ${version.id === savedVersionId ? "checked" : ""} /><strong>Mock ${label}</strong><small>${note}</small></label>`;
+              }).join("")}
             </div>
-            <div class="section-list allocation-console v5-allocation-console">
-              <div class="technical-title"><h2>Exam Sections</h2><span aria-hidden="true"></span></div>
-              <div class="allocation-grid">
-              ${SECTION_GROUPS.map((group) => `
-                <div class="section-row allocation-card ${group.tone}">
-                  <span class="section-hud-icon">${localIcon(sectionIconName(group.section))}</span>
-                  <div class="allocation-copy">
-                    <strong>${escapeHtml(group.section)}</strong>
-                    <span>Items ${group.range}</span>
-                  </div>
-                  <b>${group.end - group.start + 1}</b>
-                </div>
-              `).join("")}
+          </fieldset>
+          <section class="gx-card">
+            <fieldset class="gx-fieldset">
+              <legend class="gx-card-head"><h2>How you'll answer</h2></legend>
+              <div class="gx-choicecards">
+                <label class="gx-choicecard"><input type="radio" name="answerMode" value="screen" ${paperMode ? "" : "checked"} /><strong>On screen</strong><small>Tap your answers in the app</small></label>
+                <label class="gx-choicecard"><input type="radio" name="answerMode" value="paper" ${paperMode ? "checked" : ""} /><strong>Paper answer sheet</strong><small>Print, shade, scan to grade</small></label>
               </div>
-            </div>
+            </fieldset>
+            <label class="gx-switch ${paperMode ? "is-disabled" : ""}"><span>Shuffle questions</span><input type="checkbox" name="shuffleQuestions" ${!paperMode && draftOptions.shuffleQuestions ? "checked" : ""} ${paperMode ? "disabled" : ""} /><i aria-hidden="true"></i></label>
+            <label class="gx-switch ${paperMode ? "is-disabled" : ""}"><span>Shuffle answer choices</span><input type="checkbox" name="shuffleAnswers" ${!paperMode && draftOptions.shuffleAnswers ? "checked" : ""} ${paperMode ? "disabled" : ""} /><i aria-hidden="true"></i></label>
+            ${paperMode ? `<div class="gx-note-box"><strong>Two printable pages</strong><span>Page 1: items 1–85 · Page 2: items 86–170. Use a black pen.</span><button class="gx-btn" data-action="print-paper-sheets" type="button">Print answer sheets</button></div>` : ""}
+            <p class="gx-muted">${paperMode ? "Scans stay on this device. Only your confirmed answers are saved." : "Your progress saves automatically."}</p>
+            <button class="gx-btn is-primary" data-action="setup-submit" type="button">${paperMode ? "START PAPER EXAM" : "START MOCK EXAM"}</button>
           </section>
-
-           <form class="card setup-options run-configuration v5-panel" data-form="setup">
-             <div class="technical-title"><h2>Exam Options</h2><span aria-hidden="true"></span></div>
-             <fieldset class="answer-mode-selector">
-               <legend>Answer Mode</legend>
-               <label class="answer-mode-card ${paperMode ? "" : "active"}"><input type="radio" name="answerMode" value="screen" ${paperMode ? "" : "checked"}><span>${localIcon("message-square")}<strong>On-screen</strong><small>Select answers in the reviewer</small></span></label>
-               <label class="answer-mode-card ${paperMode ? "active" : ""}"><input type="radio" name="answerMode" value="paper" ${paperMode ? "checked" : ""}><span>${localIcon("clipboard-list")}<strong>Paper answer sheet</strong><small>Print, mark, scan, and grade</small></span></label>
-             </fieldset>
-             <label>Mock Version
-              <select name="versionId">
-                ${examVersions.map((version) => `<option value="${escapeAttr(version.id)}" ${version.id === savedVersionId ? "selected" : ""}>Mock Exam ${String(version.number).padStart(2, "0")}</option>`).join("")}
-              </select>
-            </label>
-             ${toggleControl("shuffleQuestions", "Shuffle Questions", paperMode ? false : draftOptions.shuffleQuestions, paperMode)}
-             ${toggleControl("shuffleAnswers", "Shuffle Answer Choices", paperMode ? false : draftOptions.shuffleAnswers, paperMode)}
-             ${paperMode ? `<div class="paper-setup-note">${localIcon("clipboard-list")}<span><strong>Two printable sheets</strong><small>Page 1: Items 1-85 / Page 2: Items 86-170</small></span></div><button class="btn secondary paper-print-button" data-action="print-paper-sheets" type="button">${localIcon("clipboard-list")} Print Answer Sheets</button>` : ""}
-             <p class="setup-auto-save">${localIcon("cloud-check")} ${paperMode ? "Scans stay on this device. Only confirmed answers are saved." : "Your progress is autosaved. You can pause and resume at any time."}</p>
-             <button class="btn primary technical-cta" data-action="setup-submit" type="button"><span>${icon("play")} ${paperMode ? "Start Paper Exam" : "Start Mock Exam"}</span>${icon("arrow")}</button>
-          </form>
         </div>
-        <div class="setup-disclaimer">${icon("shield")}<p>These mock exams are independently created and are not affiliated with or endorsed by the Civil Service Commission.</p></div>
-      </section>
-    `, "setup");
+        <section class="gx-card">
+          <div class="gx-card-head"><h2>What's in each mock</h2></div>
+          <div class="gx-sectionrow">
+            ${SECTION_GROUPS.map((group) => `<div style="${gxToneStyle(group.section)}"><strong>${escapeHtml(group.section)}</strong><span>Items ${group.range} · ${group.end - group.start + 1} questions</span></div>`).join("")}
+          </div>
+        </section>
+        <p class="gx-note">These mock exams are independently created and are not affiliated with or endorsed by the Civil Service Commission.</p>
+      </form>`;
+    root.innerHTML = gxShell(content, "setup");
   }
 
   function renderExam() {
@@ -1317,7 +1302,8 @@
       menu: `<path d="M4 6h16M4 12h16M4 18h16"/>`,
       clock: `<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/>`,
       music: `<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>`,
-      back: `<path d="M15 18l-6-6 6-6"/>`
+      back: `<path d="M15 18l-6-6 6-6"/>`,
+      refresh: `<path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v4h-4"/>`
     };
     return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || ""}</svg>`;
   }
@@ -2002,6 +1988,48 @@
     requestAnimationFrame(() => root.querySelector(".gx-review-strip .is-current")?.scrollIntoView({ block: "nearest", inline: "center" }));
   }
 
+  function gxEmpty(title, body) {
+    return `<section class="gx-card gx-empty"><h2>${escapeHtml(title)}</h2><p>${escapeHtml(body)}</p><div class="gx-row"><button class="gx-btn is-primary" data-action="open-setup" type="button">START MOCK EXAM</button><button class="gx-btn" data-action="practice-page" type="button">Practice</button></div></section>`;
+  }
+
+  function gxAvatarFace(presetNumber, name) {
+    const preset = avatarOption(presetNumber);
+    return preset
+      ? `<span class="gx-avatar-sprite" style="--avatar-x: ${preset.x}%; --avatar-y: ${preset.y}%" aria-hidden="true"></span>`
+      : escapeHtml(String(name || "R").trim().charAt(0).toUpperCase() || "R");
+  }
+
+  function gxScoreChart(completed) {
+    const runs = completed.slice().sort((a, b) => new Date(a.submitted_at || a.started_at) - new Date(b.submitted_at || b.started_at)).slice(-12);
+    if (!runs.length) return `<p class="gx-muted">Finish a run to start your score history.</p>`;
+    const width = 640;
+    const height = 240;
+    const pad = { left: 44, right: 18, top: 20, bottom: 34 };
+    const inset = 28;
+    const x = (index) => runs.length === 1 ? width / 2 : pad.left + inset + (index * (width - pad.left - pad.right - inset * 2)) / (runs.length - 1);
+    const y = (value) => pad.top + ((100 - value) / 100) * (height - pad.top - pad.bottom);
+    const points = runs.map((attempt, index) => ({ x: x(index), y: y(resultPercent(attempt)), value: Math.round(resultPercent(attempt)), practice: attempt.mode === "practice" }));
+    return `<svg class="gx-line" viewBox="0 0 ${width} ${height}" role="img" aria-label="Scores for your last ${runs.length} runs: ${points.map((point) => `${point.value}%`).join(", ")}">
+      ${[0, 50, 100].map((tick) => `<line class="gx-line-grid" x1="${pad.left}" x2="${width - pad.right}" y1="${y(tick)}" y2="${y(tick)}"/><text x="${pad.left - 8}" y="${y(tick) + 4}" text-anchor="end">${tick}%</text>`).join("")}
+      <line x1="${pad.left}" x2="${width - pad.right}" y1="${y(PASSING_PERCENT)}" y2="${y(PASSING_PERCENT)}" stroke="var(--primary)" stroke-width="2" stroke-dasharray="6 6"/>
+      <text x="${width - pad.right}" y="${y(PASSING_PERCENT) - 6}" text-anchor="end" fill="var(--primary)">80% pass</text>
+      <polyline fill="none" stroke="var(--select)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" points="${points.map((point) => `${point.x},${point.y}`).join(" ")}"/>
+      ${points.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="6" fill="${point.practice ? "var(--surface)" : "var(--select)"}" stroke="var(--select)" stroke-width="3"/><text class="gx-line-value" x="${point.x}" y="${point.y - 12}" text-anchor="middle">${point.value}</text>`).join("")}
+    </svg>
+    <p class="gx-muted">Filled dots are mock exams, hollow dots are practice sets. Last ${runs.length} runs.</p>`;
+  }
+
+  function gxAudioTransport(withShuffle) {
+    const svg = (path) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
+    return `<div class="gx-transport">
+      <button class="gx-icon-btn" data-action="audio-previous" type="button" aria-label="Previous track">${svg(`<path d="M19 20L9 12l10-8zM5 19V5"/>`)}</button>
+      <button class="gx-icon-btn gx-play ${app.audio.music ? "is-on" : ""}" data-action="toggle-music" type="button" aria-label="${app.audio.music ? "Pause" : "Play"} music">${svg(app.audio.music ? `<path d="M9 5v14M15 5v14"/>` : `<path d="M7 4l13 8-13 8z"/>`)}</button>
+      <button class="gx-icon-btn" data-action="audio-next" type="button" aria-label="Next track">${svg(`<path d="M5 4l10 8-10 8zM19 5v14"/>`)}</button>
+      ${withShuffle ? `<button class="gx-icon-btn ${app.audio.shuffle ? "is-on" : ""}" data-action="toggle-audio-shuffle" type="button" aria-label="Shuffle" aria-pressed="${app.audio.shuffle ? "true" : "false"}">${svg(`<path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>`)}</button>` : ""}
+      <button class="gx-icon-btn ${app.audio.muted ? "is-on" : ""}" data-action="toggle-audio-mute" type="button" aria-label="${app.audio.muted ? "Unmute" : "Mute"}" aria-pressed="${app.audio.muted ? "true" : "false"}">${svg(app.audio.muted ? `<path d="M11 5L6 9H2v6h4l5 4zM23 9l-6 6M17 9l6 6"/>` : `<path d="M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>`)}</button>
+    </div>`;
+  }
+
   function isPaperAttempt(attempt) {
     return Boolean(attempt?.options?.paperMode);
   }
@@ -2103,18 +2131,15 @@
 
   function renderPractice() {
     const tab = app.practiceReviewTab || "practice";
-    root.innerHTML = sideShell("practice", `
-      <section class="content-page practice-review-page" data-motion-purpose="page-enter">
-        <div class="page-title-row">
-          <div>
-            <h1>Practice <span>& Review</span></h1>
-            <p>Train a section or revisit questions that need attention.</p>
-          </div>
+    const content = `
+      <div class="gx-home">
+        <div class="gx-review-head">
+          <div><h1>Practice</h1><p class="gx-muted">Short sets with instant feedback, plus your mistakes and flagged questions.</p></div>
+          ${practiceReviewTabs(tab)}
         </div>
-        ${practiceReviewTabs(tab)}
         ${tab === "mistakes" ? mistakesTabContent() : tab === "flagged" ? flaggedTabContent() : practiceTabContent()}
-      </section>
-    `);
+      </div>`;
+    root.innerHTML = gxShell(content, "practice");
   }
 
   function renderRecentAttempts() {
@@ -2122,65 +2147,52 @@
     const completed = completedAttempts();
     const average = averagePercent(completed);
     const highest = completed.reduce((best, attempt) => Math.max(best, resultPercent(attempt)), 0);
-    const categoryStats = categoryPerformance(completed);
-    const weakest = practiceCategoriesForDisplay()
-      .map((category) => ({ category, percent: categoryPercent(categoryStats[category.section], category.section) }))
-      .sort((left, right) => left.percent - right.percent)[0];
-    root.innerHTML = sideShell("recent", `
-      <section class="content-page progress-page" data-motion-purpose="page-enter">
-        <div class="page-title-row">
-          <div>
-            <h1>Progress</h1>
-            <p>See how completed exams and practice sessions are improving.</p>
-          </div>
+    const stats = categoryPerformance(completed);
+    const sections = practiceCategoriesForDisplay().map((category) => ({ category, percent: stats[category.section] ? categoryPercent(stats[category.section], category.section) : null }));
+    const weakest = sections.filter((row) => row.percent !== null).sort((a, b) => a.percent - b.percent)[0];
+    const rows = filteredAttemptsByTab(attempts, app.recentTab);
+    const done = (attempt) => attempt.status === "submitted" || attempt.status === "timed_out";
+    const content = `
+      <div class="gx-home">
+        <div class="gx-review-head"><div><h1>Progress</h1><p class="gx-muted">How your mocks and practice sets are going.</p></div></div>
+        <div class="gx-stats is-row">
+          <div><strong>${completed.length}</strong><span>finished runs</span></div>
+          <div><strong>${average == null ? "–" : `${Math.round(average)}%`}</strong><span>average score</span></div>
+          <div><strong>${completed.length ? `${Math.round(highest)}%` : "–"}</strong><span>best score</span></div>
+          <div><strong class="gx-accent">${gxSealShelf().earned.length} of ${examVersions.length}</strong><span>seals earned</span></div>
         </div>
-        <div class="summary-cards statistics-rail telemetry-rail">
-          ${telemetryMetric("target", "Completed Attempts", completed.length)}
-          ${telemetryMetric("calculator", "Average Score", average == null ? "--" : `${Math.round(average)}%`)}
-          ${telemetryMetric("trophy", "Best Score", completed.length ? `${Math.round(highest)}%` : "--")}
+        <div class="gx-split">
+          <section class="gx-card">
+            <div class="gx-card-head"><h2>Score history</h2><span class="gx-muted">Pass line 80%</span></div>
+            ${gxScoreChart(completed)}
+          </section>
+          <section class="gx-card gx-sidecard">
+            <div class="gx-card-head"><h2>By section</h2></div>
+            <div class="gx-meters is-compact">
+              ${sections.map(({ category, percent }) => `<div class="gx-meter" style="${gxToneStyle(category.section)}"><span class="gx-meter-label">${escapeHtml(category.label)}</span><div class="gx-meter-bar"><i style="width: ${percent ?? 0}%"></i><b style="left: ${PASSING_PERCENT}%"></b></div><strong class="${percent !== null && percent < PASSING_PERCENT ? "is-warn" : ""}">${percent === null ? "–" : `${percent}%`}</strong></div>`).join("")}
+            </div>
+            <button class="gx-btn" data-action="practice-weakest" type="button" ${weakest ? "" : "disabled"}>Practice ${weakest ? escapeHtml(weakest.category.label) : "weakest section"}</button>
+          </section>
         </div>
-        <div class="progress-analytics-grid">
-        <section class="card trend-panel v3-panel">
-          <div class="technical-title"><div><h2>Score History</h2><p>Score across completed runs</p></div><span>${completed.length ? `${completed.length} completed` : "Awaiting first run"}</span></div>
-          ${progressTrendSvg(completed)}
-        </section>
-        <section class="card performance-card v3-panel">
-          <div class="technical-title"><div><h2>Section Accuracy</h2><p>Historical correctness by exam section.</p></div><span aria-hidden="true"></span></div>
-          <div class="performance-bars">
-            ${practiceCategoriesForDisplay().map((category) => progressBarRow(category, categoryPercent(categoryStats[category.section], category.section))).join("")}
+        <section class="gx-card">
+          <div class="gx-card-head"><h2>All runs</h2>
+            <div class="gx-row">
+              <div class="gx-filters" role="tablist" aria-label="Filter runs">${[["all", "All"], ["full", "Mock exams"], ["practice", "Practice"]].map(([key, label]) => `<button role="tab" aria-selected="${app.recentTab === key}" class="${app.recentTab === key ? "is-active" : ""}" data-recent-tab="${key}" type="button">${label}</button>`).join("")}</div>
+              <button class="gx-icon-btn" data-action="refresh-attempts" type="button" aria-label="Refresh runs">${gxIcon("refresh", 18)}</button>
+            </div>
           </div>
-          <button class="review-focus-cta" data-action="practice-weakest" type="button">${localIcon("target")} Practice weakest section <strong>${weakest && completed.length ? escapeHtml(weakest.category.label) : "Awaiting results"}</strong>${icon("arrow")}</button>
+          ${rows.length ? `<div class="gx-list">${rows.map((attempt) => `<div class="gx-listrow">
+            <span><b>${escapeHtml(examTitle(attempt))}</b><small>${attempt.mode === "practice" ? "Practice" : "Mock exam"} · ${formatDate(attempt.started_at)} · ${answeredCount(attempt)}/${attempt.total_questions} answered</small></span>
+            <strong class="${done(attempt) ? resultPercent(attempt) >= PASSING_PERCENT ? "is-good" : "is-warn" : ""}">${done(attempt) ? `${Math.round(resultPercent(attempt))}%` : escapeHtml(statusLabel(attempt.status))}</strong>
+            <span class="gx-rowactions">
+              <button class="gx-btn ${done(attempt) ? "" : "is-primary"}" data-attempt-open="${attempt.id}" type="button">${done(attempt) ? "Results" : "Continue"}</button>
+              <button class="gx-icon-btn" data-overflow="${attempt.id}" type="button" aria-label="More actions for ${escapeAttr(examTitle(attempt))}" aria-expanded="${app.modal === `overflow:${attempt.id}`}"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
+              ${app.modal === `overflow:${attempt.id}` ? overflowMenu(attempt) : ""}
+            </span>
+          </div>`).join("")}</div>` : gxEmpty("No runs yet", "Start a mock exam or a practice set to see it here.")}
         </section>
-        </div>
-        <section class="card attempts-table-card v3-panel">
-          <div class="attempt-table-title"><div><h2>Attempt Records</h2><span>${attempts.length} stored runs for ${escapeHtml(app.profile?.email || app.session?.user?.email || "this account")}</span></div><button class="btn tiny" data-action="refresh-attempts" type="button">${localIcon("history")} Refresh records</button></div>
-          <div class="tabs progress-tabs">
-            ${[
-              ["all", "All Attempts"],
-              ["full", "Mock Exams"],
-              ["practice", "Practice"]
-            ].map(([key, label]) => `<button class="${app.recentTab === key ? "active" : ""}" data-recent-tab="${key}" type="button">${label}</button>`).join("")}
-          </div>
-          <div class="attempt-table">
-            <div class="table-head"><span>Attempt</span><span>Type</span><span>Status</span><span>Score</span><span>Answered</span><span>Action</span></div>
-            ${filteredAttemptsByTab(attempts, app.recentTab).map((attempt, index) => `
-              <div class="table-row">
-                <span class="attempt-name"><i>${String(index + 1).padStart(2, "0")}</i><span><strong>${escapeHtml(examTitle(attempt))}</strong><small>${formatDate(attempt.started_at)}</small></span></span>
-                <span class="attempt-type">${attempt.mode === "practice" ? "Practice" : "Mock Exam"}</span>
-                <span class="attempt-status ${escapeAttr(attempt.status)}">${attempt.status === "submitted" || attempt.status === "timed_out" ? localIcon("circle-check") : localIcon("timer")} ${statusLabel(attempt.status)}</span>
-                <span class="attempt-score">${attempt.status === "submitted" || attempt.status === "timed_out" ? `${Math.round(resultPercent(attempt))}%` : "--"}</span>
-                <span class="attempt-answered">${answeredCount(attempt)} / ${attempt.total_questions}</span>
-                <span class="row-actions">
-                  <button class="btn tiny" data-attempt-open="${attempt.id}" type="button">${attempt.status === "in_progress" || attempt.status === "paused" ? "Continue" : "View Results"}</button>
-                  <button class="icon-only" data-overflow="${attempt.id}" type="button" title="More actions">${icon("more")}</button>
-                  ${app.modal === `overflow:${attempt.id}` ? overflowMenu(attempt) : ""}
-                </span>
-              </div>
-            `).join("") || `<div class="progress-empty-state">${emptyInline("No attempts yet", "Start a mock exam or practice session to create your first record.")}<button class="btn primary" data-action="open-setup" type="button">${icon("play")} Start Mock Exam</button></div>`}
-          </div>
-        </section>
-      </section>
-    `);
+      </div>`;
+    root.innerHTML = gxShell(content, "recent");
   }
 
   function renderMistakePicker() {
@@ -2196,97 +2208,75 @@
   function practiceReviewTabs(active) {
     const mistakes = wrongAnswerCount(completedAttempts());
     const flagged = app.attempts.reduce((sum, attempt) => sum + flaggedCount(attempt), 0);
-    return `
-      <div class="practice-mode-cards" aria-label="Practice and review modes">
-        ${[
-          ["practice", "Practice", "target", "Build skills and accuracy"],
-          ["mistakes", "Mistakes", "circle-check", `${mistakes} to review`],
-          ["flagged", "Flagged", "notebook-tabs", `${flagged} saved questions`]
-        ].map(([key, label, iconName, detail]) => `<button class="practice-mode-card ${key} ${active === key ? "active" : ""}" data-practice-review-tab="${key}" type="button">${localIcon(iconName)}<span><strong>${escapeHtml(label)}</strong><small>${escapeHtml(detail)}</small></span>${localIcon("chevron-right")}</button>`).join("")}
-      </div>
-    `;
+    return `<div class="gx-filters" role="tablist" aria-label="Practice and review">
+      ${[["practice", "Practice", ""], ["mistakes", "Mistakes", mistakes], ["flagged", "Flagged", flagged]].map(([key, label, count]) => `<button role="tab" aria-selected="${active === key}" class="${active === key ? "is-active" : ""}" data-practice-review-tab="${key}" type="button">${label}${count !== "" ? ` <small>${count}</small>` : ""}</button>`).join("")}
+    </div>`;
   }
 
   function practiceTabContent() {
     const categories = practiceCategoriesForDisplay();
     const selectedCategory = app.practiceCategoryDraft || categories[0]?.section;
+    const stats = categoryPerformance(completedAttempts());
+    const selected = categories.find((category) => category.section === selectedCategory) || categories[0];
     return `
-      <form class="custom-practice practice-console v5-panel" data-form="custom-practice">
-        <section class="practice-section-picker">
-          <div class="technical-title"><h2>Build a Practice Set</h2><span aria-hidden="true"></span></div>
-          <fieldset class="category-plates"><legend class="sr-only">Section</legend>${categories.map((category, index) => {
-            const group = SECTION_GROUPS.find((entry) => entry.section === category.section);
-            const available = group ? group.end - group.start + 1 : category.poolSize;
-            return `<label class="section-plate ${category.tone}"><input type="radio" name="category" value="${escapeAttr(category.section)}" ${category.section === selectedCategory ? "checked" : ""}/><span class="section-hud-icon">${localIcon(sectionIconName(category.section))}</span><span class="section-copy"><strong>${escapeHtml(category.section)}</strong><small>${available} available</small></span><i>${localIcon("chevron-right")}</i></label>`;
-          }).join("")}</fieldset>
+      <form class="gx-split" data-form="custom-practice">
+        <fieldset class="gx-card gx-fieldset">
+          <legend class="gx-card-head"><h2>Pick a section</h2></legend>
+          <div class="gx-choicecards is-sections">
+            ${categories.map((category) => {
+              const group = SECTION_GROUPS.find((entry) => entry.section === category.section);
+              const available = group ? group.end - group.start + 1 : category.poolSize;
+              const pct = stats[category.section] ? categoryPercent(stats[category.section], category.section) : null;
+              return `<label class="gx-choicecard" style="${gxToneStyle(category.section)}"><input type="radio" name="category" value="${escapeAttr(category.section)}" ${category.section === selectedCategory ? "checked" : ""} /><strong>${escapeHtml(category.section)}</strong><small>${available} per mock${pct !== null ? ` · you score ${pct}%` : ""}</small></label>`;
+            }).join("")}
+          </div>
+        </fieldset>
+        <section class="gx-card">
+          <div class="gx-card-head"><h2>Set it up</h2></div>
+          <div class="gx-segment" role="radiogroup" aria-label="Number of questions"><span>Questions</span>${[10, 20, 30, 40].map((count) => `<label><input type="radio" name="count" value="${count}" ${count === 20 ? "checked" : ""} /><b>${count}</b></label>`).join("")}</div>
+          <div class="gx-segment" role="radiogroup" aria-label="Difficulty"><span>Difficulty</span>${[["mixed", "Mixed"], ["easy", "Easy"], ["medium", "Medium"], ["hard", "Hard"]].map(([value, label], index) => `<label><input type="radio" name="difficulty" value="${value}" ${index === 0 ? "checked" : ""} /><b>${label}</b></label>`).join("")}</div>
+          <p class="gx-summary"><span class="gx-pill" data-practice-profile-section style="${gxToneStyle(selected.section)}">${escapeHtml(selected.label)}</span> <span><b data-practice-count>20</b> questions · <b data-practice-difficulty>Mixed</b></span></p>
+          <p class="gx-muted">Press CHECK after each answer to see if you got it right, with the explanation.</p>
+          <button class="gx-btn is-primary" data-action="custom-practice-submit" type="button">START PRACTICE</button>
         </section>
-        <section class="run-profile-panel">
-          <div class="count-segments" role="radiogroup" aria-labelledby="practice-count-label"><p class="segment-label" id="practice-count-label">Question Count</p>${[10, 20, 30, 40].map((count) => `<label><input type="radio" name="count" value="${count}" ${count === 20 ? "checked" : ""}/><span>${count}</span></label>`).join("")}</div>
-          <div class="difficulty-segments" role="radiogroup" aria-labelledby="practice-difficulty-label"><p class="segment-label" id="practice-difficulty-label">Difficulty</p>${[["mixed", "Mixed"], ["easy", "Easy"], ["medium", "Medium"], ["hard", "Hard"]].map(([value, label], index) => `<label><input type="radio" name="difficulty" value="${value}" ${index === 0 ? "checked" : ""}/><span>${label}</span></label>`).join("")}</div>
-          <div class="selected-run-profile"><span data-practice-profile-section class="selected-run-section ${toneForSection(selectedCategory)}">${localIcon(sectionIconName(selectedCategory))}<strong>${escapeHtml(sectionLabel(selectedCategory))} selected</strong></span><b><span data-practice-count>20</span> questions / <span data-practice-difficulty>Mixed</span></b></div>
-          <button class="btn primary technical-cta practice-start-cta" data-action="custom-practice-submit" type="button"><span>${localIcon("target")} Start Practice</span>${icon("arrow")}</button>
-        </section>
-      </form>
-    `;
+      </form>`;
   }
 
   function mistakesTabContent() {
     const completed = completedAttempts();
     const withMistakes = completed.map((attempt) => ({ attempt, mistakes: wrongAnswers(attempt) })).filter((item) => item.mistakes.length);
-    const categories = practiceCategoriesForDisplay();
-    const totalMissed = withMistakes.reduce((sum, item) => sum + item.mistakes.length, 0);
-    const sectionCounts = categories.map((category) => ({
-      category,
-      count: withMistakes.reduce((sum, item) => sum + item.mistakes.filter((answer) => answer.section === category.section).length, 0)
-    }));
-    const affected = sectionCounts.filter((entry) => entry.count > 0);
-    const priority = affected.slice().sort((left, right) => right.count - left.count)[0];
+    if (!withMistakes.length) return gxEmpty("No mistakes yet", completed.length ? "Your finished runs have no wrong answers." : "Finish a mock or practice set and your wrong answers will show up here.");
     return `
-      <section class="mistakes-hub">
-        ${withMistakes.length ? `
-            <section class="card mistake-list mistakes-list-only v5-panel">
-              <div class="mistake-console-head">
-                <div><h2>Review Mistakes</h2><p>Choose a completed attempt and review missed questions.</p></div>
-                <div class="mistake-summary-rail">
-                  ${telemetryMetric("notebook-tabs", "Questions to Review", totalMissed)}
-                  ${telemetryMetric("history", "Attempts", withMistakes.length)}
-                  ${telemetryMetric(sectionIconName(priority?.category.section || "Verbal Ability"), "Weakest Section", priority ? priority.category.label : "--")}
-                </div>
-              </div>
-              <div class="mistake-table-head"><span>Attempt</span><span>Type / Date</span><span>Score</span><span>Missed</span><span>Action</span></div>
-              <div class="mistake-attempt-scroll">
-                ${withMistakes.map(({ attempt, mistakes }) => `<article class="mistake-attempt-card">
-                  <div class="mistake-attempt-title"><span class="section-hud-icon">${localIcon(attempt.mode === "practice" ? sectionIconName(mistakes[0]?.section) : "target")}</span><strong>${escapeHtml(examTitle(attempt))}</strong></div>
-                  <span class="mistake-attempt-meta">${attempt.mode === "practice" ? "Practice" : "Mock Exam"}<small>${formatDate(attempt.submitted_at || attempt.started_at)}</small></span>
-                  <strong class="mistake-score">${Math.round(resultPercent(attempt))}%</strong>
-                  <strong class="mistake-count">${mistakes.length}</strong>
-                  <button class="btn technical-row-cta" data-review-mistakes="${attempt.id}" type="button">Review Mistakes ${icon("arrow")}</button>
-                </article>`).join("")}
-              </div>
-            </section>
-        ` : `<section class="card mistakes-empty v5-panel">${emptyState("No mistakes yet", completed.length ? "Your completed attempts do not contain any mistakes." : "Complete a mock exam or practice session and missed questions will appear here.", "open-setup", "Start Mock Exam", "practice-page", "Start Practice")}</section>`}
-      </section>
-    `;
+      <section class="gx-card">
+        <div class="gx-card-head"><h2>Runs with mistakes</h2><span class="gx-muted">${withMistakes.reduce((sum, item) => sum + item.mistakes.length, 0)} questions to review</span></div>
+        <div class="gx-list">
+          ${withMistakes.map(({ attempt, mistakes }) => `<div class="gx-listrow">
+            <span><b>${escapeHtml(examTitle(attempt))}</b><small>${attempt.mode === "practice" ? "Practice" : "Mock exam"} · ${formatDate(attempt.submitted_at || attempt.started_at)} · ${Math.round(resultPercent(attempt))}%</small></span>
+            <strong class="is-warn">${mistakes.length} wrong</strong>
+            <button class="gx-btn" data-review-mistakes="${attempt.id}" type="button">Review</button>
+          </div>`).join("")}
+        </div>
+      </section>`;
   }
 
   function flaggedTabContent() {
     const flagged = app.attempts.flatMap((attempt) => Object.values(attempt.answers).filter((answer) => answer.flagged).map((answer) => ({ attempt, answer })));
+    if (!flagged.length) return gxEmpty("No flagged questions", "Press Flag (or F) during an exam and the question will be saved here.");
     const grouped = practiceCategoriesForDisplay().map((category) => ({ category, rows: flagged.filter((item) => item.answer.section === category.section) })).filter((group) => group.rows.length);
     return `
-      <section class="review-queue">
-        ${flagged.length ? `<div class="flagged-workspace simplified-flagged-workspace">
-          <section class="card flagged-table-panel flagged-table-only v3-panel">
-            <div class="technical-title"><div><h2>Flagged Questions</h2><p>${flagged.length} saved question${flagged.length === 1 ? "" : "s"}, grouped by section.</p></div><span aria-hidden="true"></span></div>
-            <div class="flagged-table-head"><span>Item / Topic</span><span>Source Attempt</span><span>Answer State</span><span>Review</span></div>
-            <div class="flagged-table-scroll">
-              ${grouped.map(({ category, rows }) => `<section class="flagged-section ${category.tone}"><header>${localIcon(sectionIconName(category.section))}<h2>${escapeHtml(category.label)}</h2><em>${rows.length} items</em></header>${rows.map(({ attempt, answer }) => `
-                <div class="flagged-table-row"><span><i>${icon("flag")}</i><strong>Item ${answer.display_number}</strong><small>${escapeHtml(answer.subtopic || answer.topic || "Review item")}</small></span><span>${escapeHtml(examTitle(attempt))}<small>${formatDate(attempt.started_at)}</small></span><span class="${answer.selected_choice === answer.correct_choice ? "correct" : answer.selected_choice ? "wrong" : "unanswered"}">${answer.selected_choice ? answer.selected_choice === answer.correct_choice ? "Correct" : "Incorrect" : "Unanswered"}</span><button class="btn tiny" data-open-review="${attempt.id}" data-review-question="${answer.question_id}" type="button">Review</button></div>
-              `).join("")}</section>`).join("")}
-            </div>
-          </section>
-        </div>` : `<section class="card flagged-empty v3-panel">${emptyState("No flagged questions yet", "Flag a question during an exam or answer review and it will appear here.", "open-setup", "Start Mock Exam", "practice-page", "Start Practice")}</section>`}
-      </section>
-    `;
+      <section class="gx-card">
+        <div class="gx-card-head"><h2>Flagged questions</h2><span class="gx-muted">${flagged.length} saved</span></div>
+        ${grouped.map(({ category, rows }) => `
+          <h3 class="gx-grouphead" style="${gxToneStyle(category.section)}">${escapeHtml(category.label)} <small>${rows.length}</small></h3>
+          <div class="gx-list">${rows.map(({ attempt, answer }) => {
+            const state = answer.selected_choice ? answer.selected_choice === answer.correct_choice ? "Correct" : "Wrong" : "Not answered";
+            return `<div class="gx-listrow">
+              <span><b>Question ${answer.display_number} · ${escapeHtml(answer.subtopic || "Review item")}</b><small>${escapeHtml(examTitle(attempt))} · ${formatDate(attempt.started_at)}</small></span>
+              <strong class="${state === "Correct" ? "is-good" : state === "Wrong" ? "is-warn" : ""}">${state}</strong>
+              <button class="gx-btn" data-open-review="${attempt.id}" data-review-question="${answer.question_id}" type="button">Review</button>
+            </div>`;
+          }).join("")}</div>`).join("")}
+      </section>`;
   }
 
   function progressTrendSvg(attempts) {
@@ -2422,65 +2412,64 @@
     if (app.modal !== "profile" && !(app.modal === "password" && app.modalReturn === "profile")) return "";
     const profile = app.profile;
     const selectedAvatar = app.accountAvatarDraft ?? Number(profile.avatar_preset || 0);
-    const previewProfile = { ...profile, avatar_preset: selectedAvatar };
     return `
-      <div class="modal-backdrop drawer-backdrop">
-        <section class="profile-modal account-settings-modal command-drawer" role="dialog" aria-modal="true" aria-labelledby="account-settings-title" tabindex="-1" data-motion-purpose="modal-reveal">
-          <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
-          <div class="modal-heading">
-            <h2 id="account-settings-title">Account Settings</h2>
-            <p>Personalize your reviewer account and session.</p>
-          </div>
-          <form class="account-settings-form" data-form="profile">
-            <div class="account-identity-preview">${avatar(previewProfile, "large")}<div><strong>${escapeHtml(displayName(profile))}</strong><small>${escapeHtml(profile.email)}</small></div></div>
-            <fieldset class="avatar-picker"><legend>Choose an avatar</legend><div class="avatar-options">${AVATAR_OPTIONS.map((name, index) => {
+      <div class="gx-backdrop is-drawer">
+        <section class="gx-modal is-drawer" role="dialog" aria-modal="true" aria-labelledby="account-settings-title" tabindex="-1">
+          <button class="gx-icon-btn is-bare gx-modal-close" data-action="close-modal" type="button" aria-label="Close">${gxIcon("x")}</button>
+          <h2 id="account-settings-title">Account</h2>
+          <form class="gx-form" data-form="profile">
+            <div class="gx-profile-head"><span class="gx-avatar is-large gx-profile-preview">${gxAvatarFace(selectedAvatar, displayName(profile))}</span><div><strong>${escapeHtml(displayName(profile))}</strong><small>${escapeHtml(profile.email)}</small></div></div>
+            <fieldset class="gx-fieldset"><legend>Choose an avatar</legend><div class="gx-avatar-grid">${AVATAR_OPTIONS.map((name, index) => {
               const preset = avatarOption(index + 1);
-              return `<button class="avatar-option ${selectedAvatar === index + 1 ? "selected" : ""}" data-avatar-preset="${index + 1}" type="button" aria-label="Choose ${escapeAttr(name)} avatar" aria-pressed="${selectedAvatar === index + 1 ? "true" : "false"}"><span class="avatar-sprite" style="--avatar-x:${preset.x}%;--avatar-y:${preset.y}%" aria-hidden="true"></span></button>`;
-            }).join("")}</div><small>Selection is applied after Save Changes.</small></fieldset>
-            <div class="account-field-grid">
-              <label>Nickname<input name="nickname" value="${escapeAttr(profile.nickname || firstName(profile.name))}" maxlength="24" placeholder="What should we call you?" /></label>
-              <label>Full Name<input name="name" value="${escapeAttr(profile.name)}" required /></label>
-              <label>Email Address <small>(used for sign-in)</small><input name="email" value="${escapeAttr(profile.email)}" disabled /></label>
+              return `<button class="gx-avatar-option ${selectedAvatar === index + 1 ? "selected" : ""}" data-avatar-preset="${index + 1}" type="button" aria-label="Choose ${escapeAttr(name)} avatar" aria-pressed="${selectedAvatar === index + 1 ? "true" : "false"}"><span class="gx-avatar-sprite" style="--avatar-x: ${preset.x}%; --avatar-y: ${preset.y}%" aria-hidden="true"></span></button>`;
+            }).join("")}</div><small class="gx-muted">Saved when you press Save changes.</small></fieldset>
+            <label class="gx-field">Nickname<input name="nickname" value="${escapeAttr(profile.nickname || firstName(profile.name))}" maxlength="24" placeholder="What should we call you?" /></label>
+            <label class="gx-field">Full name<input name="name" value="${escapeAttr(profile.name)}" required /></label>
+            <label class="gx-field">Email <small>(used to sign in)</small><input name="email" value="${escapeAttr(profile.email)}" disabled /></label>
+            <button class="gx-btn" data-action="open-password" type="button">Change password</button>
+            <div class="gx-audio-settings">${audioSettingsBlock()}</div>
+            <div class="gx-modal-actions">
+              <button class="gx-btn is-quiet" data-action="signout" type="button">Sign out</button>
+              <button class="gx-btn is-primary" data-action="profile-submit" type="button" ${app.busyAction === "profile" ? "disabled" : ""}>${app.busyAction === "profile" ? "SAVING…" : "SAVE CHANGES"}</button>
             </div>
-            <button class="account-command-row" data-action="open-password" type="button">${icon("key")}<span><strong>Change Password</strong><small>Open the secure password update flow</small></span>${icon("arrow")}</button>
-            ${audioSettingsBlock()}
-            <div class="account-modal-actions">
-              <button class="btn primary" data-action="profile-submit" type="button" ${app.busyAction === "profile" ? "disabled" : ""}>${icon("save")} ${app.busyAction === "profile" ? "Saving..." : "Save Changes"}</button>
-              <button class="btn secondary" data-action="signout" type="button">${icon("logout")} Sign Out</button>
-            </div>
-            <div class="account-danger-row">
-              <button class="btn danger outline" data-action="delete-profile" type="button">${icon("delete")} Delete Account</button>
-            </div>
-            </form>
+            <button class="gx-btn is-danger-link" data-action="delete-profile" type="button">Delete account</button>
+          </form>
         </section>
-      </div>
-    `;
+      </div>`;
   }
 
   function passwordModal() {
     if (app.modal !== "password") return "";
+    const field = (name, label, autocomplete) => `<label class="gx-field">${label}<span class="field-with-icon gx-pass"><input name="${name}" type="password" minlength="8" autocomplete="${autocomplete}" required /><button class="password-toggle gx-icon-btn is-bare" data-action="toggle-password" type="button" aria-label="Show password"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>`;
     return `
-      <div class="modal-backdrop account-password-backdrop">
-        <section class="password-modal" role="dialog" aria-modal="true" aria-labelledby="password-title" tabindex="-1" data-motion-purpose="modal-reveal">
-          <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
-          <p class="eyebrow">Account security</p>
+      <div class="gx-backdrop">
+        <section class="gx-modal" role="dialog" aria-modal="true" aria-labelledby="password-title" tabindex="-1">
+          <button class="gx-icon-btn is-bare gx-modal-close" data-action="close-modal" type="button" aria-label="Close">${gxIcon("x")}</button>
           <h2 id="password-title">${app.passwordRecovery ? "Set a New Password" : "Change Password"}</h2>
           <p>${app.passwordRecovery ? "You opened a password reset link. Choose a new password for this account." : "Use your current password to confirm this change."}</p>
-          ${app.dialogError ? `<p class="form-error" role="alert">${escapeHtml(app.dialogError)}</p>` : ""}
-          <form data-form="change-password" class="password-change-form">
-            ${app.passwordRecovery ? "" : `<label>Current Password<div class="field-with-icon has-toggle">${icon("key")}<input name="currentPassword" type="password" autocomplete="current-password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>`}
-            <label>New Password<div class="field-with-icon has-toggle">${icon("key")}<input name="newPassword" type="password" minlength="8" autocomplete="new-password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
-            <label>Confirm New Password<div class="field-with-icon has-toggle">${icon("key")}<input name="confirmNewPassword" type="password" minlength="8" autocomplete="new-password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
-            <div class="modal-actions"><button class="btn secondary" data-action="close-modal" type="button">Cancel</button><button class="btn primary" data-action="password-submit" type="button" ${app.busyAction === "password" ? "disabled" : ""}>${app.busyAction === "password" ? "Updating..." : "Update Password"}</button></div>
+          ${app.dialogError ? `<p class="gx-error" role="alert">${escapeHtml(app.dialogError)}</p>` : ""}
+          <form class="gx-form" data-form="change-password">
+            ${app.passwordRecovery ? "" : field("currentPassword", "Current password", "current-password")}
+            ${field("newPassword", "New password", "new-password")}
+            ${field("confirmNewPassword", "Confirm new password", "new-password")}
+            <div class="gx-modal-actions"><button class="gx-btn is-quiet" data-action="close-modal" type="button">Cancel</button><button class="gx-btn is-primary" data-action="password-submit" type="button" ${app.busyAction === "password" ? "disabled" : ""}>${app.busyAction === "password" ? "UPDATING…" : "UPDATE PASSWORD"}</button></div>
           </form>
         </section>
-      </div>
-    `;
+      </div>`;
   }
 
   function audioSettingsBlock() {
     const track = currentMusicTrack();
-    return `<section class="account-audio-settings"><div class="audio-section-head"><strong>Audio</strong><small>Music starts only after you press Play.</small></div><div class="audio-category" role="group" aria-label="Music category">${[["cafe", "Cafe Jazz"], ["classical", "Classical"]].map(([key, label]) => `<button class="${app.audio.category === key ? "active" : ""}" data-audio-category="${key}" type="button" aria-pressed="${app.audio.category === key ? "true" : "false"}">${escapeHtml(label)}</button>`).join("")}</div><label class="audio-track-select">Track<select data-audio-track>${musicTracks().map((entry, index) => `<option value="${index}" ${index === app.audio.trackIndex ? "selected" : ""}>${escapeHtml(entry.title)} - ${escapeHtml(entry.artist)}</option>`).join("")}</select></label><div class="audio-transport" aria-label="Music controls"><button data-action="audio-previous" type="button" aria-label="Previous track">${icon("back")}</button><button class="audio-play ${app.audio.music ? "active" : ""}" data-action="toggle-music" type="button" aria-label="${app.audio.music ? "Pause" : "Play"} music">${icon(app.audio.music ? "pause" : "play")}</button><button data-action="audio-next" type="button" aria-label="Next track">${icon("arrow")}</button><button class="${app.audio.shuffle ? "active" : ""}" data-action="toggle-audio-shuffle" type="button" aria-label="Toggle shuffle" aria-pressed="${app.audio.shuffle ? "true" : "false"}">${icon("shuffle")}</button><button class="${app.audio.muted ? "active" : ""}" data-action="toggle-audio-mute" type="button" aria-label="Toggle mute" aria-pressed="${app.audio.muted ? "true" : "false"}">${icon(app.audio.muted ? "volume-off" : "volume")}</button></div><p class="audio-now-playing"><span>Selected</span><strong>${escapeHtml(track.title)}</strong><small>${escapeHtml(track.artist)}</small></p><label>Music volume<input data-audio-volume="musicVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.musicVolume)}" /></label><div class="effects-control"><button class="audio-toggle ${app.audio.sfx ? "active" : ""}" data-action="toggle-sfx" type="button"><span>Interface effects<small>Navigation, selection, confirmation, warning</small></span><b>${app.audio.sfx ? "On" : "Off"}</b></button><label>Effects volume<input data-audio-volume="sfxVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.sfxVolume)}" /></label></div></section>`;
+    return `<section class="gx-audio">
+      <div class="gx-card-head"><strong>Music</strong><span class="gx-muted">Starts only when you press play</span></div>
+      <div class="gx-filters" role="group" aria-label="Music category">${[["cafe", "Cafe Jazz"], ["classical", "Classical"]].map(([key, label]) => `<button class="${app.audio.category === key ? "is-active" : ""}" data-audio-category="${key}" type="button" aria-pressed="${app.audio.category === key ? "true" : "false"}">${label}</button>`).join("")}</div>
+      <label class="gx-field">Track<select data-audio-track>${musicTracks().map((entry, index) => `<option value="${index}" ${index === app.audio.trackIndex ? "selected" : ""}>${escapeHtml(entry.title)} – ${escapeHtml(entry.artist)}</option>`).join("")}</select></label>
+      <p class="gx-pop-track"><strong>${escapeHtml(track.title)}</strong><small>${escapeHtml(track.artist)}</small></p>
+      ${gxAudioTransport(true)}
+      <label class="gx-range">Music volume<input data-audio-volume="musicVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.musicVolume)}" /></label>
+      <button class="gx-sfx ${app.audio.sfx ? "is-on" : ""}" data-action="toggle-sfx" type="button" aria-pressed="${app.audio.sfx ? "true" : "false"}"><span>Sound effects<small>Taps, answers and results</small></span><b>${app.audio.sfx ? "On" : "Off"}</b></button>
+      <label class="gx-range">Effects volume<input data-audio-volume="sfxVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.sfxVolume)}" /></label>
+    </section>`;
   }
 
   function pauseModal(attempt) {
@@ -2584,17 +2573,15 @@
     const attempt = deletingAccount ? null : getAttempt(app.dialogTarget);
     const target = deletingAccount ? app.profile?.name || "this account" : examTitle(attempt || {});
     return `
-      <div class="modal-backdrop danger-backdrop">
-        <section class="confirm-modal ${deletingAccount ? "account-delete-confirm" : "attempt-delete-confirm"}" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" tabindex="-1" data-motion-purpose="modal-reveal">
-          <span class="danger-symbol">${icon("delete")}</span>
-          <p class="eyebrow">Destructive command</p>
-          <h2 id="confirm-title">${deletingAccount ? "Delete Account?" : "Delete Attempt?"}</h2>
-          <p><strong>${escapeHtml(target)}</strong> ${deletingAccount ? "and every stored attempt" : "and its answer history"} will be permanently removed.</p>
-          ${deletingAccount ? `<div class="delete-impact"><span>Account identity<b>${escapeHtml(target)}</b></span><span>Stored reviewer data<b>Attempts, answers, and results</b></span></div><label class="delete-confirm-field"><span>Confirmation</span><small>Type <b>DELETE</b> exactly to continue.</small><input data-delete-confirm name="deleteConfirmation" autocomplete="off" spellcheck="false" placeholder="Type DELETE" /></label>` : ""}
-          <div class="modal-actions"><button class="btn secondary" data-action="close-modal" type="button">Cancel</button><button class="btn danger" data-action="${deletingAccount ? "confirm-delete-account" : "confirm-delete-attempt"}" type="button" ${deletingAccount ? "disabled" : ""}>${deletingAccount ? "Delete Account" : "Delete Attempt"}</button></div>
+      <div class="gx-backdrop">
+        <section class="gx-modal" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" tabindex="-1">
+          <span class="gx-modal-badge is-danger">${gxIcon("x", 30)}</span>
+          <h2 id="confirm-title">${deletingAccount ? "Delete your account?" : "Delete this run?"}</h2>
+          <p><strong>${escapeHtml(target)}</strong> ${deletingAccount ? "and every saved run, answer and result" : "and its answers"} will be permanently removed. This can't be undone.</p>
+          ${deletingAccount ? `<label class="gx-field"><span>Type <b>DELETE</b> to confirm</span><input data-delete-confirm name="deleteConfirmation" autocomplete="off" spellcheck="false" placeholder="DELETE" /></label>` : ""}
+          <div class="gx-modal-actions"><button class="gx-btn is-quiet" data-action="close-modal" type="button">Cancel</button><button class="gx-btn is-danger" data-action="${deletingAccount ? "confirm-delete-account" : "confirm-delete-attempt"}" type="button" ${deletingAccount ? "disabled" : ""}>${deletingAccount ? "DELETE ACCOUNT" : "DELETE RUN"}</button></div>
         </section>
-      </div>
-    `;
+      </div>`;
   }
 
   function updatesPopover() {
@@ -2608,13 +2595,11 @@
   }
 
   function overflowMenu(attempt) {
-    return `
-      <div class="overflow-menu">
-        <button data-attempt-review="${attempt.id}" type="button">Review Answers</button>
-        <button data-attempt-retake="${attempt.id}" type="button">Retake Setup</button>
-        <button data-attempt-delete="${attempt.id}" type="button">Delete Attempt</button>
-      </div>
-    `;
+    return `<div class="gx-menu" role="menu">
+      <button role="menuitem" data-attempt-review="${attempt.id}" type="button">Review answers</button>
+      <button role="menuitem" data-attempt-retake="${attempt.id}" type="button">Set up a retake</button>
+      <button role="menuitem" class="is-danger" data-attempt-delete="${attempt.id}" type="button">Delete run</button>
+    </div>`;
   }
 
   function categoryPercent(stats, section) {
@@ -3340,13 +3325,12 @@
     if (!app.audioMenuOpen) return "";
     const track = currentMusicTrack();
     return `
-      <section class="audio-popover" aria-label="Audio settings" data-motion-purpose="popover-reveal">
-        <div class="audio-popover-head">${icon("music")}<span><strong>Audio</strong><small>${escapeHtml(app.audio.category === "cafe" ? "Cafe Jazz" : "Classical")}</small></span></div>
-        <p class="audio-popover-track"><strong>${escapeHtml(track.title)}</strong><small>${escapeHtml(track.artist)}</small></p>
-        <div class="audio-transport compact"><button data-action="audio-previous" type="button" aria-label="Previous track">${icon("back")}</button><button class="audio-play ${app.audio.music ? "active" : ""}" data-action="toggle-music" type="button" aria-label="${app.audio.music ? "Pause" : "Play"} music">${icon(app.audio.music ? "pause" : "play")}</button><button data-action="audio-next" type="button" aria-label="Next track">${icon("arrow")}</button><button class="${app.audio.muted ? "active" : ""}" data-action="toggle-audio-mute" type="button" aria-label="Toggle mute">${icon(app.audio.muted ? "volume-off" : "volume")}</button></div>
-        <label>Music volume<input data-audio-volume="musicVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.musicVolume)}" /></label>
-        <button class="audio-toggle ${app.audio.sfx ? "active" : ""}" data-action="toggle-sfx" type="button"><span>Sound effects<small>Actions and results</small></span><b>${app.audio.sfx ? "On" : "Off"}</b></button>
-        <label>Effects volume<input data-audio-volume="sfxVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.sfxVolume)}" /></label>
+      <section class="gx-pop" aria-label="Audio settings">
+        <p class="gx-pop-track"><strong>${escapeHtml(track.title)}</strong><small>${escapeHtml(track.artist)} · ${escapeHtml(app.audio.category === "cafe" ? "Cafe Jazz" : "Classical")}</small></p>
+        ${gxAudioTransport(false)}
+        <label class="gx-range">Music volume<input data-audio-volume="musicVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.musicVolume)}" /></label>
+        <button class="gx-sfx ${app.audio.sfx ? "is-on" : ""}" data-action="toggle-sfx" type="button" aria-pressed="${app.audio.sfx ? "true" : "false"}"><span>Sound effects</span><b>${app.audio.sfx ? "On" : "Off"}</b></button>
+        <label class="gx-range">Effects volume<input data-audio-volume="sfxVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.sfxVolume)}" /></label>
       </section>
     `;
   }
@@ -3356,12 +3340,12 @@
     const focusAction = active?.dataset?.action || "";
     const focusCategory = active?.dataset?.audioCategory || "";
     const focusTrack = active?.matches?.("[data-audio-track]") || false;
-    const drawer = root.querySelector(".account-settings-modal");
+    const drawer = root.querySelector(".gx-modal.is-drawer, .account-settings-modal");
     const drawerScrollTop = drawer?.scrollTop || 0;
     root.querySelectorAll(".header-audio-control, .exam-audio-control").forEach((container) => {
-      container.innerHTML = `<button class="icon-only header-audio-button ${app.audio.music && !app.audio.muted ? "active" : ""}" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${icon(app.audio.muted ? "volume-off" : "music")}</button>${audioPopover()}`;
+      container.innerHTML = container.closest(".gx") ? `<button class="gx-icon-btn header-audio-button" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${gxIcon("music")}</button>${audioPopover()}` : `<button class="icon-only header-audio-button ${app.audio.music && !app.audio.muted ? "active" : ""}" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${icon(app.audio.muted ? "volume-off" : "music")}</button>${audioPopover()}`;
     });
-    const accountAudio = root.querySelector(".account-audio-settings");
+    const accountAudio = root.querySelector(".gx-audio, .account-audio-settings");
     if (accountAudio) accountAudio.outerHTML = audioSettingsBlock();
     requestAnimationFrame(() => {
       if (drawer) drawer.scrollTop = drawerScrollTop;
@@ -3383,8 +3367,8 @@
       button.classList.toggle("selected", active);
       button.setAttribute("aria-pressed", active ? "true" : "false");
     });
-    const preview = root.querySelector(".account-identity-preview > .avatar");
-    if (preview) preview.outerHTML = avatar({ ...app.profile, avatar_preset: selected }, "large");
+    const preview = root.querySelector(".gx-profile-preview");
+    if (preview) preview.innerHTML = gxAvatarFace(selected, displayName(app.profile));
   }
 
   function handlePointerDown(event) {
@@ -3934,8 +3918,8 @@
     const category = practiceCategoriesForDisplay().find((entry) => entry.section === selectedCategory) || practiceCategoriesForDisplay()[0];
     const section = form.querySelector("[data-practice-profile-section]");
     if (section) {
-      section.className = `selected-run-section ${category.tone}`;
-      section.innerHTML = `${localIcon(sectionIconName(category.section))}<strong>${escapeHtml(category.label)} selected</strong>`;
+      section.textContent = category.label;
+      section.setAttribute("style", gxToneStyle(category.section));
     }
     const count = form.querySelector("[data-practice-count]");
     const difficulty = form.querySelector("[data-practice-difficulty]");
@@ -3963,7 +3947,7 @@
     }
     const dialog = document.querySelector("[role='dialog'], [role='alertdialog']");
     if (!dialog && app.view.name === "exam" && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
-      const editable = event.target.closest?.("input, textarea, select, button, summary, [contenteditable='true'], .audio-popover");
+      const editable = event.target.closest?.("input, textarea, select, button, summary, [contenteditable='true'], .audio-popover, .gx-pop");
       if (!editable) {
         const attempt = getAttempt(app.view.attemptId);
         const answer = currentAnswer(attempt);
