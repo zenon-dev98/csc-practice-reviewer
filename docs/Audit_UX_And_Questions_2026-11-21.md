@@ -161,3 +161,9 @@ Real bank items of every type were opened in the exam screen (`?fixture=exam&que
 - Result: correct is the longest choice in 23% (Constitution), 29% (human rights), 39% (RA 6713) and 41% (environment) of GI questions, down from 73-89%, and correct and wrong choices average the same length. Bank-wide, correct is the unique longest in 22.7% of items (25% is pure chance).
 - Not human-reviewed: every rewritten choice was checked against the law by the author, but a reviewer with legal knowledge should spot-check a sample before relying on the bank for high-stakes study.
 - Still open: assumptions/conclusions (correct longest in 54%), cross-mock repeats (Numerical 47%).
+
+### Guessable assumption and conclusion answers (2026-11-22)
+
+- Q3, assumptions/conclusions part fixed: 124 of the 280 items had a correct answer that stood out as the long, carefully hedged choice against short absolute wrong choices. Their wrong choices now read as equally careful reasoning errors: affirming the consequent, reversing a conditional, generalizing from a self-selected or small sample, before/after comparisons offered as the strongest test, or an assumption that helps the argument but is not necessary. Wrong choices that would themselves be a valid criticism (an unmentioned confound, reverse causation, a selection effect) were avoided so each item keeps one defensible answer. Short formal-logic items were left as they were.
+- Result: correct is the longest choice in 19% of these items (was 54%); bank-wide 19.9%.
+- Still open: cross-mock repeats, especially Numerical (47% of items have a close twin).
