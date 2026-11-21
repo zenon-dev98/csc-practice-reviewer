@@ -95,6 +95,7 @@
     "results",
     "results-fail",
     "results-practice",
+    "practice-exam",
     "review",
     "review-empty",
     "practice",
@@ -412,6 +413,17 @@
       submitted.score = scoreAttempt(submitted);
       submitted.percent = resultPercent(submitted);
       return setView({ name: "results", attemptId: submitted.id });
+    }
+    if (fixtureState === "practice-exam") {
+      const practiceAttempt = getAttempt("fixture-practice");
+      practiceAttempt.status = "in_progress";
+      practiceAttempt.current_question_index = 0;
+      Object.values(practiceAttempt.answers).forEach((answer) => {
+        answer.selected_choice = null;
+        answer.skipped = false;
+        answer.answer_history = [];
+      });
+      return setView({ name: "exam", attemptId: practiceAttempt.id });
     }
     if (fixtureState === "results-practice") {
       const practiceAttempt = getAttempt("fixture-practice");
@@ -1643,17 +1655,69 @@
       </section>`;
   }
 
+  // Practice gives instant feedback. A "check" entry in answer_history (already persisted) locks the answer.
+  function gxChecked(answer) {
+    return toArray(answer?.answer_history).some((entry) => entry.action === "check");
+  }
+
+  function gxStreak(attempt) {
+    const checks = Object.values(attempt.answers)
+      .map((answer) => ({ answer, at: [...toArray(answer.answer_history)].reverse().find((entry) => entry.action === "check")?.at }))
+      .filter((row) => row.at)
+      .sort((a, b) => String(b.at).localeCompare(String(a.at)));
+    let streak = 0;
+    for (const row of checks) {
+      if (row.answer.selected_choice !== row.answer.correct_choice) break;
+      streak += 1;
+    }
+    return streak;
+  }
+
+  function gxCheckAnswer() {
+    const attempt = getAttempt(app.view.attemptId);
+    const answer = currentAnswer(attempt);
+    if (!attempt || !answer || attempt.mode !== "practice" || attempt.status !== "in_progress" || !answer.selected_choice || gxChecked(answer)) return;
+    const correct = answer.selected_choice === answer.correct_choice;
+    const at = nowIso();
+    answer.answer_history = [...toArray(answer.answer_history), { action: "check", choice: answer.selected_choice, correct, at }];
+    recordAttemptEvent(attempt, "answer-checked", { choice: answer.selected_choice, correct });
+    touchAnswer(attempt, answer.question_id);
+    touchAttempt(attempt);
+    playSound(correct ? "confirmation" : "warning");
+    renderExam();
+  }
+
+  function gxFeedback(attempt, current, isLast) {
+    const correct = current.selected_choice === current.correct_choice;
+    const right = current.choices.find((choice) => choice.id === current.correct_choice);
+    const streak = gxStreak(attempt);
+    const title = correct ? (streak > 1 ? `Tama! That's ${streak} in a row.` : "Tama! Correct.") : "Not quite.";
+    return `
+      <footer class="gx-feedback ${correct ? "is-good" : "is-bad"}" role="status" aria-live="polite">
+        <span class="gx-feedback-icon">${correct ? `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>` : gxIcon("x", 34)}</span>
+        <div class="gx-feedback-text">
+          <strong>${title}</strong>
+          ${correct ? "" : `<span class="gx-feedback-answer">Correct answer: ${escapeHtml(right?.id || "")}. ${escapeHtml(right?.text || "")}</span>`}
+          ${current.explanation ? `<span>${escapeHtml(current.explanation)}</span>` : ""}
+        </div>
+        <button class="gx-btn is-primary" data-action="${isLast ? "open-submit" : "next-question"}" type="button">${isLast ? "SEE RESULTS" : "CONTINUE"}</button>
+      </footer>`;
+  }
+
   function gxExamScreen(attempt, current, linked, { remaining, isPaused, paperMode, runLabel }) {
     const groups = gxSectionGroups(attempt);
     const pace = gxPace(attempt, remaining);
     const body = gxQuestionBody(current);
     const isLast = current.position >= attempt.total_questions - 1;
-    const locked = attempt.status !== "in_progress" || paperMode;
+    const practice = attempt.mode === "practice";
+    const checked = practice && gxChecked(current);
+    const locked = attempt.status !== "in_progress" || paperMode || checked;
     const theme = gxTheme();
     const primary = paperMode
       ? (isLast ? { action: "open-paper-finish", label: "FINISH ANSWERING" } : { action: "next-question", label: "NEXT" })
-      : isLast ? { action: "open-submit", label: "REVIEW & SUBMIT" }
-        : current.selected_choice ? { action: "next-question", label: "NEXT" } : { action: "skip-question", label: "SKIP" };
+      : practice && current.selected_choice ? { action: "gx-check", label: "CHECK" }
+        : isLast ? { action: "open-submit", label: practice ? "FINISH" : "REVIEW & SUBMIT" }
+          : current.selected_choice ? { action: "next-question", label: "NEXT" } : { action: "skip-question", label: "SKIP" };
     const timerValue = attempt.mode === "practice" ? "Untimed" : attempt.options?.showTimer === false ? "Hidden" : formatDuration(remaining);
     return `
       <div class="gx" data-theme="${theme}">
@@ -1665,6 +1729,7 @@
               <div class="gx-progress-meta"><span>${escapeHtml(runLabel)}</span><span>${paperMode ? "Paper answer sheet" : `<strong class="exam-answered-value">${answeredCount(attempt)}</strong> of ${attempt.total_questions} answered`}</span></div>
             </div>
             <div class="gx-timer">${gxIcon("clock", 24)}<div><strong class="exam-time-value">${escapeHtml(timerValue)}</strong>${pace ? `<small class="${pace.tone}">${pace.text}</small>` : `<small>${isPaused ? "Paused" : attempt.mode === "practice" ? "Practice" : "Time left"}</small>`}</div></div>
+            ${practice && gxStreak(attempt) > 1 ? `<span class="gx-streak"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5 .2 2 1 3 2 3.5C11 9 11 5.5 12 2z"/></svg>${gxStreak(attempt)} in a row</span>` : ""}
             <button class="gx-icon-btn gx-nav-toggle" data-action="toggle-exam-nav" type="button" aria-label="Open question map" aria-expanded="${app.examNavOpen ? "true" : "false"}">${gxIcon("menu")}</button>
             <button class="gx-icon-btn gx-top-theme" data-action="toggle-theme" type="button" aria-label="Switch to ${theme === "light" ? "dark" : "light"} theme">${gxIcon(theme === "light" ? "moon" : "sun")}</button>
             <div class="exam-audio-control"><button class="gx-icon-btn header-audio-button" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${gxIcon("music")}</button>${audioPopover()}</div>
@@ -1684,7 +1749,7 @@
                 ${body.html}
                 <div class="gx-choices ${body.grid ? "is-grid" : ""}" role="radiogroup" aria-label="Answer choices">
                   ${current.choices.map((choice) => `
-                    <button class="gx-choice ${current.selected_choice === choice.id ? "is-selected" : ""}" ${paperMode ? "aria-disabled=\"true\" tabindex=\"-1\"" : `data-choice="${choice.id}"`} role="radio" aria-checked="${current.selected_choice === choice.id ? "true" : "false"}" type="button" ${locked ? "disabled" : ""}>
+                    <button class="gx-choice ${checked ? (choice.id === current.correct_choice ? "is-correct" : current.selected_choice === choice.id ? "is-wrong" : "is-dim") : current.selected_choice === choice.id ? "is-selected" : ""}" ${paperMode ? "aria-disabled=\"true\" tabindex=\"-1\"" : `data-choice="${choice.id}"`} role="radio" aria-checked="${current.selected_choice === choice.id ? "true" : "false"}" type="button" ${locked ? "disabled" : ""}>
                       <span class="gx-key">${escapeHtml(choice.id)}</span><span>${gxChoiceText(choice.text)}</span>
                     </button>`).join("")}
                 </div>
@@ -1693,14 +1758,14 @@
             ${gxRail(attempt, current, groups)}
           </div>
 
-          <footer class="gx-foot">
+          ${checked ? gxFeedback(attempt, current, isLast) : `<footer class="gx-foot">
             <div class="gx-foot-left">
               <button class="gx-btn" data-action="previous-question" type="button" ${current.position === 0 ? "disabled" : ""}>${gxIcon("back", 18)}BACK</button>
               ${!paperMode && current.selected_choice ? `<button class="gx-btn is-quiet" data-action="clear-answer" type="button">CLEAR</button>` : ""}
             </div>
             <span class="gx-hint">${paperMode ? "Mark your printed answer sheet" : `<kbd>A</kbd>–<kbd>D</kbd> answer · <kbd>Enter</kbd> next · <kbd>F</kbd> flag`}</span>
             <button class="gx-btn is-primary" data-action="${primary.action}" type="button">${primary.label}</button>
-          </footer>
+          </footer>`}
         </section>
         ${pauseModal(attempt)}
         ${submitModal(attempt)}
@@ -1722,12 +1787,14 @@
   function paperFinishModal(attempt) {
     if (app.modal !== "paper-finish") return "";
     return `
-      <div class="modal-backdrop static-backdrop paper-finish-backdrop" data-static-backdrop="true">
-        <section class="submit-modal paper-finish-modal" role="dialog" aria-modal="true" aria-labelledby="paper-finish-title" tabindex="-1">
-          <div class="submit-title-row"><span class="paper-finish-symbol">${localIcon("clipboard-list")}</span><div><p class="eyebrow">Paper answer mode</p><h2 id="paper-finish-title">Finish answering?</h2></div></div>
-          <p>The exam timer will stop. You can then photograph or scan both answer sheets and confirm every detected mark.</p>
-          <div class="paper-finish-checks"><span>${localIcon("timer")}<b>Timer freezes</b></span><span>${localIcon("cloud-check")}<b>Checkpoint syncs</b></span><span>${localIcon("clipboard-list")}<b>Two sheets required</b></span></div>
-          <div class="modal-actions"><button class="btn ghost" data-action="close-modal" type="button">Keep Answering</button><button class="btn primary" data-action="confirm-paper-finish" type="button">Freeze and Scan</button></div>
+      <div class="gx-backdrop static-backdrop" data-static-backdrop="true">
+        <section class="gx-modal" role="dialog" aria-modal="true" aria-labelledby="paper-finish-title" tabindex="-1">
+          <h2 id="paper-finish-title">Done with the paper sheet?</h2>
+          <p>The timer stops now. Next you'll scan both pages of your answer sheet and confirm any unclear marks.</p>
+          <div class="gx-modal-actions">
+            <button class="gx-btn is-quiet" data-action="close-modal" type="button">Keep answering</button>
+            <button class="gx-btn is-primary" data-action="confirm-paper-finish" type="button">STOP AND SCAN</button>
+          </div>
         </section>
       </div>
     `;
@@ -2328,14 +2395,20 @@
   function pauseModal(attempt) {
     if (attempt.status !== "paused") return "";
     return `
-      <div class="modal-backdrop static-backdrop" data-static-backdrop="true">
-        <section class="pause-modal" role="dialog" aria-modal="true" aria-labelledby="pause-title" tabindex="-1" data-motion-purpose="modal-reveal">
-          <span class="pause-icon">${icon("pause")}</span>
-          <p class="eyebrow">Checkpoint secured</p>
-          <h2 id="pause-title">Exam Paused</h2>
-          <div class="pause-facts"><span>${localIcon("timer")}<b>Time Remaining (Frozen)</b><strong>${formatDuration(timeRemaining(attempt))}</strong></span><span>${icon("flag")}<b>Current Checkpoint</b><strong>Item ${attempt.current_question_index + 1}</strong></span><span>${localIcon("cloud-check")}<b>Progress</b><strong>Checkpoint stored</strong></span></div>
-          <p>Your progress has been saved.<br />Resume now or save and return Home.</p>
-          <div class="pause-actions"><button class="btn primary" data-action="resume-paused" type="button">${icon("play")} Resume Exam</button><button class="btn secondary" data-action="save-exit" type="button">${icon("save")} Save and Exit</button></div>
+      <div class="gx-backdrop static-backdrop" data-static-backdrop="true">
+        <section class="gx-modal" role="dialog" aria-modal="true" aria-labelledby="pause-title" tabindex="-1">
+          <span class="gx-modal-badge">${gxIcon("pause", 30)}</span>
+          <h2 id="pause-title">Exam paused</h2>
+          <p>Your progress is saved and the clock is stopped.</p>
+          <div class="gx-modal-stats">
+            <div><strong>${formatDuration(timeRemaining(attempt))}</strong><span>time left</span></div>
+            <div><strong>${attempt.current_question_index + 1}</strong><span>current question</span></div>
+            <div><strong>${answeredCount(attempt)}</strong><span>answered</span></div>
+          </div>
+          <div class="gx-modal-actions">
+            <button class="gx-btn" data-action="save-exit" type="button">SAVE AND EXIT</button>
+            <button class="gx-btn is-primary" data-action="resume-paused" type="button">RESUME</button>
+          </div>
         </section>
       </div>
     `;
@@ -2343,23 +2416,25 @@
 
   function submitModal(attempt) {
     if (app.modal !== "submit") return "";
+    const unanswered = unansweredCount(attempt);
+    const skipped = skippedCount(attempt);
+    const flagged = flaggedCount(attempt);
+    const practice = attempt.mode === "practice";
     return `
-      <div class="modal-backdrop">
-        <section class="submit-modal" role="dialog" aria-modal="true" aria-labelledby="submit-title" tabindex="-1" data-motion-purpose="modal-reveal">
-          <div class="submit-title-row"><span class="submit-danger-symbol">${icon("warning")}</span><div><p class="eyebrow">Final submission</p><h2 id="submit-title">Submit Exam?</h2></div></div>
-          <p>You are about to submit this run. <strong>This action cannot be undone.</strong></p>
-          <div class="submit-stats">
-            <metric class="answered">${localIcon("circle-check")}<span>Answered</span><strong>${answeredCount(attempt)}</strong></metric>
-            <metric class="unanswered">${icon("clear")}<span>Unanswered</span><strong>${unansweredCount(attempt)}</strong></metric>
-            <metric class="skipped">${icon("skip")}<span>Skipped</span><strong>${skippedCount(attempt)}</strong></metric>
-            <metric class="flagged">${icon("flag")}<span>Flagged</span><strong>${flaggedCount(attempt)}</strong></metric>
+      <div class="gx-backdrop">
+        <section class="gx-modal" role="dialog" aria-modal="true" aria-labelledby="submit-title" tabindex="-1">
+          <h2 id="submit-title">${practice ? "Finish practice?" : "Submit your exam?"}</h2>
+          <p>${unanswered ? `You still have <strong>${unanswered}</strong> unanswered question${unanswered === 1 ? "" : "s"}. ` : "Every question has an answer. "}You can't change answers after submitting.</p>
+          <div class="gx-modal-stats">
+            <div class="is-good"><strong>${answeredCount(attempt)}</strong><span>answered</span></div>
+            <div class="${unanswered ? "is-warn" : ""}"><strong>${unanswered}</strong><span>unanswered${skipped ? `, including ${skipped} skipped` : ""}</span></div>
+            <div class="${flagged ? "is-warn" : ""}"><strong>${flagged}</strong><span>flagged</span></div>
           </div>
-          <div class="submit-warning">${icon("info")}<span>Review unanswered and flagged questions before submitting.</span></div>
-          <div class="modal-actions">
-            <button class="btn secondary" data-action="review-unanswered" type="button">Review Unanswered</button>
-            <button class="btn secondary" data-action="review-flagged" type="button">Review Flagged</button>
-            <button class="btn ghost" data-action="close-modal" type="button">Cancel</button>
-            <button class="btn danger" data-action="confirm-submit" type="button">Submit Exam</button>
+          <div class="gx-modal-actions is-wrap">
+            ${unanswered ? `<button class="gx-btn" data-action="review-unanswered" type="button">Go to unanswered</button>` : ""}
+            ${flagged ? `<button class="gx-btn" data-action="review-flagged" type="button">Go to flagged</button>` : ""}
+            <button class="gx-btn is-quiet" data-action="close-modal" type="button">Keep answering</button>
+            <button class="gx-btn is-primary" data-action="confirm-submit" type="button">${practice ? "FINISH" : "SUBMIT EXAM"}</button>
           </div>
         </section>
       </div>
@@ -2368,12 +2443,11 @@
 
   function chartModal(attempt, answer) {
     if (app.modal !== "chart" || !answer?.stimulus) return "";
-    const presentation = stimulusPresentation(answer.stimulus);
     return `
-      <div class="modal-backdrop chart-backdrop">
-        <section class="chart-modal stimulus-modal ${presentation.className}" role="dialog" aria-modal="true" aria-label="Expanded ${presentation.noun}" tabindex="-1" data-motion-purpose="modal-reveal">
-          <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
-          ${renderStimulusPanel(attempt, answer, linkedStimulusAnswers(attempt, answer), true)}
+      <div class="gx-backdrop">
+        <section class="gx-modal is-wide" role="dialog" aria-modal="true" aria-label="Expanded shared data" tabindex="-1">
+          <button class="gx-icon-btn is-bare gx-modal-close" data-action="close-modal" type="button" aria-label="Close">${gxIcon("x")}</button>
+          ${gxStimulus(attempt, answer, linkedStimulusAnswers(attempt, answer))}
         </section>
       </div>
     `;
@@ -2382,15 +2456,13 @@
   function timeoutModal(attempt) {
     if (app.modal !== "timeout") return "";
     return `
-      <div class="modal-backdrop static-backdrop timeout-backdrop" data-static-backdrop="true">
-        <section class="timeout-modal" role="alertdialog" aria-modal="true" aria-labelledby="timeout-title" tabindex="-1" data-motion-purpose="modal-reveal">
-          <span class="timeout-symbol">${icon("clock")}</span>
-          <h2 id="timeout-title">Time Expired</h2>
-          <div class="timeout-clock"><span>Time Remaining</span><strong>0:00</strong></div>
-          <p><b>Finalizing your attempt</b><br />Synchronizing your answers. Your submission is automatic.</p>
-          <div class="segmented-loader compact" aria-label="Submitting"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <small>Answered <strong>${answeredCount(attempt)}</strong> of ${attempt.total_questions}</small>
-          <div class="timeout-note">${icon("refresh")} Please keep this page open while the final checkpoint is stored.</div>
+      <div class="gx-backdrop static-backdrop" data-static-backdrop="true">
+        <section class="gx-modal" role="alertdialog" aria-modal="true" aria-labelledby="timeout-title" tabindex="-1">
+          <span class="gx-modal-badge is-warn">${gxIcon("clock", 30)}</span>
+          <h2 id="timeout-title">Time's up!</h2>
+          <p>Your answers are being submitted automatically. Please keep this page open for a moment.</p>
+          <div class="gx-loader" role="progressbar" aria-label="Submitting"><i></i></div>
+          <p class="gx-note">${answeredCount(attempt)} of ${attempt.total_questions} answered</p>
         </section>
       </div>
     `;
@@ -3643,6 +3715,7 @@
         return renderExam();
       }
       if (action === "toggle-theme") return gxToggleTheme();
+      if (action === "gx-check") return gxCheckAnswer();
       if (action === "gx-open-section") {
         app.gxOpenSection = target.dataset.section || null;
         return renderExam();
@@ -3809,6 +3882,11 @@
         if (!paperMode && choiceIndex !== undefined && answer?.choices?.[choiceIndex] && attempt?.status === "in_progress") {
           event.preventDefault();
           chooseAnswer(answer.choices[choiceIndex].id);
+          return;
+        }
+        if (event.key === "Enter" && attempt?.mode === "practice" && answer?.selected_choice && !gxChecked(answer) && attempt?.status === "in_progress") {
+          event.preventDefault();
+          gxCheckAnswer();
           return;
         }
         if (event.key === "Enter" && (paperMode || answer?.selected_choice) && attempt?.status === "in_progress") {
@@ -4629,6 +4707,7 @@
     const attempt = getAttempt(app.view.attemptId);
     const answer = currentAnswer(attempt);
     if (!attempt || !answer || attempt.status !== "in_progress") return;
+    if (attempt.mode === "practice" && gxChecked(answer)) return;
     const previous = answer.selected_choice;
     if (previous && previous !== choice) {
       answer.answer_changes += 1;
@@ -4651,6 +4730,7 @@
     const attempt = getAttempt(app.view.attemptId);
     const answer = currentAnswer(attempt);
     if (!answer || attempt.status !== "in_progress") return;
+    if (attempt.mode === "practice" && gxChecked(answer)) return;
     answer.selected_choice = null;
     answer.last_answered_at = nowIso();
     answer.answer_history = [...toArray(answer.answer_history), { action: "clear", at: answer.last_answered_at }];

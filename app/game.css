@@ -28,10 +28,14 @@
 }
 .gx *, .gx *::before, .gx *::after { box-sizing: border-box; }
 #app .gx h1, #app .gx h2, #app .gx h3, #app .gx p { margin: 0; font-family: inherit; letter-spacing: 0; text-transform: none; }
-#app .gx button { font: inherit; color: inherit; cursor: pointer; letter-spacing: inherit; }
+#app .gx button { font: inherit; cursor: pointer; letter-spacing: inherit; }
+.gx button { color: inherit; }
+/* cockpit-theme.css fades every disabled #app button with !important; the new screen sets its own. */
+#app .gx button:disabled { opacity: .45 !important; filter: none !important; }
+#app .gx .gx-choice:disabled { opacity: 1 !important; }
 /* Legacy desktop rules size the shared timer/count hooks; reset them inside the new screen. */
 html body #app .gx .exam-time-value, html body #app .gx .exam-answered-value { display: inline !important; width: auto !important; min-width: 0 !important; text-align: left !important; }
-.gx button:disabled { opacity: .45; cursor: not-allowed; }
+.gx button:disabled { cursor: not-allowed; }
 .gx :focus-visible { outline: 3px solid var(--select); outline-offset: 3px; }
 .gx ::selection { background: var(--primary); color: var(--on-primary); }
 .gx { scrollbar-color: var(--line-strong) transparent; }
@@ -215,4 +219,62 @@ html body #app .gx .exam-time-value, html body #app .gx .exam-answered-value { d
   .gx-timer { padding: 5px 12px 5px 10px; gap: 8px; }
   .gx-timer strong { font-size: 19px; }
   .gx-timer small { font-size: 12px; }
+}
+
+/* Pop-ups */
+.gx-backdrop { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 20px; background: rgba(6, 8, 12, .72); }
+.gx[data-theme="light"] .gx-backdrop { background: rgba(23, 26, 33, .45); }
+.gx-modal { position: relative; width: min(560px, 100%); max-height: calc(100vh - 40px); overflow-y: auto; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 32px; border: 2px solid var(--line); border-radius: 28px; background: var(--surface); text-align: center; box-shadow: 0 30px 80px rgba(0, 0, 0, .45); }
+.gx-modal.is-wide { width: min(1100px, 100%); align-items: stretch; text-align: left; padding: 24px; }
+.gx-modal.is-wide .gx-stim { position: static; max-height: none; border: 0; padding: 0; }
+.gx-modal h2 { font-size: 30px; font-weight: 900; line-height: 1.15; }
+.gx-modal p { font-size: 17px; color: var(--text-2); line-height: 1.5; max-width: 44ch; }
+.gx-modal p strong { color: var(--text); }
+.gx-modal-badge { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: var(--primary); color: var(--on-primary); }
+.gx-modal-badge.is-warn { background: var(--warn); }
+.gx-modal-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; }
+.gx-modal-stats div { display: flex; flex-direction: column; gap: 2px; padding: 14px 10px; border-radius: 16px; background: var(--surface-2); }
+.gx-modal-stats strong { font-size: 28px; font-weight: 900; font-variant-numeric: tabular-nums; }
+.gx-modal-stats span { font-size: 13px; font-weight: 800; color: var(--muted); }
+.gx-modal-stats .is-good strong { color: var(--good); }
+.gx-modal-stats .is-warn strong { color: var(--warn); }
+.gx-modal-actions { display: flex; gap: 12px; justify-content: center; width: 100%; margin-top: 4px; }
+.gx-modal-actions.is-wrap { flex-wrap: wrap; }
+.gx-modal-actions .gx-btn.is-primary { padding: 0 32px; }
+.gx-modal-close { position: absolute; top: 12px; right: 12px; z-index: 1; }
+.gx-loader { width: 100%; height: 14px; border-radius: 7px; background: var(--track); overflow: hidden; }
+.gx-loader i { display: block; width: 40%; height: 100%; border-radius: 7px; background: var(--primary); animation: gx-load 1.2s cubic-bezier(.22, 1, .36, 1) infinite; }
+@keyframes gx-load { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+@media (max-width: 900px) {
+  .gx-modal { padding: 24px 18px; }
+  .gx-modal h2 { font-size: 24px; }
+  .gx-modal-actions { flex-direction: column-reverse; }
+  .gx-modal-actions .gx-btn { width: 100%; }
+}
+
+/* Practice instant feedback */
+.gx { --bad: #ff6b6b; }
+.gx[data-theme="light"] { --bad: #d03a3a; }
+.gx-choice.is-correct { border-color: var(--good); background: color-mix(in srgb, var(--good) 14%, transparent); color: var(--good); font-weight: 900; }
+.gx-choice.is-correct .gx-key { border-color: var(--good); background: var(--good); color: var(--bg); }
+.gx-choice.is-wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 14%, transparent); color: var(--bad); }
+.gx-choice.is-wrong .gx-key { border-color: var(--bad); background: var(--bad); color: var(--bg); }
+.gx-choice.is-dim { color: var(--muted); }
+.gx .gx-choice:disabled { opacity: 1; cursor: default; }
+.gx-feedback { position: sticky; bottom: 0; z-index: 3; display: flex; align-items: center; gap: 20px; padding: 22px 56px; border-top: 2px solid var(--fb-line); background: var(--fb-bg); animation: gx-rise .35s cubic-bezier(.22, 1, .36, 1); }
+.gx-feedback.is-good { --fb: var(--good); --fb-bg: color-mix(in srgb, var(--good) 16%, var(--bg)); --fb-line: color-mix(in srgb, var(--good) 40%, var(--bg)); }
+.gx-feedback.is-bad { --fb: var(--bad); --fb-bg: color-mix(in srgb, var(--bad) 14%, var(--bg)); --fb-line: color-mix(in srgb, var(--bad) 40%, var(--bg)); }
+.gx-feedback-icon { flex: none; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--fb); color: var(--bg); }
+.gx-feedback-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; font-size: 16px; color: var(--text-2); }
+.gx-feedback-text strong { font-size: 26px; font-weight: 900; color: var(--fb); }
+.gx-feedback-answer { font-weight: 900; color: var(--text); }
+.gx-feedback .gx-btn.is-primary { --primary: var(--fb); --primary-edge: color-mix(in srgb, var(--fb) 70%, #000); --on-primary: var(--bg); }
+.gx-streak { display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; height: 48px; border-radius: 14px; background: color-mix(in srgb, var(--warn) 14%, transparent); color: var(--warn); font-weight: 900; }
+@keyframes gx-rise { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@media (max-width: 900px) {
+  .gx-feedback { flex-wrap: wrap; gap: 12px; padding: 16px; }
+  .gx-feedback-icon { width: 48px; height: 48px; }
+  .gx-feedback-text strong { font-size: 21px; }
+  .gx-feedback .gx-btn.is-primary { flex: 1 1 100%; }
+  .gx-streak { height: 40px; padding: 0 10px; font-size: 14px; }
 }
