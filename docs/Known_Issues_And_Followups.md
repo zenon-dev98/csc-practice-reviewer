@@ -52,7 +52,7 @@
 
 ## Question bank follow-ups (2026-11-21)
 
-- Reading passages are 73-111 words; lengthen them and raise reading time above data interpretation (audit Q11).
+- Reading passages are now 146-247 words, but nearly all follow one template (problem, pilot, result, keep monitoring). More varied genres (argument, narrative, explanation) would test reading more like the real exam.
 - Abstract reasoning still has many quick letter/number code items; only the 26 word-described figure puzzles became drawn figure series.
 - Answer leak (correct choice is the longest 58% of the time), joke distractors, and cross-mock near-duplicates (audit Q3-Q6) are still open.
 - Pipe/work problems reuse the same number pairs across mocks (10 and 15 days, 12 and 18 hours).

@@ -142,3 +142,9 @@ Real bank items of every type were opened in the exam screen (`?fixture=exam&que
 | D6 | Movement puzzles in words ("a marker moves two corners clockwise on every turn") make you imagine the figure, and the same ↑ → ↓ ← rotation item repeats in nearly every mock. | Fixed: all 26 word-described figure puzzles are replaced by drawn figure series (new `figures` stimulus kind). Each concept appears once; easy items use one rule, medium items combine two. Original answer letters and difficulty are kept. |
 | D7 | Ordering items and 15 chart sets use A-D as statement or row labels, which collide with the A-D answer letters. | Open: content change. |
 | D8 | Bar charts with several measures show one measure at a time behind tabs; the exact table below has all of them. | Open, minor. |
+
+### Reading passages (2026-11-21)
+
+- Q11 fixed: all 60 passages were lengthened from 73-111 words (average 90) to 146-247 words (average 182). Each keeps its original sentences word for word; a new opening paragraph adds background (who is affected, why it matters) and a middle paragraph adds detail or viewpoints. Neither adds an action, so all 240 existing questions keep the same single correct answer. A before/after diff confirmed that only passage text changed.
+- Q10 fixed: reading items in versions 1-13 now expect 95 seconds, so reading averages 87 seconds against 78 for data interpretation. Versions 14-20 derive time from difficulty and were left unchanged.
+- Still open: most passages share one template (a problem, a pilot, a result, more monitoring), and so do many of their questions. Real exam reading covers more genres.
