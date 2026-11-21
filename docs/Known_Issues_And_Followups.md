@@ -54,7 +54,7 @@
 
 - Reading passages are now 146-247 words, but nearly all follow one template (problem, pilot, result, keep monitoring). More varied genres (argument, narrative, explanation) would test reading more like the real exam.
 - Abstract reasoning still has many quick letter/number code items; only the 26 word-described figure puzzles became drawn figure series.
-- Answer leak and joke choices: fixed for reading comprehension (correct longest in 28%, was 94%), General Information (23-41%, was 73-89%) and assumptions/conclusions (19%, was 54%); bank-wide 19.9%. The rewritten GI choices should get a legal spot-check by a human reviewer. Cross-mock near-duplicates remain open; Numerical repeats most (47% of items have a twin).
+- Answer leak and joke choices: fixed for reading comprehension (correct longest in 28%, was 94%), General Information (23-41%, was 73-89%) and assumptions/conclusions (19%, was 54%); bank-wide 19.9%. The rewritten GI choices should get a legal spot-check by a human reviewer. Near-identical cross-mock copies were replaced (137 to 51 remaining matches, all reviewed as same-type rather than copies). Same-type repetition (for example several work-rate problems with different numbers) remains by design, as in the real exam.
 - Pipe/work problems reuse the same number pairs across mocks (10 and 15 days, 12 and 18 hours).
 
 ## Motion follow-ups (2026-11-21)
