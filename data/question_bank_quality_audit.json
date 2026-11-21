@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-18T09:58:20.025Z",
+  "generatedAt": "2026-11-21T11:01:43.833Z",
   "source": "app/question-bank",
   "versionCount": 20,
   "totalQuestions": 3400,
@@ -56,12 +56,12 @@
         "Data interpretation": 16
       },
       "answerPositions": {
-        "A": 43,
+        "A": 44,
         "B": 43,
-        "C": 42,
+        "C": 41,
         "D": 42
       },
-      "longestAnswerRun": 2,
+      "longestAnswerRun": 3,
       "uniqueItemNumbers": 170,
       "exactDuplicatePromptGroups": [],
       "templateDuplicatePromptGroups": [],
@@ -182,8 +182,8 @@
       "answerPositions": {
         "A": 43,
         "B": 43,
-        "C": 42,
-        "D": 42
+        "C": 43,
+        "D": 41
       },
       "longestAnswerRun": 2,
       "uniqueItemNumbers": 170,
@@ -304,12 +304,12 @@
         "Data interpretation": 16
       },
       "answerPositions": {
-        "A": 43,
+        "A": 42,
         "B": 41,
-        "C": 44,
-        "D": 42
+        "C": 46,
+        "D": 41
       },
-      "longestAnswerRun": 2,
+      "longestAnswerRun": 3,
       "uniqueItemNumbers": 170,
       "exactDuplicatePromptGroups": [],
       "templateDuplicatePromptGroups": [],
@@ -428,10 +428,10 @@
         "Data interpretation": 16
       },
       "answerPositions": {
-        "A": 42,
-        "B": 43,
+        "A": 44,
+        "B": 42,
         "C": 42,
-        "D": 43
+        "D": 42
       },
       "longestAnswerRun": 2,
       "uniqueItemNumbers": 170,
@@ -552,10 +552,10 @@
         "Data interpretation": 16
       },
       "answerPositions": {
-        "A": 43,
-        "B": 42,
-        "C": 43,
-        "D": 42
+        "A": 40,
+        "B": 43,
+        "C": 44,
+        "D": 43
       },
       "longestAnswerRun": 2,
       "uniqueItemNumbers": 170,
@@ -801,8 +801,8 @@
       },
       "answerPositions": {
         "A": 43,
-        "B": 42,
-        "C": 43,
+        "B": 43,
+        "C": 42,
         "D": 42
       },
       "longestAnswerRun": 2,
@@ -1048,8 +1048,8 @@
         "Data interpretation": 16
       },
       "answerPositions": {
-        "A": 43,
-        "B": 42,
+        "A": 42,
+        "B": 43,
         "C": 43,
         "D": 42
       },
@@ -1174,8 +1174,8 @@
       "answerPositions": {
         "A": 42,
         "B": 43,
-        "C": 42,
-        "D": 43
+        "C": 43,
+        "D": 42
       },
       "longestAnswerRun": 2,
       "uniqueItemNumbers": 170,
@@ -1297,8 +1297,8 @@
       },
       "answerPositions": {
         "A": 43,
-        "B": 42,
-        "C": 43,
+        "B": 43,
+        "C": 42,
         "D": 42
       },
       "longestAnswerRun": 2,
@@ -1421,11 +1421,11 @@
       },
       "answerPositions": {
         "A": 43,
-        "B": 43,
-        "C": 42,
+        "B": 44,
+        "C": 41,
         "D": 42
       },
-      "longestAnswerRun": 2,
+      "longestAnswerRun": 3,
       "uniqueItemNumbers": 170,
       "exactDuplicatePromptGroups": [],
       "templateDuplicatePromptGroups": [],
@@ -1544,9 +1544,9 @@
         "Data interpretation": 16
       },
       "answerPositions": {
-        "A": 43,
+        "A": 42,
         "B": 43,
-        "C": 42,
+        "C": 43,
         "D": 42
       },
       "longestAnswerRun": 2,
@@ -1670,8 +1670,8 @@
       "answerPositions": {
         "A": 43,
         "B": 41,
-        "C": 44,
-        "D": 42
+        "C": 43,
+        "D": 43
       },
       "longestAnswerRun": 2,
       "uniqueItemNumbers": 170,
@@ -1792,8 +1792,8 @@
         "Data interpretation": 16
       },
       "answerPositions": {
-        "A": 42,
-        "B": 43,
+        "A": 41,
+        "B": 44,
         "C": 42,
         "D": 43
       },
@@ -1916,8 +1916,8 @@
         "Data interpretation": 16
       },
       "answerPositions": {
-        "A": 43,
-        "B": 42,
+        "A": 44,
+        "B": 41,
         "C": 43,
         "D": 42
       },
@@ -2040,12 +2040,12 @@
         "Data interpretation": 16
       },
       "answerPositions": {
-        "A": 41,
-        "B": 44,
-        "C": 41,
-        "D": 44
+        "A": 39,
+        "B": 47,
+        "C": 39,
+        "D": 45
       },
-      "longestAnswerRun": 1,
+      "longestAnswerRun": 2,
       "uniqueItemNumbers": 170,
       "exactDuplicatePromptGroups": [],
       "templateDuplicatePromptGroups": [],
@@ -2164,10 +2164,10 @@
         "Data interpretation": 16
       },
       "answerPositions": {
-        "A": 43,
-        "B": 42,
-        "C": 43,
-        "D": 42
+        "A": 41,
+        "B": 40,
+        "C": 46,
+        "D": 43
       },
       "longestAnswerRun": 2,
       "uniqueItemNumbers": 170,
@@ -2288,8 +2288,8 @@
         "Data interpretation": 16
       },
       "answerPositions": {
-        "A": 41,
-        "B": 44,
+        "A": 42,
+        "B": 43,
         "C": 41,
         "D": 44
       },
@@ -2412,12 +2412,12 @@
         "Data interpretation": 16
       },
       "answerPositions": {
-        "A": 43,
-        "B": 42,
-        "C": 43,
-        "D": 42
+        "A": 42,
+        "B": 43,
+        "C": 46,
+        "D": 39
       },
-      "longestAnswerRun": 2,
+      "longestAnswerRun": 3,
       "uniqueItemNumbers": 170,
       "exactDuplicatePromptGroups": [],
       "templateDuplicatePromptGroups": [],

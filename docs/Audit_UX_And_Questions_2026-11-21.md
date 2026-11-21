@@ -103,3 +103,42 @@ Fixed: all 69 letter-citing explanations now say "the answer" / "ang tamang sago
 - v11-q052 (key D, explanation says B)
 - v11-q053 (key A, explanation says B)
 - v11-q055 (key D, explanation says B)
+
+## Time-cost and realism audit (2026-11-21, second pass)
+
+Bank: 20 mock versions x 170 items = 3,400 items. Per mock: 20 General Information, 60 Verbal, 40 Numerical, 50 Analytical. The time limit allows about 67 seconds per item.
+
+| # | Severity | Finding | Scope |
+|---|---|---|---|
+| Q10 | High | Time is spent in the wrong place. Data-interpretation items are rated 81 s on average and word problems 77 s, but reading comprehension only 74 s. On the real exam, reading should be the slowest part. | bank-wide `expectedSeconds` |
+| Q11 | High | Reading passages are too short to be a real test: 60 passages, 73-111 words each (90 on average), 4 items per passage. Real CSE passages are much longer and the questions take longer to answer. | 60 passages, 240 items |
+| Q12 | High | 53 data-interpretation items make you calculate something for every row before you can answer: 17 ask for the highest or lowest ratio (4 divisions, e.g. v17-q163 59/11800 vs 51/10200 ...), 6 are weighted averages (4 multiplications and a division, e.g. v04-q161), 29 are multi-step. Some mocks have 6 of them (v04, v11). The answer usually hinges on rounding, not on reading the chart. | 53 of 320 DI items |
+| Q13 | Medium | About 90 Numerical items are long hand arithmetic with no shortcut: compound interest to the peso (v12-q115), successive discounts plus tax plus a fee (v05-q099), mixed-fraction borrowing (v04-q088), decimal chains (v02-q082). These test patience rather than reasoning. | 52 basic operations, 38 word problems |
+| Q14 | Low | 51 of the 80 chart/table sets use thousands-scale numbers (e.g. PHP 781,200 + 703,000 + ...) where small numbers would test the same skill. | 51 sets |
+
+Still open from the first pass: Q3 answer leak (the correct choice is the longest option 58% of the time), Q4 joke distractors, Q5/Q6 duplicates and near-duplicates, Q7 nothing human-reviewed.
+
+Overall: the answer keys are reliable (no wrong key found in about 50 hand-checked items and 690 recomputed sums), but as practice for the real exam the bank is weak. It is too easy to guess (Q3, Q4), it repeats itself across mocks (Q6), its reading is too short (Q11), and its hardest items are tedious arithmetic instead of reasoning (Q12, Q13).
+
+### Fixes applied (2026-11-21)
+
+- Q12 fixed: 31 data-interpretation items rewritten. Each still uses its original table, but now asks a reasoning question (a compound condition, a supported statement, a check against a friendly benchmark such as 90% or 300 per hour) or an "about what percent" question whose choices are far enough apart that estimating decides it. No weighted averages or four-way close ratio comparisons remain in these sets.
+- Q13 narrowed and fixed: a closer read shows most flagged fraction and decimal items are normal 30-45 second exam work. 19 were truly tedious and are rewritten: 9 compound-interest-to-the-peso items now test the idea (interest on interest, up 20% then down 20%, doubling, simple vs compound), 3 stacked discount/tax items now ask for the equivalent discount or the effect of order, 6 long multiplications now have a shortcut (25 x, 99 x, 125 x 8), and the 9-and-15-hour pump item now resolves to whole hours.
+- Every rewritten item keeps its ID; past attempts store their own copy of each question, so history is unchanged. Provenance notes the rewrite and status stays needs_review.
+- Because difficulty now comes from reasoning rather than arithmetic, several rewritten items are medium or easy. To keep the validated 50/90/30 split per mock, 21 paragraph-organization items (hard under the authoring rubric) were relabeled from medium to hard.
+- Still open: reading is rated slightly faster than data interpretation (74 vs 78 seconds) until the passages are lengthened (Q11).
+
+## Question display audit (2026-11-21)
+
+Real bank items of every type were opened in the exam screen (`?fixture=exam&question=<id>`) at 1536x736 and 375x812.
+
+| # | Finding | Status |
+|---|---|---|
+| D1 | Line charts always started the axis at 0 with odd ticks (0, 27, 55, 82, 109), so 97-99% uptime drew as two flat overlapping lines and v06-q163 ("largest increase") could not be read from the chart. | Fixed: the axis fits the data with round steps, points show their values (one- and two-line charts), and the left margin fits the tick labels on phones. |
+| D2 | Shape and arrow symbols came from mixed fonts, so ▲ and ○ differed in size and weight, and answer choices showed them at body-text size. | Fixed: shapes and arrows are drawn as matching SVG glyphs and enlarged in choices. |
+| D3 | Sequences ("7, 12, 17, 22, ____", "▲○, ▲▲○○, ...") were plain sentences. | Fixed: number-sequence and abstract-reasoning items show each term as a tile with a "?" slot. |
+| D4 | "Row 1: ... Row 2: ... Row 3: ..." matrices and "[2, 5, 7], [4, 3, 7], [6, ?, 10]" rows were plain text you had to picture. | Fixed: both render as grids. |
+| D5 | Paragraph-ordering items in v14-v20 label sentences "A. B. C. D." and showed as one dense paragraph; choices like "A-C-D-B" were not drawn as steps. | Fixed: all 160 ordering items now parse into a numbered list, and letter orders render as steps. |
+| D6 | Movement puzzles in words ("a marker moves two corners clockwise on every turn") make you imagine the figure, and the same ↑ → ↓ ← rotation item repeats in nearly every mock. | Open: needs drawn figure stimuli and new items (content work). |
+| D7 | Ordering items and 15 chart sets use A-D as statement or row labels, which collide with the A-D answer letters. | Open: content change. |
+| D8 | Bar charts with several measures show one measure at a time behind tabs; the exact table below has all of them. | Open, minor. |

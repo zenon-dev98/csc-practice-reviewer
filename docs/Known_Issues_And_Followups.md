@@ -48,4 +48,11 @@
 
 - Sign-in, create-account, the paper scan/confirm workflow and the loading/config/error screens are not yet converted to the game style.
 - 15 of 80 chart/table sets label rows with bare A–D, which collides with answer letters; renaming them is a question-content change that needs approval.
-- `npm run qa:paper` was not run for stage 1: Playwright is not installed on this machine (`npm run setup` installs it). Paper scan/review screens were not changed.
+- `npm run qa:paper` was not run for stage 1: Playwright is not installed on this machine (`npm run setup` installs it). Stage 5 restyled the paper scan/review screens (markup and data hooks only) and qa:paper has still not run.
+
+## Question bank follow-ups (2026-11-21)
+
+- Reading passages are 73-111 words; lengthen them and raise reading time above data interpretation (audit Q11).
+- Abstract reasoning describes figures in words ("a marker moves two corners clockwise") instead of showing them, and the same arrow-rotation item repeats in almost every mock. Needs drawn figure stimuli and new items.
+- Answer leak (correct choice is the longest 58% of the time), joke distractors, and cross-mock near-duplicates (audit Q3-Q6) are still open.
+- Pipe/work problems reuse the same number pairs across mocks (10 and 15 days, 12 and 18 hours).
