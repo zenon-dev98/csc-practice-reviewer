@@ -46,7 +46,7 @@
 
 ## Redesign follow-ups (2026-11-21)
 
-- Fixed 2026-11-22: the 15 chart/table sets that labelled rows A–D now use real names (North, Malinis, Riverside...) in the table, alt text, questions, choices and explanations, so row names no longer collide with answer letters.
+- Fixed 2026-11-22: the 15 chart/table sets that labelled rows A–D now use real names (North, Malinis, Riverside...) in the table, alt text, questions, choices and explanations, so row names no longer collide with answer letters. The 48 v15-v20 paragraph-ordering items now label sentences I-IV.
 - `npm run qa:paper` was not run for stage 1: Playwright is not installed on this machine (`npm run setup` installs it). Stage 5 restyled the paper scan/review screens (markup and data hooks only) and qa:paper has still not run.
 
 ## Question bank follow-ups (2026-11-21)
