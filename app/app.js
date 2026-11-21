@@ -1003,186 +1003,110 @@
   }
 
   function renderLoading() {
-    root.innerHTML = cockpitFrame(`
-      <section class="system-screen boot-screen" aria-live="polite">
-        <div class="system-grid" aria-hidden="true"></div>
-        <div class="system-corner top-left" aria-hidden="true"></div><div class="system-corner top-right" aria-hidden="true"></div><div class="system-corner bottom-left" aria-hidden="true"></div><div class="system-corner bottom-right" aria-hidden="true"></div>
-        <div class="boot-console">
-          <img src="assets/brand-shield.svg" alt="" />
-          <p class="eyebrow">Private reviewer network</p>
-          <strong class="boot-brand">CSC Practice Reviewer</strong>
-          <small class="boot-product-line">Independent mock exam and review tool</small>
-          <h1>Syncing reviewer data</h1>
-          <div class="segmented-loader" aria-label="Loading"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <span class="boot-status">Connecting securely</span>
-          <div class="boot-sync-modules" aria-label="Reviewer synchronization status">
-            <span>${localIcon("circle-check")}<b>Account</b><small>Authenticating</small></span>
-            <span>${localIcon("notebook-tabs")}<b>Question bank</b><small>Loading locally</small></span>
-            <span>${localIcon("cloud-check")}<b>Progress</b><small>Checking cloud state</small></span>
-          </div>
-        </div>
-      </section>
-    `, "system-frame");
+    root.innerHTML = gxPublicPage(`
+      <section class="gx-system" aria-live="polite">
+        ${gxBrandMark(64)}
+        <h1>Loading your reviewer</h1>
+        <div class="gx-dots" role="progressbar" aria-label="Loading"><i></i><i></i><i></i></div>
+        <p class="gx-muted">Checking your account, question bank and saved progress.</p>
+      </section>`, { bare: true });
   }
 
   function renderFatal(title, message) {
-    root.innerHTML = cockpitFrame(`
-      <section class="system-screen diagnostic-screen">
-        <aside class="diagnostic-rail status-rail"><strong>System Status</strong><span>Connection <b>Failed</b></span><span>Services <b>Unavailable</b></span><span>Data Access <b>Pending</b></span><span>Security <b>Standby</b></span></aside>
-        <article class="diagnostic-panel danger-diagnostic" role="alert">
-          <div class="diagnostic-code">ERR / SYNC-01</div>
-          ${brandBlock()}
-          <p class="eyebrow">Reviewer diagnostics</p>
-          <h1>${escapeHtml(title)}</h1>
-          <p>${escapeHtml(message)}</p>
-          <details><summary>Technical details</summary><code>No credentials, account data, or secrets are shown in this diagnostic.</code></details>
-          <button class="btn primary" data-action="reload-app" type="button">${icon("refresh")} Reload App</button>
-        </article>
-      </section>
-    `, "system-frame");
+    root.innerHTML = gxPublicPage(`
+      <section class="gx-system gx-card" role="alert">
+        <span class="gx-modal-badge is-danger" aria-hidden="true">!</span>
+        <h1>${escapeHtml(title)}</h1>
+        <p>${escapeHtml(message)}</p>
+        <p class="gx-muted">Your saved progress is not affected. Reloading usually fixes this.</p>
+        <button class="gx-btn is-primary" data-action="reload-app" type="button">RELOAD</button>
+      </section>`, { bare: true });
   }
 
   function renderConfig() {
-    root.innerHTML = cockpitFrame(`
-      <section class="system-screen diagnostic-screen">
-        <aside class="diagnostic-rail status-rail"><strong>System Status</strong><span>Connection <b>Missing</b></span><span>Services <b>Waiting</b></span><span>Data Access <b>Pending</b></span><span>Security <b>Standby</b></span></aside>
-        <article class="diagnostic-panel warning-diagnostic">
-          <div class="diagnostic-code">CFG / API-00</div>
-          ${brandBlock()}
-          <p class="eyebrow">Developer configuration</p>
-          <h1>Supabase setup required</h1>
-          <p>This build needs a project URL and publishable browser key in <code>app/supabase-config.js</code>.</p>
-          <details><summary>Configuration shape</summary><pre>window.CSC_SUPABASE_CONFIG = {
+    root.innerHTML = gxPublicPage(`
+      <section class="gx-system gx-card">
+        <span class="gx-modal-badge" aria-hidden="true">i</span>
+        <h1>Supabase setup required</h1>
+        <p>This build needs a project URL and publishable browser key in <code>app/supabase-config.js</code>.</p>
+        <pre class="gx-code">window.CSC_SUPABASE_CONFIG = {
   url: "https://project-ref.supabase.co",
   publishableKey: "sb_publishable_..."
-};</pre></details>
-          <button class="btn primary" data-action="reload-app" type="button">${icon("refresh")} Reload App</button>
-        </article>
-      </section>
-    `, "system-frame");
+};</pre>
+        <button class="gx-btn is-primary" data-action="reload-app" type="button">RELOAD</button>
+      </section>`, { bare: true });
   }
 
   function renderCreateAccount() {
-    root.innerHTML = publicShell(`
-      <section class="auth-canvas access-console create-state">
-        <div class="auth-copy">
-          <span class="soft-pill">${icon("shield")} Private reviewer access</span>
-          <h1>Start strong.<br /><em>Track every run.</em></h1>
-          <p>Private Civil Service Professional practice with saved progress, timing, and review history.</p>
-          <div class="auth-chips">
-            <span>${icon("clock")} <b>Exam continuity</b><small>Pause, resume, and recover unfinished runs</small></span>
-            <span>${icon("stats")} <b>Private analytics</b><small>Scores and timing stay tied to your account</small></span>
-            <span>${icon("review")} <b>Targeted review</b><small>Return to mistakes and flagged questions</small></span>
-          </div>
+    const busy = app.busyAction === "create";
+    root.innerHTML = gxPublicPage(gxAuthLayout("Start your first mock.", "Saved progress, timing and review history for the Professional exam.", `
+      <form class="gx-card gx-form gx-authcard" data-form="signup">
+        <h2>Create account</h2>
+        <label class="gx-field">Full name<input name="name" autocomplete="name" placeholder="Your full name" required /></label>
+        <label class="gx-field">Email<input name="email" type="email" autocomplete="email" placeholder="you@example.com" required /></label>
+        <div class="gx-authpair">
+          ${gxPasswordField("password", "Password", "new-password", "At least 8 characters")}
+          ${gxPasswordField("confirmPassword", "Confirm password", "new-password", "Repeat it")}
         </div>
-        <form class="auth-card" data-form="signup">
-          <div class="auth-card-head">
-            <h2>Create Account</h2>
-            <p>Set up your reviewer account.</p>
-          </div>
-          <label class="field-label">Full Name<div class="field-with-icon">${icon("user")}<input name="name" autocomplete="name" placeholder="Enter your full name" required /></div></label>
-          <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="email" placeholder="Enter your email address" required /></div></label>
-          <div class="auth-password-grid">
-            <label class="field-label">Password<div class="field-with-icon has-toggle">${icon("key")}<input name="password" type="password" autocomplete="new-password" minlength="8" placeholder="New password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
-            <label class="field-label">Confirm Password<div class="field-with-icon has-toggle">${icon("key")}<input name="confirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Confirm" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
-          </div>
-          <label class="field-label">Invite Code<div class="field-with-icon">${icon("shield")}<input name="inviteCode" autocomplete="off" placeholder="Enter invite code" required /></div></label>
-          <button class="btn primary" data-action="signup-submit" type="button" ${app.busyAction === "create" ? "disabled" : ""}>${app.busyAction === "create" ? "Creating account..." : "Create Account"}</button>
-          <div class="auth-divider"><span>or</span></div>
-          <p class="auth-switch-copy">Already have an account?</p>
-          <button class="text-link" data-action="show-signin" type="button">Sign in</button>
-        </form>
-      </section>
-    `);
+        <label class="gx-field">Invite code<input name="inviteCode" autocomplete="off" placeholder="From the person who invited you" required /></label>
+        <button class="gx-btn is-primary" data-action="signup-submit" type="button" ${busy ? "disabled" : ""}>${busy ? "CREATING ACCOUNT…" : "CREATE ACCOUNT"}</button>
+        <p class="gx-authswitch">Already have an account? <button class="gx-link" data-action="show-signin" type="button">Sign in</button></p>
+      </form>`));
   }
 
   function renderSignIn() {
-    root.innerHTML = publicShell(`
-      <section class="auth-canvas access-console select-mode">
-        <div class="auth-copy compact-copy">
-          <span class="soft-pill">${icon("shield")} Returning reviewer</span>
-          <h1>Welcome back.<br /><em>Keep moving.</em></h1>
-          <p>Continue saved exams, targeted practice, mistakes, flags, and personal performance records.</p>
-          <div class="auth-chips">
-            <span>${icon("clock")} <b>Resume unfinished exams</b><small>Return to the exact saved checkpoint</small></span>
-            <span>${icon("stats")} <b>View previous scores</b><small>Compare section and pacing records</small></span>
-            <span>${icon("bookmark")} <b>Continue focused review</b><small>Practice mistakes and flagged items</small></span>
-          </div>
-        </div>
-        <form class="auth-card profile-picker-card" data-form="signin" autocomplete="off">
-          <div class="auth-card-head">
-            <h2>Sign In</h2>
-            <p>Continue your saved exams and review history.</p>
-          </div>
-          <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="off" placeholder="Enter your email address" required /></div></label>
-          <label class="field-label">Password<div class="field-with-icon has-toggle">${icon("lock")}<input name="password" type="password" autocomplete="off" placeholder="Enter your password" required /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
-          <button class="btn primary" data-action="signin-submit" type="button" ${app.busyAction === "signin" ? "disabled" : ""}>${app.busyAction === "signin" ? "Signing in..." : "Sign In"}</button>
-          <button class="text-link" data-action="forgot-password" type="button">Forgot Password?</button>
-          <div class="auth-divider"><span>or</span></div>
-          <p class="auth-switch-copy">New here?</p>
-          <button class="text-link" data-action="show-create" type="button">Create account</button>
-        </form>
-      </section>
-    `);
+    const busy = app.busyAction === "signin";
+    root.innerHTML = gxPublicPage(gxAuthLayout("Welcome back.", "Pick up your unfinished mock, practice your mistakes, or start a new run.", `
+      <form class="gx-card gx-form gx-authcard" data-form="signin" autocomplete="off">
+        <h2>Sign in</h2>
+        <label class="gx-field">Email<input name="email" type="email" autocomplete="off" placeholder="you@example.com" required /></label>
+        ${gxPasswordField("password", "Password", "off", "Your password")}
+        <button class="gx-btn is-primary" data-action="signin-submit" type="button" ${busy ? "disabled" : ""}>${busy ? "SIGNING IN…" : "SIGN IN"}</button>
+        <button class="gx-link" data-action="forgot-password" type="button">Forgot password?</button>
+        <p class="gx-authswitch">New here? <button class="gx-link" data-action="show-create" type="button">Create an account</button></p>
+      </form>`));
   }
 
-  function renderFixtureCreateProfile() {
-    root.innerHTML = publicShell(`
-      <section class="auth-canvas create-state fixture-auth">
-        <div class="auth-copy">
-          <span class="soft-pill">${icon("building")} Civil Service Exam Practice</span>
-          <h1>Review smarter. Track your progress clearly.</h1>
-          <p>Save mock exam scores, review history, and progress across every section while preparing for the Professional level.</p>
-          <div class="auth-chips">
-            <span>${icon("clock")} Timed mock exams</span>
-            <span>${icon("stats")} Score tracking</span>
-            <span>${icon("review")} Reviewer history</span>
-          </div>
-        </div>
-        <form class="auth-card fixture-create-card" data-form="signup">
-          <div class="auth-card-head">
-            <h2>Create Account</h2>
-            <p>Set up your reviewer account.</p>
-          </div>
-          <label class="field-label">Full Name<div class="field-with-icon">${icon("user")}<input name="name" autocomplete="name" placeholder="Enter your full name" /></div></label>
-          <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="email" placeholder="Enter your email address" /></div></label>
-          <button class="btn primary" data-action="signup-submit" type="button">${icon("spark")} Create Account</button>
-          <div class="auth-divider"><span>or</span></div>
-          <p class="auth-switch-copy">Already have an account?</p>
-          <button class="text-link" data-action="show-signin" type="button">Sign in</button>
-        </form>
-      </section>
-    `);
+  function gxBrandMark(size = 30) {
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="var(--primary)"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="var(--on-primary)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   }
 
-  function renderFixtureSelectProfile() {
-    root.innerHTML = publicShell(`
-      <section class="auth-canvas select-mode fixture-auth">
-        <div class="auth-copy compact-copy">
-          <span class="soft-pill">${icon("building")} Civil Service Exam Practice</span>
-          <h1>Returning reviewer</h1>
-          <p>Sign in to continue your saved exam progress, review history, flagged questions, and results.</p>
-          <div class="auth-chips">
-            <span>${icon("clock")} Resume unfinished exams</span>
-            <span>${icon("stats")} View previous scores</span>
-            <span>${icon("bookmark")} Continue category practice</span>
-          </div>
+  function gxPasswordField(name, label, autocomplete, placeholder) {
+    return `<label class="gx-field">${label}<span class="field-with-icon gx-pass"><input name="${name}" type="password" minlength="8" autocomplete="${autocomplete}" placeholder="${escapeAttr(placeholder)}" required /><button class="password-toggle gx-icon-btn is-bare" data-action="toggle-password" type="button" aria-label="Show password"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>`;
+  }
+
+  function gxPublicPage(content, { bare = false } = {}) {
+    const theme = gxTheme();
+    return `
+      <div class="gx" data-theme="${theme}">
+        <div class="gx-page">
+          <header class="gx-appbar">
+            <strong class="gx-brand">${gxBrandMark()}<span>CSC Reviewer</span></strong>
+            <div class="gx-appbar-end"><button class="gx-icon-btn" data-action="toggle-theme" type="button" aria-label="Switch to ${theme === "light" ? "dark" : "light"} theme">${gxIcon(theme === "light" ? "moon" : "sun")}</button></div>
+          </header>
+          <main class="gx-pagebody ${bare ? "gx-center" : ""}">${content}</main>
+          <p class="gx-note gx-public-note">Independent practice tool. Not affiliated with or endorsed by the Civil Service Commission.</p>
         </div>
-        <form class="auth-card profile-picker-card" data-form="signin" autocomplete="off">
-          <div class="auth-card-head">
-            <h2>Sign In</h2>
-            <p>Continue your saved exams and review history.</p>
-          </div>
-          <label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" autocomplete="off" placeholder="Enter your email address" /></div></label>
-          <label class="field-label">Password<div class="field-with-icon has-toggle">${icon("lock")}<input name="password" type="password" autocomplete="off" placeholder="Enter your password" /><button class="password-toggle" data-action="toggle-password" type="button" aria-label="Show password">${icon("eye")}</button></div></label>
-          <button class="btn primary" data-action="signin-submit" type="button">Sign In</button>
-          <button class="text-link" data-action="forgot-password" type="button">Forgot Password?</button>
-          <div class="auth-divider"><span>or</span></div>
-          <p class="auth-switch-copy">New here?</p>
-          <button class="text-link" data-action="show-create" type="button">Create account</button>
-        </form>
+        ${forgotPasswordModal()}
+        ${toast()}
+      </div>`;
+  }
+
+  function gxAuthLayout(title, lead, form) {
+    const perks = [
+      ["Pause and resume", "Unfinished mocks come back exactly where you left them."],
+      ["Instant feedback", "Practice sets check each answer as you go."],
+      ["Earn every seal", "Pass a mock at 80% or better to add it to your shelf."]
+    ];
+    return `<div class="gx-auth">
+      <section class="gx-authcopy">
+        <h1>${escapeHtml(title)}</h1>
+        <p class="gx-authlead">${escapeHtml(lead)}</p>
+        <ul class="gx-perks">${perks.map(([head, body]) => `<li>${gxBrandMark(26)}<span><strong>${head}</strong><small>${body}</small></span></li>`).join("")}</ul>
+        <p class="gx-muted">Invite-only. Your answers and scores stay private to your account.</p>
       </section>
-    `);
+      ${form}
+    </div>`;
   }
 
   function renderSetup() {
@@ -1388,10 +1312,12 @@
   }
 
   function gxOrderingParts(prompt) {
-    const patterns = [/(?:^|\s)(IV|VI|V|III|II|I)\.\s+/g, /(?:^|\s)\((\d+)\)\s+/g];
+    const patterns = [/(?:^|\s)(IV|VI|V|III|II|I)\.\s+/g, /(?:^|\s)\((\d+)\)\s+/g, /(?:^|\s)([A-F])\.\s+(?=[A-Z0-9"'])/g];
     for (const pattern of patterns) {
       const markers = [...prompt.matchAll(pattern)];
       if (markers.length < 3) continue;
+      // Letter labels must run A, B, C... so an initial or "a.m. B." cannot start a false list.
+      if (/^[A-F]$/.test(markers[0][1]) && markers.some((marker, index) => marker[1] !== "ABCDEF"[index])) continue;
       return {
         instruction: prompt.slice(0, markers[0].index).trim(),
         statements: markers.map((marker, index) => ({ label: marker[1], text: prompt.slice(marker.index + marker[0].length, markers[index + 1]?.index ?? prompt.length).trim() }))
@@ -1424,32 +1350,91 @@
       };
     }
     const shortChoices = current.choices.every((choice) => String(choice.text).length <= 28);
+    if (!/number sequence|abstract reasoning/i.test(current.csc_skill || "")) {
+      return { html: `<h1 class="gx-prompt ${prompt.length > 160 ? "is-long" : ""}">${escapeHtml(prompt)}</h1>`, grid: shortChoices && !current.stimulus };
+    }
+    const tile = (term) => /^(_{2,}|\?)$/.test(term) ? `<div class="gx-tile is-blank">?</div>` : `<div class="gx-tile">${gxGlyphs(term)}</div>`;
+    const matrix = prompt.match(/^(.*?)Row 1:\s*(.+?)\.\s*Row 2:\s*(.+?)\.\s*Row 3:\s*(.+?)\s*\.?\s*$/i);
+    if (matrix) {
+      const rows = matrix.slice(2, 5).map((row) => row.split(/\s*,\s*/).map((cell) => cell.replace(/\.$/, "").trim()).filter(Boolean));
+      if (rows.every((row) => row.length === 3)) {
+        return { html: `<h1 class="gx-lead">${escapeHtml(matrix[1].trim() || "Complete the grid.")}</h1><div class="gx-matrix" role="group" aria-label="${escapeAttr(prompt)}">${rows.flat().map(tile).join("")}</div>`, grid: shortChoices };
+      }
+    }
+    const bracketRows = [...prompt.matchAll(/\[([^\]]+)\]/g)];
+    if (bracketRows.length >= 3) {
+      const rows = bracketRows.map((match) => match[1].split(/\s*,\s*/));
+      const before = prompt.slice(0, bracketRows[0].index).trim();
+      const after = prompt.slice(bracketRows.at(-1).index + bracketRows.at(-1)[0].length).replace(/^[.\s]+/, "").trim();
+      if (rows.every((row) => row.length === rows[0].length)) {
+        return { html: `<h1 class="gx-lead">${escapeHtml(before)}${after ? ` ${escapeHtml(after)}` : ""}</h1><div class="gx-matrix" style="--cols: ${rows[0].length}" role="group" aria-label="${escapeAttr(prompt)}">${rows.flat().map(tile).join("")}</div>`, grid: shortChoices };
+      }
+    }
+    // "Lead text: term, term, term, ____." sequences become a row of tiles.
+    const sequence = prompt.match(/^(.*?[?:.])\s+((?:[^,]{1,14},\s*){2,}_{2,})\s*\.?\s*$/) || prompt.match(/^(.*?[?:.])\s+((?:[^,]{1,14},\s*){2,}[^,]{1,14})\s*\.?\s*$/);
+    if (sequence && (sequence[2].includes("_") || /[?:]$/.test(sequence[1]))) {
+      const terms = sequence[2].split(/\s*,\s*/).map((term) => term.trim()).filter(Boolean);
+      return { html: `<h1 class="gx-lead">${escapeHtml(sequence[1])}</h1><div class="gx-seqrow" role="group" aria-label="${escapeAttr(prompt)}">${terms.map(tile).join("")}${terms.some((term) => /^_{2,}$/.test(term)) ? "" : tile("?")}</div>`, grid: shortChoices };
+    }
     return { html: `<h1 class="gx-prompt ${prompt.length > 160 ? "is-long" : ""}">${escapeHtml(prompt)}</h1>`, grid: shortChoices && !current.stimulus };
+  }
+
+  // Shapes and arrows are drawn, not left to font fallback, so every glyph has the same size and weight.
+  const GX_SHAPES = {
+    "■": `<rect x="4" y="4" width="16" height="16" rx="1.5" fill="currentColor"/>`, "□": `<rect x="4.5" y="4.5" width="15" height="15" rx="1.5" fill="none" stroke="currentColor" stroke-width="2.2"/>`,
+    "▲": `<path d="M12 3.5 21 20H3z" fill="currentColor"/>`, "△": `<path d="M12 4.5 20 19.5H4z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>`,
+    "●": `<circle cx="12" cy="12" r="8.5" fill="currentColor"/>`, "○": `<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2.2"/>`,
+    "◆": `<path d="M12 2.5 21.5 12 12 21.5 2.5 12z" fill="currentColor"/>`, "◇": `<path d="M12 3.5 20.5 12 12 20.5 3.5 12z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>`,
+    "★": `<path d="M12 2.5l2.9 6.1 6.6.7-5 4.5 1.4 6.6L12 17l-5.9 3.4 1.4-6.6-5-4.5 6.6-.7z" fill="currentColor"/>`, "☆": `<path d="M12 3.5l2.6 5.5 6 .6-4.5 4.1 1.3 5.9L12 16.6l-5.4 3 1.3-5.9-4.5-4.1 6-.6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>`
+  };
+  const GX_ARROWS = { "↑": 0, "↗": 45, "→": 90, "↘": 135, "↓": 180, "↙": 225, "←": 270, "↖": 315 };
+
+  function gxGlyphs(text) {
+    return escapeHtml(text).replace(/[■□▲△●○◆◇★☆↑↗→↘↓↙←↖]/g, (glyph) => {
+      const inner = GX_SHAPES[glyph] || `<path d="M12 20V4M6 10l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" transform="rotate(${GX_ARROWS[glyph]} 12 12)"/>`;
+      return `<svg class="gx-glyph" viewBox="0 0 24 24" role="img" aria-label="${glyph}">${inner}</svg>`;
+    });
   }
 
   function gxChoiceText(text) {
     const value = String(text);
-    if (/^\s*[\dIVX]+(\s*-\s*[\dIVX]+){2,}\s*$/.test(value)) {
+    if (/^\s*[\dIVX]+(\s*-\s*[\dIVX]+){2,}\s*$/.test(value) || /^\s*[A-F](\s*-\s*[A-F]){2,}\s*$/.test(value)) {
       return `<span class="gx-seq">${value.split(/\s*-\s*/).map((part) => escapeHtml(part.trim())).join("<i>›</i>")}</span>`;
     }
+    if (/[■□▲△●○◆◇★☆↑↗→↘↓↙←↖]/.test(value)) return `<span class="gx-glyphs">${gxGlyphs(value)}</span>`;
     return escapeHtml(value);
   }
 
   function gxLineChart(stimulus, series, rows) {
     const width = 640;
     const height = 300;
-    const pad = { left: 48, right: 24, top: 26, bottom: 40 };
+    const pad = { left: 48, right: 30, top: 26, bottom: 40 };
     const values = series.flatMap((entry) => entry.values);
-    const min = Math.min(0, ...values);
-    const max = Math.max(...values) * 1.1 || 1;
+    // Fit the axis to the data with a round step, so small differences (97.5 vs 99.2) stay visible.
+    const lo = Math.min(...values);
+    const hi = Math.max(...values);
+    const rawStep = (hi - lo || Math.abs(hi) || 1) / 4;
+    const magnitude = 10 ** Math.floor(Math.log10(rawStep));
+    const step = [1, 2, 2.5, 5, 10].map((m) => m * magnitude).find((s) => s >= rawStep);
+    const min = lo >= 0 && lo - step * 1.5 <= 0 ? 0 : Math.floor(lo / step) * step - (lo % step === 0 ? step : 0);
+    const max = Math.ceil(hi / step) * step + (hi % step === 0 ? step : 0);
     const x = (index) => rows.length === 1 ? width / 2 : pad.left + (index * (width - pad.left - pad.right)) / (rows.length - 1);
     const y = (value) => pad.top + ((max - value) / (max - min || 1)) * (height - pad.top - pad.bottom);
-    const ticks = [0, 0.25, 0.5, 0.75, 1].map((t) => min + t * (max - min));
-    const fmt = (value) => Number.isInteger(value) ? String(value) : value.toFixed(1).replace(/\.0$/, "");
+    const ticks = [];
+    for (let tick = min; tick <= max + step / 2; tick += step) ticks.push(Number(tick.toFixed(6)));
+    const fmt = (value) => Number.isInteger(value) ? String(value) : String(Number(value.toFixed(2)));
+    pad.left = Math.max(pad.left, 22 + Math.max(...ticks.map((tick) => fmt(tick).length)) * 13);
     return `<svg class="gx-line" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeAttr(stimulus.alt || stimulus.altText || stimulus.title || "Line graph")}">
-      ${ticks.map((tick) => `<line class="gx-line-grid" x1="${pad.left}" x2="${width - pad.right}" y1="${y(tick)}" y2="${y(tick)}"/><text x="${pad.left - 8}" y="${y(tick) + 4}" text-anchor="end">${fmt(Math.round(tick))}</text>`).join("")}
-      ${series.map((entry) => `<polyline fill="none" stroke="${entry.color}" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" points="${entry.values.map((value, index) => `${x(index)},${y(value)}`).join(" ")}"/>
-        ${entry.values.map((value, index) => `<circle cx="${x(index)}" cy="${y(value)}" r="5" fill="${entry.color}"/>`).join("")}`).join("")}
+      ${ticks.map((tick) => `<line class="gx-line-grid" x1="${pad.left}" x2="${width - pad.right}" y1="${y(tick)}" y2="${y(tick)}"/><text x="${pad.left - 8}" y="${y(tick) + 4}" text-anchor="end">${fmt(tick)}</text>`).join("")}
+      ${series.map((entry, seriesIndex) => `<polyline fill="none" stroke="${entry.color}" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" points="${entry.values.map((value, index) => `${x(index)},${y(value)}`).join(" ")}"/>
+        ${entry.values.map((value, index) => {
+          const other = series[seriesIndex === 0 ? 1 : 0]?.values[index];
+          const below = series.length > 1 && other !== undefined && (seriesIndex === 0 ? value < other : value <= other);
+          const dot = `<circle cx="${x(index)}" cy="${y(value)}" r="5" fill="${entry.color}"/>`;
+          // Three or more crossing lines make labels collide; the exact-value table below covers them.
+          if (series.length > 2) return dot;
+          return `${dot}<text class="gx-line-value" x="${x(index)}" y="${y(value) + (below ? 20 : -11)}" text-anchor="middle" fill="${entry.color}">${escapeHtml(entry.rawValues?.[index] ?? fmt(value))}</text>`;
+        }).join("")}`).join("")}
       ${rows.map((row, index) => `<text x="${x(index)}" y="${height - 12}" text-anchor="middle">${escapeHtml(row[0])}</text>`).join("")}
     </svg>`;
   }
@@ -2061,71 +2046,94 @@
     const detections = normalizedPaperDetections();
     const summary = paperDetectionSummary(detections);
     const version = examVersions.find((candidate) => candidate.id === attempt.exam_version_id);
-    const versionLabel = `Mock Exam ${String(version?.number || 1).padStart(2, "0")}`;
-    root.innerHTML = cockpitFrame(`
-      <section class="paper-workflow ${review ? "paper-review-stage" : "paper-scan-stage"}" data-motion-purpose="page-enter">
-        <header class="paper-workflow-header">
-          <div class="exam-brand">${logo()}<div><strong>CSC Practice Reviewer</strong><span>Independent mock exam and review tool</span></div></div>
-          <div class="paper-run-status"><span>${escapeHtml(versionLabel)}</span><b>${review ? "Verify detected answers" : "Scan answer sheets"}</b><small>Timer frozen at ${formatDuration(attempt.elapsed_seconds)}</small></div>
-          <div class="paper-header-actions"><button class="btn secondary" data-action="print-paper-sheets" type="button">${localIcon("clipboard-list")} Print Sheets</button><button class="btn ghost" data-action="paper-save-exit" type="button">${icon("save")} Save and Exit</button></div>
-        </header>
-        <main class="paper-workflow-body">
-          <section class="paper-stage-title">
-            <div><p class="eyebrow">Paper answer mode / ${review ? "Step 2 of 2" : "Step 1 of 2"}</p><h1>${review ? "Confirm detected answers" : "Upload both answer sheets"}</h1><p>${review ? "Resolve uncertain marks, verify blanks, then grade through the normal submission path." : "Use a CamScanner JPG, phone photo, or PNG. Processing remains on this device."}</p></div>
-            <div class="paper-privacy-badge">${icon("shield")}<span><strong>Local processing</strong><small>Images are never uploaded</small></span></div>
-          </section>
-          ${app.paperSyncError ? `<div class="paper-sync-error" role="alert">${icon("warning")}<span><strong>Cloud checkpoint not confirmed</strong>${escapeHtml(app.paperSyncError)}</span><button class="btn secondary" data-action="retry-paper-sync" type="button">Retry sync</button></div>` : ""}
-          ${review ? renderPaperConfirmation(attempt, detections, summary) : renderPaperUploadStage(attempt)}
-        </main>
+    const versionLabel = `Mock ${String(version?.number || 1).padStart(2, "0")}`;
+    // Corrections re-render the page; keep the reader at the item they just fixed.
+    const keepScroll = root.querySelector(".gx-paper")?.dataset.phase === (review ? "review" : "scan") ? root.querySelector(".gx")?.scrollTop || 0 : 0;
+    const theme = gxTheme();
+    root.innerHTML = `
+      <div class="gx" data-theme="${theme}">
+        <div class="gx-page">
+          <header class="gx-appbar">
+            <strong class="gx-brand">${gxBrandMark()}<span>${escapeHtml(versionLabel)} · Paper</span></strong>
+            <div class="gx-appbar-end gx-paper-bar">
+              <button class="gx-btn is-quiet" data-action="print-paper-sheets" type="button">Print sheets</button>
+              <button class="gx-btn" data-action="paper-save-exit" type="button">Save and exit</button>
+              <button class="gx-icon-btn" data-action="toggle-theme" type="button" aria-label="Switch to ${theme === "light" ? "dark" : "light"} theme">${gxIcon(theme === "light" ? "moon" : "sun")}</button>
+            </div>
+          </header>
+          <main class="gx-pagebody"><div class="gx-home gx-paper" data-phase="${review ? "review" : "scan"}">
+            <ol class="gx-steps" aria-label="Paper grading steps">
+              <li class="${review ? "is-done" : "is-current"}"><b>1</b>Scan sheets</li>
+              <li class="${review ? "is-current" : ""}"><b>2</b>Confirm answers</li>
+              <li><b>3</b>Results</li>
+            </ol>
+            <div class="gx-review-head">
+              <div><h1>${review ? "Confirm the answers we read" : "Scan both answer sheets"}</h1>
+              <p class="gx-muted">${review ? "Fix anything marked yellow or red, confirm blanks, then grade." : `Timer stopped at ${formatDuration(attempt.elapsed_seconds)}. Use a phone photo, CamScanner JPG or PNG. Images stay on this device.`}</p></div>
+            </div>
+            ${app.paperSyncError ? `<div class="gx-error gx-paper-sync" role="alert"><span><strong>Not saved online yet.</strong> ${escapeHtml(app.paperSyncError)}</span><button class="gx-btn" data-action="retry-paper-sync" type="button">Retry</button></div>` : ""}
+            ${review ? renderPaperConfirmation(attempt, detections, summary) : renderPaperUploadStage(attempt)}
+          </div></main>
+        </div>
         ${toast()}
-      </section>
-    `, "paper-frame");
+      </div>`;
+    if (keepScroll) root.querySelector(".gx").scrollTop = keepScroll;
     requestAnimationFrame(() => renderPaperScanCanvases());
     syncPaperSubmissionPoll(attempt);
   }
 
   function renderPaperUploadStage(attempt) {
+    const ready = app.paperScans.every(Boolean);
     return `
-      <div class="paper-upload-grid">
+      <div class="gx-paper-pages">
         ${[0, 1].map((pageIndex) => {
           const scan = app.paperScans[pageIndex];
-          const range = pageIndex === 0 ? "Items 1-85" : "Items 86-170";
-          return `<section class="paper-upload-card ${scan ? "has-scan" : ""}">
-            <div class="paper-upload-head"><span>Page ${pageIndex + 1}</span><strong>${range}</strong><em>${scan ? scan.alignmentConfidence >= 0.55 ? "Markers found" : "Check corners" : "Required"}</em></div>
-            <div class="paper-canvas-wrap ${scan ? "" : "empty"}">
-              ${scan ? `<canvas class="paper-alignment-canvas" data-paper-canvas="${pageIndex}" aria-label="Page ${pageIndex + 1} alignment preview"></canvas><p>Drag each numbered handle onto its matching corner marker.</p>` : `<div class="paper-upload-placeholder">${localIcon("clipboard-list")}<strong>No sheet selected</strong><span>JPG or PNG / CamScanner or camera</span></div>`}
+          const range = pageIndex === 0 ? "Items 1–85" : "Items 86–170";
+          const status = scan ? scan.alignmentConfidence >= 0.55 ? ["is-good", "Corners found"] : ["is-warn", "Check corners"] : ["", "Needed"];
+          return `<section class="gx-card gx-paper-page">
+            <div class="gx-card-head"><h2>Page ${pageIndex + 1} <small class="gx-muted">${range}</small></h2><span class="gx-chip ${status[0]}">${status[1]}</span></div>
+            <div class="gx-paper-canvas ${scan ? "" : "is-empty"}">
+              ${scan ? `<canvas data-paper-canvas="${pageIndex}" aria-label="Page ${pageIndex + 1} alignment preview"></canvas>` : `<p><strong>No photo yet</strong><span>Take a photo or choose an image of page ${pageIndex + 1}.</span></p>`}
             </div>
-            <div class="paper-upload-actions">
-              <label class="btn primary paper-file-label">${icon("open")} ${scan ? "Replace File" : "Choose File"}<input data-paper-file="${pageIndex}" type="file" accept="image/jpeg,image/png"></label>
-              <label class="btn secondary paper-file-label paper-camera-label">${icon("camera")} Use Camera<input data-paper-file="${pageIndex}" type="file" accept="image/jpeg,image/png" capture="environment"></label>
-              ${scan ? `<button class="btn secondary" data-action="rotate-paper-scan" data-paper-page="${pageIndex}" type="button">${icon("refresh")} Rotate</button><button class="btn ghost" data-action="reset-paper-corners" data-paper-page="${pageIndex}" type="button">Reset corners</button>` : ""}
+            ${scan ? `<p class="gx-muted">Drag each numbered dot onto its matching corner square.</p>` : ""}
+            <div class="gx-row">
+              <label class="gx-btn ${scan ? "" : "is-primary"} gx-file">${scan ? "Replace" : "Take photo"}<input data-paper-file="${pageIndex}" type="file" accept="image/jpeg,image/png" capture="environment"></label>
+              <label class="gx-btn gx-file">Choose file<input data-paper-file="${pageIndex}" type="file" accept="image/jpeg,image/png"></label>
+              ${scan ? `<button class="gx-btn is-quiet" data-action="rotate-paper-scan" data-paper-page="${pageIndex}" type="button">Rotate</button><button class="gx-btn is-quiet" data-action="reset-paper-corners" data-paper-page="${pageIndex}" type="button">Reset corners</button>` : ""}
             </div>
           </section>`;
         }).join("")}
       </div>
-      <section class="paper-capture-guidance"><strong>Capture checklist</strong><span>Keep all four markers visible</span><span>Avoid shadows across bubbles</span><span>Use a flat, bright surface</span><span>Confirm page numbers before analysis</span></section>
-      <footer class="paper-workflow-actions"><span>Both pages are required before recognition can begin.</span><button class="btn primary" data-action="analyze-paper-sheets" type="button" ${app.paperScans.every(Boolean) ? "" : "disabled"}>Analyze 170 Answers ${icon("arrow")}</button></footer>
+      <section class="gx-note-box"><strong>For a clean read</strong><span>Lay the sheet flat in bright light, keep all four corner squares in the photo, and avoid shadows across the bubbles.</span></section>
+      <div class="gx-paper-actions"><span class="gx-muted">${ready ? "Both pages are in." : "Add both pages to continue."}</span><button class="gx-btn is-primary" data-action="analyze-paper-sheets" type="button" ${ready ? "" : "disabled"}>READ 170 ANSWERS</button></div>
     `;
   }
 
   function renderPaperConfirmation(attempt, detections, summary) {
     const unresolved = detections.filter((item) => (item.state === "multiple" || item.state === "low") && !item.reviewed).length;
     const blanks = detections.filter((item) => !item.choice).length;
+    const stateLabel = { confident: "Read clearly", blank: "Blank", multiple: "Two marks", low: "Faint mark" };
     return `
-      <section class="paper-detection-summary" aria-label="Recognition summary">
-        <metric class="confident">${localIcon("circle-check")}<span>Confident</span><strong>${summary.confident}</strong></metric>
-        <metric class="blank">${icon("clear")}<span>Blank</span><strong>${summary.blank}</strong></metric>
-        <metric class="multiple">${icon("warning")}<span>Multiple</span><strong>${summary.multiple}</strong></metric>
-        <metric class="low">${localIcon("target")}<span>Low confidence</span><strong>${summary.low}</strong></metric>
-      </section>
-      <section class="paper-answer-review v5-panel">
-        <div class="paper-review-legend"><span><i class="confident"></i>Confident</span><span><i class="blank"></i>Blank</span><span><i class="multiple"></i>Multiple marks</span><span><i class="low"></i>Low confidence</span><small>Click A-D or Blank to correct any item.</small></div>
-        <div class="paper-answer-grid">
-          ${detections.map((item) => `<article class="paper-answer-item ${item.state} ${item.reviewed ? "reviewed" : ""}"><strong>${item.number}</strong><div>${["A", "B", "C", "D"].map((choice) => `<button class="${item.choice === choice ? "selected" : ""}" data-paper-answer="${item.number}" data-paper-choice="${choice}" type="button" aria-label="Item ${item.number}: ${choice}">${choice}</button>`).join("")}<button class="paper-blank-choice ${!item.choice ? "selected" : ""}" data-paper-answer="${item.number}" data-paper-choice="" type="button">Blank</button></div><small>${item.reviewed ? "Verified" : item.state === "confident" ? `${Math.round((item.confidence || 0) * 100)}%` : item.state.replace("low", "Check mark")}</small></article>`).join("")}
+      <div class="gx-stats is-row gx-paper-summary" aria-label="What we read">
+        <div class="is-good"><strong>${summary.confident}</strong><span>read clearly</span></div>
+        <div><strong>${summary.blank}</strong><span>blank</span></div>
+        <div class="is-bad"><strong>${summary.multiple}</strong><span>two marks</span></div>
+        <div class="is-warn"><strong>${summary.low}</strong><span>faint marks</span></div>
+      </div>
+      <section class="gx-card">
+        <div class="gx-card-head"><h2>All 170 answers</h2><span class="gx-muted">Tap a letter, or – for blank, to correct an item</span></div>
+        <div class="gx-paper-grid">
+          ${detections.map((item) => {
+            const flagged = (item.state === "multiple" || item.state === "low") && !item.reviewed;
+            return `<article class="gx-paper-item is-${item.state} ${item.reviewed ? "is-reviewed" : ""}">
+              <span class="gx-paper-num">${item.number}<small>${item.reviewed ? "Checked" : flagged ? stateLabel[item.state] : item.choice ? "" : "Blank"}</small></span>
+              <div>${["A", "B", "C", "D"].map((choice) => `<button class="${item.choice === choice ? "is-selected" : ""}" data-paper-answer="${item.number}" data-paper-choice="${choice}" type="button" aria-pressed="${item.choice === choice ? "true" : "false"}" aria-label="Item ${item.number}: ${choice}">${choice}</button>`).join("")}<button class="is-blank ${!item.choice ? "is-selected" : ""}" data-paper-answer="${item.number}" data-paper-choice="" type="button" aria-pressed="${!item.choice ? "true" : "false"}" aria-label="Item ${item.number}: blank">–</button></div>
+            </article>`;
+          }).join("")}
         </div>
       </section>
-      <label class="paper-blank-confirm ${blanks ? "" : "complete"}"><input data-paper-confirm-blanks type="checkbox" ${app.paperBlankConfirmed || !blanks ? "checked" : ""} ${blanks ? "" : "disabled"}><span><strong>${blanks ? `Confirm ${blanks} blank item${blanks === 1 ? "" : "s"}` : "No blank items detected"}</strong><small>Blank answers will be graded as unanswered.</small></span></label>
-      <footer class="paper-workflow-actions"><button class="btn secondary" data-action="paper-back-upload" type="button">${icon("back")} Recheck Images</button><span class="paper-review-readiness">${unresolved ? `${unresolved} uncertain item${unresolved === 1 ? "" : "s"} still need review` : "All uncertain marks reviewed"}</span><button class="btn primary" data-action="confirm-paper-grade" type="button" ${unresolved || (blanks && !app.paperBlankConfirmed) ? "disabled" : ""}>Confirm and Grade ${icon("submit")}</button></footer>
+      <label class="gx-switch gx-card ${blanks ? "" : "is-disabled"}"><span>${blanks ? `${blanks} blank item${blanks === 1 ? " is" : "s are"} correct` : "No blank items"}<small class="gx-muted">Blank answers are graded as unanswered.</small></span><input data-paper-confirm-blanks type="checkbox" ${app.paperBlankConfirmed || !blanks ? "checked" : ""} ${blanks ? "" : "disabled"}><i aria-hidden="true"></i></label>
+      <div class="gx-paper-actions"><button class="gx-btn is-quiet" data-action="paper-back-upload" type="button">Back to photos</button><span class="${unresolved ? "gx-warn-text" : "gx-good-text"}">${unresolved ? `${unresolved} item${unresolved === 1 ? "" : "s"} still need a look` : "Every unclear mark is checked"}</span><button class="gx-btn is-primary" data-action="confirm-paper-grade" type="button" ${unresolved || (blanks && !app.paperBlankConfirmed) ? "disabled" : ""}>GRADE MY SHEET</button></div>
     `;
   }
 
@@ -2292,23 +2300,6 @@
 
   function emptyInline(title, body) {
     return `<div class="empty-inline"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(body)}</span></div>`;
-  }
-
-  function publicShell(content) {
-    return cockpitFrame(`
-      <header class="app-header public-header">
-        <div class="brand">${logo()}${brandText()}</div>
-        <span class="access-status"><i></i> Invite-only access</span>
-      </header>
-      <main class="public-main">${content}</main>
-      <footer class="public-status-rail">
-        <span>${icon("shield")} Independent practice reviewer</span>
-        <span>Not affiliated with or endorsed by the Civil Service Commission</span>
-        <span class="status-online"><i></i> Secure account storage</span>
-      </footer>
-      ${forgotPasswordModal()}
-      ${toast()}
-    `, "public-frame");
   }
 
   function signedHeader(active = "dashboard") {
@@ -2552,19 +2543,17 @@
     if (app.modal !== "forgot-password" && app.modal !== "forgot-success") return "";
     const value = app.resetEmail || document.querySelector("[data-form='signin'] input[name='email']")?.value || app.profile?.email || "";
     const success = app.modal === "forgot-success";
+    const busy = app.busyAction === "reset";
     return `
-      <div class="modal-backdrop auth-dialog-backdrop">
-        <section class="reset-modal" role="dialog" aria-modal="true" aria-labelledby="reset-title" tabindex="-1" data-motion-purpose="modal-reveal">
-          <button class="modal-close" data-action="close-modal" type="button">${icon("x")}</button>
-          <span class="reset-symbol">${icon(success ? "check" : "mail")}</span>
-          <p class="eyebrow">Account recovery</p>
-          <h2 id="reset-title">${success ? "Reset link sent" : "Reset your password"}</h2>
+      <div class="gx-backdrop">
+        <section class="gx-modal" role="dialog" aria-modal="true" aria-labelledby="reset-title" tabindex="-1">
+          <button class="gx-icon-btn is-bare gx-modal-close" data-action="close-modal" type="button" aria-label="Close">${gxIcon("x")}</button>
+          <h2 id="reset-title">${success ? "Check your email" : "Reset your password"}</h2>
           ${success
-            ? `<p>Check <strong>${escapeHtml(value || "your email")}</strong> for the secure reset link.</p><button class="btn primary" data-action="close-modal" type="button">Return to Sign In</button>`
-            : `<p>Enter the email used for this private reviewer account.</p>${app.dialogError ? `<p class="form-error" role="alert">${escapeHtml(app.dialogError)}</p>` : ""}<form data-form="forgot-password"><label class="field-label">Email Address<div class="field-with-icon">${icon("mail")}<input name="email" type="email" value="${escapeAttr(value)}" autocomplete="email" required /></div></label><div class="modal-actions"><button class="btn secondary" data-action="close-modal" type="button">Cancel</button><button class="btn primary" data-action="send-reset" type="button" ${app.busyAction === "reset" ? "disabled" : ""}>${app.busyAction === "reset" ? "Sending..." : "Send Reset Link"}</button></div></form>`}
+            ? `<p>We sent a reset link to <strong>${escapeHtml(value || "your email")}</strong>. Open it on this device to choose a new password.</p><div class="gx-modal-actions"><button class="gx-btn is-primary" data-action="close-modal" type="button">BACK TO SIGN IN</button></div>`
+            : `<p>Enter the email you use for this reviewer account.</p>${app.dialogError ? `<p class="gx-error" role="alert">${escapeHtml(app.dialogError)}</p>` : ""}<form class="gx-form" data-form="forgot-password"><label class="gx-field">Email<input name="email" type="email" value="${escapeAttr(value)}" autocomplete="email" required /></label><div class="gx-modal-actions"><button class="gx-btn is-quiet" data-action="close-modal" type="button">Cancel</button><button class="gx-btn is-primary" data-action="send-reset" type="button" ${busy ? "disabled" : ""}>${busy ? "SENDING…" : "SEND RESET LINK"}</button></div></form>`}
         </section>
-      </div>
-    `;
+      </div>`;
   }
 
   function confirmationModal() {
