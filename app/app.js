@@ -187,6 +187,8 @@
 
   const root = document.getElementById("app");
   new MutationObserver(() => gxAfterRender()).observe(root, { childList: true });
+  // Stacked passage/chart panels fade at the bottom while more content sits below the panel edge.
+  document.addEventListener("scroll", (event) => event.target.classList?.contains("gx-stim") && gxStimMore(event.target), { capture: true, passive: true });
   root.dataset.inputMode = "pointer";
 
   function boot() {
@@ -1474,7 +1476,9 @@
     const step = [1, 2, 2.5, 5, 10].map((m) => m * magnitude).find((s) => s >= rawStep);
     const min = lo >= 0 && lo - step * 1.5 <= 0 ? 0 : Math.floor(lo / step) * step - (lo % step === 0 ? step : 0);
     const max = Math.ceil(hi / step) * step + (hi % step === 0 ? step : 0);
-    const x = (index) => rows.length === 1 ? width / 2 : pad.left + (index * (width - pad.left - pad.right)) / (rows.length - 1);
+    // Points sit in from both ends so their value labels never collide with the tick labels or clip at the edge.
+    const inset = 34;
+    const x = (index) => rows.length === 1 ? width / 2 : pad.left + inset + (index * (width - pad.left - pad.right - inset * 2)) / (rows.length - 1);
     const y = (value) => pad.top + ((max - value) / (max - min || 1)) * (height - pad.top - pad.bottom);
     const ticks = [];
     for (let tick = min; tick <= max + step / 2; tick += step) ticks.push(Number(tick.toFixed(6)));
@@ -1514,7 +1518,7 @@
         const active = Math.min(Number(app.gxSeries?.[stimulus.id] || 0), series.length - 1);
         const entry = series[active];
         const max = Math.max(1, ...entry.values.map((value) => Math.abs(value)));
-        visual = `${series.length > 1 ? `<div class="gx-linked" role="tablist" aria-label="Chart measure">${series.map((item, index) => `<button role="tab" aria-selected="${index === active}" class="${index === active ? "is-current" : ""}" style="--tone: ${item.color}; --tone-ink: var(--text)" data-action="gx-series" data-stimulus="${escapeAttr(stimulus.id)}" data-series="${index}" type="button">${escapeHtml(item.label)}</button>`).join("")}</div>` : ""}
+        visual = `${series.length > 1 ? `<div class="gx-linked" role="group" aria-label="Chart measure">${series.map((item, index) => `<button aria-pressed="${index === active}" class="${index === active ? "is-current" : ""}" style="--tone: ${item.color}; --tone-ink: var(--text)" data-action="gx-series" data-stimulus="${escapeAttr(stimulus.id)}" data-series="${index}" type="button">${escapeHtml(item.label)}</button>`).join("")}</div>` : ""}
           <figure class="gx-bars" style="margin: 0"><figcaption>${escapeHtml(entry.label)}</figcaption>
             ${entry.values.map((value, index) => `<div class="gx-bar"><span>${escapeHtml(rows[index]?.[0] ?? "")}</span><div><i style="width: ${Math.max(2, (Math.abs(value) / max) * 100)}%; background: ${entry.color}"></i></div><strong>${escapeHtml(entry.rawValues[index])}</strong></div>`).join("")}
           </figure>`;
@@ -1664,9 +1668,14 @@
     return Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
   }
 
+  function gxStimMore(panel) {
+    panel.classList.toggle("has-more", panel.scrollHeight - panel.scrollTop - panel.clientHeight > 4);
+  }
+
   function gxAfterRender() {
     const gx = root.querySelector(".gx");
     if (!gx) return;
+    gx.querySelectorAll(".gx-stim").forEach(gxStimMore);
     const view = app.view || {};
     const attempt = view.attemptId ? getAttempt(view.attemptId) : null;
     const motion = app.gxMotion || (app.gxMotion = {});
@@ -2027,6 +2036,13 @@
             </div>
           </div>
         </section>
+        <div class="gx-row">
+          <a class="gx-btn is-primary" data-action="review-answers" href="${escapeAttr(reviewHref)}">${score === attempt.total_questions ? "REVIEW ANSWERS" : `REVIEW ${attempt.total_questions - score} MISTAKE${attempt.total_questions - score === 1 ? "" : "S"}`}</a>
+          ${isPractice
+            ? `<button class="gx-btn" data-action="repeat-practice" type="button">Repeat this set</button><button class="gx-btn" data-action="change-practice" type="button">Change practice</button>`
+            : `<a class="gx-btn" data-action="practice-weakest" href="${escapeAttr(practiceHref)}">Practice ${escapeHtml(weakestSection.replace(" Information", "").replace(" Ability", ""))}</a><a class="gx-btn" data-action="retake-same-version" href="${escapeAttr(retakeHref)}">Retake this mock</a>`}
+          <button class="gx-btn is-quiet" data-action="dashboard" type="button">Back to home</button>
+        </div>
 
         <div class="gx-split">
           <section class="gx-card">
@@ -2051,13 +2067,6 @@
           </section>
         </div>
 
-        <div class="gx-row">
-          <a class="gx-btn is-primary" data-action="review-answers" href="${escapeAttr(reviewHref)}">REVIEW ${attempt.total_questions - score} MISTAKE${attempt.total_questions - score === 1 ? "" : "S"}</a>
-          ${isPractice
-            ? `<button class="gx-btn" data-action="repeat-practice" type="button">Repeat this set</button><button class="gx-btn" data-action="change-practice" type="button">Change practice</button>`
-            : `<a class="gx-btn" data-action="practice-weakest" href="${escapeAttr(practiceHref)}">Practice ${escapeHtml(weakestSection.replace(" Information", "").replace(" Ability", ""))}</a><a class="gx-btn" data-action="retake-same-version" href="${escapeAttr(retakeHref)}">Retake this mock</a>`}
-          <button class="gx-btn is-quiet" data-action="dashboard" type="button">Back to home</button>
-        </div>
       </div>`;
     root.innerHTML = gxShell(content, "results");
   }
@@ -2108,11 +2117,11 @@
       <div class="gx-home gx-review">
         <div class="gx-review-head">
           <div><h1>Answer review</h1><p class="gx-muted">${escapeHtml(examTitle(attempt))} · ${Math.round(resultPercent(attempt))}% · ${score} of ${attempt.total_questions} correct</p></div>
-          <div class="gx-filters" role="tablist" aria-label="Filter questions">
-            ${["all", "wrong", "correct", "flagged"].map((filter) => `<button role="tab" aria-selected="${app.reviewFilter === filter}" class="${app.reviewFilter === filter ? "is-active" : ""}" data-review-filter="${filter}" type="button">${filterLabel(filter)} <small>${filteredReviewAnswers(attempt, filter).length}</small></button>`).join("")}
+          <div class="gx-filters" role="group" aria-label="Filter questions">
+            ${["all", "wrong", "correct", "flagged"].map((filter) => `<button aria-pressed="${app.reviewFilter === filter}" class="${app.reviewFilter === filter ? "is-active" : ""}" data-review-filter="${filter}" type="button">${filterLabel(filter)} <small>${filteredReviewAnswers(attempt, filter).length}</small></button>`).join("")}
           </div>
         </div>
-        <div class="gx-review-strip" aria-label="Questions">
+        <div class="gx-review-strip" role="group" aria-label="Questions">
           ${filtered.map((item, itemIndex) => `<button class="gx-cell ${state(item)} ${itemIndex === index ? "is-current" : ""} ${item.flagged ? "is-flagged" : ""}" style="${gxToneStyle(item.section)}" data-review-index="${itemIndex}" type="button" aria-label="Question ${item.display_number}, ${item.selected_choice === item.correct_choice ? "correct" : item.selected_choice ? "wrong" : "not answered"}" ${itemIndex === index ? "aria-current=\"step\"" : ""}>${item.display_number}</button>`).join("")}
         </div>
         ${question}
@@ -2142,15 +2151,18 @@
     if (!runs.length) return `<p class="gx-muted">Finish a run to start your score history.</p>`;
     const width = 640;
     const height = 240;
-    const pad = { left: 44, right: 18, top: 20, bottom: 34 };
-    const inset = 28;
+    // Labels render at 22px on phones (viewBox scaled ~0.5), so the padding leaves room for "100%" and top values.
+    const pad = { left: 70, right: 18, top: 36, bottom: 20 };
+    const inset = 36;
+    const scores = runs.map((attempt) => resultPercent(attempt));
+    // Axis floor sits 10+ points under the lowest score (and the pass line), so close scores do not flatten into one line.
+    const floor = Math.max(0, Math.floor((Math.min(...scores, PASSING_PERCENT) - 10) / 10) * 10);
     const x = (index) => runs.length === 1 ? width / 2 : pad.left + inset + (index * (width - pad.left - pad.right - inset * 2)) / (runs.length - 1);
-    const y = (value) => pad.top + ((100 - value) / 100) * (height - pad.top - pad.bottom);
-    const points = runs.map((attempt, index) => ({ x: x(index), y: y(resultPercent(attempt)), value: Math.round(resultPercent(attempt)), practice: attempt.mode === "practice" }));
+    const y = (value) => pad.top + ((100 - value) / (100 - floor)) * (height - pad.top - pad.bottom);
+    const points = runs.map((attempt, index) => ({ x: x(index), y: y(scores[index]), value: Math.round(scores[index]), practice: attempt.mode === "practice" }));
     return `<svg class="gx-line" viewBox="0 0 ${width} ${height}" role="img" aria-label="Scores for your last ${runs.length} runs: ${points.map((point) => `${point.value}%`).join(", ")}">
-      ${[0, 50, 100].map((tick) => `<line class="gx-line-grid" x1="${pad.left}" x2="${width - pad.right}" y1="${y(tick)}" y2="${y(tick)}"/><text x="${pad.left - 8}" y="${y(tick) + 4}" text-anchor="end">${tick}%</text>`).join("")}
+      ${[floor, Math.round((floor + 100) / 20) * 10, 100].map((tick) => `<line class="gx-line-grid" x1="${pad.left}" x2="${width - pad.right}" y1="${y(tick)}" y2="${y(tick)}"/><text x="${pad.left - 8}" y="${y(tick) + 4}" text-anchor="end">${tick}%</text>`).join("")}
       <line x1="${pad.left}" x2="${width - pad.right}" y1="${y(PASSING_PERCENT)}" y2="${y(PASSING_PERCENT)}" stroke="var(--primary)" stroke-width="2" stroke-dasharray="6 6"/>
-      <text x="${width - pad.right}" y="${y(PASSING_PERCENT) - 6}" text-anchor="end" fill="var(--primary)">80% pass</text>
       <polyline class="gx-draw" pathLength="1" fill="none" stroke="var(--select)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" points="${points.map((point) => `${point.x},${point.y}`).join(" ")}"/>
       ${points.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="6" fill="${point.practice ? "var(--surface)" : "var(--select)"}" stroke="var(--select)" stroke-width="3"/><text class="gx-line-value" x="${point.x}" y="${point.y - 12}" text-anchor="middle">${point.value}</text>`).join("")}
     </svg>
@@ -2338,7 +2350,7 @@
         <section class="gx-card">
           <div class="gx-card-head"><h2>All runs</h2>
             <div class="gx-row">
-              <div class="gx-filters" role="tablist" aria-label="Filter runs">${[["all", "All"], ["full", "Mock exams"], ["practice", "Practice"]].map(([key, label]) => `<button role="tab" aria-selected="${app.recentTab === key}" class="${app.recentTab === key ? "is-active" : ""}" data-recent-tab="${key}" type="button">${label}</button>`).join("")}</div>
+              <div class="gx-filters" role="group" aria-label="Filter runs">${[["all", "All"], ["full", "Mock exams"], ["practice", "Practice"]].map(([key, label]) => `<button aria-pressed="${app.recentTab === key}" class="${app.recentTab === key ? "is-active" : ""}" data-recent-tab="${key}" type="button">${label}</button>`).join("")}</div>
               <button class="gx-icon-btn" data-action="refresh-attempts" type="button" aria-label="Refresh runs">${gxIcon("refresh", 18)}</button>
             </div>
           </div>
@@ -2369,8 +2381,8 @@
   function practiceReviewTabs(active) {
     const mistakes = wrongAnswerCount(completedAttempts());
     const flagged = app.attempts.reduce((sum, attempt) => sum + flaggedCount(attempt), 0);
-    return `<div class="gx-filters" role="tablist" aria-label="Practice and review">
-      ${[["practice", "Practice", ""], ["mistakes", "Mistakes", mistakes], ["flagged", "Flagged", flagged]].map(([key, label, count]) => `<button role="tab" aria-selected="${active === key}" class="${active === key ? "is-active" : ""}" data-practice-review-tab="${key}" type="button">${label}${count !== "" ? ` <small>${count}</small>` : ""}</button>`).join("")}
+    return `<div class="gx-filters" role="group" aria-label="Practice and review">
+      ${[["practice", "Practice", ""], ["mistakes", "Mistakes", mistakes], ["flagged", "Flagged", flagged]].map(([key, label, count]) => `<button aria-pressed="${active === key}" class="${active === key ? "is-active" : ""}" data-practice-review-tab="${key}" type="button">${label}${count !== "" ? ` <small>${count}</small>` : ""}</button>`).join("")}
     </div>`;
   }
 

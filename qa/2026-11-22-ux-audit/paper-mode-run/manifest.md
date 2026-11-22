@@ -1,0 +1,40 @@
+# Paper Mode QA
+
+- Build: `dc7d2abcf49e85a4`
+- Expected: 31
+- Executed: 31
+- Passed: 31
+- Failed: 0
+- Runtime errors: 0
+
+- [x] paper tools load
+- [x] two print pages cover 1-170
+- [x] all 170 patterned bubbles recognize correctly: []
+- [x] all unmarked bubbles recognize as blank: []
+- [x] double mark is reported as multiple: {"number":1,"choice":null,"state":"multiple","confidence":0,"scores":[254.99999999999997,254.99999999999997,2.842170943040401e-14,2.842170943040401e-14],"reviewed":false}
+- [x] faint mark is reported for review: {"number":1,"choice":"C","state":"low","confidence":0.62,"scores":[2.842170943040401e-14,2.842170943040401e-14,31,2.842170943040401e-14],"reviewed":false}
+- [x] corrected mark favors the final dark choice: {"number":1,"choice":"D","state":"confident","confidence":0.99,"scores":[31,2.842170943040401e-14,2.842170943040401e-14,254.99999999999997],"reviewed":false}
+- [x] skewed sheet recognizes correctly: 0 errors
+- [x] shadowed sheet recognizes correctly: 0 errors
+- [x] brightened sheet recognizes correctly: 0 errors
+- [x] rotated sheet normalizes and recognizes correctly: {"errors":0,"orientation":{"turns":3,"confidence":0.7316654192181197,"scores":[2.842170943040401e-14,126.01593825042885,29.750000000000018,33.81443396226415]}}
+- [x] automatic markers locate all four corners: {"points":[{"x":13,"y":13},{"x":393,"y":13},{"x":393,"y":514},{"x":13,"y":514}],"confidence":0.9790570175438597}
+- [x] Letter and A4 print outputs contain two pages: Letter: 2 pages; A4: 2 pages
+- [x] paper setup locks both shuffle controls
+- [x] paper setup exposes two-page print action
+- [x] paper exam choices are read-only: 5 choices
+- [x] paper exam next works without an onscreen answer: Question 1 -> Question 2
+- [x] paper finish requires confirmation
+- [x] paper finish opens local upload stage
+- [x] upload stage separates file and camera controls
+- [x] paper timeout freezes and opens local upload stage
+- [x] both uploaded pages enable recognition
+- [x] recognition produces 170 editable items
+- [x] manual answer correction is applied
+- [x] intentional blank requires confirmation
+- [x] confirmed paper answers reach results
+- [x] paper result is labeled
+- [x] paper review omits answer-change claims
+- [x] scan images trigger no upload request: []
+- [x] paper desktop states have no document overflow: []
+- [x] paper mobile states remain reachable: []

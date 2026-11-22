@@ -72,7 +72,7 @@ html body #app .gx .exam-time-value, html body #app .gx .exam-answered-value { d
 
 .gx-body { flex: 1; display: flex; gap: 28px; padding: 8px 32px 24px; align-items: flex-start; }
 .gx-main { flex: 1 1 auto; min-width: 0; display: flex; gap: 24px; align-items: flex-start; }
-.gx-qcol { flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 26px; padding: 4px 8px; }
+.gx-qcol { flex: 1 1 520px; min-width: 0; max-width: 920px; display: flex; flex-direction: column; gap: 26px; padding: 4px 8px; }
 /* Question header: one line, fixed height, quiet. The label truncates so Flag never wraps and the question
    always starts at the same place. The question text is the loudest thing on the screen; choices are a step down. */
 .gx-meta { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; min-height: 42px; }
@@ -96,7 +96,7 @@ html body #app .gx .exam-time-value, html body #app .gx .exam-answered-value { d
 .gx-choice.is-selected .gx-key { border-color: var(--select); background: var(--select); color: var(--on-select); }
 
 /* Analogy */
-.gx-analogy { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 14px 18px; max-width: 820px; }
+.gx-analogy { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 14px 18px; }
 .gx-tile { display: grid; place-items: center; min-height: 96px; padding: 10px 14px; border: 2px solid var(--line); border-bottom-width: 5px; border-radius: 18px; background: var(--surface); font-size: clamp(20px, 2.2vw, 32px); font-weight: 900; letter-spacing: .02em; text-align: center; overflow-wrap: anywhere; }
 .gx-tile small { margin-right: 10px; font-size: 16px; font-weight: 800; letter-spacing: 0; color: var(--muted); }
 .gx-tile.is-blank { border: 3px dashed var(--line-strong); color: var(--muted); }
@@ -104,7 +104,7 @@ html body #app .gx .exam-time-value, html body #app .gx .exam-answered-value { d
 .gx-isto { font-weight: 800; color: var(--muted); }
 
 /* Ordering */
-.gx-order { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; max-width: 820px; }
+.gx-order { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
 .gx-order li { display: flex; gap: 16px; align-items: flex-start; padding: 14px 18px; border: 2px solid var(--line); border-radius: 16px; background: var(--surface); }
 .gx-order b { flex: none; display: grid; place-items: center; min-width: 34px; height: 34px; padding: 0 6px; border-radius: 17px; background: var(--tone); color: #15110f; font-weight: 900; }
 .gx-order span { font: 400 18px/1.55 Literata, Georgia, serif; padding-top: 3px; }
@@ -178,10 +178,15 @@ html body #app .gx .exam-time-value, html body #app .gx .exam-answered-value { d
 /* Legacy modals keep working above the new layer */
 .gx .modal-backdrop { z-index: 20; }
 
+/* Side by side, the capped question column sits centred in the free space. Stacked it must not get auto margins:
+   they cancel the stretch and the column would grow to its widest line. */
+@media (min-width: 1181px) { .gx-qcol { margin-inline: auto; } }
 @media (max-width: 1180px) {
   .gx-main { flex-direction: column; align-items: stretch; }
   /* Stacked: the passage/chart scrolls inside a fixed-height panel so the question below starts at a steady spot. */
   .gx-stim { position: static; max-height: 46dvh; flex-basis: auto; }
+  /* Set by gxStimMore while content continues below the panel edge. */
+  .gx-stim.has-more { -webkit-mask-image: linear-gradient(#000 calc(100% - 56px), transparent); mask-image: linear-gradient(#000 calc(100% - 56px), transparent); }
 }
 @media (max-width: 900px) {
   .gx-top { flex-wrap: wrap; padding: 12px 16px; gap: 10px; }
@@ -256,7 +261,8 @@ html body #app .gx .exam-time-value, html body #app .gx .exam-answered-value { d
 .gx-modal p { font-size: 17px; color: var(--text-2); line-height: 1.5; max-width: 44ch; }
 .gx-modal p strong { color: var(--text); }
 .gx-modal-badge { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: var(--primary); color: var(--on-primary); }
-.gx-modal-badge.is-warn { background: var(--warn); }
+/* .gx .is-warn would recolor the icon to the badge color; keep the icon dark on the orange badge. */
+.gx .gx-modal-badge.is-warn { background: var(--warn); color: var(--on-primary); }
 .gx-modal-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; }
 .gx-modal-stats div { display: flex; flex-direction: column; gap: 2px; padding: 14px 10px; border-radius: 16px; background: var(--surface-2); }
 .gx-modal-stats strong { font-size: 28px; font-weight: 900; font-variant-numeric: tabular-nums; }
@@ -321,6 +327,8 @@ html body #app .gx .exam-time-value, html body #app .gx .exam-answered-value { d
 .gx-split { display: flex; flex-wrap: wrap; gap: 24px; }
 .gx-split > :first-child { flex: 3 1 560px; min-width: 0; }
 .gx-split > :last-child { flex: 2 1 360px; min-width: 0; }
+/* Form pages: a short settings card keeps its own height instead of stretching to its neighbour. */
+form.gx-split, form .gx-split { align-items: flex-start; }
 .gx-card { padding: 26px; border: 2px solid var(--line); border-radius: 28px; background: var(--surface); display: flex; flex-direction: column; gap: 16px; }
 .gx-card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .gx-card h2 { font-size: 22px; font-weight: 900; }
@@ -383,7 +391,7 @@ a.gx-btn { text-decoration: none; }
 .gx .gx-cell.is-right { background: var(--good); color: #0b1a10; }
 .gx .gx-cell.is-wrong { background: var(--bad); color: #2a0e0e; }
 .gx .gx-cell.is-blank { background: var(--track); color: var(--muted); }
-.gx-review-main { align-items: flex-start; }
+/* .gx-main already aligns to the top side by side; stacked it must stretch, or the column grows to its widest line. */
 .gx-review-main .gx-stim { top: 92px; }
 .gx-verdict { margin-left: auto; padding: 4px 12px; border-radius: 12px; font-size: 14px; font-weight: 900; }
 .gx-verdict.is-right { background: color-mix(in srgb, var(--good) 16%, transparent); color: var(--good); }
@@ -411,6 +419,8 @@ a.gx-btn { text-decoration: none; }
   .gx-card { padding: 18px; border-radius: 22px; }
   .gx-hero { flex-direction: column; text-align: center; gap: 16px; }
   .gx-hero > svg { width: 150px; height: 150px; }
+  /* Stacked, a 260px flex-basis becomes a fixed height and leaves a gap under the stats. */
+  .gx-hero-text { flex-basis: auto; }
   .gx-hero-text h1 { font-size: 26px; }
   .gx-hero .gx-row { justify-content: center; }
   .gx-stats { justify-content: center; }
@@ -419,6 +429,11 @@ a.gx-btn { text-decoration: none; }
   .gx-review-head h1 { font-size: 24px; }
   .gx-filters { width: 100%; overflow-x: auto; }
   .gx-review-nav .gx-btn.is-primary { flex: 1; }
+  /* Empty states: stacked full-width buttons so labels never wrap inside a button. */
+  .gx-empty { padding: 28px 18px; }
+  .gx-empty .gx-row { flex-direction: column; align-items: stretch; width: 100%; }
+  /* Results actions: the main action gets its own full row so its label stays on one line. */
+  .gx-home > .gx-row > .gx-btn.is-primary { flex-basis: 100%; }
 }
 .gx-avatar { overflow: hidden; padding: 0; }
 .gx-avatar-sprite { display: block; width: 100%; height: 100%; background: url("assets/avatars/v5-avatar-source.png") no-repeat var(--avatar-x) var(--avatar-y) / 2144% 1208%; transform: scale(1.04); }
@@ -486,7 +501,7 @@ a.gx-btn { text-decoration: none; }
 .gx-modal.is-drawer { width: min(520px, 100%); max-height: 100vh; height: 100%; border-radius: 28px 0 0 28px; align-items: stretch; text-align: left; }
 .gx-form { display: flex; flex-direction: column; gap: 14px; width: 100%; text-align: left; }
 .gx-field { display: flex; flex-direction: column; gap: 6px; font-weight: 900; }
-.gx-field small { color: var(--muted); font-weight: 700; }
+.gx-field small { color: var(--muted); font-size: 13px; font-weight: 700; }
 .gx-pass { position: relative; display: block; }
 .gx-pass .gx-icon-btn { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 42px; height: 42px; }
 .gx-error { padding: 10px 14px; border-radius: 12px; background: color-mix(in srgb, var(--bad) 14%, transparent); color: var(--bad); font-weight: 800; }
@@ -595,7 +610,7 @@ a.gx-btn { text-decoration: none; }
 .gx-paper-item.is-multiple:not(.is-reviewed) { border-color: var(--bad); }
 .gx-paper-item.is-low:not(.is-reviewed) { border-color: var(--warn); }
 .gx-paper-num { width: 46px; display: flex; flex-direction: column; font-weight: 900; font-variant-numeric: tabular-nums; }
-.gx-paper-num small { font-size: 11px; font-weight: 800; color: var(--muted); white-space: nowrap; }
+.gx-paper-num small { font-size: 12px; font-weight: 800; color: var(--muted); white-space: nowrap; }
 .gx-paper-item.is-multiple:not(.is-reviewed) small { color: var(--bad); }
 .gx-paper-item.is-low:not(.is-reviewed) small { color: var(--warn); }
 .gx-paper-item.is-reviewed small { color: var(--good); }
@@ -655,7 +670,8 @@ a.gx-btn { text-decoration: none; }
 .gx-choice .gx-figchoice .gx-figure { color: currentColor; }
 @media (max-width: 900px) {
   .gx-figrow { gap: 6px; }
-  .gx-figtile { width: 68px; height: 68px; padding: 5px; }
+  /* Five frames (four + the blank) fit one phone row. */
+  .gx-figtile { width: min(68px, calc((100% - 24px) / 5)); height: auto; aspect-ratio: 1; padding: 5px; }
   .gx-figchoice { width: 56px; height: 56px; }
 }
 @media (max-width: 900px) {
@@ -752,6 +768,8 @@ a.gx-btn { text-decoration: none; }
   .gx-timer.is-pulse { animation: gx-timer-pulse .5s ease-out; }
 }
 .gx-result-hero { position: relative; overflow: visible; }
+/* Confetti flies past the card; clip at the page so it never adds sideways scroll. */
+.gx-pagebody { overflow-x: clip; }
 .gx-confetti { position: absolute; left: 120px; top: 110px; width: 0; height: 0; pointer-events: none; z-index: 2; }
 .gx-confetti i { position: absolute; width: 10px; height: 14px; border-radius: 3px; animation: gx-confetti 1.6s cubic-bezier(.2, .7, .3, 1) var(--d) both; }
 .gx-timer { transition: border-color .3s ease, background-color .3s ease; }
@@ -764,4 +782,12 @@ a.gx-btn { text-decoration: none; }
   /* Gentler path: no movement, but arrivals and feedback still fade so changes stay legible. */
   .gx.is-entering .gx-home > *, .gx.is-entering .gx-qcol, .gx.is-entering .gx-stim, .gx-qcol.is-next, .gx-review-main.is-next, .gx-stim.is-next, .gx-backdrop.is-entering .gx-modal, .toast.is-entering { animation: gx-fade .18s ease both; }
   .gx-btn:active, .gx-choice:active, .gx-version:active, .gx-choicecard:active { transform: none; }
+}
+
+/* 375px phones (iPhone mini/SE): close, timer, map and pause stay on one row instead of Pause wrapping alone. */
+@media (max-width: 400px) {
+  .gx-top { gap: 8px; }
+  .gx-top .gx-icon-btn { width: 44px; height: 44px; }
+  .gx-top .gx-btn { min-height: 44px; padding: 0 12px; }
+  .gx-timer { gap: 6px; padding: 4px 10px 4px 8px; }
 }

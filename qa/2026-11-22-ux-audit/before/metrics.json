@@ -1,0 +1,713 @@
+[
+ {
+  "name": "phone-dashboard",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 1869,
+  "errors": []
+ },
+ {
+  "name": "phone-setup",
+  "overflowX": 0,
+  "wide": [],
+  "small": [
+   "input. 1x42 \"\""
+  ],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 2122,
+  "errors": []
+ },
+ {
+  "name": "phone-practice",
+  "overflowX": 0,
+  "wide": [],
+  "small": [
+   "input. 1x42 \"\""
+  ],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 1134,
+  "errors": []
+ },
+ {
+  "name": "phone-mistakes",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 844,
+  "errors": []
+ },
+ {
+  "name": "phone-flagged",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 4883,
+  "errors": []
+ },
+ {
+  "name": "phone-flagged-empty",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 844,
+  "errors": []
+ },
+ {
+  "name": "phone-progress",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 1830,
+  "errors": []
+ },
+ {
+  "name": "phone-progress-empty",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 1253,
+  "errors": []
+ },
+ {
+  "name": "phone-results",
+  "overflowX": 63,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 1538,
+  "errors": []
+ },
+ {
+  "name": "phone-results-fail",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 1589,
+  "errors": []
+ },
+ {
+  "name": "phone-results-practice",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 1271,
+  "errors": []
+ },
+ {
+  "name": "phone-review",
+  "overflowX": 48,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 1265,
+  "errors": []
+ },
+ {
+  "name": "phone-profile-modal",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [
+   "small. 10.8333px \"(used to sign in)\""
+  ],
+  "usesGx": true,
+  "scrollH": 1869,
+  "errors": []
+ },
+ {
+  "name": "phone-pause",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 844,
+  "errors": []
+ },
+ {
+  "name": "phone-submit",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 844,
+  "errors": []
+ },
+ {
+  "name": "phone-timeout",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 844,
+  "errors": []
+ },
+ {
+  "name": "phone-practice-exam",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 844,
+  "errors": []
+ },
+ {
+  "name": "phone-paper-setup",
+  "overflowX": 0,
+  "wide": [],
+  "small": [
+   "input. 1x42 \"\""
+  ],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 2325,
+  "errors": []
+ },
+ {
+  "name": "phone-paper-exam",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 844,
+  "errors": []
+ },
+ {
+  "name": "phone-paper-scan",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [
+   "li. 0px \"2Confirm answers\"",
+   "li. 0px \"3Results\""
+  ],
+  "usesGx": true,
+  "scrollH": 1366,
+  "errors": []
+ },
+ {
+  "name": "phone-paper-review",
+  "overflowX": 0,
+  "wide": [],
+  "small": [
+   "input. 1x42 \"\""
+  ],
+  "tiny": [
+   "li.is-done 0px \"1Scan sheets\"",
+   "li. 0px \"3Results\"",
+   "small. 11px \"Blank\"",
+   "small. 11px \"Faint mark\"",
+   "small. 11px \"Two marks\""
+  ],
+  "usesGx": true,
+  "scrollH": 11087,
+  "errors": []
+ },
+ {
+  "name": "phone-paper-results",
+  "overflowX": 62,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 1538,
+  "errors": []
+ },
+ {
+  "name": "phone-q-v01-q001",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 844,
+  "errors": []
+ },
+ {
+  "name": "phone-q-v01-q121",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 844,
+  "errors": []
+ },
+ {
+  "name": "phone-q-v15-q065",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 1081,
+  "errors": []
+ },
+ {
+  "name": "phone-q-v14-q135",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 844,
+  "errors": []
+ },
+ {
+  "name": "phone-q-v01-q139",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 844,
+  "errors": []
+ },
+ {
+  "name": "phone-q-v14-q091",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 844,
+  "errors": []
+ },
+ {
+  "name": "phone-q-v17-q078",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 1047,
+  "errors": []
+ },
+ {
+  "name": "phone-q-v16-q163",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [
+   "th. 11.5px \"Canal\"",
+   "th. 11.5px \"Planned km\"",
+   "th. 11.5px \"Cleared km\"",
+   "th. 11.5px \"Crews\"",
+   "th. 11.5px \"Days\""
+  ],
+  "usesGx": true,
+  "scrollH": 1010,
+  "errors": []
+ },
+ {
+  "name": "phone-q-v17-q163",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [
+   "th. 11.5px \"Batch\"",
+   "th. 11.5px \"Planned\"",
+   "th. 11.5px \"Scanned\"",
+   "th. 11.5px \"Errors\"",
+   "th. 11.5px \"Hours\""
+  ],
+  "usesGx": true,
+  "scrollH": 1010,
+  "errors": []
+ },
+ {
+  "name": "phone-q-v20-q159",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [
+   "th. 11.5px \"Clinic\"",
+   "th. 11.5px \"Referred\"",
+   "th. 11.5px \"Completed\"",
+   "th. 11.5px \"Same day\"",
+   "th. 11.5px \"Follow-up\""
+  ],
+  "usesGx": true,
+  "scrollH": 1010,
+  "errors": []
+ },
+ {
+  "name": "phone-q-v18-q154",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 954,
+  "errors": []
+ },
+ {
+  "name": "desktop-dashboard",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 1125,
+  "errors": []
+ },
+ {
+  "name": "desktop-setup",
+  "overflowX": 0,
+  "wide": [],
+  "small": [
+   "input. 1x42 \"\""
+  ],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 991,
+  "errors": []
+ },
+ {
+  "name": "desktop-practice",
+  "overflowX": 0,
+  "wide": [],
+  "small": [
+   "input. 1x42 \"\""
+  ],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 736,
+  "errors": []
+ },
+ {
+  "name": "desktop-mistakes",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 736,
+  "errors": []
+ },
+ {
+  "name": "desktop-flagged",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 2738,
+  "errors": []
+ },
+ {
+  "name": "desktop-flagged-empty",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 736,
+  "errors": []
+ },
+ {
+  "name": "desktop-progress",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 1216,
+  "errors": []
+ },
+ {
+  "name": "desktop-progress-empty",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 1013,
+  "errors": []
+ },
+ {
+  "name": "desktop-results",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 864,
+  "errors": []
+ },
+ {
+  "name": "desktop-results-fail",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 864,
+  "errors": []
+ },
+ {
+  "name": "desktop-results-practice",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 783,
+  "errors": []
+ },
+ {
+  "name": "desktop-review",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 1061,
+  "errors": []
+ },
+ {
+  "name": "desktop-profile-modal",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [
+   "small. 10.8333px \"(used to sign in)\""
+  ],
+  "usesGx": true,
+  "scrollH": 1125,
+  "errors": []
+ },
+ {
+  "name": "desktop-pause",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 817,
+  "errors": []
+ },
+ {
+  "name": "desktop-submit",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 817,
+  "errors": []
+ },
+ {
+  "name": "desktop-timeout",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 817,
+  "errors": []
+ },
+ {
+  "name": "desktop-practice-exam",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 736,
+  "errors": []
+ },
+ {
+  "name": "desktop-paper-setup",
+  "overflowX": 0,
+  "wide": [],
+  "small": [
+   "input. 1x42 \"\""
+  ],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 1119,
+  "errors": []
+ },
+ {
+  "name": "desktop-paper-exam",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 817,
+  "errors": []
+ },
+ {
+  "name": "desktop-paper-scan",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 926,
+  "errors": []
+ },
+ {
+  "name": "desktop-paper-review",
+  "overflowX": 0,
+  "wide": [],
+  "small": [
+   "input. 1x42 \"\""
+  ],
+  "tiny": [
+   "small. 11px \"Blank\"",
+   "small. 11px \"Faint mark\"",
+   "small. 11px \"Two marks\""
+  ],
+  "usesGx": true,
+  "scrollH": 3301,
+  "errors": []
+ },
+ {
+  "name": "desktop-paper-results",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 864,
+  "errors": []
+ },
+ {
+  "name": "desktop-q-v01-q001",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 803,
+  "errors": []
+ },
+ {
+  "name": "desktop-q-v01-q121",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 817,
+  "errors": []
+ },
+ {
+  "name": "desktop-q-v15-q065",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 975,
+  "errors": []
+ },
+ {
+  "name": "desktop-q-v14-q135",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 817,
+  "errors": []
+ },
+ {
+  "name": "desktop-q-v01-q139",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 817,
+  "errors": []
+ },
+ {
+  "name": "desktop-q-v14-q091",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 817,
+  "errors": []
+ },
+ {
+  "name": "desktop-q-v17-q078",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 817,
+  "errors": []
+ },
+ {
+  "name": "desktop-q-v16-q163",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 736,
+  "errors": []
+ },
+ {
+  "name": "desktop-q-v17-q163",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 817,
+  "errors": []
+ },
+ {
+  "name": "desktop-q-v20-q159",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 817,
+  "errors": []
+ },
+ {
+  "name": "desktop-q-v18-q154",
+  "overflowX": 0,
+  "wide": [],
+  "small": [],
+  "tiny": [],
+  "usesGx": true,
+  "scrollH": 817,
+  "errors": []
+ }
+]
