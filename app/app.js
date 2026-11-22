@@ -537,7 +537,7 @@
       Object.keys(attempt.answers).forEach((questionId) => app.dirtyAnswers.add(`${attempt.id}|${questionId}`));
     });
     if (recoveredAttempts.length) {
-      app.toast = `Recovered unsynced progress for ${recoveredAttempts.length === 1 ? "your active exam" : `${recoveredAttempts.length} active exams`} from this device.`;
+      dismissToastLater(app.toast = `Recovered unsynced progress for ${recoveredAttempts.length === 1 ? "your active exam" : `${recoveredAttempts.length} active exams`} from this device.`);
       scheduleFlush();
     }
     app.attempts.filter((attempt) => attempt._clockMigrated).forEach((attempt) => {
@@ -1145,7 +1145,7 @@
             <label class="gx-switch ${paperMode ? "is-disabled" : ""}"><span>Shuffle answer choices</span><input type="checkbox" name="shuffleAnswers" ${!paperMode && draftOptions.shuffleAnswers ? "checked" : ""} ${paperMode ? "disabled" : ""} /><i aria-hidden="true"></i></label>
             ${paperMode ? `<div class="gx-note-box"><strong>Two printable pages</strong><span>Page 1: items 1–85 · Page 2: items 86–170. Use a black pen.</span><button class="gx-btn" data-action="print-paper-sheets" type="button">Print answer sheets</button></div>` : ""}
             <p class="gx-muted">${paperMode ? "Scans stay on this device. Only your confirmed answers are saved." : "Your progress saves automatically."}</p>
-            <button class="gx-btn is-primary" data-action="setup-submit" type="button">${paperMode ? "START PAPER EXAM" : "START MOCK EXAM"}</button>
+            <button class="gx-btn is-primary" data-action="setup-submit" type="button" ${app.busyAction === "start" ? "disabled" : ""}>${app.busyAction === "start" ? "STARTING…" : paperMode ? "START PAPER EXAM" : "START MOCK EXAM"}</button>
           </section>
         </div>
         <section class="gx-card">
@@ -2410,7 +2410,7 @@
           <div class="gx-segment" role="radiogroup" aria-label="Difficulty"><span>Difficulty</span>${[["mixed", "Mixed"], ["easy", "Easy"], ["medium", "Medium"], ["hard", "Hard"]].map(([value, label], index) => `<label><input type="radio" name="difficulty" value="${value}" ${index === 0 ? "checked" : ""} /><b>${label}</b></label>`).join("")}</div>
           <p class="gx-summary"><span class="gx-pill" data-practice-profile-section style="${gxToneStyle(selected.section)}">${escapeHtml(selected.label)}</span> <span><b data-practice-count>20</b> questions · <b data-practice-difficulty>Mixed</b></span></p>
           <p class="gx-muted">Press CHECK after each answer to see if you got it right, with the explanation.</p>
-          <button class="gx-btn is-primary" data-action="custom-practice-submit" type="button">START PRACTICE</button>
+          <button class="gx-btn is-primary" data-action="custom-practice-submit" type="button" ${app.busyAction === "start" ? "disabled" : ""}>${app.busyAction === "start" ? "STARTING…" : "START PRACTICE"}</button>
         </section>
       </form>`;
   }
@@ -3598,7 +3598,7 @@
   }
 
   function toast() {
-    return app.toast ? `<div class="toast">${escapeHtml(app.toast)}</div>` : "";
+    return app.toast ? `<div class="toast" role="status">${escapeHtml(app.toast)}</div>` : "";
   }
 
   async function handleSubmit(event) {
@@ -3611,10 +3611,10 @@
     try {
       if (formName === "signup") await runBusy("create", () => signUp(data));
       if (formName === "signin") await runBusy("signin", () => signIn(data));
-      if (formName === "setup") await startFullExam(formOptions(form));
+      if (formName === "setup" && !app.busyAction) { const options = formOptions(form); await runBusy("start", () => startFullExam(options)); }
       if (formName === "profile") await runBusy("profile", () => saveProfile(form));
       if (formName === "change-password") await runBusy("password", () => changePassword(data));
-      if (formName === "custom-practice") await startPractice(data.category, Number(data.count), data.difficulty);
+      if (formName === "custom-practice" && !app.busyAction) await runBusy("start", () => startPractice(data.category, Number(data.count), data.difficulty));
       if (formName === "forgot-password") await runBusy("reset", () => sendPasswordReset(data));
     } catch (error) {
       if (formName === "forgot-password" || formName === "change-password") {
@@ -3875,13 +3875,18 @@
       if (action === "show-create") return setView({ name: "create" });
       if (action === "signup-submit") return await runBusy("create", () => signUp(formDataFromButton(target)));
       if (action === "signin-submit") return await runBusy("signin", () => signIn(formDataFromButton(target)));
-      if (action === "setup-submit") return await startFullExam(formOptions(target.closest("form")));
+      if (action === "setup-submit") {
+        if (app.busyAction) return;
+        const options = formOptions(target.closest("form"));
+        return await runBusy("start", () => startFullExam(options));
+      }
       if (action === "print-paper-sheets") return printPaperSheets(target.closest("form"));
       if (action === "profile-submit") return await runBusy("profile", () => saveProfile(target.closest("form")));
       if (action === "password-submit") return await runBusy("password", () => changePassword(formDataFromButton(target)));
       if (action === "custom-practice-submit") {
+        if (app.busyAction) return;
         const values = formDataFromButton(target);
-        return await startPractice(values.category, Number(values.count), values.difficulty);
+        return await runBusy("start", () => startPractice(values.category, Number(values.count), values.difficulty));
       }
       if (action === "reset-practice") {
         const form = target.closest("form");
@@ -5600,6 +5605,10 @@
   function showToast(message) {
     app.toast = message;
     render();
+    dismissToastLater(message);
+  }
+
+  function dismissToastLater(message) {
     setTimeout(() => {
       if (app.toast === message) {
         app.toast = "";

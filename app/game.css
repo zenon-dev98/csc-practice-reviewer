@@ -791,3 +791,13 @@ a.gx-btn { text-decoration: none; }
   .gx-top .gx-btn { min-height: 44px; padding: 0 12px; }
   .gx-timer { gap: 6px; padding: 4px 10px 4px 8px; }
 }
+
+/* Notices: game style, centred above the bottom action bar or tab bar, and never in the way of a tap.
+   cockpit-theme.css pins .toast bottom-right with !important, where it covered NEXT. */
+#app .gx .toast {
+  position: fixed !important; left: 16px !important; right: 16px !important; bottom: 100px !important; z-index: 40;
+  width: fit-content; max-width: min(460px, calc(100% - 32px)) !important; margin-inline: auto;
+  padding: 12px 18px !important; border: 2px solid var(--line-strong) !important; border-radius: 16px !important; clip-path: none;
+  background: var(--surface-2) !important; color: var(--text) !important; box-shadow: 0 16px 40px rgba(0, 0, 0, .4) !important;
+  font: 800 15px/1.4 Nunito, system-ui, sans-serif !important; text-align: center; pointer-events: none;
+}
