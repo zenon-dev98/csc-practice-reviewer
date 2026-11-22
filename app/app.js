@@ -4351,7 +4351,7 @@
   }
 
   async function startPractice(category, count, difficulty) {
-    const pool = buildPracticePool(category, difficulty);
+    const pool = buildPracticePool(category, difficulty, count);
     const selected = pool.slice(0, count).map((question, index) => ({ question, displayNumber: index + 1, originalItemNumber: question.itemNumber }));
     const attempt = await createAttempt({
       mode: "practice",
@@ -4461,11 +4461,18 @@
     return seededShuffle(blocks, hashCode(seedText)).flat();
   }
 
-  function buildPracticePool(category, difficulty) {
-    let pool = questionBank.filter((question) => question.section === category);
-    if (difficulty && difficulty !== "mixed") pool = pool.filter((question) => question.difficulty === difficulty);
-    if (pool.length < 120) pool = questionBank.filter((question) => question.section === category);
-    return seededShuffle(pool, hashCode(`${category}-${difficulty}-${app.session.user.id}`)).slice(0, 120);
+  // Each practice set is drawn fresh from the whole section: questions this user has never answered come first,
+  // in a new order every time, and already-answered ones are used only when the unseen ones run out.
+  function buildPracticePool(category, difficulty, count) {
+    const section = questionBank.filter((question) => question.section === category);
+    let pool = difficulty && difficulty !== "mixed" ? section.filter((question) => question.difficulty === difficulty) : section;
+    if (pool.length < count) pool = section;
+    const answered = new Set(toArray(app.attempts).flatMap((attempt) => Object.values(attempt.answers || {}).filter((answer) => answer.selected_choice).map((answer) => answer.question_id)));
+    const seed = hashCode(`${category}-${difficulty}-${app.session.user.id}-${Date.now()}-${Math.random()}`);
+    return [
+      ...seededShuffle(pool.filter((question) => !answered.has(question.id)), seed),
+      ...seededShuffle(pool.filter((question) => answered.has(question.id)), seed + 1)
+    ];
   }
 
   function shuffledChoices(question, shouldShuffle, seed) {
