@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-21T18:40:31.212Z",
+  "generatedAt": "2026-11-22T01:26:52.719Z",
   "source": "app/question-bank",
   "versionCount": 20,
   "totalQuestions": 3400,
@@ -108,10 +108,26 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v01-q133-fig",
+          "kind": "figures",
+          "items": [
+            133
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v01-q134-fig",
           "kind": "figures",
           "items": [
             134
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v01-q137-fig",
+          "kind": "figures",
+          "items": [
+            137
           ],
           "logicSolutionCount": null
         },
@@ -256,10 +272,26 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v02-q135-fig",
+          "kind": "figures",
+          "items": [
+            135
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v02-q137-fig",
           "kind": "figures",
           "items": [
             137
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v02-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
           ],
           "logicSolutionCount": null
         },
@@ -404,10 +436,26 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v03-q135-fig",
+          "kind": "figures",
+          "items": [
+            135
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v03-q137-fig",
           "kind": "figures",
           "items": [
             137
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v03-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
           ],
           "logicSolutionCount": null
         },
@@ -560,10 +608,26 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v04-q137-fig",
+          "kind": "figures",
+          "items": [
+            137
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v04-q139-fig",
           "kind": "figures",
           "items": [
             139
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v04-q140-fig",
+          "kind": "figures",
+          "items": [
+            140
           ],
           "logicSolutionCount": null
         },
@@ -708,10 +772,26 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v05-q135-fig",
+          "kind": "figures",
+          "items": [
+            135
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v05-q139-fig",
           "kind": "figures",
           "items": [
             139
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v05-q140-fig",
+          "kind": "figures",
+          "items": [
+            140
           ],
           "logicSolutionCount": null
         },
@@ -864,6 +944,22 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v06-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v06-q140-fig",
+          "kind": "figures",
+          "items": [
+            140
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v06-data-a",
           "kind": "table",
           "items": [
@@ -996,10 +1092,26 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v07-q136-fig",
+          "kind": "figures",
+          "items": [
+            136
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v07-q138-fig",
           "kind": "figures",
           "items": [
             138
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v07-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
           ],
           "logicSolutionCount": null
         },
@@ -1152,10 +1264,26 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v08-q137-fig",
+          "kind": "figures",
+          "items": [
+            137
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v08-q138-fig",
           "kind": "figures",
           "items": [
             138
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v08-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
           ],
           "logicSolutionCount": null
         },
@@ -1300,10 +1428,26 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v09-q137-fig",
+          "kind": "figures",
+          "items": [
+            137
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v09-q138-fig",
           "kind": "figures",
           "items": [
             138
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v09-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
           ],
           "logicSolutionCount": null
         },
@@ -1444,6 +1588,22 @@
           "kind": "figures",
           "items": [
             135
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v10-q138-fig",
+          "kind": "figures",
+          "items": [
+            138
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v10-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
           ],
           "logicSolutionCount": null
         },
@@ -1604,6 +1764,22 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v11-q138-fig",
+          "kind": "figures",
+          "items": [
+            138
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v11-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v11-data-a",
           "kind": "table",
           "items": [
@@ -1728,6 +1904,14 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v12-q135-fig",
+          "kind": "figures",
+          "items": [
+            135
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v12-q136-fig",
           "kind": "figures",
           "items": [
@@ -1740,6 +1924,14 @@
           "kind": "figures",
           "items": [
             137
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v12-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
           ],
           "logicSolutionCount": null
         },
@@ -1876,6 +2068,14 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v13-q135-fig",
+          "kind": "figures",
+          "items": [
+            135
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v13-q136-fig",
           "kind": "figures",
           "items": [
@@ -1888,6 +2088,14 @@
           "kind": "figures",
           "items": [
             137
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v13-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
           ],
           "logicSolutionCount": null
         },
@@ -2024,6 +2232,14 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v14-q135-fig",
+          "kind": "figures",
+          "items": [
+            135
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v14-q136-fig",
           "kind": "figures",
           "items": [
@@ -2036,6 +2252,14 @@
           "kind": "figures",
           "items": [
             137
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v14-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
           ],
           "logicSolutionCount": null
         },
@@ -2172,6 +2396,14 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v15-q135-fig",
+          "kind": "figures",
+          "items": [
+            135
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v15-q136-fig",
           "kind": "figures",
           "items": [
@@ -2184,6 +2416,14 @@
           "kind": "figures",
           "items": [
             137
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v15-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
           ],
           "logicSolutionCount": null
         },
@@ -2320,6 +2560,14 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v16-q135-fig",
+          "kind": "figures",
+          "items": [
+            135
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v16-q136-fig",
           "kind": "figures",
           "items": [
@@ -2332,6 +2580,14 @@
           "kind": "figures",
           "items": [
             137
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v16-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
           ],
           "logicSolutionCount": null
         },
@@ -2476,10 +2732,26 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v17-q134-fig",
+          "kind": "figures",
+          "items": [
+            134
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v17-q136-fig",
           "kind": "figures",
           "items": [
             136
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v17-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
           ],
           "logicSolutionCount": null
         },
@@ -2616,6 +2888,14 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v18-q135-fig",
+          "kind": "figures",
+          "items": [
+            135
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v18-q136-fig",
           "kind": "figures",
           "items": [
@@ -2628,6 +2908,14 @@
           "kind": "figures",
           "items": [
             137
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v18-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
           ],
           "logicSolutionCount": null
         },
@@ -2772,10 +3060,26 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v19-q135-fig",
+          "kind": "figures",
+          "items": [
+            135
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v19-q136-fig",
           "kind": "figures",
           "items": [
             136
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v19-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
           ],
           "logicSolutionCount": null
         },
@@ -2912,6 +3216,14 @@
           "logicSolutionCount": null
         },
         {
+          "id": "v20-q135-fig",
+          "kind": "figures",
+          "items": [
+            135
+          ],
+          "logicSolutionCount": null
+        },
+        {
           "id": "v20-q136-fig",
           "kind": "figures",
           "items": [
@@ -2924,6 +3236,14 @@
           "kind": "figures",
           "items": [
             137
+          ],
+          "logicSolutionCount": null
+        },
+        {
+          "id": "v20-q139-fig",
+          "kind": "figures",
+          "items": [
+            139
           ],
           "logicSolutionCount": null
         },
