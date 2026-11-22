@@ -3611,10 +3611,10 @@
     try {
       if (formName === "signup") await runBusy("create", () => signUp(data));
       if (formName === "signin") await runBusy("signin", () => signIn(data));
-      if (formName === "setup" && !app.busyAction) { const options = formOptions(form); await runBusy("start", () => startFullExam(options)); }
+      if (formName === "setup" && !app.busyAction) { const options = formOptions(form); await runStart(() => startFullExam(options)); }
       if (formName === "profile") await runBusy("profile", () => saveProfile(form));
       if (formName === "change-password") await runBusy("password", () => changePassword(data));
-      if (formName === "custom-practice" && !app.busyAction) await runBusy("start", () => startPractice(data.category, Number(data.count), data.difficulty));
+      if (formName === "custom-practice" && !app.busyAction) await runStart(() => startPractice(data.category, Number(data.count), data.difficulty));
       if (formName === "forgot-password") await runBusy("reset", () => sendPasswordReset(data));
     } catch (error) {
       if (formName === "forgot-password" || formName === "change-password") {
@@ -3878,7 +3878,7 @@
       if (action === "setup-submit") {
         if (app.busyAction) return;
         const options = formOptions(target.closest("form"));
-        return await runBusy("start", () => startFullExam(options));
+        return await runStart(() => startFullExam(options));
       }
       if (action === "print-paper-sheets") return printPaperSheets(target.closest("form"));
       if (action === "profile-submit") return await runBusy("profile", () => saveProfile(target.closest("form")));
@@ -3886,7 +3886,7 @@
       if (action === "custom-practice-submit") {
         if (app.busyAction) return;
         const values = formDataFromButton(target);
-        return await runBusy("start", () => startPractice(values.category, Number(values.count), values.difficulty));
+        return await runStart(() => startPractice(values.category, Number(values.count), values.difficulty));
       }
       if (action === "reset-practice") {
         const form = target.closest("form");
@@ -4200,6 +4200,23 @@
     } finally {
       app.busyAction = "";
       render();
+    }
+  }
+
+  // Starting saves the attempt before the exam opens. The button changes in place: a full render would rebuild
+  // the page and jump its scroll to the top just before the exam screen replaces it.
+  async function runStart(task) {
+    const view = app.view;
+    app.busyAction = "start";
+    root.querySelectorAll('[data-action="setup-submit"], [data-action="custom-practice-submit"]').forEach((button) => {
+      button.disabled = true;
+      button.textContent = "STARTING…";
+    });
+    try {
+      return await task();
+    } finally {
+      app.busyAction = "";
+      if (app.view === view) render();
     }
   }
 
