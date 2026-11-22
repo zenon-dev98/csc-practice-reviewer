@@ -237,10 +237,16 @@ html body #app .gx .exam-time-value, html body #app .gx .exam-answered-value { d
 .gx-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); }
 .gx-cell { font-size: 11px; }
 .gx-rail-theme { display: none; }
+/* Phones hide the header sound button during an exam; the question map carries the same controls. */
+.gx-rail-sound { display: none; }
+.gx-rail-sound summary { list-style: none; }
+.gx-rail-sound summary::-webkit-details-marker { display: none; }
+.gx-rail-sound[open] summary { margin-bottom: 12px; }
 @media (max-width: 900px) {
   .gx-top .gx-label, .gx-top .gx-top-theme, .gx-top .exam-audio-control { display: none; }
   .gx-top .gx-btn { min-height: 48px; padding: 0 14px; }
   .gx-rail-theme { display: inline-flex; }
+  .gx-rail-sound { display: block; }
   .gx-tile { font-size: 15px; letter-spacing: 0; padding: 8px; overflow-wrap: normal; }
   .gx-tile small { font-size: 13px; margin-right: 6px; }
 }
@@ -528,13 +534,6 @@ a.gx-btn { text-decoration: none; }
 
 /* Audio pop-over and account audio panel */
 #app .gx .gx-pop { position: absolute; top: calc(100% + 10px); right: 0; z-index: 12; width: 300px; display: flex; flex-direction: column; gap: 12px; padding: 16px; border: 2px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: 0 24px 60px rgba(0, 0, 0, .45); color: var(--text); font: 700 15px/1.4 Nunito, sans-serif; text-align: left; }
-.gx-pop-track { display: flex; flex-direction: column; }
-.gx-pop-track small { color: var(--muted); font-size: 13px; }
-.gx-transport { display: flex; gap: 8px; flex-wrap: wrap; }
-.gx-transport .gx-icon-btn { width: 44px; height: 44px; }
-.gx-transport .gx-icon-btn.is-on { border-color: var(--select); color: var(--select); }
-.gx-transport .gx-play { background: var(--primary); border-color: var(--primary-edge); color: var(--on-primary); }
-.gx-transport .gx-play.is-on { background: var(--primary); color: var(--on-primary); }
 .gx-range { display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 800; color: var(--text-2); }
 #app .gx .gx-range input { width: 100%; min-height: 0; padding: 0; border: 0; background: transparent; accent-color: var(--select); }
 .gx-sfx { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 48px; padding: 0 14px; border: 2px solid var(--line); border-radius: 14px; background: var(--surface-2); text-align: left; font-weight: 800; }
@@ -544,6 +543,10 @@ a.gx-btn { text-decoration: none; }
 .gx-sfx.is-on b { color: var(--good); }
 .gx-audio { display: flex; flex-direction: column; gap: 12px; }
 .gx-audio .gx-filters { align-self: flex-start; }
+.gx-fx-level { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 800; color: var(--text-2); }
+.gx-fx-level small { color: var(--muted); font-size: 13px; }
+.gx-fx-level .gx-filters { align-self: stretch; }
+.gx-fx-level .gx-filters button { flex: 1; padding: 0 8px; }
 .gx .exam-audio-control { position: relative; }
 
 /* ---- Stage 5: sign-in, system screens, paper grading ---- */
@@ -801,3 +804,48 @@ a.gx-btn { text-decoration: none; }
   background: var(--surface-2) !important; color: var(--text) !important; box-shadow: 0 16px 40px rgba(0, 0, 0, .4) !important;
   font: 800 15px/1.4 Nunito, system-ui, sans-serif !important; text-align: center; pointer-events: none;
 }
+
+/* ---- Exam effects, phase 1 (2026-11-22) ----
+   The layer lives on <body> outside #app (see gxFxLayer in app.js) so re-renders never cut an effect short.
+   Nothing here takes taps. Triggers: .is-squash = a new pick at Full; .gx-fx-ghost = the outgoing question on
+   NEXT/SKIP (.is-flick / .is-drop); .is-cleared = a section's last blank answered; .is-tick = answered counter in the last 10%;
+   .gx-fx-banner = section clear, milestone or all answered; .gx-fx-aura = all answered at Full. */
+@property --gx-fx-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+.gx, .gx-fx { --gx-spring: cubic-bezier(.34, 1.56, .64, 1); }
+@supports (animation-timing-function: linear(0, 1)) {
+  .gx, .gx-fx { --gx-spring: linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%, 0.938 16.7%, 1.017 19.4%, 1.067, 1.099 24.3%, 1.108 26%, 1.098 28.4%, 1.026 34.6%, 1.003 38.8%, 0.992 43.6%, 0.996 51.4%, 1); }
+}
+.gx-fx { position: fixed; inset: 0; z-index: 6; pointer-events: none; font: 800 15px/1.35 Nunito, system-ui, sans-serif; }
+.gx-fx canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.gx-fx-banner { position: absolute; left: 16px; right: 16px; width: fit-content; max-width: min(440px, calc(100% - 32px)); margin-inline: auto; padding: 14px 22px; border: 3px solid var(--fx-accent); border-radius: 20px; background: var(--fx-bg); color: var(--fx-text); text-align: center; box-shadow: 0 18px 44px rgba(0, 0, 0, .4), 0 0 0 6px color-mix(in srgb, var(--fx-accent) 18%, transparent); opacity: 0; }
+.gx-fx-banner:empty { display: none; }
+.gx-fx-banner strong { display: block; color: var(--fx-accent); font-size: 26px; font-weight: 900; line-height: 1.1; text-transform: uppercase; letter-spacing: .02em; }
+.gx-fx-banner small { display: block; margin-top: 4px; font-size: 14px; font-weight: 800; }
+.gx-fx-banner.is-in { animation: gx-fx-banner-in .5s var(--gx-spring) forwards; }
+.gx-fx-banner.is-out { animation: gx-fx-banner-out .25s ease-in forwards; }
+@keyframes gx-fx-banner-in { from { opacity: 0; transform: translateY(-24px) scale(.7) rotate(-3deg); } to { opacity: 1; transform: none; } }
+@keyframes gx-fx-banner-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(-14px) scale(.92); } }
+.gx.gx-fx-ghosts { position: fixed; inset: 0; z-index: 6; overflow: hidden; background: transparent; pointer-events: none; }
+.gx-fx-ghost.is-flick { animation: gx-fx-flick .18s ease-in forwards; }
+.gx-fx-ghost.is-drop { animation: gx-fx-drop .2s ease-in forwards; }
+@keyframes gx-fx-flick { to { opacity: 0; transform: translateX(-48px) rotate(-1.5deg); } }
+@keyframes gx-fx-drop { to { opacity: 0; transform: translateY(24px) scale(.96); } }
+.gx-fx-aura { position: absolute; inset: 0; padding: 5px; background: conic-gradient(from var(--gx-fx-angle), #ff7a1a, #ffc93c, #ff4d6d, #b07cff, #4db8ff, #7bd66b, #ff7a1a); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); animation: gx-fx-aura 1.3s cubic-bezier(.3, .6, .3, 1) forwards; }
+@keyframes gx-fx-aura { 0% { opacity: 0; } 15% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; --gx-fx-angle: 360deg; } }
+.gx-seg.is-cleared { overflow: hidden; }
+.gx-seg.is-cleared::after { content: ""; position: absolute; inset: 0; border-radius: 9px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .85), transparent); transform: translateX(-100%); animation: gx-fx-sweep .55s ease-out .12s; }
+@keyframes gx-fx-sweep { to { transform: translateX(100%); } }
+html body #app .gx .exam-answered-value.is-tick { display: inline-block !important; animation: gx-fx-tick .4s var(--gx-spring); }
+@keyframes gx-fx-tick { 0% { transform: scale(1.6); } 100% { transform: none; } }
+@media (prefers-reduced-motion: no-preference) {
+  .gx-choice.is-popping.is-squash { animation: gx-fx-squash .42s var(--gx-spring); }
+  .gx-choice.is-popping.is-squash .gx-key { animation: gx-fx-stamp .4s var(--gx-spring); }
+}
+@keyframes gx-fx-squash { 0% { transform: scale(.95, .92); } 100% { transform: none; } }
+@keyframes gx-fx-stamp { 0% { transform: scale(1.5) rotate(-12deg); } 100% { transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .gx-fx-banner.is-in { animation: gx-fade .2s ease forwards; }
+  .gx-fx-banner.is-out { animation: gx-fx-fade-out .2s ease forwards; }
+  .gx-seg.is-cleared::after, .gx-fx-aura { animation: none; display: none; }
+}
+@keyframes gx-fx-fade-out { to { opacity: 0; } }

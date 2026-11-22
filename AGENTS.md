@@ -337,14 +337,24 @@ Rules:
 ## Motion
 
 Motion may communicate hierarchy, interaction, navigation, progress, loading,
-saving, or content transition. It must not exist as decorative noise.
+saving, or content transition, and may celebrate real exam progress (a pick, a
+section clear, a milestone, all items answered). Motion with no real trigger is
+decorative noise and stays out. The approved direction (2026-11-22) is bouncy and
+expressive; its live proposal is the "Exam Game Feel" artifact.
 
 - Prefer `transform` and `opacity`.
-- Avoid layout shift, large scaling, bounce, elastic easing, and endless pulse.
-- Keep hover and press feedback restrained.
-- Keep page-entry motion brief.
+- Avoid layout shift and large scaling.
+- Spring overshoot (`--gx-spring`) and a short trauma-based shake (under 400 ms,
+  at most 6 px) are allowed for celebrations.
+- Looping motion runs only while its state holds (for example a combo), never as
+  an idle pulse, and settles after a few seconds.
+- Celebrations never block input, never pause or cost exam time, and never reveal
+  correctness during a mock exam.
+- Every exam effect follows the user's Exam effects level (Auto = Full in
+  practice, Subtle in mocks; Full; Subtle; Calm) and `prefers-reduced-motion`
+  (no shake, sparks or springs; short fades only).
+- Nothing flashes more than three times in any one second (WCAG 2.3.1).
 - Stop when the state is complete.
-- Respect `prefers-reduced-motion`.
 
 Meaningful motion changes must define trigger, start, end, duration, easing, and
 reduced-motion behavior. Static screenshots alone do not verify time-based

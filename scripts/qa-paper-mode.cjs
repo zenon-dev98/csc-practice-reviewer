@@ -240,9 +240,9 @@ let browser;
   await shot("paper-exam");
   const paperChoiceCount = await page.locator(".gx-choices .gx-choice").count();
   check("paper exam choices are read-only", paperChoiceCount > 0 && await page.locator(".gx-choices .gx-choice:disabled").count() === paperChoiceCount, `${paperChoiceCount} choices`);
-  const beforeItem = await page.locator(".gx-qnum").innerText();
+  const beforeItem = await page.locator("#app .gx-qnum").innerText();
   await page.getByRole("button", { name: /^Next/i }).click();
-  const afterItem = await page.locator(".gx-qnum").innerText();
+  const afterItem = await page.locator("#app .gx-qnum").innerText();
   check("paper exam next works without an onscreen answer", beforeItem !== afterItem, `${beforeItem} -> ${afterItem}`);
   // The top-bar Finish button is always visible; the rail copy is hidden when the question map is collapsed.
   await page.getByRole("button", { name: /^Finish( answering)?$/i }).first().click();

@@ -59,7 +59,7 @@ Anti-references:
 ## Pre-Ship Audit Checklist
 
 - Accessibility: visible focus states, labeled grouped navigation, readable table stimulus, no color-only status.
-- Performance: static JS only, no remote fonts, no heavy animation beyond result count-up.
+- Performance: static JS only, no remote fonts. Exam effects (sparks, banners, shake) use one canvas on a body-level layer whose loop stops when idle, CSS transforms and synthesized Web Audio; no animation library and no audio files. Background music was retired on 2026-11-22.
 - Theming: tokenized colors, no one-note beige or gradient palette.
 - Responsive: no horizontal overflow at 390px, navigator collapses by section, choices stack cleanly.
 - Anti-patterns: no nested decorative cards, no hero layout, no giant whitespace in exam mode.

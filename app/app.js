@@ -9,6 +9,13 @@
   const DEFAULT_PRACTICE_COUNT = 20;
   const PAPER_POLL_INTERVAL_MS = 7000;
   const AUDIO_PREFS_KEY = "csc-reviewer-audio";
+  const GX_FX_LEVELS = [["auto", "Auto"], ["full", "Full"], ["subtle", "Subtle"], ["calm", "Calm"]];
+  const GX_FX_HINTS = {
+    auto: "Full in practice sets, Subtle in mock exams.",
+    full: "Sparks, shakes and big banners everywhere.",
+    subtle: "Banners and small motion, no sparks or shake.",
+    calm: "Closest to the silent paper exam: colour changes only."
+  };
   const ATTEMPT_RECOVERY_KEY_PREFIX = "csc-reviewer-attempt-recovery";
   const QA_TIMING_ENABLED = new URLSearchParams(location.search).get("qaTiming") === "1";
   const AVATAR_OPTIONS = [
@@ -19,24 +26,6 @@
   ];
   const AVATAR_SPRITE_COLUMNS = [75.1, 80.6, 86.2, 91.7, 97.1];
   const AVATAR_SPRITE_ROWS = [30.9, 40.7, 50.5, 60.4];
-  const MUSIC_LIBRARY = {
-    cafe: [
-      { title: "Catchy Swing", artist: "Doge", src: "assets/audio/music/cafe-catchy-swing.ogg" },
-      { title: "Fusion Break", artist: "Spring Spring", src: "assets/audio/music/cafe-fusion-jazz.ogg" },
-      { title: "Corner Table", artist: "Spring Spring", src: "assets/audio/music/cafe-corner-table.ogg" },
-      { title: "Piano Sway", artist: "Tozan", src: "assets/audio/music/cafe-piano-sway.ogg" },
-      { title: "Jazz and Brass", artist: "Emma MA", src: "assets/audio/music/cafe-jazz-brass.wav" },
-      { title: "Quiet Espresso", artist: "Ruskerdax", src: "assets/audio/music/cafe-quiet-espresso.mp3" }
-    ],
-    classical: [
-      { title: "Once Upon a Time", artist: "TAD", src: "assets/audio/music/classical-once-upon-a-time.mp3" },
-      { title: "Fantasy Orchestral", artist: "Joth", src: "assets/audio/music/classical-fantasy-orchestral.mp3" },
-      { title: "Calm Theme", artist: "Pebonius", src: "assets/audio/music/classical-calm-theme.ogg" },
-      { title: "Orchestring", artist: "Tozan", src: "assets/audio/music/classical-orchestring.ogg" },
-      { title: "Forget Me Not", artist: "Kistol", src: "assets/audio/music/classical-forget-me-not.ogg" },
-      { title: "Emotional Piano", artist: "Centurion of War", src: "assets/audio/music/classical-emotional-piano.ogg" }
-    ]
-  };
   const generatedVersions = window.CSC_EXAM_VERSIONS || [];
   const generatedQuestions = generatedVersions.flatMap((version) => version.questions || []);
   const sourceQuestions = window.CSC_QUESTIONS || [];
@@ -165,11 +154,7 @@
     practiceCategoryDraft: null,
     audioMenuOpen: false,
     audio: loadAudioPreferences(),
-    audioElements: null,
     audioContext: null,
-    audioUserGesture: false,
-    audioHistory: [],
-    audioShuffleBag: [],
     accountAvatarDraft: null,
     examNavScrollTop: 0,
     examNavDrag: null,
@@ -206,7 +191,6 @@
         flushDirty({ immediate: true });
       } else {
         recordVisibilityEvent("visible");
-        syncBackgroundMusic();
       }
     });
     document.addEventListener("click", handleClick);
@@ -976,7 +960,6 @@
     app.view = view;
     app.audioMenuOpen = false;
     render();
-    syncBackgroundMusic();
     if (view.name === "results" && previousView !== "results") playSound("confirmation");
   }
 
@@ -1241,7 +1224,8 @@
       flag: `<path d="M5 21V4h13l-3 4.5 3 4.5H5"/>`,
       menu: `<path d="M4 6h16M4 12h16M4 18h16"/>`,
       clock: `<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/>`,
-      music: `<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>`,
+      sound: `<path d="M4 9.5v5h4l5 4v-13l-5 4z"/><path d="M16.5 9a4.5 4.5 0 0 1 0 6M19 6.5a8 8 0 0 1 0 11"/>`,
+      mute: `<path d="M4 9.5v5h4l5 4v-13l-5 4z"/><path d="M17 9.5l5 5M22 9.5l-5 5"/>`,
       back: `<path d="M15 18l-6-6 6-6"/>`,
       refresh: `<path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v4h-4"/>`
     };
@@ -1323,6 +1307,7 @@
         <div class="gx-key-legend"><span><i style="background: var(--${gxTone(open.section)})"></i>Answered</span><span><i style="border: 2px solid var(--line-strong)"></i>Skipped</span><span><i style="background: var(--flag); border-radius: 50%"></i>Flagged</span></div>
         <button class="gx-btn gx-rail-theme" data-action="${isPaperAttempt(attempt) ? "open-paper-finish" : "open-submit"}" type="button">${isPaperAttempt(attempt) ? "Finish answering" : attempt.mode === "practice" ? "Finish practice" : "Submit exam"}</button>
         <button class="gx-btn gx-rail-theme" data-action="toggle-theme" type="button">${gxIcon(gxTheme() === "light" ? "moon" : "sun", 18)}${gxTheme() === "light" ? "Dark theme" : "Light theme"}</button>
+        <details class="gx-rail-sound"><summary class="gx-btn">${gxIcon(app.audio.sfx ? "sound" : "mute", 18)}Sound and effects</summary><div class="gx-audio">${gxSoundControls()}</div></details>
         <p class="gx-note">Independent practice tool. Not affiliated with the Civil Service Commission.</p>
       </div></aside>`;
   }
@@ -1618,7 +1603,7 @@
             ${practice && gxStreak(attempt) > 1 ? `<span class="gx-streak"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5 .2 2 1 3 2 3.5C11 9 11 5.5 12 2z"/></svg>${gxStreak(attempt)} in a row</span>` : ""}
             <button class="gx-icon-btn gx-nav-toggle" data-action="toggle-exam-nav" type="button" aria-label="Open question map" aria-expanded="${app.examNavOpen ? "true" : "false"}">${gxIcon("menu")}</button>
             <button class="gx-icon-btn gx-top-theme" data-action="toggle-theme" type="button" aria-label="Switch to ${theme === "light" ? "dark" : "light"} theme">${gxIcon(theme === "light" ? "moon" : "sun")}</button>
-            <div class="exam-audio-control"><button class="gx-icon-btn header-audio-button" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${gxIcon("music")}</button>${audioPopover()}</div>
+            <div class="exam-audio-control"><button class="gx-icon-btn header-audio-button" data-action="toggle-audio-menu" type="button" aria-label="Sound and effects" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${gxIcon(app.audio.sfx ? "sound" : "mute")}</button>${audioPopover()}</div>
             <button class="gx-btn" data-action="pause-exam" type="button" aria-label="Pause" ${attempt.options?.enablePause === false || isPaused ? "disabled" : ""}>${gxIcon("pause", 18)}<span class="gx-label">Pause</span></button>
             <button class="gx-btn is-quiet gx-top-submit" data-action="${paperMode ? "open-paper-finish" : "open-submit"}" type="button">${paperMode ? "Finish" : attempt.mode === "practice" ? "Finish" : "Submit"}</button>
           </header>
@@ -1664,6 +1649,284 @@
 
   // ---- Game-style signed-in screens (stage 3): shared shell, Home, Results, Review. ----
   // ---- Motion: animate real changes only (new screen, question, pick, check, pop-up), never routine re-renders. ----
+  // ---- Exam effects, phase 1 (2026-11-22): pick sparks, card flick, section clears, milestones, all answered. ----
+  // The layer sits on <body>, outside #app, so the full re-render after every tap never cuts an effect short.
+  // Everything passes taps through, never pauses the clock, and fires only when this session sees the answered
+  // count go up, so reopening or refreshing an exam never replays a celebration.
+  const gxFx = { particles: [], raf: 0, trauma: 0, shakeRaf: 0 };
+  const GX_SECTION_ROOTS = [261.63, 293.66, 329.63, 392];
+
+  function gxFxLevel(attempt) {
+    const level = app.audio.effects || "auto";
+    if (level !== "auto") return level;
+    return attempt?.mode === "practice" ? "full" : "subtle";
+  }
+
+  function gxFxLayer() {
+    let layer = document.getElementById("gx-fx");
+    if (!layer) {
+      layer = document.createElement("div");
+      layer.id = "gx-fx";
+      layer.className = "gx-fx";
+      layer.innerHTML = `<canvas aria-hidden="true"></canvas><div class="gx-fx-banner" role="status"></div>`;
+      document.body.appendChild(layer);
+    }
+    return layer;
+  }
+
+  function gxFxVar(gx, name) {
+    return getComputedStyle(gx).getPropertyValue(name).trim();
+  }
+
+  function gxFxCenter(element) {
+    const rect = element.getBoundingClientRect();
+    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+  }
+
+  function gxFxBurst(x, y, colors, count, speed = 3.2, kind = "spark") {
+    for (let index = 0; index < count; index += 1) {
+      const angle = Math.random() * Math.PI * 2;
+      const velocity = speed * (0.5 + Math.random());
+      gxFx.particles.push({ x, y, vx: Math.cos(angle) * velocity, vy: Math.sin(angle) * velocity - (kind === "confetti" ? 2.5 : 0), life: 1, decay: kind === "confetti" ? 0.012 : 0.035 + Math.random() * 0.02, color: colors[index % colors.length], kind, spin: Math.random() * 0.3, turn: Math.random() * 6 });
+    }
+    gxFxLoop();
+  }
+
+  function gxFxRing(x, y, color) {
+    gxFx.particles.push({ x, y, kind: "ring", life: 1, decay: 0.04, color, radius: 6 });
+    gxFxLoop();
+  }
+
+  function gxFxLoop() {
+    if (!gxFx.raf && !document.hidden) gxFx.raf = requestAnimationFrame(gxFxFrame);
+  }
+
+  function gxFxFrame() {
+    gxFx.raf = 0;
+    const canvas = gxFxLayer().querySelector("canvas");
+    const ratio = window.devicePixelRatio || 1;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    if (canvas.width !== Math.round(width * ratio) || canvas.height !== Math.round(height * ratio)) {
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
+    }
+    const context = canvas.getContext("2d");
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    context.clearRect(0, 0, width, height);
+    for (let index = gxFx.particles.length - 1; index >= 0; index -= 1) {
+      const particle = gxFx.particles[index];
+      particle.life -= particle.decay;
+      if (particle.life <= 0) {
+        gxFx.particles.splice(index, 1);
+        continue;
+      }
+      context.globalAlpha = Math.min(1, particle.life * 1.4);
+      context.fillStyle = context.strokeStyle = particle.color;
+      if (particle.kind === "ring") {
+        particle.radius += 6;
+        context.lineWidth = 4 * particle.life;
+        context.beginPath();
+        context.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        context.stroke();
+        continue;
+      }
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+      particle.vy += particle.kind === "confetti" ? 0.09 : 0.12;
+      particle.vx *= 0.97;
+      if (particle.kind === "confetti") {
+        particle.turn += particle.spin;
+        context.save();
+        context.translate(particle.x, particle.y);
+        context.rotate(particle.turn);
+        context.fillRect(-4, -2.5, 8, 5);
+        context.restore();
+      } else {
+        context.beginPath();
+        context.arc(particle.x, particle.y, 2.4 * particle.life + 0.6, 0, Math.PI * 2);
+        context.fill();
+      }
+    }
+    context.globalAlpha = 1;
+    // The loop stops as soon as there is nothing left to draw.
+    if (gxFx.particles.length) gxFx.raf = requestAnimationFrame(gxFxFrame);
+  }
+
+  // Trauma-model shake: offset = trauma squared, capped at 6 px and 1.2 degrees, gone in about 350 ms.
+  function gxFxShake(amount) {
+    gxFx.trauma = Math.min(1, gxFx.trauma + amount);
+    if (!gxFx.shakeRaf) gxFx.shakeRaf = requestAnimationFrame(gxFxShakeFrame);
+  }
+
+  function gxFxShakeFrame(time) {
+    gxFx.trauma = Math.max(0, gxFx.trauma - 0.045);
+    const strength = gxFx.trauma * gxFx.trauma;
+    const tick = time / 40;
+    const target = root.querySelector(".gx-exam");
+    if (target) target.style.transform = strength ? `translate(${(6 * strength * Math.sin(tick * 1.7)).toFixed(2)}px, ${(6 * strength * Math.sin(tick * 2.3 + 1)).toFixed(2)}px) rotate(${(1.2 * strength * Math.sin(tick * 1.3 + 2)).toFixed(3)}deg)` : "";
+    gxFx.shakeRaf = gxFx.trauma > 0 ? requestAnimationFrame(gxFxShakeFrame) : 0;
+  }
+
+  function gxFxBanner(gx, title, subtitle, accent, extra = "") {
+    const banner = gxFxLayer().querySelector(".gx-fx-banner");
+    const header = gx.querySelector(".gx-top");
+    clearTimeout(gxFx.bannerTimer);
+    banner.style.top = `${Math.round((header?.getBoundingClientRect().bottom || 80) + 10)}px`;
+    banner.style.setProperty("--fx-bg", gxFxVar(gx, "--surface"));
+    banner.style.setProperty("--fx-text", gxFxVar(gx, "--text-2"));
+    banner.style.setProperty("--fx-accent", accent);
+    banner.innerHTML = `<strong>${escapeHtml(title)}</strong><small>${escapeHtml(subtitle)}</small>${extra}`;
+    banner.classList.remove("is-in", "is-out");
+    void banner.offsetWidth;
+    banner.classList.add("is-in");
+    gxFx.bannerTimer = setTimeout(() => banner.classList.replace("is-in", "is-out"), 2000);
+  }
+
+  // NEXT and SKIP: a copy of the outgoing question flicks away while the new one slides in. The copy is made
+  // before the re-render, so the button stays instant.
+  function gxFxAdvance(kind) {
+    playSound(kind === "skip" ? "skip" : "advance");
+    const attempt = getAttempt(app.view.attemptId);
+    const column = root.querySelector(".gx-qcol");
+    const gx = root.querySelector(".gx");
+    if (!column || !gx || gxFxLevel(attempt) === "calm" || gxReducedMotion()) return;
+    const rect = column.getBoundingClientRect();
+    const wrap = document.createElement("div");
+    wrap.className = "gx gx-fx-ghosts";
+    wrap.dataset.theme = gx.dataset.theme || "dark";
+    wrap.setAttribute("aria-hidden", "true");
+    wrap.inert = true;
+    const ghost = column.cloneNode(true);
+    ghost.className = `gx-qcol gx-fx-ghost ${kind === "skip" ? "is-drop" : "is-flick"}`;
+    Object.assign(ghost.style, { position: "absolute", left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, margin: "0" });
+    wrap.appendChild(ghost);
+    document.body.appendChild(wrap);
+    setTimeout(() => wrap.remove(), 260);
+  }
+
+  function gxFxPick(gx, choice, attempt) {
+    const level = gxFxLevel(attempt);
+    if (level === "calm") return;
+    choice.classList.add("is-popping");
+    if (navigator.vibrate && navigator.userActivation?.hasBeenActive !== false) {
+      try {
+        navigator.vibrate(10);
+      } catch {
+        // Vibration is optional.
+      }
+    }
+    if (level !== "full" || gxReducedMotion()) return;
+    choice.classList.add("is-squash");
+    const key = choice.querySelector(".gx-key");
+    if (key) {
+      const point = gxFxCenter(key);
+      gxFxBurst(point.x, point.y, [gxFxVar(gx, "--select")], 6, 2.6);
+    }
+  }
+
+  function gxFxProgress(gx, attempt) {
+    const memory = (app.gxMotion.progress ||= {});
+    const groups = gxSectionGroups(attempt);
+    const total = attempt.total_questions;
+    const answered = answeredCount(attempt);
+    const previous = memory[attempt.id];
+    const fired = previous?.fired || new Set();
+    memory[attempt.id] = { answered, fired };
+    const complete = groups.map((group) => group.answers.length > 0 && group.answers.every((answer) => answer.selected_choice));
+    const reached = [25, 50, 75, 90].filter((pct) => answered >= Math.ceil(total * pct / 100));
+    if (!previous) {
+      // First sight of this attempt: anything already reached counts as celebrated.
+      groups.forEach((group, index) => complete[index] && fired.add(group.section));
+      reached.forEach((pct) => fired.add(pct));
+      if (answered === total) fired.add("all");
+      return;
+    }
+    if (answered <= previous.answered) return;
+    const level = gxFxLevel(attempt);
+    const counter = gx.querySelector(".exam-answered-value");
+    if (counter && level !== "calm" && answered >= Math.ceil(total * 0.9)) counter.classList.add("is-tick");
+    const freshPct = reached.filter((pct) => !fired.has(pct));
+    freshPct.forEach((pct) => fired.add(pct));
+    if (answered === total && !fired.has("all")) {
+      fired.add("all");
+      groups.forEach((group) => fired.add(group.section));
+      return gxFxAllAnswered(gx, attempt, level);
+    }
+    const index = groups.findIndex((group, position) => complete[position] && !fired.has(group.section));
+    if (index >= 0) {
+      fired.add(groups[index].section);
+      return gxFxSectionClear(gx, groups[index], index, level);
+    }
+    if (freshPct.length) gxFxMilestone(gx, attempt, freshPct[freshPct.length - 1], level);
+  }
+
+  function gxFxSectionClear(gx, group, index, level) {
+    if (level === "calm") return;
+    const root0 = GX_SECTION_ROOTS[index % GX_SECTION_ROOTS.length];
+    playSound([0, 4, 7, 12].map((step) => [root0 * 2 ** (step / 12), 0.18, "triangle", 0.06]));
+    const tone = gxFxVar(gx, `--${gxTone(group.section)}`);
+    const ink = gxFxVar(gx, `--${gxTone(group.section)}-ink`) || tone;
+    const segment = gx.querySelectorAll(".gx-segs .gx-seg")[index];
+    segment?.classList.add("is-cleared");
+    if (level === "full" && !gxReducedMotion() && segment) {
+      const point = gxFxCenter(segment);
+      setTimeout(() => {
+        gxFxRing(point.x, point.y, tone);
+        gxFxBurst(point.x, point.y, [tone, "#ffffff", gxFxVar(gx, "--primary")], 28, 4.2);
+        gxFxShake(0.55);
+      }, 200);
+    }
+    const seconds = group.answers.reduce((sum, answer) => sum + Number(answer.time_spent_seconds || 0), 0);
+    const label = (group.label || group.section).replace(" Information", "").replace(" Ability", "");
+    setTimeout(() => gxFxBanner(gx, `${label} clear`, `${group.answers.length}/${group.answers.length} answered · ${formatDuration(seconds)} · ${Math.round(seconds / Math.max(1, group.answers.length))} s each`, ink), 260);
+  }
+
+  function gxFxMilestone(gx, attempt, pct, level) {
+    if (level === "calm") return;
+    playSound("chime");
+    const total = attempt.total_questions;
+    const left = total - answeredCount(attempt);
+    const remaining = Math.max(0, timeRemaining(attempt));
+    const accent = gx.dataset.theme === "light" ? "#9a6a00" : gxFxVar(gx, "--primary");
+    const copy = {
+      25: ["Quarter done", `${total - left} of ${total} answered`],
+      50: ["Halfway", `${left} to go${attempt.total_time_seconds ? ` · about ${Math.round(remaining / Math.max(1, left))} s each` : ""}`],
+      75: ["Final stretch", `${left} left`],
+      90: [`${left} to go`, "Every answer counts down now"]
+    }[pct];
+    if (level === "full" && !gxReducedMotion()) {
+      const bar = gx.querySelector(".gx-segs");
+      if (bar) {
+        const point = gxFxCenter(bar);
+        gxFxBurst(point.x, point.y, [gxFxVar(gx, "--primary"), "#ffffff"], pct === 50 ? 24 : 12, 3.4);
+      }
+    }
+    gxFxBanner(gx, copy[0], copy[1], accent);
+  }
+
+  function gxFxAllAnswered(gx, attempt, level) {
+    if (level === "calm") return;
+    playSound("fanfare");
+    const remaining = Math.max(0, timeRemaining(attempt));
+    const flags = flaggedCount(attempt);
+    const accent = gx.dataset.theme === "light" ? "#9a6a00" : gxFxVar(gx, "--primary");
+    if (level === "full" && !gxReducedMotion()) {
+      const aura = document.createElement("div");
+      aura.className = "gx-fx-aura";
+      gxFxLayer().appendChild(aura);
+      setTimeout(() => aura.remove(), 1400);
+      const bar = gx.querySelector(".gx-segs");
+      if (bar) {
+        const point = gxFxCenter(bar);
+        gxFxBurst(point.x, point.y, ["--general", "--verbal", "--numerical", "--analytical", "--primary"].map((name) => gxFxVar(gx, name)), 70, 5, "confetti");
+      }
+      gxFxShake(0.4);
+    }
+    const spare = attempt.total_time_seconds ? `${formatDuration(remaining)} to spare · ` : "";
+    gxFxBanner(gx, `All ${attempt.total_questions} answered`, `${spare}${flags} flagged · review or submit`, accent);
+  }
+
   function gxReducedMotion() {
     return Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
   }
@@ -1693,7 +1956,10 @@
     }
     if (current) {
       const sameQuestion = question === motion.question;
-      if (sameQuestion && current.selected_choice && current.selected_choice !== motion.choice) gx.querySelector(`.gx-choice[data-choice="${current.selected_choice}"]`)?.classList.add("is-popping");
+      if (sameQuestion && current.selected_choice && current.selected_choice !== motion.choice) {
+        const picked = gx.querySelector(`.gx-choice[data-choice="${current.selected_choice}"]`);
+        if (picked) gxFxPick(gx, picked, attempt);
+      }
       const checked = attempt.mode === "practice" && gxChecked(current);
       if (checked && !(sameQuestion && motion.checked)) gx.querySelector(".gx-qcol")?.classList.add("is-just-checked");
       if (sameQuestion && current.flagged !== motion.flagged) gx.querySelector(".gx-btn.is-flag")?.classList.add("is-popping");
@@ -1702,6 +1968,7 @@
       motion.flagged = current.flagged;
       motion.stimulus = current.stimulus?.id || "";
     }
+    if (attempt && view.name === "exam" && attempt.mode !== "practice" && !isPaperAttempt(attempt)) gxFxProgress(gx, attempt);
     // The pause dialog follows the attempt's status rather than app.modal.
     const modal = app.modal || (attempt?.status === "paused" ? "paused" : "");
     if (modal && modal !== motion.modal) gx.querySelector(".gx-backdrop")?.classList.add("is-entering");
@@ -1803,7 +2070,7 @@
             <div class="gx-appbar-end">
               ${streak > 0 ? `<span class="gx-streak" title="Days in a row with practice"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5 .2 2 1 3 2 3.5C11 9 11 5.5 12 2z"/></svg>${streak}-day streak</span>` : ""}
               <button class="gx-icon-btn" data-action="toggle-theme" type="button" aria-label="Switch to ${theme === "light" ? "dark" : "light"} theme">${gxIcon(theme === "light" ? "moon" : "sun")}</button>
-              <div class="header-audio-control"><button class="gx-icon-btn header-audio-button" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${gxIcon("music")}</button>${audioPopover()}</div>
+              <div class="header-audio-control"><button class="gx-icon-btn header-audio-button" data-action="toggle-audio-menu" type="button" aria-label="Sound and effects" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${gxIcon(app.audio.sfx ? "sound" : "mute")}</button>${audioPopover()}</div>
               <button class="gx-avatar" data-action="account-settings" type="button" aria-label="Account settings for ${escapeAttr(name)}">${preset ? `<span class="gx-avatar-sprite" style="--avatar-x: ${preset.x}%; --avatar-y: ${preset.y}%" aria-hidden="true"></span>` : escapeHtml(name.trim().charAt(0).toUpperCase() || "R")}</button>
             </div>
           </header>
@@ -2169,17 +2436,6 @@
     <p class="gx-muted">Filled dots are mock exams, hollow dots are practice sets. Last ${runs.length} runs.</p>`;
   }
 
-  function gxAudioTransport(withShuffle) {
-    const svg = (path) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
-    return `<div class="gx-transport">
-      <button class="gx-icon-btn" data-action="audio-previous" type="button" aria-label="Previous track">${svg(`<path d="M19 20L9 12l10-8zM5 19V5"/>`)}</button>
-      <button class="gx-icon-btn gx-play ${app.audio.music ? "is-on" : ""}" data-action="toggle-music" type="button" aria-label="${app.audio.music ? "Pause" : "Play"} music">${svg(app.audio.music ? `<path d="M9 5v14M15 5v14"/>` : `<path d="M7 4l13 8-13 8z"/>`)}</button>
-      <button class="gx-icon-btn" data-action="audio-next" type="button" aria-label="Next track">${svg(`<path d="M5 4l10 8-10 8zM19 5v14"/>`)}</button>
-      ${withShuffle ? `<button class="gx-icon-btn ${app.audio.shuffle ? "is-on" : ""}" data-action="toggle-audio-shuffle" type="button" aria-label="Shuffle" aria-pressed="${app.audio.shuffle ? "true" : "false"}">${svg(`<path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>`)}</button>` : ""}
-      <button class="gx-icon-btn ${app.audio.muted ? "is-on" : ""}" data-action="toggle-audio-mute" type="button" aria-label="${app.audio.muted ? "Unmute" : "Mute"}" aria-pressed="${app.audio.muted ? "true" : "false"}">${svg(app.audio.muted ? `<path d="M11 5L6 9H2v6h4l5 4zM23 9l-6 6M17 9l6 6"/>` : `<path d="M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>`)}</button>
-    </div>`;
-  }
-
   function isPaperAttempt(attempt) {
     return Boolean(attempt?.options?.paperMode);
   }
@@ -2483,7 +2739,7 @@
           ${routes.map(([route, label, action, iconName]) => `<button class="${activeRoute === route ? "active" : ""}" data-action="${action}" type="button" aria-label="${escapeAttr(label)}" title="${escapeAttr(label)}"><span class="nav-glyph">${localIcon(iconName)}</span><span class="nav-label">${escapeHtml(label)}</span></button>`).join("")}
         </nav>
         <div class="header-actions">
-          <div class="header-audio-control"><button class="icon-only header-audio-button ${app.audio.music && !app.audio.muted ? "active" : ""}" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${icon(app.audio.muted ? "volume-off" : "music")}</button>${audioPopover()}</div>
+          <div class="header-audio-control"><button class="icon-only header-audio-button" data-action="toggle-audio-menu" type="button" aria-label="Sound and effects" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${icon(app.audio.sfx ? "music" : "volume-off")}</button>${audioPopover()}</div>
           <button class="account-button" data-action="account-settings" type="button">${avatar(profile)}<span>${escapeHtml(displayName(profile))}</span>${icon("chev")}</button>
         </div>
       </header>
@@ -2614,18 +2870,22 @@
       </div>`;
   }
 
+  // Sound effects plus the exam effects level; background music was retired (2026-11-22).
   function audioSettingsBlock() {
-    const track = currentMusicTrack();
     return `<section class="gx-audio">
-      <div class="gx-card-head"><strong>Music</strong><span class="gx-muted">Starts only when you press play</span></div>
-      <div class="gx-filters" role="group" aria-label="Music category">${[["cafe", "Cafe Jazz"], ["classical", "Classical"]].map(([key, label]) => `<button class="${app.audio.category === key ? "is-active" : ""}" data-audio-category="${key}" type="button" aria-pressed="${app.audio.category === key ? "true" : "false"}">${label}</button>`).join("")}</div>
-      <label class="gx-field">Track<select data-audio-track>${musicTracks().map((entry, index) => `<option value="${index}" ${index === app.audio.trackIndex ? "selected" : ""}>${escapeHtml(entry.title)} – ${escapeHtml(entry.artist)}</option>`).join("")}</select></label>
-      <p class="gx-pop-track"><strong>${escapeHtml(track.title)}</strong><small>${escapeHtml(track.artist)}</small></p>
-      ${gxAudioTransport(true)}
-      <label class="gx-range">Music volume<input data-audio-volume="musicVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.musicVolume)}" /></label>
-      <button class="gx-sfx ${app.audio.sfx ? "is-on" : ""}" data-action="toggle-sfx" type="button" aria-pressed="${app.audio.sfx ? "true" : "false"}"><span>Sound effects<small>Taps, answers and results</small></span><b>${app.audio.sfx ? "On" : "Off"}</b></button>
-      <label class="gx-range">Effects volume<input data-audio-volume="sfxVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.sfxVolume)}" /></label>
+      <div class="gx-card-head"><strong>Sound and effects</strong></div>
+      ${gxSoundControls()}
     </section>`;
+  }
+
+  function gxSoundControls() {
+    const level = app.audio.effects;
+    return `<button class="gx-sfx ${app.audio.sfx ? "is-on" : ""}" data-action="toggle-sfx" type="button" aria-pressed="${app.audio.sfx ? "true" : "false"}"><span>Sound effects<small>Taps, answers and celebrations</small></span><b>${app.audio.sfx ? "On" : "Off"}</b></button>
+      <label class="gx-range">Effects volume<input data-audio-volume="sfxVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.sfxVolume)}" /></label>
+      <div class="gx-fx-level"><span>Exam effects</span>
+        <div class="gx-filters" role="group" aria-label="Exam effects">${GX_FX_LEVELS.map(([key, label]) => `<button class="${level === key ? "is-active" : ""}" data-fx-level="${key}" type="button" aria-pressed="${level === key ? "true" : "false"}">${label}</button>`).join("")}</div>
+        <small>${GX_FX_HINTS[level]}</small>
+      </div>`;
   }
 
   function pauseModal(attempt) {
@@ -3306,127 +3566,25 @@
   }
 
   function loadAudioPreferences() {
-    const defaults = { music: false, sfx: true, musicVolume: 0.24, sfxVolume: 0.38, category: "cafe", trackIndex: 0, shuffle: true, muted: false };
+    const defaults = { sfx: true, sfxVolume: 0.38, effects: "auto" };
     try {
-      const saved = JSON.parse(localStorage.getItem(AUDIO_PREFS_KEY) || "null");
-      const preferences = saved ? { ...defaults, ...saved } : defaults;
-      preferences.music = Boolean(preferences.music);
-      preferences.sfx = Boolean(preferences.sfx);
-      preferences.shuffle = Boolean(preferences.shuffle);
-      preferences.muted = Boolean(preferences.muted);
-      preferences.category = MUSIC_LIBRARY[preferences.category] ? preferences.category : "cafe";
-      preferences.trackIndex = Math.max(0, Math.min(MUSIC_LIBRARY[preferences.category].length - 1, Number(preferences.trackIndex) || 0));
-      return preferences;
+      const saved = JSON.parse(localStorage.getItem(AUDIO_PREFS_KEY) || "null") || {};
+      return {
+        sfx: saved.sfx === undefined ? defaults.sfx : Boolean(saved.sfx),
+        sfxVolume: Number.isFinite(Number(saved.sfxVolume)) ? Number(saved.sfxVolume) : defaults.sfxVolume,
+        effects: GX_FX_LEVELS.some(([key]) => key === saved.effects) ? saved.effects : defaults.effects
+      };
     } catch {
       return defaults;
     }
   }
 
   function saveAudioPreferences() {
-    localStorage.setItem(AUDIO_PREFS_KEY, JSON.stringify(app.audio));
-  }
-
-  function ensureAudioElements() {
-    if (app.audioElements) return app.audioElements;
-    const music = new Audio();
-    music.loop = false;
-    music.preload = "metadata";
-    music.addEventListener("ended", () => nextMusicTrack(true));
-    app.audioElements = { music };
-    loadMusicTrack(false);
-    updateAudioVolumes();
-    return app.audioElements;
-  }
-
-  function updateAudioVolumes() {
-    if (!app.audioElements) return;
-    app.audioElements.music.volume = Math.max(0, Math.min(1, Number(app.audio.musicVolume) || 0));
-    app.audioElements.music.muted = Boolean(app.audio.muted);
-  }
-
-  function syncBackgroundMusic() {
-    if (!app.audio.music) return pauseBackgroundMusic();
-    if (!app.audioUserGesture) return;
-    const { music } = ensureAudioElements();
-    loadMusicTrack(false);
-    updateAudioVolumes();
-    music.play().catch(() => {});
-  }
-
-  function pauseBackgroundMusic() {
-    app.audioElements?.music.pause();
-  }
-
-  function musicTracks(category = app.audio.category) {
-    return MUSIC_LIBRARY[category] || MUSIC_LIBRARY.cafe;
-  }
-
-  function currentMusicTrack() {
-    const tracks = musicTracks();
-    return tracks[Math.max(0, Math.min(tracks.length - 1, Number(app.audio.trackIndex) || 0))] || tracks[0];
-  }
-
-  function loadMusicTrack(autoplay = false) {
-    const { music } = ensureAudioElements();
-    const track = currentMusicTrack();
-    if (music.dataset.trackSrc !== track.src) {
-      music.dataset.trackSrc = track.src;
-      music.src = track.src;
-      music.load();
+    try {
+      localStorage.setItem(AUDIO_PREFS_KEY, JSON.stringify(app.audio));
+    } catch {
+      // Private mode or blocked storage: the choice still applies for this visit.
     }
-    updateAudioVolumes();
-    if (autoplay && app.audio.music && app.audioUserGesture) music.play().catch(() => {});
-  }
-
-  function setMusicCategory(category) {
-    if (!MUSIC_LIBRARY[category] || category === app.audio.category) return;
-    app.audio.category = category;
-    app.audio.trackIndex = 0;
-    app.audioHistory = [];
-    app.audioShuffleBag = [];
-    saveAudioPreferences();
-    loadMusicTrack(app.audio.music);
-    refreshAudioUi();
-  }
-
-  function selectMusicTrack(index) {
-    const nextIndex = Math.max(0, Math.min(musicTracks().length - 1, Number(index) || 0));
-    if (nextIndex !== app.audio.trackIndex) app.audioHistory.push(app.audio.trackIndex);
-    app.audio.trackIndex = nextIndex;
-    app.audioShuffleBag = app.audioShuffleBag.filter((item) => item !== nextIndex);
-    saveAudioPreferences();
-    loadMusicTrack(app.audio.music);
-  }
-
-  function nextMusicTrack(fromEnded = false) {
-    const tracks = musicTracks();
-    const current = Number(app.audio.trackIndex) || 0;
-    app.audioHistory.push(current);
-    let next;
-    if (app.audio.shuffle) {
-      if (!app.audioShuffleBag.length) {
-        app.audioShuffleBag = tracks.map((_, index) => index).filter((index) => index !== current);
-        for (let index = app.audioShuffleBag.length - 1; index > 0; index -= 1) {
-          const swap = Math.floor(Math.random() * (index + 1));
-          [app.audioShuffleBag[index], app.audioShuffleBag[swap]] = [app.audioShuffleBag[swap], app.audioShuffleBag[index]];
-        }
-      }
-      next = app.audioShuffleBag.shift();
-    } else {
-      next = (current + 1) % tracks.length;
-    }
-    app.audio.trackIndex = next ?? ((current + 1) % tracks.length);
-    saveAudioPreferences();
-    loadMusicTrack(app.audio.music || fromEnded);
-    refreshAudioUi();
-  }
-
-  function previousMusicTrack() {
-    const previous = app.audioHistory.pop();
-    app.audio.trackIndex = previous ?? ((Number(app.audio.trackIndex) - 1 + musicTracks().length) % musicTracks().length);
-    saveAudioPreferences();
-    loadMusicTrack(app.audio.music);
-    refreshAudioUi();
   }
 
   function playSound(kind = "navigation") {
@@ -3439,9 +3597,12 @@
       correct: [[660, 0.07, "triangle", 0.05], [880, 0.08, "triangle", 0.05], [1175, 0.16, "sine", 0.04]],
       wrong: [[196, 0.12, "square", 0.025], [147, 0.2, "triangle", 0.04]],
       pop: [[900, 0.04, "sine", 0.03]],
+      advance: [[480, 0.05, "sine", 0.035], [760, 0.07, "sine", 0.03]],
+      skip: [[300, 0.07, "triangle", 0.03]],
+      chime: [[880, 0.16, "sine", 0.045], [1320, 0.3, "sine", 0.03]],
       fanfare: [[523, 0.12, "triangle", 0.05], [659, 0.12, "triangle", 0.05], [784, 0.12, "triangle", 0.05], [1047, 0.35, "sine", 0.05]]
     };
-    const sequence = definitions[kind] || definitions.navigation;
+    const sequence = Array.isArray(kind) ? kind : definitions[kind] || definitions.navigation;
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     if (!AudioContextClass) return;
     app.audioContext ||= new AudioContextClass();
@@ -3464,56 +3625,30 @@
     }
   }
 
-  function toggleAudioMaster() {
-    const enabled = !(app.audio.music || app.audio.sfx);
-    app.audio.music = enabled;
-    app.audio.sfx = enabled;
-    saveAudioPreferences();
-    refreshAudioUi();
-    if (enabled) {
-      app.audioUserGesture = true;
-      playSound("confirmation");
-      syncBackgroundMusic();
-    } else {
-      pauseBackgroundMusic();
-    }
-  }
-
   function audioPopover() {
     if (!app.audioMenuOpen) return "";
-    const track = currentMusicTrack();
-    return `
-      <section class="gx-pop" aria-label="Audio settings">
-        <p class="gx-pop-track"><strong>${escapeHtml(track.title)}</strong><small>${escapeHtml(track.artist)} · ${escapeHtml(app.audio.category === "cafe" ? "Cafe Jazz" : "Classical")}</small></p>
-        ${gxAudioTransport(false)}
-        <label class="gx-range">Music volume<input data-audio-volume="musicVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.musicVolume)}" /></label>
-        <button class="gx-sfx ${app.audio.sfx ? "is-on" : ""}" data-action="toggle-sfx" type="button" aria-pressed="${app.audio.sfx ? "true" : "false"}"><span>Sound effects</span><b>${app.audio.sfx ? "On" : "Off"}</b></button>
-        <label class="gx-range">Effects volume<input data-audio-volume="sfxVolume" type="range" min="0" max="1" step="0.05" value="${escapeAttr(app.audio.sfxVolume)}" /></label>
-      </section>
-    `;
+    return `<section class="gx-pop" aria-label="Sound and effects">${gxSoundControls()}</section>`;
   }
 
   function refreshAudioUi() {
     const active = document.activeElement;
     const focusAction = active?.dataset?.action || "";
-    const focusCategory = active?.dataset?.audioCategory || "";
-    const focusTrack = active?.matches?.("[data-audio-track]") || false;
+    const focusLevel = active?.dataset?.fxLevel || "";
     const drawer = root.querySelector(".gx-modal.is-drawer, .account-settings-modal");
     const drawerScrollTop = drawer?.scrollTop || 0;
     root.querySelectorAll(".header-audio-control, .exam-audio-control").forEach((container) => {
-      container.innerHTML = container.closest(".gx") ? `<button class="gx-icon-btn header-audio-button" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${gxIcon("music")}</button>${audioPopover()}` : `<button class="icon-only header-audio-button ${app.audio.music && !app.audio.muted ? "active" : ""}" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${icon(app.audio.muted ? "volume-off" : "music")}</button>${audioPopover()}`;
+      container.innerHTML = container.closest(".gx") ? `<button class="gx-icon-btn header-audio-button" data-action="toggle-audio-menu" type="button" aria-label="Sound and effects" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${gxIcon(app.audio.sfx ? "sound" : "mute")}</button>${audioPopover()}` : `<button class="icon-only header-audio-button" data-action="toggle-audio-menu" type="button" aria-label="Sound and effects" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${icon(app.audio.sfx ? "music" : "volume-off")}</button>${audioPopover()}`;
     });
-    const accountAudio = root.querySelector(".gx-audio, .account-audio-settings");
+    const accountAudio = root.querySelector(".gx-audio-settings .gx-audio, .account-audio-settings");
     if (accountAudio) accountAudio.outerHTML = audioSettingsBlock();
+    root.querySelectorAll(".gx-rail-sound .gx-audio").forEach((block) => { block.innerHTML = gxSoundControls(); });
     requestAnimationFrame(() => {
       if (drawer) drawer.scrollTop = drawerScrollTop;
       const nextFocus = focusAction
         ? root.querySelector(`[data-action="${focusAction}"]`)
-        : focusCategory
-          ? root.querySelector(`[data-audio-category="${focusCategory}"]`)
-          : focusTrack
-            ? root.querySelector("[data-audio-track]")
-            : null;
+        : focusLevel
+          ? root.querySelector(`[data-fx-level="${focusLevel}"]`)
+          : null;
       nextFocus?.focus({ preventScroll: true });
     });
   }
@@ -3829,21 +3964,16 @@
     if (target.tagName === "A" && (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey)) return;
     if (target.tagName === "A") event.preventDefault();
     const action = target.dataset.action;
-    app.audioUserGesture = true;
-
     try {
       if (app.fixtureMode && handleFixtureClick(target, action)) return;
-      if (target.dataset.audioCategory) return setMusicCategory(target.dataset.audioCategory);
+      if (target.dataset.fxLevel) {
+        app.audio.effects = target.dataset.fxLevel;
+        saveAudioPreferences();
+        return refreshAudioUi();
+      }
       if (action === "toggle-audio-menu") {
         app.audioMenuOpen = !app.audioMenuOpen;
-        refreshAudioUi();
-        return syncBackgroundMusic();
-      }
-      if (action === "toggle-music") {
-        app.audio.music = !app.audio.music;
-        saveAudioPreferences();
-        refreshAudioUi();
-        return syncBackgroundMusic();
+        return refreshAudioUi();
       }
       if (action === "toggle-sfx") {
         app.audio.sfx = !app.audio.sfx;
@@ -3852,23 +3982,7 @@
         if (app.audio.sfx) playSound("confirmation");
         return;
       }
-      if (action === "audio-previous") return previousMusicTrack();
-      if (action === "audio-next") return nextMusicTrack();
-      if (action === "toggle-audio-shuffle") {
-        app.audio.shuffle = !app.audio.shuffle;
-        app.audioShuffleBag = [];
-        saveAudioPreferences();
-        return refreshAudioUi();
-      }
-      if (action === "toggle-audio-mute") {
-        app.audio.muted = !app.audio.muted;
-        saveAudioPreferences();
-        updateAudioVolumes();
-        return refreshAudioUi();
-      }
-      if (action === "toggle-audio-master") return toggleAudioMaster();
-      syncBackgroundMusic();
-      if (!target.disabled && !target.dataset.choice && !["confirm-submit", "confirm-delete-account", "confirm-delete-attempt"].includes(action)) playSound("navigation");
+      if (!target.disabled && !target.dataset.choice && !["confirm-submit", "confirm-delete-account", "confirm-delete-attempt", "next-question", "skip-question"].includes(action)) playSound("navigation");
       if (action === "reload-app") return location.reload();
       if (action === "toggle-password") return togglePasswordVisibility(target);
       if (action === "show-signin") return setView({ name: "signin" });
@@ -4031,11 +4145,6 @@
       app.paperBlankConfirmed = input.checked;
       return render();
     }
-    if (input.matches("[data-audio-track]")) {
-      selectMusicTrack(input.value);
-      refreshAudioUi();
-      return;
-    }
     if (input.closest("[data-form='setup']")) {
       const form = input.closest("[data-form='setup']");
       const paper = form.elements.answerMode?.value === "paper";
@@ -4055,7 +4164,6 @@
     const audioInput = event.target.closest("[data-audio-volume]");
     if (audioInput) {
       app.audio[audioInput.dataset.audioVolume] = Number(audioInput.value);
-      updateAudioVolumes();
       saveAudioPreferences();
       return;
     }
@@ -5025,8 +5133,10 @@
     answer.skipped = true;
     recordAttemptEvent(attempt, "skip");
     touchAnswer(attempt, answer.question_id);
-    if (answer.position < attempt.total_questions - 1) gotoQuestion(answer.position + 1);
-    else renderExam();
+    if (answer.position < attempt.total_questions - 1) {
+      gxFxAdvance("skip");
+      gotoQuestion(answer.position + 1);
+    } else renderExam();
   }
 
   function toggleFlag() {
@@ -5048,6 +5158,7 @@
       showToast("Choose an answer or use Skip.");
       return;
     }
+    if (delta > 0 && attempt.current_question_index < attempt.total_questions - 1) gxFxAdvance("next");
     gotoQuestion(Math.min(Math.max(0, attempt.current_question_index + delta), attempt.total_questions - 1), delta > 0 ? "next" : "previous");
   }
 
