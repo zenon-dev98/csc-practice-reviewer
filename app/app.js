@@ -1168,20 +1168,33 @@
     const linked = linkedStimulusAnswers(attempt, current);
     const isPaused = attempt.status === "paused";
     const paperMode = isPaperAttempt(attempt);
-    const existingNav = root.querySelector(".gx-rail");
+    const existingNav = root.querySelector(".gx-rail-in");
     if (existingNav) app.examNavScrollTop = existingNav.scrollTop;
+    // Every action re-renders the screen, so keep the reader where they were: same question keeps the page and
+    // passage scroll; a new question in the same passage set keeps the passage scroll and starts the page at the top.
+    const previous = app.examScroll || {};
+    const keepPage = previous.attemptId === attempt.id && previous.questionId === current.question_id;
+    const keepStim = keepPage || (previous.attemptId === attempt.id && current.stimulus?.id && previous.stimulusId === current.stimulus.id);
+    const pageTop = keepPage ? root.querySelector(".gx")?.scrollTop || 0 : 0;
+    const stimTop = keepStim ? root.querySelector(".gx-stim")?.scrollTop || 0 : 0;
+    app.examScroll = { attemptId: attempt.id, questionId: current.question_id, stimulusId: current.stimulus?.id || "" };
     ensureAttemptClock(attempt);
 
     const version = examVersions.find((candidate) => candidate.id === attempt.exam_version_id);
     const versionNumber = app.fixtureMode ? 7 : version?.number;
     const runLabel = attempt.mode === "practice" ? escapeHtml(attempt.title || "Practice") : `Mock Exam ${versionNumber ? String(versionNumber).padStart(2, "0") : ""}`.trim();
     root.innerHTML = gxExamScreen(attempt, current, linked, { remaining, isPaused, paperMode, runLabel });
+    // Restore synchronously, before paint, so the page never flashes at the top.
+    const page = root.querySelector(".gx");
+    if (page && pageTop) page.scrollTop = pageTop;
+    const stim = root.querySelector(".gx-stim");
+    if (stim && stimTop) stim.scrollTop = stimTop;
 
     if ((!app.fixtureMode || QA_TIMING_ENABLED) && attempt.status === "in_progress" && app.modal !== "timeout") {
       app.timerId = setInterval(() => tickAttempt(attempt.id), 1000);
     }
     requestAnimationFrame(() => {
-      const nav = root.querySelector(".gx-rail");
+      const nav = root.querySelector(".gx-rail-in");
       if (nav) nav.scrollTop = app.examNavScrollTop;
     });
   }
@@ -1291,7 +1304,7 @@
     const sealLabel = attempt.mode === "practice" ? "Practice set" : "Your seal";
     const sealNote = attempt.mode === "practice" ? "Fills as you answer." : "Fills as you answer. Earned when you score 80% or more.";
     return `
-      <aside class="gx-rail ${app.examNavOpen ? "is-open" : ""}" aria-label="Seal and question map">
+      <aside class="gx-rail ${app.examNavOpen ? "is-open" : ""}" aria-label="Seal and question map"><div class="gx-rail-in">
         <div class="gx-seal">${gxSealSvg(groups, attempt.total_questions)}<p><strong>${sealLabel}</strong>${sealNote}</p></div>
         ${groups.length > 1 ? `<div class="gx-secs">${groups.map((group) => `
           <button class="gx-sec ${group.section === open.section ? "is-open" : ""}" style="${gxToneStyle(group.section)}" data-action="gx-open-section" data-section="${escapeAttr(group.section)}" type="button" aria-pressed="${group.section === open.section}">
@@ -1309,7 +1322,7 @@
         <button class="gx-btn gx-rail-theme" data-action="${isPaperAttempt(attempt) ? "open-paper-finish" : "open-submit"}" type="button">${isPaperAttempt(attempt) ? "Finish answering" : attempt.mode === "practice" ? "Finish practice" : "Submit exam"}</button>
         <button class="gx-btn gx-rail-theme" data-action="toggle-theme" type="button">${gxIcon(gxTheme() === "light" ? "moon" : "sun", 18)}${gxTheme() === "light" ? "Dark theme" : "Light theme"}</button>
         <p class="gx-note">Independent practice tool. Not affiliated with the Civil Service Commission.</p>
-      </aside>`;
+      </div></aside>`;
   }
 
   function gxOrderingParts(prompt) {
@@ -1602,7 +1615,7 @@
             <button class="gx-icon-btn gx-nav-toggle" data-action="toggle-exam-nav" type="button" aria-label="Open question map" aria-expanded="${app.examNavOpen ? "true" : "false"}">${gxIcon("menu")}</button>
             <button class="gx-icon-btn gx-top-theme" data-action="toggle-theme" type="button" aria-label="Switch to ${theme === "light" ? "dark" : "light"} theme">${gxIcon(theme === "light" ? "moon" : "sun")}</button>
             <div class="exam-audio-control"><button class="gx-icon-btn header-audio-button" data-action="toggle-audio-menu" type="button" aria-label="Audio controls" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${gxIcon("music")}</button>${audioPopover()}</div>
-            <button class="gx-btn" data-action="pause-exam" type="button" ${attempt.options?.enablePause === false || isPaused ? "disabled" : ""}>${gxIcon("pause", 18)}<span class="gx-label">Pause</span></button>
+            <button class="gx-btn" data-action="pause-exam" type="button" aria-label="Pause" ${attempt.options?.enablePause === false || isPaused ? "disabled" : ""}>${gxIcon("pause", 18)}<span class="gx-label">Pause</span></button>
             <button class="gx-btn is-quiet gx-top-submit" data-action="${paperMode ? "open-paper-finish" : "open-submit"}" type="button">${paperMode ? "Finish" : attempt.mode === "practice" ? "Finish" : "Submit"}</button>
           </header>
 
@@ -1982,10 +1995,20 @@
     const center = passed && !isPractice
       ? `<circle cx="80" cy="80" r="44" fill="var(--primary)"/><path d="M62 81l12 12 24-26" fill="none" stroke="var(--on-primary)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>`
       : `<circle cx="80" cy="80" r="44" fill="var(--surface-2)"/><text x="80" y="90" text-anchor="middle" font-weight="900" font-size="30" fill="var(--text)">${Math.round(pct)}%</text>`;
-    const title = isPractice ? "Practice complete" : passed ? `Seal ${versionLabel} earned!` : "So close. Keep going!";
+    // The message follows the actual score: "so close" only when it really is close to the 80% seal.
+    const needed = Math.max(1, Math.ceil(attempt.total_questions * PASSING_PERCENT / 100) - score);
+    const weakLabel = escapeHtml(sectionLabel(weakestSection));
+    const tier = pct >= PASSING_PERCENT ? "passed" : pct >= 70 ? "close" : pct >= 50 ? "building" : "start";
+    const title = isPractice ? "Practice complete"
+      : { passed: `Seal ${versionLabel} earned!`, close: "So close!", building: "Getting there", start: "Keep building" }[tier];
     const subtitle = isPractice
       ? `${score} of ${attempt.total_questions} correct in ${escapeHtml(attempt.practice_category || attempt.title || "this set")}.`
-      : passed ? `You passed Mock Exam ${versionLabel} with ${Math.round(pct)}%. The real exam needs 80%.` : `You scored ${Math.round(pct)}% on Mock Exam ${versionLabel}. ${Math.max(1, Math.ceil(attempt.total_questions * PASSING_PERCENT / 100) - score)} more correct answers would have earned the seal.`;
+      : {
+        passed: `You passed Mock Exam ${versionLabel} with ${Math.round(pct)}%. The real exam needs 80%.`,
+        close: `You scored ${Math.round(pct)}% on Mock Exam ${versionLabel}. ${needed} more correct answer${needed === 1 ? "" : "s"} would have earned the seal.`,
+        building: `You scored ${Math.round(pct)}% on Mock Exam ${versionLabel}; the seal needs 80%. Your biggest gains are in ${weakLabel}.`,
+        start: `You scored ${Math.round(pct)}% on Mock Exam ${versionLabel}; the seal needs 80%. Start with short practice sets in ${weakLabel}, then try another mock.`
+      }[tier];
     const reviewHref = routeHref("review", { attempt: attempt.id });
     const practiceHref = routeHref("practice", { category: weakestSection });
     const retakeHref = routeHref("setup", { version: attempt.exam_version_id });
@@ -5020,11 +5043,22 @@
     attempt.status = "paused";
     attempt.paused_at = nowIso();
     touchAttempt(attempt);
-    if (!app.fixtureMode && app.client && app.session?.user?.id) {
-      await app.client.from("pause_events").insert({ attempt_id: attempt.id, user_id: app.session.user.id, paused_at: attempt.paused_at });
-    }
-    await flushDirty({ immediate: true });
+    // Show the pause at once; the local recovery copy is already written, and the cloud save follows.
     renderExam();
+    syncPauseEvent(attempt, () => app.client.from("pause_events").insert({ attempt_id: attempt.id, user_id: app.session.user.id, paused_at: attempt.paused_at }));
+  }
+
+  // Pause/resume bookkeeping runs after the screen updates, so the button responds immediately.
+  async function syncPauseEvent(attempt, write) {
+    try {
+      if (!app.fixtureMode && app.client && app.session?.user?.id) {
+        const { error } = await write();
+        if (error) throw error;
+      }
+      await flushDirty({ immediate: true });
+    } catch {
+      showToast("Saved on this device. It will sync online when the connection returns.");
+    }
   }
 
   async function resumePausedAttempt() {
@@ -5034,11 +5068,8 @@
     attempt.paused_at = null;
     materializeAttemptClock(attempt, Date.now(), true);
     touchAttempt(attempt);
-    if (!app.fixtureMode && app.client && app.session?.user?.id) {
-      await app.client.from("pause_events").update({ resumed_at: nowIso() }).eq("attempt_id", attempt.id).is("resumed_at", null);
-    }
-    await flushDirty({ immediate: true });
     renderExam();
+    syncPauseEvent(attempt, () => app.client.from("pause_events").update({ resumed_at: nowIso() }).eq("attempt_id", attempt.id).is("resumed_at", null));
   }
 
   async function saveAndExit() {

@@ -1,0 +1,129 @@
+ok   phone plain: header one line  {"metaH":42,"flagTop":134.375,"pillTop":140.375,"tableOverflow":0,"pageOverflowX":0,"promptTop":194}
+ok   phone plain: no sideways table scroll  overflow 0
+ok   phone plain: no page sideways scroll  overflow 0
+ok   phone plain: prompt top  194
+ok   phone longprompt: header one line  {"metaH":42,"flagTop":134.375,"pillTop":140.375,"tableOverflow":0,"pageOverflowX":0,"promptTop":194}
+ok   phone longprompt: no sideways table scroll  overflow 0
+ok   phone longprompt: no page sideways scroll  overflow 0
+ok   phone longprompt: prompt top  194
+ok   phone analogy: header one line  {"metaH":42,"flagTop":134.375,"pillTop":140.375,"tableOverflow":0,"pageOverflowX":0,"promptTop":194}
+ok   phone analogy: no sideways table scroll  overflow 0
+ok   phone analogy: no page sideways scroll  overflow 0
+ok   phone analogy: prompt top  194
+ok   phone ordering: header one line  {"metaH":42,"flagTop":134.375,"pillTop":140.375,"tableOverflow":0,"pageOverflowX":0,"promptTop":194}
+ok   phone ordering: no sideways table scroll  overflow 0
+ok   phone ordering: no page sideways scroll  overflow 0
+ok   phone ordering: prompt top  194
+ok   phone orderingEn: header one line  {"metaH":42,"flagTop":134.375,"pillTop":140.375,"tableOverflow":0,"pageOverflowX":0,"promptTop":194}
+ok   phone orderingEn: no sideways table scroll  overflow 0
+ok   phone orderingEn: no page sideways scroll  overflow 0
+ok   phone orderingEn: prompt top  194
+ok   phone figure: header one line  {"metaH":42,"flagTop":134.375,"pillTop":140.375,"tableOverflow":0,"pageOverflowX":0,"promptTop":194}
+ok   phone figure: no sideways table scroll  overflow 0
+ok   phone figure: no page sideways scroll  overflow 0
+ok   phone figure: prompt top  194
+ok   phone figAnalogy: header one line  {"metaH":42,"flagTop":134.375,"pillTop":140.375,"tableOverflow":0,"pageOverflowX":0,"promptTop":194}
+ok   phone figAnalogy: no sideways table scroll  overflow 0
+ok   phone figAnalogy: no page sideways scroll  overflow 0
+ok   phone figAnalogy: prompt top  194
+ok   phone sequence: header one line  {"metaH":42,"flagTop":134.375,"pillTop":140.375,"tableOverflow":0,"pageOverflowX":0,"promptTop":194}
+ok   phone sequence: no sideways table scroll  overflow 0
+ok   phone sequence: no page sideways scroll  overflow 0
+ok   phone sequence: prompt top  194
+ok   phone symbol: header one line  {"metaH":42,"flagTop":134.375,"pillTop":140.375,"tableOverflow":0,"pageOverflowX":0,"promptTop":194}
+ok   phone symbol: no sideways table scroll  overflow 0
+ok   phone symbol: no page sideways scroll  overflow 0
+ok   phone symbol: prompt top  194
+ok   phone passage: header one line  {"metaH":42,"flagTop":495.96875,"pillTop":501.96875,"tableOverflow":0,"pageOverflowX":0,"promptTop":556}
+ok   phone passage: no sideways table scroll  overflow 0
+ok   phone passage: no page sideways scroll  overflow 0
+ok   phone passage: prompt top  556
+ok   phone filipinoPassage: header one line  {"metaH":42,"flagTop":495.96875,"pillTop":501.96875,"tableOverflow":0,"pageOverflowX":0,"promptTop":556}
+ok   phone filipinoPassage: no sideways table scroll  overflow 0
+ok   phone filipinoPassage: no page sideways scroll  overflow 0
+ok   phone filipinoPassage: prompt top  556
+ok   phone barTable: header one line  {"metaH":42,"flagTop":495.96875,"pillTop":501.96875,"tableOverflow":1,"pageOverflowX":0,"promptTop":556}
+ok   phone barTable: no sideways table scroll  overflow 1
+ok   phone barTable: no page sideways scroll  overflow 0
+ok   phone barTable: prompt top  556
+ok   phone table: header one line  {"metaH":42,"flagTop":495.96875,"pillTop":501.96875,"tableOverflow":0,"pageOverflowX":0,"promptTop":556}
+ok   phone table: no sideways table scroll  overflow 0
+ok   phone table: no page sideways scroll  overflow 0
+ok   phone table: prompt top  556
+ok   phone line: header one line  {"metaH":42,"flagTop":495.96875,"pillTop":501.96875,"tableOverflow":0,"pageOverflowX":0,"promptTop":556}
+ok   phone line: no sideways table scroll  overflow 0
+ok   phone line: no page sideways scroll  overflow 0
+ok   phone line: prompt top  556
+ok   phone gi: header one line  {"metaH":42,"flagTop":134.375,"pillTop":140.375,"tableOverflow":0,"pageOverflowX":0,"promptTop":194}
+ok   phone gi: no sideways table scroll  overflow 0
+ok   phone gi: no page sideways scroll  overflow 0
+ok   phone gi: prompt top  194
+ok   phone: tapping a choice keeps page and passage scroll  {"page":203,"stim":120} -> {"page":203,"stim":120}
+ok   phone: pause modal appears immediately  57 ms
+ok   phone map sheet full width (v01-q001)  {"left":0,"right":390,"bottom":844,"top":76}
+ok   phone map sheet full width (v17-q078)  {"left":0,"right":390,"bottom":844,"top":76}
+ok   phone: no runtime errors
+ok   desktop plain: header one line  {"metaH":42,"flagTop":102.984375,"pillTop":108.984375,"tableOverflow":0,"pageOverflowX":0,"promptTop":171}
+ok   desktop plain: no sideways table scroll  overflow 0
+ok   desktop plain: no page sideways scroll  overflow 0
+ok   desktop plain: prompt top  171
+ok   desktop longprompt: header one line  {"metaH":42,"flagTop":102.984375,"pillTop":108.984375,"tableOverflow":0,"pageOverflowX":0,"promptTop":171}
+ok   desktop longprompt: no sideways table scroll  overflow 0
+ok   desktop longprompt: no page sideways scroll  overflow 0
+ok   desktop longprompt: prompt top  171
+ok   desktop analogy: header one line  {"metaH":42,"flagTop":102.984375,"pillTop":108.984375,"tableOverflow":0,"pageOverflowX":0,"promptTop":171}
+ok   desktop analogy: no sideways table scroll  overflow 0
+ok   desktop analogy: no page sideways scroll  overflow 0
+ok   desktop analogy: prompt top  171
+ok   desktop ordering: header one line  {"metaH":42,"flagTop":102.984375,"pillTop":108.984375,"tableOverflow":0,"pageOverflowX":0,"promptTop":171}
+ok   desktop ordering: no sideways table scroll  overflow 0
+ok   desktop ordering: no page sideways scroll  overflow 0
+ok   desktop ordering: prompt top  171
+ok   desktop orderingEn: header one line  {"metaH":42,"flagTop":102.984375,"pillTop":108.984375,"tableOverflow":0,"pageOverflowX":0,"promptTop":171}
+ok   desktop orderingEn: no sideways table scroll  overflow 0
+ok   desktop orderingEn: no page sideways scroll  overflow 0
+ok   desktop orderingEn: prompt top  171
+ok   desktop figure: header one line  {"metaH":42,"flagTop":102.984375,"pillTop":108.984375,"tableOverflow":0,"pageOverflowX":0,"promptTop":171}
+ok   desktop figure: no sideways table scroll  overflow 0
+ok   desktop figure: no page sideways scroll  overflow 0
+ok   desktop figure: prompt top  171
+ok   desktop figAnalogy: header one line  {"metaH":42,"flagTop":102.984375,"pillTop":108.984375,"tableOverflow":0,"pageOverflowX":0,"promptTop":171}
+ok   desktop figAnalogy: no sideways table scroll  overflow 0
+ok   desktop figAnalogy: no page sideways scroll  overflow 0
+ok   desktop figAnalogy: prompt top  171
+ok   desktop sequence: header one line  {"metaH":42,"flagTop":102.984375,"pillTop":108.984375,"tableOverflow":0,"pageOverflowX":0,"promptTop":171}
+ok   desktop sequence: no sideways table scroll  overflow 0
+ok   desktop sequence: no page sideways scroll  overflow 0
+ok   desktop sequence: prompt top  171
+ok   desktop symbol: header one line  {"metaH":42,"flagTop":102.984375,"pillTop":108.984375,"tableOverflow":0,"pageOverflowX":0,"promptTop":171}
+ok   desktop symbol: no sideways table scroll  overflow 0
+ok   desktop symbol: no page sideways scroll  overflow 0
+ok   desktop symbol: prompt top  171
+ok   desktop passage: header one line  {"metaH":42,"flagTop":102.984375,"pillTop":108.984375,"tableOverflow":0,"pageOverflowX":0,"promptTop":171}
+ok   desktop passage: no sideways table scroll  overflow 0
+ok   desktop passage: no page sideways scroll  overflow 0
+ok   desktop passage: prompt top  171
+ok   desktop filipinoPassage: header one line  {"metaH":42,"flagTop":102.984375,"pillTop":108.984375,"tableOverflow":0,"pageOverflowX":0,"promptTop":171}
+ok   desktop filipinoPassage: no sideways table scroll  overflow 0
+ok   desktop filipinoPassage: no page sideways scroll  overflow 0
+ok   desktop filipinoPassage: prompt top  171
+ok   desktop barTable: header one line  {"metaH":42,"flagTop":102.984375,"pillTop":108.984375,"tableOverflow":0,"pageOverflowX":0,"promptTop":171}
+ok   desktop barTable: no sideways table scroll  overflow 0
+ok   desktop barTable: no page sideways scroll  overflow 0
+ok   desktop barTable: prompt top  171
+ok   desktop table: header one line  {"metaH":42,"flagTop":102.984375,"pillTop":108.984375,"tableOverflow":0,"pageOverflowX":0,"promptTop":171}
+ok   desktop table: no sideways table scroll  overflow 0
+ok   desktop table: no page sideways scroll  overflow 0
+ok   desktop table: prompt top  171
+ok   desktop line: header one line  {"metaH":42,"flagTop":102.984375,"pillTop":108.984375,"tableOverflow":0,"pageOverflowX":0,"promptTop":171}
+ok   desktop line: no sideways table scroll  overflow 0
+ok   desktop line: no page sideways scroll  overflow 0
+ok   desktop line: prompt top  171
+ok   desktop gi: header one line  {"metaH":42,"flagTop":102.984375,"pillTop":108.984375,"tableOverflow":0,"pageOverflowX":0,"promptTop":171}
+ok   desktop gi: no sideways table scroll  overflow 0
+ok   desktop gi: no page sideways scroll  overflow 0
+ok   desktop gi: prompt top  171
+ok   desktop: tapping a choice keeps page and passage scroll  {"page":81,"stim":107} -> {"page":81,"stim":107}
+ok   desktop: pause modal appears immediately  35 ms
+ok   desktop: no runtime errors
+0 failing of 128
