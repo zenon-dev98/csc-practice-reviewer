@@ -442,7 +442,9 @@ a.gx-btn { text-decoration: none; }
   .gx-home > .gx-row > .gx-btn.is-primary { flex-basis: 100%; }
 }
 .gx-avatar { overflow: hidden; padding: 0; }
-.gx-avatar-sprite { display: block; width: 100%; height: 100%; background: url("assets/avatars/v5-avatar-source.png") no-repeat var(--avatar-x) var(--avatar-y) / 2144% 1208%; transform: scale(1.04); }
+/* Seal badge: initials on the chosen colour inside a ring of seal segments (gxBadge in app.js). */
+.gx .gx-avatar { background: transparent; color: var(--muted); }
+.gx-badge { display: block; width: 100%; height: 100%; }
 
 /* ---- Stage 4: setup, practice, progress, account ---- */
 #app .gx input:not([type="radio"]):not([type="checkbox"]), #app .gx select { width: 100%; min-height: 50px; padding: 0 14px; border: 2px solid var(--line); border-radius: 14px; background: var(--bg); color: var(--text); font: 700 16px Nunito, sans-serif; letter-spacing: 0; box-shadow: none; }
@@ -516,8 +518,8 @@ a.gx-btn { text-decoration: none; }
 .gx-profile-head div { display: flex; flex-direction: column; }
 .gx-profile-head small { color: var(--muted); }
 .gx-avatar.is-large { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 32px; overflow: hidden; font-size: 26px; }
-.gx-avatar-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
-.gx-avatar-option { aspect-ratio: 1; padding: 0; border: 3px solid transparent; border-radius: 16px; background: var(--surface-2); overflow: hidden; }
+.gx-avatar-grid { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; }
+.gx-avatar-option { aspect-ratio: 1; padding: 4px; border: 3px solid transparent; border-radius: 16px; background: var(--surface-2); color: var(--muted); overflow: hidden; }
 .gx-avatar-option.selected { border-color: var(--select); }
 .gx-audio-settings { padding: 16px; border-radius: 18px; background: var(--surface-2); }
 @media (max-width: 900px) {
@@ -527,7 +529,7 @@ a.gx-btn { text-decoration: none; }
   .gx-listrow > span:first-child { flex-basis: 100%; }
   .gx-modal.is-drawer { border-radius: 24px 24px 0 0; margin-top: 40px; height: auto; max-height: calc(100vh - 40px); }
   .gx-backdrop.is-drawer { place-items: end stretch; }
-  .gx-avatar-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .gx-avatar-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 .gx-modal .gx-field { width: 100%; text-align: left; }

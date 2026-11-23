@@ -2417,7 +2417,6 @@
     const theme = gxTheme();
     const streak = gxStudyStreak();
     const name = displayName(app.profile) || "Reviewer";
-    const preset = avatarOption(app.profile?.avatar_preset);
     const tabIcons = {
       dashboard: `<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>`,
       setup: `<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>`,
@@ -2436,7 +2435,7 @@
               ${streak > 0 ? `<span class="gx-streak" title="Days in a row with practice"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5 .2 2 1 3 2 3.5C11 9 11 5.5 12 2z"/></svg>${streak}-day streak</span>` : ""}
               <button class="gx-icon-btn" data-action="toggle-theme" type="button" aria-label="Switch to ${theme === "light" ? "dark" : "light"} theme">${gxIcon(theme === "light" ? "moon" : "sun")}</button>
               <div class="header-audio-control"><button class="gx-icon-btn header-audio-button" data-action="toggle-audio-menu" type="button" aria-label="Sound and effects" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${gxIcon(app.audio.sfx ? "sound" : "mute")}</button>${audioPopover()}</div>
-              <button class="gx-avatar" data-action="account-settings" type="button" aria-label="Account settings for ${escapeAttr(name)}">${preset ? `<span class="gx-avatar-sprite" style="--avatar-x: ${preset.x}%; --avatar-y: ${preset.y}%" aria-hidden="true"></span>` : escapeHtml(name.trim().charAt(0).toUpperCase() || "R")}</button>
+              <button class="gx-avatar" data-action="account-settings" type="button" aria-label="Account settings for ${escapeAttr(name)}, ${gxSealShelf().earned.length} of ${examVersions.length || 20} seals">${gxBadge(app.profile?.avatar_preset, name)}</button>
             </div>
           </header>
           <main class="gx-pagebody">${content}</main>
@@ -2771,11 +2770,27 @@
     return `<section class="gx-card gx-empty"><h2>${escapeHtml(title)}</h2><p>${escapeHtml(body)}</p><div class="gx-row"><button class="gx-btn is-primary" data-action="open-setup" type="button">START MOCK EXAM</button><button class="gx-btn" data-action="practice-page" type="button">Practice</button></div></section>`;
   }
 
+  // Seal badge (2026-11-23): initials on a chosen colour inside a 20-segment ring that lights one gold segment per
+  // seal earned. It replaces the animal avatars. The stored avatar_preset (1-20 from the old picker) now picks the
+  // colour, so no schema change was needed; 0 means the default gold.
+  const GX_BADGE_COLORS = [["Purple", "#b07cff"], ["Coral", "#ff7a6b"], ["Blue", "#4db8ff"], ["Green", "#7bd66b"], ["Gold", "#ffc93c"], ["Teal", "#2ad1c9"], ["Pink", "#ff8ac2"], ["Silver", "#c9cfdb"]];
+
+  function gxBadgeSlot(presetNumber) {
+    const preset = Number(presetNumber || 0);
+    return preset > 0 ? ((preset - 1) % GX_BADGE_COLORS.length) + 1 : 5;
+  }
+
+  function gxBadge(presetNumber, name, earned = gxSealShelf().earned.length, total = examVersions.length || 20) {
+    const color = GX_BADGE_COLORS[gxBadgeSlot(presetNumber) - 1][1];
+    const letters = escapeHtml(initials(name));
+    const radius = 21;
+    const step = (2 * Math.PI * radius) / Math.max(1, total);
+    const segments = Array.from({ length: total }, (_, index) => `<circle cx="24" cy="24" r="${radius}" stroke="${index < earned ? "#ffc93c" : "currentColor"}" stroke-opacity="${index < earned ? 1 : 0.28}" stroke-dasharray="${(step - 1.4).toFixed(2)} 200" stroke-dashoffset="${(-index * step).toFixed(2)}"/>`).join("");
+    return `<svg class="gx-badge" viewBox="0 0 48 48" aria-hidden="true"><g transform="rotate(-90 24 24)" fill="none" stroke-width="3.4">${segments}</g><circle cx="24" cy="24" r="16.5" fill="${color}"/><text x="24" y="24" dy=".36em" text-anchor="middle" font-size="${letters.length > 1 ? 13 : 16}" font-weight="900" fill="#15110f" font-family="Nunito, system-ui, sans-serif">${letters}</text></svg>`;
+  }
+
   function gxAvatarFace(presetNumber, name) {
-    const preset = avatarOption(presetNumber);
-    return preset
-      ? `<span class="gx-avatar-sprite" style="--avatar-x: ${preset.x}%; --avatar-y: ${preset.y}%" aria-hidden="true"></span>`
-      : escapeHtml(String(name || "R").trim().charAt(0).toUpperCase() || "R");
+    return gxBadge(presetNumber, name);
   }
 
   function gxScoreChart(completed) {
@@ -3188,7 +3203,8 @@
   function profileModal() {
     if (app.modal !== "profile" && !(app.modal === "password" && app.modalReturn === "profile")) return "";
     const profile = app.profile;
-    const selectedAvatar = app.accountAvatarDraft ?? Number(profile.avatar_preset || 0);
+    const selectedAvatar = gxBadgeSlot(app.accountAvatarDraft ?? profile.avatar_preset);
+    const seals = gxSealShelf().earned.length;
     return `
       <div class="gx-backdrop is-drawer">
         <section class="gx-modal is-drawer" role="dialog" aria-modal="true" aria-labelledby="account-settings-title" tabindex="-1">
@@ -3196,10 +3212,7 @@
           <h2 id="account-settings-title">Account</h2>
           <form class="gx-form" data-form="profile">
             <div class="gx-profile-head"><span class="gx-avatar is-large gx-profile-preview">${gxAvatarFace(selectedAvatar, displayName(profile))}</span><div><strong>${escapeHtml(displayName(profile))}</strong><small>${escapeHtml(profile.email)}</small></div></div>
-            <fieldset class="gx-fieldset"><legend>Choose an avatar</legend><div class="gx-avatar-grid">${AVATAR_OPTIONS.map((name, index) => {
-              const preset = avatarOption(index + 1);
-              return `<button class="gx-avatar-option ${selectedAvatar === index + 1 ? "selected" : ""}" data-avatar-preset="${index + 1}" type="button" aria-label="Choose ${escapeAttr(name)} avatar" aria-pressed="${selectedAvatar === index + 1 ? "true" : "false"}"><span class="gx-avatar-sprite" style="--avatar-x: ${preset.x}%; --avatar-y: ${preset.y}%" aria-hidden="true"></span></button>`;
-            }).join("")}</div><small class="gx-muted">Saved when you press Save changes.</small></fieldset>
+            <fieldset class="gx-fieldset"><legend>Badge colour</legend><div class="gx-avatar-grid">${GX_BADGE_COLORS.map(([label], index) => `<button class="gx-avatar-option ${selectedAvatar === index + 1 ? "selected" : ""}" data-avatar-preset="${index + 1}" type="button" aria-label="${escapeAttr(label)} badge" aria-pressed="${selectedAvatar === index + 1 ? "true" : "false"}">${gxBadge(index + 1, displayName(profile), seals)}</button>`).join("")}</div><small class="gx-muted">The ring lights one gold segment for each seal you earn (${seals} of ${examVersions.length || 20}). Saved when you press Save changes.</small></fieldset>
             <label class="gx-field">Nickname<input name="nickname" value="${escapeAttr(profile.nickname || firstName(profile.name))}" maxlength="24" placeholder="What should we call you?" /></label>
             <label class="gx-field">Full name<input name="name" value="${escapeAttr(profile.name)}" required /></label>
             <label class="gx-field">Email <small>(used to sign in)</small><input name="email" value="${escapeAttr(profile.email)}" disabled /></label>
@@ -4024,7 +4037,7 @@
   }
 
   function refreshAvatarUi() {
-    const selected = Number(app.accountAvatarDraft || 0);
+    const selected = gxBadgeSlot(app.accountAvatarDraft);
     root.querySelectorAll("[data-avatar-preset]").forEach((button) => {
       const active = Number(button.dataset.avatarPreset) === selected;
       button.classList.toggle("selected", active);
