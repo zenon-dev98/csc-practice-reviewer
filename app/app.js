@@ -11,7 +11,7 @@
   const AUDIO_PREFS_KEY = "csc-reviewer-audio";
   const GX_FX_LEVELS = [["auto", "Auto"], ["full", "Full"], ["subtle", "Subtle"], ["calm", "Calm"]];
   const GX_FX_HINTS = {
-    auto: "Full in practice sets, Subtle in mock exams.",
+    auto: "Full effects everywhere. Pick Subtle or Calm for a quieter exam.",
     full: "Sparks, shakes and big banners everywhere.",
     subtle: "Banners and small motion, no sparks or shake.",
     calm: "Closest to the silent paper exam: colour changes only."
@@ -1659,13 +1659,13 @@
   // The layer sits on <body>, outside #app, so the full re-render after every tap never cuts an effect short.
   // Everything passes taps through, never pauses the clock, and fires only when this session sees the answered
   // count go up, so reopening or refreshing an exam never replays a celebration.
-  const gxFx = { particles: [], raf: 0, trauma: 0, shakeRaf: 0 };
+  const gxFx = { particles: [], raf: 0 };
   const GX_SECTION_ROOTS = [261.63, 293.66, 329.63, 392];
 
   function gxFxLevel(attempt) {
     const level = app.audio.effects || "auto";
-    if (level !== "auto") return level;
-    return attempt?.mode === "practice" ? "full" : "subtle";
+    // Auto is Full everywhere (2026-11-23, the user asked for more game feel); Subtle and Calm are opt-in.
+    return level === "auto" ? "full" : level;
   }
 
   function gxFxLayer() {
@@ -1698,8 +1698,8 @@
     gxFxLoop();
   }
 
-  function gxFxRing(x, y, color) {
-    gxFx.particles.push({ x, y, kind: "ring", life: 1, decay: 0.04, color, radius: 6 });
+  function gxFxRing(x, y, color, grow = 6) {
+    gxFx.particles.push({ x, y, kind: "ring", life: 1, decay: 0.04, color, radius: 6, grow });
     gxFxLoop();
   }
 
@@ -1730,7 +1730,7 @@
       context.globalAlpha = Math.min(1, particle.life * 1.4);
       context.fillStyle = context.strokeStyle = particle.color;
       if (particle.kind === "ring") {
-        particle.radius += 6;
+        particle.radius += particle.grow || 6;
         context.lineWidth = 4 * particle.life;
         context.beginPath();
         context.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
@@ -1766,19 +1766,18 @@
     if (gxFx.particles.length) gxFx.raf = requestAnimationFrame(gxFxFrame);
   }
 
-  // Trauma-model shake: offset = trauma squared, capped at 6 px and 1.2 degrees, gone in about 350 ms.
+  // Shake: one CSS keyframe run on the exam screen (soft, medium or hard by strength), so it plays off the main
+  // thread; a per-frame JS shake restyled the whole screen and delayed taps such as Pause by ~250 ms.
   function gxFxShake(amount) {
-    gxFx.trauma = Math.min(1, gxFx.trauma + amount);
-    if (!gxFx.shakeRaf) gxFx.shakeRaf = requestAnimationFrame(gxFxShakeFrame);
-  }
-
-  function gxFxShakeFrame(time) {
-    gxFx.trauma = Math.max(0, gxFx.trauma - 0.045);
-    const strength = gxFx.trauma * gxFx.trauma;
-    const tick = time / 40;
-    const target = root.querySelector(".gx-exam");
-    if (target) target.style.transform = strength ? `translate(${(6 * strength * Math.sin(tick * 1.7)).toFixed(2)}px, ${(6 * strength * Math.sin(tick * 2.3 + 1)).toFixed(2)}px) rotate(${(1.2 * strength * Math.sin(tick * 1.3 + 2)).toFixed(3)}deg)` : "";
-    gxFx.shakeRaf = gxFx.trauma > 0 ? requestAnimationFrame(gxFxShakeFrame) : 0;
+    if (gxReducedMotion()) return;
+    const target = root.querySelector(".gx-main");
+    if (!target) return;
+    const kind = amount >= 0.7 ? "is-shake-hard" : amount >= 0.35 ? "is-shake" : "is-shake-soft";
+    target.classList.remove("is-shake-hard", "is-shake", "is-shake-soft");
+    void target.offsetWidth;
+    target.classList.add(kind);
+    clearTimeout(gxFx.shakeTimer);
+    gxFx.shakeTimer = setTimeout(() => target.classList.remove(kind), 560);
   }
 
   function gxFxBanner(gx, title, subtitle, accent, extra = "") {
@@ -1820,7 +1819,112 @@
     setTimeout(() => wrap.remove(), 260);
   }
 
-  function gxFxPick(gx, choice, attempt) {
+  // ---- Impact layer (2026-11-23): screen flash, slam titles with light rays, hit-stop, answer orbs, heat edges. ----
+  // One flash per moment at most (never more than three a second, WCAG 2.3.1). All of it passes taps through.
+  function gxFxFlash(color = "#ffffff", strength = 0.35) {
+    if (gxReducedMotion()) return;
+    const flash = document.createElement("div");
+    flash.className = "gx-fx-flash";
+    flash.style.setProperty("--fx-flash", color);
+    flash.style.setProperty("--fx-flash-max", String(strength));
+    gxFxLayer().appendChild(flash);
+    setTimeout(() => flash.remove(), 450);
+  }
+
+  // A big title slams into the middle of the screen over spinning rays, holds, then lifts away.
+  function gxFxSlam(title, subtitle, accent, { size = "big", rays = true } = {}) {
+    const layer = gxFxLayer();
+    layer.querySelector(".gx-fx-slam")?.remove();
+    const slam = document.createElement("div");
+    slam.className = `gx-fx-slam is-${size}`;
+    slam.setAttribute("role", "status");
+    slam.style.setProperty("--fx-accent", accent);
+    slam.innerHTML = `${rays && !gxReducedMotion() ? `<i class="gx-fx-rays" aria-hidden="true"></i>` : ""}<strong>${escapeHtml(title)}</strong>${subtitle ? `<small>${escapeHtml(subtitle)}</small>` : ""}`;
+    layer.appendChild(slam);
+    clearTimeout(gxFx.slamTimer);
+    gxFx.slamTimer = setTimeout(() => {
+      slam.classList.add("is-out");
+      setTimeout(() => slam.remove(), 360);
+    }, size === "big" ? 1700 : 1200);
+  }
+
+  // Hit-stop: the question area punches in and springs back.
+  function gxFxImpact(gx) {
+    if (gxReducedMotion()) return;
+    // The question column, not the whole screen: animating large containers repaints everything and delays taps.
+    const body = gx.querySelector(".gx-qcol");
+    if (!body) return;
+    body.classList.remove("is-impact");
+    void body.offsetWidth;
+    body.classList.add("is-impact");
+    setTimeout(() => body.classList.remove("is-impact"), 420);
+  }
+
+  // A glowing orb flies from the picked answer into its section's progress bar, which gulps it.
+  function gxFxOrb(from, segmentIndex, color) {
+    const segment = root.querySelectorAll(".gx-segs .gx-seg")[segmentIndex];
+    if (!from || !segment) return;
+    const start = gxFxCenter(from);
+    const rect = segment.getBoundingClientRect();
+    const fill = segment.querySelector("i");
+    const end = { x: rect.left + Math.min(rect.width - 4, Math.max(4, (fill?.offsetWidth || 0) + 6)), y: rect.top + rect.height / 2 };
+    const orb = document.createElement("i");
+    orb.className = "gx-fx-orb";
+    orb.style.setProperty("--fx-orb", color);
+    gxFxLayer().appendChild(orb);
+    const mid = { x: (start.x + end.x) / 2 + (Math.random() * 120 - 60), y: Math.min(start.y, end.y) - 70 };
+    const flight = orb.animate([
+      { transform: `translate(${start.x}px, ${start.y}px) scale(.5)`, opacity: 1 },
+      { transform: `translate(${mid.x}px, ${mid.y}px) scale(1.25)`, opacity: 1, offset: 0.45 },
+      { transform: `translate(${end.x}px, ${end.y}px) scale(.55)`, opacity: 1 }
+    ], { duration: 520, easing: "cubic-bezier(.45, 0, .8, .4)" });
+    flight.onfinish = () => {
+      orb.remove();
+      const landed = root.querySelectorAll(".gx-segs .gx-seg")[segmentIndex];
+      if (!landed) return;
+      landed.classList.remove("is-gulp");
+      void landed.offsetWidth;
+      landed.classList.add("is-gulp");
+      gxFxBurst(end.x, end.y, [color, "#ffffff"], 8, 2.4);
+      playSound([[1180, 0.05, "sine", 0.03]]);
+    };
+  }
+
+  // Heat edges: the screen border glows warmer as the flow combo climbs.
+  function gxFxHeat(heat) {
+    const layer = gxFxLayer();
+    let edge = layer.querySelector(".gx-fx-heat");
+    if (heat <= 0) {
+      edge?.remove();
+      return;
+    }
+    if (!edge) {
+      edge = document.createElement("div");
+      edge.className = "gx-fx-heat";
+      layer.prepend(edge);
+    }
+    edge.style.setProperty("--fx-heat", String(heat));
+  }
+
+  function gxFxChecked(gx, attempt, current) {
+    if (gxFxLevel(attempt) !== "full" || gxReducedMotion()) return;
+    const correct = current.selected_choice === current.correct_choice;
+    const choice = gx.querySelector(`.gx-choice.${correct ? "is-correct" : "is-wrong"}`);
+    if (correct) {
+      gxFxFlash(gxFxVar(gx, "--good"), 0.18);
+      if (choice) {
+        const point = gxFxCenter(choice);
+        gxFxRing(point.x, point.y, gxFxVar(gx, "--good"), 9);
+        gxFxBurst(point.x, point.y, [gxFxVar(gx, "--good"), "#ffffff", gxFxVar(gx, "--primary")], 26, 4);
+      }
+      gxFxShake(0.3);
+    } else {
+      gxFxFlash(gxFxVar(gx, "--bad"), 0.22);
+      gxFxShake(0.5);
+    }
+  }
+
+  function gxFxPick(gx, choice, attempt, first) {
     const level = gxFxLevel(attempt);
     if (level === "calm") return;
     choice.classList.add("is-popping");
@@ -1832,11 +1936,20 @@
       }
     }
     if (level !== "full" || gxReducedMotion()) return;
-    choice.classList.add("is-squash");
+    choice.classList.add("is-squash", "is-shine");
     const key = choice.querySelector(".gx-key");
+    const select = gxFxVar(gx, "--select");
     if (key) {
       const point = gxFxCenter(key);
-      gxFxBurst(point.x, point.y, [gxFxVar(gx, "--select")], 6, 2.6);
+      gxFxRing(point.x, point.y, select, 4);
+      gxFxBurst(point.x, point.y, [select, "#ffffff"], 12, 3.2);
+    }
+    gxFxShake(0.18);
+    if (first && key && attempt.mode !== "practice") {
+      const current = currentAnswer(attempt);
+      const groups = gxSectionGroups(attempt);
+      const index = groups.findIndex((group) => group.answers.some((answer) => answer.question_id === current?.question_id));
+      if (index >= 0) gxFxOrb(key, index, gxFxVar(gx, `--${gxTone(groups[index].section)}`));
     }
   }
 
@@ -1887,17 +2000,25 @@
     const ink = gxFxVar(gx, `--${gxTone(group.section)}-ink`) || tone;
     const segment = gx.querySelectorAll(".gx-segs .gx-seg")[index];
     segment?.classList.add("is-cleared");
-    if (level === "full" && !gxReducedMotion() && segment) {
-      const point = gxFxCenter(segment);
-      setTimeout(() => {
-        gxFxRing(point.x, point.y, tone);
-        gxFxBurst(point.x, point.y, [tone, "#ffffff", gxFxVar(gx, "--primary")], 28, 4.2);
-        gxFxShake(0.55);
-      }, 200);
-    }
     const seconds = group.answers.reduce((sum, answer) => sum + Number(answer.time_spent_seconds || 0), 0);
     const label = (group.label || group.section).replace(" Information", "").replace(" Ability", "");
-    setTimeout(() => gxFxBanner(gx, `${label} clear`, `${group.answers.length}/${group.answers.length} answered · ${formatDuration(seconds)} · ${Math.round(seconds / Math.max(1, group.answers.length))} s each`, ink), 260);
+    const detail = `${group.answers.length}/${group.answers.length} answered · ${formatDuration(seconds)} · ${Math.round(seconds / Math.max(1, group.answers.length))} s each`;
+    if (level === "full" && !gxReducedMotion()) {
+      playSound("boom");
+      gxFxFlash(tone, 0.32);
+      gxFxImpact(gx);
+      gxFxSlam(`${label} clear!`, detail, tone);
+      setTimeout(() => {
+        const point = segment ? gxFxCenter(segment) : { x: window.innerWidth / 2, y: 90 };
+        gxFxRing(point.x, point.y, tone, 10);
+        gxFxRing(window.innerWidth / 2, window.innerHeight / 2, tone, 14);
+        gxFxBurst(point.x, point.y, [tone, "#ffffff", gxFxVar(gx, "--primary")], 60, 5.5);
+        gxFxBurst(window.innerWidth / 2, window.innerHeight / 2, [tone, "#ffffff", gxFxVar(gx, "--primary")], 40, 7, "confetti");
+        gxFxShake(0.95);
+      }, 120);
+      return;
+    }
+    setTimeout(() => gxFxBanner(gx, `${label} clear`, detail, ink), 260);
   }
 
   function gxFxMilestone(gx, attempt, pct, level) {
@@ -1915,10 +2036,19 @@
     }[pct];
     if (level === "full" && !gxReducedMotion()) {
       const bar = gx.querySelector(".gx-segs");
+      const primary = gxFxVar(gx, "--primary");
       if (bar) {
         const point = gxFxCenter(bar);
-        gxFxBurst(point.x, point.y, [gxFxVar(gx, "--primary"), "#ffffff"], pct === 50 ? 24 : 12, 3.4);
+        gxFxRing(point.x, point.y, primary, 8);
+        gxFxBurst(point.x, point.y, [primary, "#ffffff"], pct === 50 ? 50 : 30, 4.5);
       }
+      if (pct === 50) {
+        playSound("boom");
+        gxFxFlash(primary, 0.25);
+      }
+      gxFxSlam(`${copy[0]}!`, copy[1], primary, { size: pct === 50 ? "big" : "small" });
+      gxFxShake(pct === 50 ? 0.7 : 0.45);
+      return;
     }
     gxFxBanner(gx, copy[0], copy[1], accent);
   }
@@ -1929,19 +2059,22 @@
     const remaining = Math.max(0, timeRemaining(attempt));
     const flags = flaggedCount(attempt);
     const accent = gx.dataset.theme === "light" ? "#9a6a00" : gxFxVar(gx, "--primary");
+    const spare = attempt.total_time_seconds ? `${formatDuration(remaining)} to spare · ` : "";
     if (level === "full" && !gxReducedMotion()) {
+      playSound("boom");
       const aura = document.createElement("div");
       aura.className = "gx-fx-aura";
       gxFxLayer().appendChild(aura);
       setTimeout(() => aura.remove(), 1400);
-      const bar = gx.querySelector(".gx-segs");
-      if (bar) {
-        const point = gxFxCenter(bar);
-        gxFxBurst(point.x, point.y, ["--general", "--verbal", "--numerical", "--analytical", "--primary"].map((name) => gxFxVar(gx, name)), 70, 5, "confetti");
-      }
-      gxFxShake(0.4);
+      const colors = ["--general", "--verbal", "--numerical", "--analytical", "--primary"].map((name) => gxFxVar(gx, name));
+      gxFxFlash("#ffffff", 0.45);
+      gxFxImpact(gx);
+      gxFxSlam(`All ${attempt.total_questions} answered!`, `${spare}${flags} flagged · review or submit`, accent);
+      for (let column = 0; column < 8; column += 1) gxFxBurst((window.innerWidth / 8) * (column + 0.5), -10, colors, 18, 3, "confetti");
+      gxFxRing(window.innerWidth / 2, window.innerHeight / 2, accent, 16);
+      gxFxShake(1);
+      return;
     }
-    const spare = attempt.total_time_seconds ? `${formatDuration(remaining)} to spare · ` : "";
     gxFxBanner(gx, `All ${attempt.total_questions} answered`, `${spare}${flags} flagged · review or submit`, accent);
   }
 
@@ -2035,7 +2168,13 @@
       return;
     }
     if (gxFlowTier(after) > gxFlowTier(before)) {
-      playSound([[520 + gxFlowTier(after) * 120, 0.2, "triangle", 0.05]]);
+      playSound([[520 + gxFlowTier(after) * 120, 0.2, "triangle", 0.05], [780 + gxFlowTier(after) * 120, 0.25, "triangle", 0.05]]);
+      if (level === "full" && !gxReducedMotion()) {
+        const words = { 1: "Flow!", 2: "Heating up!", 3: "On fire!", 4: "Blazing!", 5: "Inferno!" }[gxFlowTier(after)];
+        gxFxSlam(`×${after} ${words}`, attempt.mode === "practice" ? "correct in a row" : "on pace in a row", "#ff8a1f", { size: "small" });
+        gxFxShake(0.25 + gxFlowTier(after) * 0.12);
+        if (gxFlowTier(after) >= 3) gxFxFlash("#ff7a1a", 0.2);
+      }
       const chip = gx.querySelector(".gx-combo");
       if (chip) {
         chip.classList.add("is-pop");
@@ -2066,6 +2205,7 @@
       if (!gxFx.fireRaf) gxFx.fireRaf = requestAnimationFrame(gxFxFireFrame);
     }
     gxFxInferno(level === "full" && count >= 25 && !gxReducedMotion());
+    gxFxHeat(level === "full" ? (count >= 25 ? 1 : count >= 15 ? 0.75 : count >= 10 ? 0.55 : count >= 5 ? 0.3 : 0) : 0);
   }
 
   function gxFxFireFrame() {
@@ -2263,6 +2403,7 @@
   function gxFxLeaveExam() {
     gxFx.fireStrength = 0;
     gxFxInferno(false);
+    gxFxHeat(0);
     gxFx.tntWasActive = false;
     const layer = document.getElementById("gx-fx");
     layer?.querySelector(".gx-fx-fuse")?.remove();
@@ -2321,10 +2462,13 @@
       const sameQuestion = question === motion.question;
       if (sameQuestion && current.selected_choice && current.selected_choice !== motion.choice) {
         const picked = gx.querySelector(`.gx-choice[data-choice="${current.selected_choice}"]`);
-        if (picked) gxFxPick(gx, picked, attempt);
+        if (picked) gxFxPick(gx, picked, attempt, !motion.choice);
       }
       const checked = attempt.mode === "practice" && gxChecked(current);
-      if (checked && !(sameQuestion && motion.checked)) gx.querySelector(".gx-qcol")?.classList.add("is-just-checked");
+      if (checked && !(sameQuestion && motion.checked)) {
+        gx.querySelector(".gx-qcol")?.classList.add("is-just-checked");
+        gxFxChecked(gx, attempt, current);
+      }
       if (sameQuestion && current.flagged !== motion.flagged) gx.querySelector(".gx-btn.is-flag")?.classList.add("is-popping");
       motion.choice = current.selected_choice;
       motion.checked = checked;
@@ -3979,6 +4123,7 @@
       skip: [[300, 0.07, "triangle", 0.03]],
       chime: [[880, 0.16, "sine", 0.045], [1320, 0.3, "sine", 0.03]],
       coach: [[740, 0.12, "sine", 0.04]],
+      boom: [[90, 0.3, "sine", 0.16], [58, 0.5, "sine", 0.14]],
       thump: [[90, 0.2, "sine", 0.12]],
       tick: [[1500, 0.03, "square", 0.012]],
       fizz: [[700, 0.08, "sawtooth", 0.012], [420, 0.12, "sawtooth", 0.01], [260, 0.2, "sawtooth", 0.008]],

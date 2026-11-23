@@ -344,15 +344,19 @@ expressive; its live proposal is the "Exam Game Feel" artifact.
 
 - Prefer `transform` and `opacity`.
 - Avoid layout shift and large scaling.
-- Spring overshoot (`--gx-spring`) and a short trauma-based shake (under 400 ms,
-  at most 6 px) are allowed for celebrations.
+- Spring overshoot (`--gx-spring`), slam titles with light rays, hit-stop,
+  answer orbs, heat edges and a keyframe shake of the question area (up to
+  500 ms and 9 px) are allowed for real exam moments. Animate small containers
+  (`.gx-main`, `.gx-qcol`), never the whole exam screen: that repaints
+  everything each frame and delays taps.
+- At most one screen flash per moment, never more than three in any one second.
 - Looping motion runs only while its state holds (for example a combo), never as
   an idle pulse, and settles after a few seconds.
 - Celebrations never block input, never pause or cost exam time, and never reveal
   correctness during a mock exam.
-- Every exam effect follows the user's Exam effects level (Auto = Full in
-  practice, Subtle in mocks; Full; Subtle; Calm) and `prefers-reduced-motion`
-  (no shake, sparks or springs; short fades only).
+- Every exam effect follows the user's Exam effects level (Auto = Full
+  everywhere; Full; Subtle; Calm) and `prefers-reduced-motion` (no shake, flash,
+  sparks, orbs or springs; short fades only).
 - Nothing flashes more than three times in any one second (WCAG 2.3.1).
 - Stop when the state is complete.
 

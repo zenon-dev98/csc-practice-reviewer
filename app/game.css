@@ -898,3 +898,46 @@ html body #app .gx .exam-answered-value.is-tick { display: inline-block !importa
   outline: 3px solid var(--select) !important; outline-offset: 2px !important;
 }
 #app .gx .gx-pass .gx-icon-btn:focus-visible { outline-offset: -3px !important; }
+
+/* ---- Impact layer (2026-11-23) ----
+   .gx-fx-flash = one screen flash per big moment · .gx-fx-slam = title slamming into the centre over spinning
+   rays, held ~1.5 s · .gx-qcol.is-impact = hit-stop punch · .gx-fx-orb = answer orb flying into the progress
+   bar, .gx-seg.is-gulp = the bar swallowing it · .gx-fx-heat = screen edges glowing with the flow combo ·
+   .gx-choice.is-shine = light sweep across a picked answer. None of it takes taps. */
+.gx-fx-flash { position: absolute; inset: 0; background: radial-gradient(circle at 50% 45%, var(--fx-flash), transparent 75%); opacity: 0; animation: gx-fx-flash .42s ease-out forwards; }
+@keyframes gx-fx-flash { 0% { opacity: 0; } 18% { opacity: var(--fx-flash-max); } 100% { opacity: 0; } }
+.gx-fx-slam { position: absolute; left: 50%; top: 42%; width: min(92vw, 640px); display: grid; place-items: center; gap: 6px; text-align: center; transform: translate(-50%, -50%); animation: gx-fx-slam-in .5s var(--gx-spring) both; }
+.gx-fx-slam strong { position: relative; z-index: 1; display: block; color: var(--fx-accent); font: 900 clamp(34px, 9vw, 64px)/1.02 Nunito, system-ui, sans-serif; letter-spacing: .01em; text-transform: uppercase; -webkit-text-stroke: 7px rgba(10, 12, 18, .82); paint-order: stroke fill; text-shadow: 0 6px 0 rgba(0, 0, 0, .35), 0 0 30px color-mix(in srgb, var(--fx-accent) 60%, transparent); }
+.gx-fx-slam.is-small strong { font-size: clamp(28px, 7vw, 46px); }
+.gx-fx-slam small { position: relative; z-index: 1; display: inline-block; padding: 6px 14px; border-radius: 14px; background: rgba(10, 12, 18, .78); color: #f2f4f8; font: 800 15px/1.35 Nunito, system-ui, sans-serif; }
+.gx-fx-slam.is-out { animation: gx-fx-slam-out .34s ease-in forwards; }
+@keyframes gx-fx-slam-in { 0% { opacity: 0; transform: translate(-50%, -50%) scale(2.6) rotate(-6deg); } 60% { opacity: 1; } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+@keyframes gx-fx-slam-out { to { opacity: 0; transform: translate(-50%, -80%) scale(.85); } }
+.gx-fx-rays { position: absolute; left: 50%; top: 50%; width: 520px; height: 520px; margin: -260px 0 0 -260px; border-radius: 50%; background: repeating-conic-gradient(color-mix(in srgb, var(--fx-accent) 55%, transparent) 0 9deg, transparent 9deg 24deg); will-change: transform, opacity; -webkit-mask: radial-gradient(circle, #000 18%, transparent 68%); mask: radial-gradient(circle, #000 18%, transparent 68%); animation: gx-fx-rays 1.8s linear forwards; }
+.gx-fx-slam.is-small .gx-fx-rays { width: 360px; height: 360px; margin: -180px 0 0 -180px; }
+/* Rotating the element (not the gradient angle) keeps the spin on the compositor instead of repainting each frame. */
+@keyframes gx-fx-rays { 0% { opacity: 0; transform: scale(.4) rotate(0deg); } 15% { opacity: 1; transform: scale(1) rotate(15deg); } 75% { opacity: .9; } 100% { opacity: 0; transform: scale(1.1) rotate(120deg); } }
+.gx-qcol.is-impact { animation: gx-fx-impact .4s var(--gx-spring); }
+@keyframes gx-fx-impact { 0% { transform: scale(.965); } 100% { transform: none; } }
+.gx-fx-orb { position: absolute; left: 0; top: 0; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffffff, var(--fx-orb) 55%, transparent 72%); box-shadow: 0 0 16px 4px color-mix(in srgb, var(--fx-orb) 70%, transparent); }
+.gx-seg.is-gulp { animation: gx-fx-gulp .38s var(--gx-spring); }
+@keyframes gx-fx-gulp { 0% { transform: scaleY(1.9); filter: brightness(1.6); } 100% { transform: none; filter: none; } }
+.gx-fx-heat { position: absolute; inset: 0; box-shadow: inset 0 0 calc(40px + 90px * var(--fx-heat)) calc(4px + 14px * var(--fx-heat)) rgba(255, 106, 20, calc(.18 + .42 * var(--fx-heat))); transition: box-shadow .6s ease; }
+.gx-choice.is-shine { position: relative; overflow: hidden; }
+.gx-choice.is-shine::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, .45) 50%, transparent 70%); transform: translateX(-120%); animation: gx-fx-shine .55s ease-out forwards; pointer-events: none; }
+@keyframes gx-fx-shine { to { transform: translateX(120%); } }
+@media (prefers-reduced-motion: reduce) {
+  .gx-fx-slam, .gx-fx-slam.is-out { animation: gx-fade .2s ease both; }
+  .gx-fx-slam.is-out { animation-name: gx-fx-fade-out; }
+  .gx-fx-rays, .gx-fx-flash, .gx-fx-orb { display: none; }
+  .gx-qcol.is-impact, .gx-seg.is-gulp, .gx-choice.is-shine::after { animation: none; }
+}
+
+/* Shakes (gxFxShake): decaying keyframes, off the main thread. Hard peaks at 9 px and 1.2 degrees over 500 ms. */
+.gx-main.is-shake-hard { animation: gx-fx-shake-hard .5s linear; }
+.gx-main.is-shake { animation: gx-fx-shake .42s linear; }
+.gx-main.is-shake-soft { animation: gx-fx-shake-soft .26s linear; }
+@keyframes gx-fx-shake-hard { 10% { transform: translate(-9px, 4px) rotate(-1.2deg); } 22% { transform: translate(8px, -5px) rotate(1deg); } 36% { transform: translate(-6px, 3px) rotate(-.7deg); } 50% { transform: translate(4px, -2px) rotate(.4deg); } 66% { transform: translate(-2px, 1px); } 82% { transform: translate(1px, 0); } 100% { transform: none; } }
+@keyframes gx-fx-shake { 14% { transform: translate(-5px, 2px) rotate(-.6deg); } 32% { transform: translate(4px, -3px) rotate(.5deg); } 52% { transform: translate(-3px, 1px); } 74% { transform: translate(1px, 0); } 100% { transform: none; } }
+@keyframes gx-fx-shake-soft { 25% { transform: translate(-2px, 1px); } 55% { transform: translate(2px, -1px); } 100% { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .gx-main.is-shake-hard, .gx-main.is-shake, .gx-main.is-shake-soft { animation: none; } }

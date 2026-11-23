@@ -116,7 +116,7 @@ let browser;
     const popping = await page.locator(".gx-choice.is-popping").count();
     const pickAnimations = running(await readAnimations(page));
     await shot("pick-040ms");
-    check("answer pick pops only the chosen choice", popping === 1 && pickAnimations.length > 0 && pickAnimations.every((animation) => /gx-choice|gx-key/.test(animation.target)), pickAnimations.map((animation) => animation.target));
+    check("answer pick pops only the chosen choice", popping === 1 && pickAnimations.length > 0 && pickAnimations.every((animation) => /gx-choice|gx-key|gx-main\.is-shake/.test(animation.target)), pickAnimations.map((animation) => animation.target));
     check("answer pick does not replay the page entry", !(await entering(page)));
     await page.waitForTimeout(400);
     const before = await page.locator("#app .gx-qnum").innerText();
