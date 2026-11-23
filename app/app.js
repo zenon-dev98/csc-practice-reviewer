@@ -86,6 +86,10 @@
     "results-practice",
     "practice-exam",
     "exam-final",
+    "challenges",
+    "challenge-play",
+    "challenge-waiting",
+    "challenge-replay",
     "review",
     "review-empty",
     "practice",
@@ -282,6 +286,11 @@
   function requestedView() {
     const params = new URLSearchParams(location.search);
     const view = params.get("view");
+    if (view === "join") {
+      chState().joinCode = String(params.get("code") || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
+      app.practiceReviewTab = "challenges";
+      return { name: "practice" };
+    }
     if (view === "review") {
       const attemptId = params.get("attempt");
       return getAttempt(attemptId) ? { name: "review", attemptId, index: 0 } : null;
@@ -471,6 +480,15 @@
     if (fixtureState === "submit") {
       app.modal = "submit";
       return setView({ name: "exam", attemptId: active.id });
+    }
+    if (fixtureState.startsWith("challenge")) {
+      chFixtures(chState());
+      if (fixtureState === "challenges") {
+        app.practiceReviewTab = "challenges";
+        return setView({ name: "practice" });
+      }
+      if (fixtureState === "challenge-play") return setView({ name: "challenge-play", challengeId: "fx-play" });
+      return setView({ name: "challenge", challengeId: fixtureState === "challenge-waiting" ? "fx-waiting" : "fx-revealed" });
     }
     if (fixtureState === "exam-final") {
       // Nine minutes left, for the final-ten-minutes effects.
@@ -962,6 +980,7 @@
 
   function setView(view) {
     const previousView = app.view.name;
+    if (view.name !== "challenge-play") clearInterval(app.chTimer);
     if ((view.name === "create" || view.name === "signin") && app.view.name !== view.name) app.toast = "";
     app.view = view;
     app.audioMenuOpen = false;
@@ -989,6 +1008,8 @@
     if (app.view.name === "results") return renderResults();
     if (app.view.name === "review") return renderReview();
     if (app.view.name === "practice") return renderPractice();
+    if (app.view.name === "challenge-play") return renderChallengePlay();
+    if (app.view.name === "challenge") return renderChallenge();
     if (app.view.name === "recent") return renderRecentAttempts();
     if (app.view.name === "mistakes") return renderMistakePicker();
     if (app.view.name === "bookmarks") return renderBookmarks();
@@ -1230,6 +1251,7 @@
       flag: `<path d="M5 21V4h13l-3 4.5 3 4.5H5"/>`,
       menu: `<path d="M4 6h16M4 12h16M4 18h16"/>`,
       clock: `<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/>`,
+      crown: `<path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z" fill="currentColor"/>`,
       bomb: `<circle cx="10" cy="14.5" r="6.5"/><path d="M6.8 13a3.3 3.3 0 0 1 2.5-2.7"/><path d="M13.6 9.6l1.9-1.9"/><path d="M15.5 7.7c.8-1.6 2.4-2.2 3.6-1.4"/><path d="M20.5 2.5v1.6M22.5 4.7h-1.6M21.9 3.1l-1 1"/>`,
       sound: `<path d="M4 9.5v5h4l5 4v-13l-5 4z"/><path d="M16.5 9a4.5 4.5 0 0 1 0 6M19 6.5a8 8 0 0 1 0 11"/>`,
       mute: `<path d="M4 9.5v5h4l5 4v-13l-5 4z"/><path d="M17 9.5l5 5M22 9.5l-5 5"/>`,
@@ -2691,6 +2713,7 @@
     const content = `
       <div class="gx-home">
         <h1 class="gx-greeting">${greeting}, ${escapeHtml(firstName)}</h1>
+        ${chHomeCard()}
         <div class="gx-split">
           ${hero}
           <section class="gx-card gx-shelf" aria-label="Your seals">
@@ -3082,15 +3105,919 @@
     `;
   }
 
+  // ---- Friends' challenge (2026-11-23) ----
+  // Asynchronous Kahoot-style rounds against friends. Everyone plays the same questions (same order, same choice
+  // order); points depend on speed; other players' results stay hidden until everyone finishes, the deadline passes or
+  // the host ends it, then a replay plays them back. All writes go through the Supabase functions in
+  // supabase/challenges.sql, which own the rules (RLS, write-once answers, server-computed points).
+  const CH_SKILLS = [
+    ["Word meaning", "Word meaning", "Verbal Ability"],
+    ["Sentence completion", "Sentence completion", "Verbal Ability"],
+    ["Error recognition", "Error spotting", "Verbal Ability"],
+    ["Sentence structure", "Sentence structure", "Verbal Ability"],
+    ["Word analogy", "Analogies", "Analytical Ability"],
+    ["Symbolic logic / abstract reasoning", "Figures and symbols", "Analytical Ability"],
+    ["Number sequence", "Number sequences", "Numerical Ability"],
+    ["Basic operations", "Basic operations", "Numerical Ability"],
+    ["Philippine Constitution", "Constitution", "General Information"],
+    ["RA 6713 / Code of Conduct", "RA 6713", "General Information"],
+    ["Environment management and protection", "Environment", "General Information"],
+    ["Peace and human rights", "Peace and human rights", "General Information"]
+  ];
+  const CH_DEFAULT_SKILLS = ["Word meaning", "Word analogy", "Number sequence"];
+  const CH_TILES = [
+    ["#e8455a", `<svg class="gx-ch-shape" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l10 18H2z" fill="currentColor"/></svg>`],
+    ["#2f7de0", `<svg class="gx-ch-shape" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z" fill="currentColor"/></svg>`],
+    ["#d98a00", `<svg class="gx-ch-shape" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/></svg>`],
+    ["#14a374", `<svg class="gx-ch-shape" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor"/></svg>`]
+  ];
+  const CH_PLAYER_COLORS = ["#ffd24d", "#ff8a65", "#4dc3ff", "#5ee0a0", "#b99bff", "#ff9fb2", "#7fe0d6", "#ffb35c"];
+  const CH_SOUNDS = { drop: "drop_002", right: "confirmation_001", wrong: "error_004", callout: "maximize_006", sparkle: "glass_001", fanfare: "confirmation_002" };
+
+  function chState() {
+    app.ch ||= { list: [], loaded: false, loading: null, error: "", draft: { skills: new Set(CH_DEFAULT_SKILLS), count: 10, hours: 24, title: "" }, created: null, joinCode: "", confirmEnd: null, busy: "" };
+    return app.ch;
+  }
+
+  function chSound(name, volume = 0.6) {
+    if (!app.audio.sfx) return;
+    try {
+      const sound = new Audio(`assets/fx/${CH_SOUNDS[name]}.wav`);
+      sound.volume = Math.max(0, Math.min(1, volume * (Number(app.audio.sfxVolume) / 0.38 || 1)));
+      sound.play().catch(() => {});
+    } catch {
+      // Sound is optional.
+    }
+  }
+
+  function chUserId() {
+    return app.session?.user?.id || "";
+  }
+
+  function chRevealed(challenge) {
+    return Boolean(challenge.ended_at) || new Date(challenge.deadline) <= new Date();
+  }
+
+  function chMine(challenge) {
+    return challenge.players.find((player) => player.user_id === chUserId());
+  }
+
+  function chAnswersOf(challenge, userId) {
+    return challenge.answers.filter((answer) => answer.user_id === userId).sort((a, b) => a.question_index - b.question_index);
+  }
+
+  // Points as the database computes them; the streak bonus (+100 from the third correct answer in a row) is shown
+  // in the app only, from the same stored answers, so every player sees the same totals.
+  function chPoints(correct, ms, timerSeconds) {
+    if (!correct || ms > timerSeconds * 1000) return 0;
+    return Math.max(500, Math.min(1000, Math.round(1000 * (1 - ms / (timerSeconds * 1000) / 2))));
+  }
+
+  function chScore(challenge, userId) {
+    let streak = 0;
+    let bestStreak = 0;
+    let total = 0;
+    let right = 0;
+    for (let index = 0; index < challenge.question_ids.length; index += 1) {
+      const answer = challenge.answers.find((row) => row.user_id === userId && row.question_index === index);
+      if (answer?.correct) {
+        streak += 1;
+        right += 1;
+        bestStreak = Math.max(bestStreak, streak);
+        total += answer.points + (streak >= 3 ? 100 : 0);
+      } else {
+        streak = 0;
+      }
+    }
+    return { total, right, bestStreak };
+  }
+
+  function chQuestion(challenge, index) {
+    const question = questionsById.get(challenge.question_ids[index]);
+    if (!question) return null;
+    const shuffled = shuffledChoices(question, true, challenge.choice_seed);
+    return { id: question.id, prompt: question.prompt, choices: shuffled.choices, correct: shuffled.correctChoice, section: question.section, subtopic: question.subtopic, csc_skill: question.cscSkill || question.subtopic, stimulus: question.stimulus || null, selected_choice: null };
+  }
+
+  function chTimeLeft(challenge) {
+    const ms = new Date(challenge.deadline) - new Date();
+    if (ms <= 0) return "now";
+    const hours = Math.floor(ms / 3600000);
+    const minutes = Math.floor((ms % 3600000) / 60000);
+    return hours ? `${hours} h ${minutes} m` : `${minutes} m`;
+  }
+
+  function chStatus(challenge) {
+    const mine = chMine(challenge);
+    if (chRevealed(challenge)) return { key: "results", label: "Results are in" };
+    if (!mine?.finished_at) return { key: "play", label: chAnswersOf(challenge, chUserId()).length ? "Continue" : "Your turn" };
+    const waiting = challenge.players.filter((player) => !player.finished_at).length;
+    return { key: "waiting", label: `Waiting for ${waiting}` };
+  }
+
+  async function chLoad(force = false) {
+    const state = chState();
+    if (state.loading) return state.loading;
+    if (state.loaded && !force) return state.list;
+    if (app.fixtureMode) {
+      state.list ||= [];
+      state.loaded = true;
+      return state.list;
+    }
+    state.loading = (async () => {
+      try {
+        const [challenges, players, answers] = await Promise.all([
+          app.client.from("challenges").select("*").order("created_at", { ascending: false }),
+          app.client.from("challenge_players").select("*"),
+          app.client.from("challenge_answers").select("*")
+        ]);
+        const error = challenges.error || players.error || answers.error;
+        if (error) throw error;
+        state.list = (challenges.data || []).map((challenge) => ({
+          ...challenge,
+          players: (players.data || []).filter((player) => player.challenge_id === challenge.id).sort((a, b) => String(a.joined_at).localeCompare(String(b.joined_at))),
+          answers: (answers.data || []).filter((answer) => answer.challenge_id === challenge.id)
+        }));
+        state.error = "";
+      } catch (error) {
+        // Fail visibly: the list says it could not load instead of showing an empty, wrong state.
+        state.error = readableError(error);
+      } finally {
+        state.loaded = true;
+        state.loading = null;
+      }
+      return state.list;
+    })();
+    return state.loading;
+  }
+
+  function chFind(id) {
+    return chState().list.find((challenge) => challenge.id === id);
+  }
+
+  async function chRpc(name, args) {
+    const { data, error } = await app.client.rpc(name, args);
+    if (error) throw error;
+    return data;
+  }
+
+  // Questions are drawn at random from the chosen fast types, skipping ones the host has answered before when the
+  // pool allows. Items with a long shared stimulus (reading passages, tables, charts) never qualify.
+  function chDraw(skills, count) {
+    const seen = new Set((app.attempts || []).flatMap((attempt) => Object.values(attempt.answers || {}).map((answer) => answer.question_id)));
+    const pool = questionBank.filter((question) => skills.includes(question.cscSkill) && (!question.stimulus || question.stimulus.kind === "figures") && toArray(question.choices).length >= 4);
+    const fresh = pool.filter((question) => !seen.has(question.id));
+    const source = fresh.length >= count ? fresh : pool;
+    const picked = seededShuffle(source, Math.floor(Math.random() * 2147483647)).slice(0, count);
+    return { ids: picked.map((question) => question.id), timers: picked.map((question) => Math.max(10, Math.min(180, Math.round(Number(question.expectedSeconds) || 60)))) };
+  }
+
+  async function chCreate() {
+    const state = chState();
+    const skills = [...state.draft.skills];
+    if (!skills.length) return showToast("Pick at least one question type.");
+    const draw = chDraw(skills, state.draft.count);
+    if (draw.ids.length < state.draft.count) return showToast("Not enough questions in those types. Add another type.");
+    const title = String(state.draft.title || "").trim() || "Speed round";
+    if (app.fixtureMode) {
+      const id = `fixture-ch-${Date.now()}`;
+      state.list.unshift({ id, code: "K7QX2M", host_id: chUserId(), title, question_ids: draw.ids, question_timers: draw.timers, question_types: skills, choice_seed: 12345, created_at: nowIso(), deadline: new Date(Date.now() + state.draft.hours * 3600000).toISOString(), ended_at: null, players: [{ challenge_id: id, user_id: chUserId(), display_name: firstName(displayName(app.profile)), badge: Number(app.profile?.avatar_preset || 0), joined_at: nowIso(), finished_at: null }], answers: [] });
+      state.created = { id, code: "K7QX2M" };
+      return render();
+    }
+    const data = await chRpc("create_challenge", { p_title: title, p_question_ids: draw.ids, p_question_timers: draw.timers, p_question_types: skills, p_hours: state.draft.hours });
+    state.created = data;
+    await chLoad(true);
+    render();
+  }
+
+  async function chJoin(code) {
+    const clean = String(code || "").trim().toUpperCase();
+    if (!/^[A-HJ-NP-Z2-9]{6}$/.test(clean)) return showToast("Challenge codes are 6 letters and numbers, like K7QX2M.");
+    if (app.fixtureMode) return showToast("Joining works with a real account.");
+    const data = await chRpc("join_challenge", { p_code: clean });
+    chState().joinCode = "";
+    await chLoad(true);
+    setView({ name: "challenge", challengeId: data.id });
+  }
+
+  function chShareLink(challenge) {
+    return routeHref("join", { code: challenge.code });
+  }
+
+  async function chCopy(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("Copied.");
+    } catch {
+      showToast(`Copy this: ${text}`);
+    }
+  }
+
+  // ---- Play ----
+  function chStartKey(challenge, index) {
+    return `csc-ch-start-${challenge.id}-${index}`;
+  }
+
+  // The start time of each question is remembered on this device, so leaving and coming back does not reset its timer.
+  function chQuestionStart(challenge, index) {
+    const key = chStartKey(challenge, index);
+    try {
+      const saved = Number(localStorage.getItem(key));
+      if (saved > 0) return saved;
+      const now = Date.now();
+      localStorage.setItem(key, String(now));
+      return now;
+    } catch {
+      return (app.chStarts ||= {})[key] ||= Date.now();
+    }
+  }
+
+  function chNextIndex(challenge) {
+    const answered = new Set(chAnswersOf(challenge, chUserId()).map((answer) => answer.question_index));
+    for (let index = 0; index < challenge.question_ids.length; index += 1) if (!answered.has(index)) return index;
+    return -1;
+  }
+
+  function renderChallengePlay() {
+    const challenge = chFind(app.view.challengeId);
+    if (!challenge) {
+      chLoad(true).then(() => (chFind(app.view.challengeId) ? render() : setView({ name: "practice" })));
+      root.innerHTML = gxShell(`<div class="gx-home"><section class="gx-card"><p class="gx-muted">Loading the challenge…</p></section></div>`, "practice");
+      return;
+    }
+    const state = chState();
+    const mine = chMine(challenge);
+    if (mine?.finished_at || chRevealed(challenge)) return setView({ name: "challenge", challengeId: challenge.id });
+    const index = state.feedback?.index ?? chNextIndex(challenge);
+    if (index < 0) {
+      root.innerHTML = gxShell(`<div class="gx-home"><section class="gx-card"><p class="gx-muted">Saving your answers…</p></section></div>`, "practice");
+      chFinish(challenge);
+      return;
+    }
+    const question = chQuestion(challenge, index);
+    const timer = challenge.question_timers[index];
+    const start = chQuestionStart(challenge, index);
+    const feedback = state.feedback?.index === index ? state.feedback : null;
+    if (feedback) question.selected_choice = feedback.choice;
+    const body = gxQuestionBody(question);
+    const score = chScore(challenge, chUserId());
+    const theme = gxTheme();
+    root.innerHTML = `
+      <div class="gx" data-theme="${theme}">
+        <section class="gx-exam gx-ch-play">
+          <header class="gx-top">
+            <button class="gx-icon-btn is-bare" data-action="ch-leave" type="button" aria-label="Leave the challenge for now">${gxIcon("x", 24)}</button>
+            <div class="gx-progress">
+              <div class="gx-ch-timebar" role="timer" aria-label="Time for this question"><i data-ch-bar style="--ch-left: ${Math.max(0, 1 - (Date.now() - start) / (timer * 1000))}"></i></div>
+              <div class="gx-progress-meta"><span class="gx-run"><span>${escapeHtml(challenge.title)}</span></span><span>Question <strong>${index + 1}</strong> of ${challenge.question_ids.length}</span></div>
+            </div>
+            <div class="gx-timer"><strong data-ch-seconds>${Math.max(0, Math.ceil(timer - (Date.now() - start) / 1000))}</strong><small>seconds</small></div>
+            <div class="gx-timer gx-ch-score"><strong>${score.total.toLocaleString()}</strong><small>points</small></div>
+          </header>
+          <div class="gx-body">
+            <div class="gx-main">
+              <div class="gx-qcol ${feedback ? "is-just-checked" : ""}">
+                ${question ? body.html : `<p class="gx-error">This question is missing from this copy of the app. Refresh the page to load the latest questions.</p>`}
+                <div class="gx-ch-tiles ${body.grid ? "is-grid" : ""}" role="radiogroup" aria-label="Answer choices">
+                  ${question ? question.choices.map((choice, position) => {
+                    const state = feedback ? (choice.id === question.correct ? "is-right" : choice.id === feedback.choice ? "is-wrong" : "is-out") : "";
+                    return `<button class="gx-ch-tile ${state}" style="--tile: ${CH_TILES[position % 4][0]}" data-ch-choice="${choice.id}" role="radio" aria-checked="${feedback?.choice === choice.id}" type="button" ${feedback ? "disabled" : ""}>${CH_TILES[position % 4][1]}<span>${gxChoiceText(choice.text, question.stimulus)}</span></button>`;
+                  }).join("") : ""}
+                </div>
+                ${feedback ? `<div class="gx-ch-verdict ${feedback.correct ? "is-good" : "is-bad"}" role="status">${feedback.correct ? `<strong>+${feedback.points}</strong><span>${feedback.ms < 1000 ? "Lightning fast" : `${(feedback.ms / 1000).toFixed(1)} s`}</span>` : `<strong>${feedback.choice ? "Not quite" : "Time's up"}</strong><span>The answer was ${escapeHtml(question.correct)}: ${gxChoiceText(question.choices.find((choice) => choice.id === question.correct)?.text || "", question.stimulus)}</span>`}</div>` : ""}
+              </div>
+            </div>
+          </div>
+        </section>
+        ${toast()}
+      </div>`;
+    chTick(challenge, index, timer, start, Boolean(feedback));
+  }
+
+  function chTick(challenge, index, timer, start, paused) {
+    clearInterval(app.chTimer);
+    if (paused) return;
+    const update = () => {
+      if (app.view.name !== "challenge-play" || app.view.challengeId !== challenge.id) return clearInterval(app.chTimer);
+      const left = timer * 1000 - (Date.now() - start);
+      const bar = root.querySelector("[data-ch-bar]");
+      const seconds = root.querySelector("[data-ch-seconds]");
+      if (bar) bar.style.setProperty("--ch-left", String(Math.max(0, left / (timer * 1000))));
+      if (seconds) seconds.textContent = String(Math.max(0, Math.ceil(left / 1000)));
+      root.querySelector(".gx-ch-timebar")?.classList.toggle("is-low", left <= 5000);
+      if (left <= 0) {
+        clearInterval(app.chTimer);
+        chAnswer(challenge, index, null);
+      }
+    };
+    app.chTimer = setInterval(update, 200);
+    update();
+  }
+
+  async function chAnswer(challenge, index, choice) {
+    const state = chState();
+    if (state.busy === "answer" || state.feedback) return;
+    state.busy = "answer";
+    clearInterval(app.chTimer);
+    const question = chQuestion(challenge, index);
+    const timer = challenge.question_timers[index];
+    const ms = Math.max(0, Math.min(timer * 1000, Date.now() - chQuestionStart(challenge, index)));
+    const correct = Boolean(choice) && choice === question?.correct;
+    try {
+      let points = chPoints(correct, ms, timer);
+      if (!app.fixtureMode) {
+        const data = await chRpc("submit_challenge_answer", { p_challenge: challenge.id, p_question_index: index, p_choice: choice, p_answer_ms: Math.round(ms), p_correct: correct });
+        points = Number(data?.points ?? points);
+      }
+      if (!challenge.answers.some((row) => row.user_id === chUserId() && row.question_index === index)) {
+        challenge.answers.push({ challenge_id: challenge.id, user_id: chUserId(), question_index: index, choice, answer_ms: Math.round(ms), correct: correct && points > 0, points });
+      }
+      state.feedback = { index, choice, correct: correct && points > 0, points, ms };
+      playSound(correct ? "correct" : "wrong");
+      render();
+      if (correct && gxFxLevel(null) !== "calm" && !gxReducedMotion()) {
+        const tile = root.querySelector(".gx-ch-tile.is-right");
+        if (tile) {
+          const point = gxFxCenter(tile);
+          gxFxBurst(point.x, point.y, ["#ffffff", "#ffd24d", tile.style.getPropertyValue("--tile") || "#5ee0a0"], 22, 4);
+        }
+      }
+      setTimeout(() => {
+        state.feedback = null;
+        if (app.view.name === "challenge-play") render();
+      }, 1500);
+    } catch (error) {
+      showToast(readableError(error));
+      await chLoad(true);
+      setView({ name: "challenge", challengeId: challenge.id });
+    } finally {
+      state.busy = "";
+    }
+  }
+
+  async function chFinish(challenge) {
+    const state = chState();
+    if (state.busy === "finish") return;
+    state.busy = "finish";
+    try {
+      if (app.fixtureMode) {
+        const mine = chMine(challenge);
+        if (mine) mine.finished_at = nowIso();
+        // Same rule as finish_challenge(): the last player to finish reveals the results.
+        if (challenge.players.every((player) => player.finished_at)) challenge.ended_at = nowIso();
+      } else {
+        await chRpc("finish_challenge", { p_challenge: challenge.id });
+        await chLoad(true);
+      }
+      playSound("confirmation");
+    } catch (error) {
+      showToast(readableError(error));
+    } finally {
+      state.busy = "";
+    }
+    setView({ name: "challenge", challengeId: challenge.id });
+  }
+
+  async function chEnd(challenge) {
+    if (app.fixtureMode) {
+      challenge.ended_at = nowIso();
+      return render();
+    }
+    await chRpc("end_challenge", { p_challenge: challenge.id });
+    await chLoad(true);
+    render();
+  }
+
+  // ---- Challenge page: before the reveal, a waiting card; after it, the replay. ----
+  function chBadge(player, size = "") {
+    return `<span class="gx-ch-badge ${size}">${gxBadge(player.badge, player.display_name, 0, 20)}</span>`;
+  }
+
+  function renderChallenge() {
+    const challenge = chFind(app.view.challengeId);
+    if (!challenge) {
+      chLoad(true).then(() => (chFind(app.view.challengeId) ? render() : setView({ name: "practice" })));
+      root.innerHTML = gxShell(`<div class="gx-home"><section class="gx-card"><p class="gx-muted">Loading the challenge…</p></section></div>`, "practice");
+      return;
+    }
+    const content = chRevealed(challenge) ? chReplayPage(challenge) : chWaitingPage(challenge);
+    root.innerHTML = gxShell(content, "practice");
+    if (chRevealed(challenge)) chReplayMount(challenge);
+  }
+
+  function chWaitingPage(challenge) {
+    const mine = chMine(challenge);
+    const score = chScore(challenge, chUserId());
+    const finished = challenge.players.filter((player) => player.finished_at).length;
+    const isHost = challenge.host_id === chUserId();
+    const state = chState();
+    const myRows = chAnswersOf(challenge, chUserId());
+    const fastest = myRows.filter((row) => row.correct).sort((a, b) => a.answer_ms - b.answer_ms)[0];
+    return `
+      <div class="gx-home gx-ch-page">
+        <div class="gx-review-head"><div><h1>${escapeHtml(challenge.title)}</h1><p class="gx-muted">${challenge.question_ids.length} questions · ${challenge.players.length} player${challenge.players.length === 1 ? "" : "s"} · results in ${chTimeLeft(challenge)} or when everyone finishes</p></div></div>
+        <div class="gx-split">
+          <section class="gx-card">
+            ${mine?.finished_at
+              ? `<span class="gx-tag">Your score</span><strong class="gx-ch-big">${score.total.toLocaleString()} pts</strong><p>${score.right} of ${challenge.question_ids.length} correct${fastest ? ` · fastest answer ${(fastest.answer_ms / 1000).toFixed(1)} s` : ""}. Everyone else's scores stay hidden until the reveal.</p>`
+              : `<span class="gx-tag">${myRows.length ? "In progress" : "Ready when you are"}</span><strong class="gx-ch-big">${myRows.length ? `${myRows.length} of ${challenge.question_ids.length} answered` : `${challenge.question_ids.length} questions`}</strong><p>Each question has its own timer. Faster correct answers score more. You can't go back to a question.</p>
+                 <button class="gx-btn is-primary" data-ch-play="${challenge.id}" type="button">${myRows.length ? "CONTINUE" : "PLAY NOW"}</button>`}
+            <div class="gx-list">
+              ${challenge.players.map((player) => `<div class="gx-listrow">${chBadge(player)}<span><b>${escapeHtml(player.display_name)}${player.user_id === chUserId() ? " <small>(you)</small>" : ""}</b><small>${player.user_id === challenge.host_id ? "Host" : "Player"}</small></span><strong class="${player.finished_at ? "is-good" : ""}">${player.finished_at ? "Finished" : "Not yet"}</strong></div>`).join("")}
+            </div>
+            <p class="gx-muted">${finished} of ${challenge.players.length} finished.</p>
+          </section>
+          <section class="gx-card gx-sidecard">
+            <div class="gx-card-head"><h2>Invite friends</h2></div>
+            <p>Share the code. Friends with an account tap Practice, then Challenges, and enter it.</p>
+            <div class="gx-ch-code" aria-label="Challenge code ${challenge.code.split("").join(" ")}">${escapeHtml(challenge.code)}</div>
+            <div class="gx-row">
+              <button class="gx-btn" data-ch-copy="${escapeAttr(challenge.code)}" type="button">Copy code</button>
+              <button class="gx-btn" data-ch-copy="${escapeAttr(chShareLink(challenge))}" type="button">Copy link</button>
+            </div>
+            ${isHost ? `<hr /><p class="gx-muted">Ending now reveals the results to everyone. Anyone who hasn't finished keeps the answers they gave so far.</p>
+              <button class="gx-btn ${state.confirmEnd === challenge.id ? "is-danger" : ""}" data-ch-end="${challenge.id}" type="button">${state.confirmEnd === challenge.id ? "TAP AGAIN TO END AND REVEAL" : "End now and reveal"}</button>` : ""}
+          </section>
+        </div>
+        <p class="gx-note">Independent practice tool. Not affiliated with or endorsed by the Civil Service Commission.</p>
+      </div>`;
+  }
+
+  // ---- Replay ----
+  function chRounds(challenge) {
+    const players = challenge.players;
+    const totals = Object.fromEntries(players.map((player) => [player.user_id, 0]));
+    const streaks = Object.fromEntries(players.map((player) => [player.user_id, 0]));
+    const best = Object.fromEntries(players.map((player) => [player.user_id, 0]));
+    const rankOf = (table) => players.map((player) => player.user_id).sort((a, b) => table[b] - table[a]);
+    let previous = rankOf(totals);
+    const name = (id) => players.find((player) => player.user_id === id)?.display_name || "Player";
+    const rounds = challenge.question_ids.map((questionId, index) => {
+      const question = chQuestion(challenge, index);
+      const picks = {};
+      const gains = {};
+      for (const player of players) {
+        const row = challenge.answers.find((answer) => answer.user_id === player.user_id && answer.question_index === index);
+        picks[player.user_id] = row ? { choice: row.choice, ms: row.answer_ms, correct: row.correct } : null;
+        if (row?.correct) {
+          streaks[player.user_id] += 1;
+          best[player.user_id] = Math.max(best[player.user_id], streaks[player.user_id]);
+          gains[player.user_id] = row.points + (streaks[player.user_id] >= 3 ? 100 : 0);
+        } else {
+          streaks[player.user_id] = 0;
+          gains[player.user_id] = 0;
+        }
+        totals[player.user_id] += gains[player.user_id];
+      }
+      const rank = rankOf(totals);
+      const correct = players.filter((player) => picks[player.user_id]?.correct);
+      const highlights = [];
+      const answeredBy = players.filter((player) => picks[player.user_id]);
+      if (answeredBy.length > 1 && correct.length === 0) highlights.push(["Stumped everyone", "nobody got this one", "#ff8a65"]);
+      else if (players.length > 2 && correct.length === 1) highlights.push([`Only ${name(correct[0].user_id)} got it`, "nobody else picked it", CH_PLAYER_COLORS[players.indexOf(correct[0]) % CH_PLAYER_COLORS.length]]);
+      if (index > 0 && rank[0] !== previous[0]) highlights.push(["Lead change", `${name(rank[0])} takes first`, "#ffd24d"]);
+      for (const player of players) {
+        const climb = previous.indexOf(player.user_id) - rank.indexOf(player.user_id);
+        if (index > 0 && climb >= 2) highlights.push(["Comeback", `${name(player.user_id)} climbs ${climb} places`, CH_PLAYER_COLORS[players.indexOf(player) % CH_PLAYER_COLORS.length]]);
+        if (picks[player.user_id]?.correct && (streaks[player.user_id] === 3 || streaks[player.user_id] === 5)) highlights.push([`×${streaks[player.user_id]} streak`, `${name(player.user_id)} is on fire`, "#ffb35c"]);
+      }
+      const fastest = correct.slice().sort((a, b) => picks[a.user_id].ms - picks[b.user_id].ms)[0];
+      const slowest = Math.max(1000, ...answeredBy.map((player) => picks[player.user_id].ms));
+      previous = rank;
+      return { index, question, picks, gains, totals: { ...totals }, rank, highlights, fastest, correct: correct.length, trackMax: Math.max(10, Math.ceil(slowest / 1000 * 1.2 / 5) * 5), timer: challenge.question_timers[index] };
+    });
+    return { rounds, best };
+  }
+
+  function chReplayPage(challenge) {
+    try {
+      localStorage.setItem(`csc-ch-watched-${challenge.id}`, "1");
+    } catch {
+      // Watched state is only a convenience for the Home card.
+    }
+    return `
+      <div class="gx-home gx-ch-page">
+        <div class="gx-review-head"><div><h1>${escapeHtml(challenge.title)}</h1><p class="gx-muted">${challenge.players.length} players · ${challenge.question_ids.length} questions · results revealed</p></div>
+          <button class="gx-btn" data-action="ch-list" type="button">All challenges</button></div>
+        <div class="gx-ch-stage" data-ch-stage>
+          <canvas class="gx-ch-fx" aria-hidden="true"></canvas>
+          <div class="gx-ch-q" data-ch-q></div>
+          <div class="gx-ch-board"><h2>Leaderboard</h2><div class="gx-ch-rows" data-ch-rows style="height: ${challenge.players.length * 64}px"></div><div class="gx-ch-fast" data-ch-fast>Press play to watch the round.</div></div>
+          <div class="gx-ch-podium" data-ch-podium hidden></div>
+          <div class="gx-ch-callouts" data-ch-callouts role="status"></div>
+        </div>
+        <div class="gx-row">
+          <button class="gx-btn is-primary" data-ch-replay="play" type="button">PLAY</button>
+          <button class="gx-btn" data-ch-replay="next" type="button">Next</button>
+          <button class="gx-btn" data-ch-replay="end" type="button">Skip to podium</button>
+          <button class="gx-btn" data-ch-replay="speed" type="button" aria-pressed="false">2× speed</button>
+        </div>
+        <div class="gx-ch-dots" data-ch-dots aria-label="Questions"></div>
+      </div>`;
+  }
+
+  function chReplayMount(challenge) {
+    const { rounds, best } = chRounds(challenge);
+    const players = challenge.players;
+    const color = (id) => CH_PLAYER_COLORS[players.findIndex((player) => player.user_id === id) % CH_PLAYER_COLORS.length];
+    const maxTotal = Math.max(1, ...Object.values(rounds.at(-1)?.totals || {}));
+    const motion = !gxReducedMotion() && gxFxLevel(null) !== "calm";
+    const replay = app.chReplay = { challengeId: challenge.id, i: -1, playing: false, speed: 1, timers: [] };
+    const stage = root.querySelector("[data-ch-stage]");
+    const $ = (selector) => stage.querySelector(selector);
+    const later = (fn, ms) => replay.timers.push(setTimeout(() => { if (app.chReplay === replay && stage.isConnected) fn(); }, ms));
+    const clear = () => { replay.timers.forEach(clearTimeout); replay.timers = []; };
+    const badge = (player) => chBadge(player, "is-small");
+    const rowsBox = $("[data-ch-rows]");
+    rowsBox.innerHTML = players.map((player) => `<div class="gx-ch-row" data-p="${player.user_id}" style="--c: ${color(player.user_id)}"><i class="gx-ch-fill"></i><span class="gx-ch-rank"></span>${badge(player)}<span class="gx-ch-who">${escapeHtml(player.display_name)}</span><span class="gx-ch-crown" aria-hidden="true">${gxIcon("crown", 18)}</span><span class="gx-ch-pts" data-v="0">0</span><span class="gx-ch-gain"></span></div>`).join("");
+
+    const rows = (round) => {
+      const totals = round ? round.totals : Object.fromEntries(players.map((player) => [player.user_id, 0]));
+      const rank = round ? round.rank : players.map((player) => player.user_id);
+      for (const player of players) {
+        const row = rowsBox.querySelector(`[data-p="${player.user_id}"]`);
+        const position = rank.indexOf(player.user_id);
+        row.style.transform = `translateY(${position * 64}px)`;
+        row.querySelector(".gx-ch-rank").textContent = position + 1;
+        row.querySelector(".gx-ch-fill").style.width = `${Math.max(3, (totals[player.user_id] / maxTotal) * 100)}%`;
+        const points = row.querySelector(".gx-ch-pts");
+        points.dataset.v = totals[player.user_id];
+        points.textContent = totals[player.user_id].toLocaleString();
+        row.classList.toggle("is-lead", Boolean(round) && position === 0);
+        const gain = row.querySelector(".gx-ch-gain");
+        gain.textContent = round?.gains[player.user_id] ? `+${round.gains[player.user_id]}` : "";
+        gain.classList.remove("is-up");
+        void gain.offsetWidth;
+        if (round?.gains[player.user_id] && motion) gain.classList.add("is-up");
+      }
+    };
+    const dots = () => {
+      stage.parentElement.querySelector("[data-ch-dots]").innerHTML = rounds.map((round, index) => `<button type="button" class="gx-ch-dot ${index === replay.i ? "is-now" : index < replay.i ? "is-past" : ""} ${round.highlights.length ? "has-hl" : ""}" data-ch-jump="${index}" aria-label="Question ${index + 1}${round.highlights.length ? ", highlight" : ""}">${index + 1}</button>`).join("");
+    };
+    const question = (round) => {
+      const box = $("[data-ch-q]");
+      const q = round.question;
+      box.className = "gx-ch-q";
+      void box.offsetWidth;
+      if (motion) box.classList.add("is-in");
+      box.innerHTML = `<div class="gx-ch-qhead"><strong>Question ${round.index + 1} <small>of ${rounds.length}</small></strong><span class="gx-tag">${escapeHtml(q?.csc_skill || "")}</span></div>
+        <p class="gx-ch-prompt">${escapeHtml(q?.prompt || "Question unavailable")}</p>
+        <div class="gx-ch-tiles is-grid">${(q?.choices || []).map((choice, position) => `<div class="gx-ch-tile" data-k="${choice.id}" style="--tile: ${CH_TILES[position % 4][0]}">${CH_TILES[position % 4][1]}<span>${gxChoiceText(choice.text, q.stimulus)}</span><span class="gx-ch-pickers"></span></div>`).join("")}</div>
+        <div class="gx-ch-track" data-max="${round.trackMax} s">${players.map((player) => `<span class="gx-ch-runner" data-p="${player.user_id}">${badge(player)}<small></small></span>`).join("")}</div>`;
+    };
+    const drop = (round, speed) => {
+      const order = players.filter((player) => round.picks[player.user_id]).sort((a, b) => round.picks[a.user_id].ms - round.picks[b.user_id].ms);
+      order.forEach((player, n) => later(() => {
+        const pick = round.picks[player.user_id];
+        if (pick.choice) stage.querySelector(`.gx-ch-tile[data-k="${pick.choice}"] .gx-ch-pickers`)?.insertAdjacentHTML("beforeend", `<span class="gx-ch-picker">${badge(player)}</span>`);
+        const runner = stage.querySelector(`.gx-ch-runner[data-p="${player.user_id}"]`);
+        if (runner) {
+          runner.classList.add(n % 2 ? "is-down" : "is-up", "is-on");
+          runner.style.left = `${8 + (pick.ms / 1000 / round.trackMax) * 84}%`;
+          runner.querySelector("small").textContent = `${(pick.ms / 1000).toFixed(1)} s`;
+        }
+        chSound("drop", 0.4);
+      }, (n * 280) / speed));
+    };
+    const reveal = (round) => {
+      stage.querySelectorAll(".gx-ch-tile").forEach((tile) => {
+        const right = tile.dataset.k === round.question?.correct;
+        tile.classList.add(right ? "is-right" : "is-out");
+        if (!right && tile.querySelector(".gx-ch-picker") && motion) tile.classList.add("is-shake");
+        if (right && round.correct && motion) {
+          const point = gxFxCenter(tile);
+          gxFxBurst(point.x, point.y, ["#ffffff", "#ffd24d", tile.style.getPropertyValue("--tile")], 18, 3.4);
+        }
+      });
+      players.forEach((player) => { if (round.picks[player.user_id] && !round.picks[player.user_id].correct) stage.querySelector(`.gx-ch-runner[data-p="${player.user_id}"]`)?.classList.add("is-wrong"); });
+      chSound(round.correct ? "right" : "wrong", 0.5);
+    };
+    const callouts = (list, speed) => {
+      const box = $("[data-ch-callouts]");
+      box.innerHTML = "";
+      list.forEach(([title, sub, tint], n) => later(() => {
+        box.innerHTML = `<div class="gx-ch-callout" style="--cc: ${tint}"><strong>${escapeHtml(title)}</strong><small>${escapeHtml(sub)}</small></div>`;
+        chSound("callout", 0.45);
+        if (motion) {
+          const point = gxFxCenter(box);
+          gxFxRing(point.x, point.y, tint, 8);
+          gxFxBurst(point.x, point.y, [tint, "#ffffff"], 14, 3);
+        }
+      }, (n * 1500) / speed));
+    };
+    const finale = () => {
+      clear();
+      replay.playing = false;
+      stage.parentElement.querySelector('[data-ch-replay="play"]').textContent = "REPLAY";
+      const last = rounds.at(-1);
+      const order = last.rank.map((id) => players.find((player) => player.user_id === id));
+      const place = (player, n) => player ? `<div class="gx-ch-step p${n}">${chBadge(player, "is-large")}<b>${escapeHtml(player.display_name)}</b><small>${last.totals[player.user_id].toLocaleString()} pts</small><div class="gx-ch-block">${n}</div></div>` : "";
+      const tough = rounds.slice().sort((a, b) => a.correct - b.correct)[0];
+      const podium = $("[data-ch-podium]");
+      podium.hidden = false;
+      podium.innerHTML = `<h2>Final standings</h2><div class="gx-ch-steps">${place(order[1], 2)}${place(order[0], 1)}${place(order[2], 3)}</div>
+        ${order.length > 3 ? `<p class="gx-muted">${order.slice(3).map((player, n) => `${n + 4}. ${escapeHtml(player.display_name)} · ${last.totals[player.user_id].toLocaleString()} pts`).join(" · ")}</p>` : ""}
+        <div class="gx-ch-stats">${players.map((player) => {
+          const rows = challenge.answers.filter((answer) => answer.user_id === player.user_id);
+          const right = rows.filter((answer) => answer.correct).length;
+          const avg = rows.length ? rows.reduce((sum, answer) => sum + answer.answer_ms, 0) / rows.length / 1000 : 0;
+          return `<div class="gx-ch-stat">${badge(player)}<div><b>${escapeHtml(player.display_name)}</b>${right}/${rounds.length} correct · ${avg.toFixed(1)} s avg · best streak ×${best[player.user_id]}${player.finished_at ? "" : " · didn't finish"}</div></div>`;
+        }).join("")}</div>
+        ${tough?.question ? `<div class="gx-ch-tough"><b>Toughest question:</b> Q${tough.index + 1}, "${escapeHtml(tough.question.prompt)}" (${tough.correct} of ${players.length} correct). Answer: ${escapeHtml(tough.question.choices.find((choice) => choice.id === tough.question.correct)?.text || tough.question.correct)}.</div>` : ""}`;
+      stage.classList.add("is-final");
+      $("[data-ch-callouts]").innerHTML = "";
+      replay.i = rounds.length;
+      dots();
+      chSound("fanfare", 0.7);
+      if (motion) {
+        const width = window.innerWidth;
+        for (let column = 0; column < 6; column += 1) gxFxBurst((width / 6) * (column + 0.5), -10, ["#ffd24d", "#ff8a65", "#4dc3ff", "#5ee0a0", "#ffffff"], 20, 3, "confetti");
+        later(() => {
+          const winner = podium.querySelector(".p1 .gx-ch-badge");
+          if (winner) {
+            const point = gxFxCenter(winner);
+            gxFxRing(point.x, point.y, "#ffd24d", 9);
+            chSound("sparkle", 0.5);
+          }
+        }, 1200);
+      }
+    };
+    const step = () => {
+      clear();
+      if (replay.i >= rounds.length - 1) return finale();
+      replay.i += 1;
+      const round = rounds[replay.i];
+      const speed = replay.speed;
+      const quiet = round.highlights.length === 0;
+      const d = (quiet ? 0.65 : 1) / speed;
+      stage.classList.remove("is-final");
+      $("[data-ch-podium]").hidden = true;
+      dots();
+      question(round);
+      $("[data-ch-fast]").textContent = `Question ${round.index + 1}: picks are coming in…`;
+      later(() => drop(round, 1 / d), 500 * d);
+      later(() => reveal(round), 1900 * d);
+      later(() => { rows(round); $("[data-ch-fast]").textContent = round.fastest ? `Fastest correct: ${players.find((player) => player.user_id === round.fastest.user_id)?.display_name} in ${(round.picks[round.fastest.user_id].ms / 1000).toFixed(1)} s` : "Nobody got it right"; }, 2400 * d);
+      later(() => callouts(round.highlights, speed), 2900 * d);
+      if (replay.playing) later(step, quiet ? 3900 * d : 3300 * d + (round.highlights.length * 1500) / speed);
+    };
+    replay.step = step;
+    replay.finale = finale;
+    replay.clear = clear;
+    replay.rows = rows;
+    replay.rounds = rounds;
+    rows(null);
+    dots();
+    if (rounds.length) question(rounds[0]);
+  }
+
+  function chReplayControl(action, value) {
+    const replay = app.chReplay;
+    if (!replay) return;
+    const playButton = root.querySelector('[data-ch-replay="play"]');
+    if (action === "play") {
+      if (replay.i >= replay.rounds.length) {
+        replay.i = -1;
+        replay.rows(null);
+      }
+      replay.playing = !replay.playing;
+      playButton.textContent = replay.playing ? "PAUSE" : "PLAY";
+      if (replay.playing) replay.step();
+      else replay.clear();
+    }
+    if (action === "next") {
+      replay.playing = false;
+      playButton.textContent = "PLAY";
+      replay.step();
+    }
+    if (action === "end") {
+      replay.rows(replay.rounds.at(-1));
+      replay.finale();
+    }
+    if (action === "speed") {
+      replay.speed = replay.speed === 1 ? 2 : 1;
+      const button = root.querySelector('[data-ch-replay="speed"]');
+      button.setAttribute("aria-pressed", String(replay.speed === 2));
+    }
+    if (action === "jump") {
+      replay.clear();
+      replay.playing = false;
+      playButton.textContent = "PLAY";
+      replay.i = Number(value) - 1;
+      replay.rows(replay.i >= 0 ? replay.rounds[replay.i] : null);
+      replay.step();
+    }
+  }
+
+  // ---- Challenges tab (Practice page) ----
+  function challengesTabContent() {
+    const state = chState();
+    if (!state.loaded) {
+      chLoad().then(() => app.view.name === "practice" && app.practiceReviewTab === "challenges" && render());
+      return `<section class="gx-card"><p class="gx-muted">Loading your challenges…</p></section>`;
+    }
+    const created = state.created && chFind(state.created.id);
+    const draft = state.draft;
+    const groups = ["Verbal Ability", "Analytical Ability", "Numerical Ability", "General Information"];
+    return `
+      ${created ? `<section class="gx-card gx-ch-created">
+        <div class="gx-card-head"><h2>Challenge ready</h2><span class="gx-muted">${escapeHtml(created.title)}</span></div>
+        <p>Send this code to your friends. Results unlock when everyone finishes, or in ${chTimeLeft(created)}.</p>
+        <div class="gx-ch-code">${escapeHtml(created.code)}</div>
+        <div class="gx-row"><button class="gx-btn" data-ch-copy="${escapeAttr(created.code)}" type="button">Copy code</button><button class="gx-btn" data-ch-copy="${escapeAttr(chShareLink(created))}" type="button">Copy link</button><button class="gx-btn is-primary" data-ch-play="${created.id}" type="button">PLAY NOW</button></div>
+      </section>` : ""}
+      <div class="gx-split">
+        <section class="gx-card">
+          <div class="gx-card-head"><h2>Start a challenge</h2></div>
+          <p class="gx-muted">Everyone gets the same questions. Fast correct answers score up to 1,000 points. Scores stay secret until the reveal.</p>
+          <label class="gx-field">Name <input data-ch-title maxlength="60" placeholder="Speed round" value="${escapeAttr(draft.title)}" /></label>
+          <fieldset class="gx-fieldset"><legend>Question types</legend>
+            ${groups.map((group) => `<div class="gx-ch-chips" role="group" aria-label="${escapeAttr(group)}"><span style="${gxToneStyle(group)}">${escapeHtml(group.replace(" Information", "").replace(" Ability", ""))}</span>${CH_SKILLS.filter((skill) => skill[2] === group).map(([key, label]) => `<button class="gx-ch-chip" data-ch-skill="${escapeAttr(key)}" aria-pressed="${draft.skills.has(key)}" type="button">${escapeHtml(label)}</button>`).join("")}</div>`).join("")}
+          </fieldset>
+          <div class="gx-segment" role="group" aria-label="Number of questions"><span>Questions</span>${[5, 10, 15].map((count) => `<button class="gx-ch-seg" data-ch-count="${count}" aria-pressed="${draft.count === count}" type="button">${count}</button>`).join("")}</div>
+          <div class="gx-segment" role="group" aria-label="Deadline"><span>Results unlock in</span>${[[6, "6 h"], [24, "24 h"], [48, "2 days"], [72, "3 days"]].map(([hours, label]) => `<button class="gx-ch-seg" data-ch-hours="${hours}" aria-pressed="${draft.hours === hours}" type="button">${label}</button>`).join("")}</div>
+          <button class="gx-btn is-primary" data-action="ch-create" type="button" ${state.busy === "create" ? "disabled" : ""}>${state.busy === "create" ? "CREATING…" : "CREATE CHALLENGE"}</button>
+        </section>
+        <section class="gx-card gx-sidecard">
+          <div class="gx-card-head"><h2>Join a challenge</h2></div>
+          <label class="gx-field">Code <input data-ch-code maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="K7QX2M" value="${escapeAttr(state.joinCode)}" /></label>
+          <button class="gx-btn is-primary" data-action="ch-join" type="button" ${state.busy === "join" ? "disabled" : ""}>${state.busy === "join" ? "JOINING…" : "JOIN"}</button>
+          <hr />
+          <div class="gx-card-head"><h2>Your challenges</h2><button class="gx-icon-btn is-bare" data-action="ch-refresh" type="button" aria-label="Refresh challenges">${gxIcon("refresh", 20)}</button></div>
+          ${state.error ? `<p class="gx-error">Couldn't load your challenges: ${escapeHtml(state.error)} <button class="gx-link" data-action="ch-refresh" type="button">Try again</button></p>` : ""}
+          ${state.list.length ? `<div class="gx-list">${state.list.map((challenge) => {
+            const status = chStatus(challenge);
+            return `<div class="gx-listrow"><span><b>${escapeHtml(challenge.title)}</b><small>${challenge.players.length} player${challenge.players.length === 1 ? "" : "s"} · ${challenge.question_ids.length} questions · code ${escapeHtml(challenge.code)}</small></span><strong class="${status.key === "results" ? "is-good" : status.key === "play" ? "is-warn" : ""}">${escapeHtml(status.label)}</strong><button class="gx-btn" data-ch-open="${challenge.id}" type="button">${status.key === "play" ? "Play" : status.key === "results" ? "Watch" : "Open"}</button></div>`;
+          }).join("")}</div>` : state.error ? "" : `<p class="gx-muted">No challenges yet. Start one, or join with a friend's code.</p>`}
+        </section>
+      </div>`;
+  }
+
+  // Home card: a challenge waiting on you, or results you haven't watched.
+  function chHomeCard() {
+    if (app.fixtureMode && !app.ch) return "";
+    const state = chState();
+    if (!state.loaded) {
+      chLoad().then(() => app.view.name === "dashboard" && state.list.length && render());
+      return "";
+    }
+    const watched = (challenge) => {
+      try {
+        return localStorage.getItem(`csc-ch-watched-${challenge.id}`) === "1";
+      } catch {
+        return false;
+      }
+    };
+    const results = state.list.find((challenge) => chRevealed(challenge) && !watched(challenge));
+    const turn = state.list.find((challenge) => chStatus(challenge).key === "play");
+    const pick = results || turn;
+    if (!pick) return "";
+    return `<section class="gx-card gx-ch-home ${results ? "is-results" : ""}">
+      <div class="gx-ch-home-badges">${pick.players.slice(0, 5).map((player) => chBadge(player)).join("")}</div>
+      <div><h2>${results ? "Challenge results are in" : "Your turn in a challenge"}</h2><p>"${escapeHtml(pick.title)}" · ${pick.players.length} player${pick.players.length === 1 ? "" : "s"}${results ? "" : ` · closes in ${chTimeLeft(pick)}`}</p></div>
+      <button class="gx-btn is-primary" data-ch-open="${pick.id}" type="button">${results ? "WATCH THE REPLAY" : "PLAY"}</button>
+    </section>`;
+  }
+
+  // Click handling for every challenge control. Returns true when it handled the click.
+  async function chHandleClick(target, action) {
+    const state = chState();
+    if (target.dataset.chSkill) {
+      const key = target.dataset.chSkill;
+      if (state.draft.skills.has(key)) state.draft.skills.delete(key);
+      else state.draft.skills.add(key);
+      target.setAttribute("aria-pressed", String(state.draft.skills.has(key)));
+      return true;
+    }
+    if (target.dataset.chCount) {
+      state.draft.count = Number(target.dataset.chCount);
+      target.closest("[role=group]").querySelectorAll("[data-ch-count]").forEach((button) => button.setAttribute("aria-pressed", String(button === target)));
+      return true;
+    }
+    if (target.dataset.chHours) {
+      state.draft.hours = Number(target.dataset.chHours);
+      target.closest("[role=group]").querySelectorAll("[data-ch-hours]").forEach((button) => button.setAttribute("aria-pressed", String(button === target)));
+      return true;
+    }
+    if (target.dataset.chCopy) {
+      await chCopy(target.dataset.chCopy);
+      return true;
+    }
+    if (target.dataset.chOpen) {
+      const challenge = chFind(target.dataset.chOpen);
+      if (challenge && chStatus(challenge).key === "play") setView({ name: "challenge-play", challengeId: challenge.id });
+      else setView({ name: "challenge", challengeId: target.dataset.chOpen });
+      return true;
+    }
+    if (target.dataset.chPlay) {
+      state.created = null;
+      setView({ name: "challenge-play", challengeId: target.dataset.chPlay });
+      return true;
+    }
+    if (target.dataset.chChoice) {
+      const challenge = chFind(app.view.challengeId);
+      const index = chNextIndex(challenge);
+      if (challenge && index >= 0) await chAnswer(challenge, index, target.dataset.chChoice);
+      return true;
+    }
+    if (target.dataset.chEnd) {
+      const challenge = chFind(target.dataset.chEnd);
+      if (state.confirmEnd !== target.dataset.chEnd) {
+        state.confirmEnd = target.dataset.chEnd;
+        render();
+        return true;
+      }
+      state.confirmEnd = null;
+      if (challenge) await chEnd(challenge);
+      return true;
+    }
+    if (target.dataset.chReplay) {
+      chReplayControl(target.dataset.chReplay);
+      return true;
+    }
+    if (target.dataset.chJump) {
+      chReplayControl("jump", target.dataset.chJump);
+      return true;
+    }
+    if (action === "ch-create") {
+      state.draft.title = root.querySelector("[data-ch-title]")?.value || "";
+      state.busy = "create";
+      render();
+      try {
+        await chCreate();
+      } finally {
+        state.busy = "";
+        render();
+      }
+      return true;
+    }
+    if (action === "ch-join") {
+      state.joinCode = root.querySelector("[data-ch-code]")?.value || "";
+      state.busy = "join";
+      render();
+      try {
+        await chJoin(state.joinCode);
+      } finally {
+        state.busy = "";
+        if (app.view.name === "practice") render();
+      }
+      return true;
+    }
+    if (action === "ch-refresh") {
+      await chLoad(true);
+      render();
+      return true;
+    }
+    if (action === "ch-leave") {
+      clearInterval(app.chTimer);
+      app.practiceReviewTab = "challenges";
+      setView({ name: "practice" });
+      return true;
+    }
+    if (action === "ch-list") {
+      app.practiceReviewTab = "challenges";
+      setView({ name: "practice" });
+      return true;
+    }
+    return false;
+  }
+
+  // QA fixtures: a waiting challenge, one ready to play, and a revealed one with four players for the replay.
+  function chFixtures(state) {
+    const me = "fixture-user";
+    const ids = questionBank.filter((question) => ["Word meaning", "Word analogy", "Number sequence"].includes(question.cscSkill) && !question.stimulus).slice(0, 10).map((question) => question.id);
+    const timers = ids.map((id) => Math.max(10, Math.min(180, Math.round(Number(questionsById.get(id)?.expectedSeconds) || 50))));
+    const people = [[me, "John", 5], ["fx-mara", "Mara", 2], ["fx-jun", "Jun", 3], ["fx-ana", "Ana", 4]];
+    const base = (id, title, ended) => ({ id, code: "K7QX2M", host_id: me, title, question_ids: ids, question_timers: timers, question_types: ["Word meaning"], choice_seed: 777, created_at: nowIso(), deadline: new Date(Date.now() + 18 * 3600000).toISOString(), ended_at: ended ? nowIso() : null });
+    const revealed = { ...base("fx-revealed", "Saturday Speed Round", true), players: people.map(([id, name, badge]) => ({ challenge_id: "fx-revealed", user_id: id, display_name: name, badge, joined_at: nowIso(), finished_at: nowIso() })), answers: [] };
+    const plan = { [me]: [1, 1, 1, 1, 1, 0, 1, 0, 1, 1], "fx-mara": [1, 1, 0, 1, 0, 0, 1, 0, 1, 1], "fx-jun": [1, 1, 1, 0, 0, 1, 1, 1, 1, 0], "fx-ana": [0, 1, 1, 1, 1, 1, 1, 0, 1, 1] };
+    const speed = { [me]: 6, "fx-mara": 4, "fx-jun": 9, "fx-ana": 7 };
+    for (const [userId] of people) {
+      ids.forEach((id, index) => {
+        const question = chQuestion(revealed, index);
+        const right = plan[userId][index] === 1;
+        const wrong = question.choices.find((choice) => choice.id !== question.correct)?.id || "A";
+        const ms = Math.round((speed[userId] + ((index * 7 + userId.length) % 9)) * 1000);
+        revealed.answers.push({ challenge_id: "fx-revealed", user_id: userId, question_index: index, choice: right ? question.correct : wrong, answer_ms: ms, correct: right, points: chPoints(right, ms, timers[index]) });
+      });
+    }
+    const waiting = { ...base("fx-waiting", "Weeknight sprint", false), players: [{ challenge_id: "fx-waiting", user_id: me, display_name: "John", badge: 5, joined_at: nowIso(), finished_at: nowIso() }, { challenge_id: "fx-waiting", user_id: "fx-mara", display_name: "Mara", badge: 2, joined_at: nowIso(), finished_at: null }], answers: [] };
+    ids.forEach((id, index) => waiting.answers.push({ challenge_id: "fx-waiting", user_id: me, question_index: index, choice: "A", answer_ms: 5000, correct: index % 3 !== 0, points: index % 3 !== 0 ? chPoints(true, 5000, timers[index]) : 0 }));
+    const play = { ...base("fx-play", "Lunch break round", false), players: [{ challenge_id: "fx-play", user_id: "fx-ana", display_name: "Ana", badge: 4, joined_at: nowIso(), finished_at: nowIso() }, { challenge_id: "fx-play", user_id: me, display_name: "John", badge: 5, joined_at: nowIso(), finished_at: null }], answers: [], host_id: "fx-ana" };
+    state.list = [revealed, waiting, play];
+    state.loaded = true;
+  }
+
   function renderPractice() {
     const tab = app.practiceReviewTab || "practice";
     const content = `
       <div class="gx-home">
         <div class="gx-review-head">
-          <div><h1>Practice</h1><p class="gx-muted">Short sets with instant feedback, plus your mistakes and flagged questions.</p></div>
+          <div><h1>Practice</h1><p class="gx-muted">Short sets with instant feedback, your mistakes and flags, and challenges with friends.</p></div>
           ${practiceReviewTabs(tab)}
         </div>
-        ${tab === "mistakes" ? mistakesTabContent() : tab === "flagged" ? flaggedTabContent() : practiceTabContent()}
+        ${tab === "mistakes" ? mistakesTabContent() : tab === "flagged" ? flaggedTabContent() : tab === "challenges" ? challengesTabContent() : practiceTabContent()}
       </div>`;
     root.innerHTML = gxShell(content, "practice");
   }
@@ -3162,7 +4089,7 @@
     const mistakes = wrongAnswerCount(completedAttempts());
     const flagged = app.attempts.reduce((sum, attempt) => sum + flaggedCount(attempt), 0);
     return `<div class="gx-filters" role="group" aria-label="Practice and review">
-      ${[["practice", "Practice", ""], ["mistakes", "Mistakes", mistakes], ["flagged", "Flagged", flagged]].map(([key, label, count]) => `<button aria-pressed="${active === key}" class="${active === key ? "is-active" : ""}" data-practice-review-tab="${key}" type="button">${label}${count !== "" ? ` <small>${count}</small>` : ""}</button>`).join("")}
+      ${[["practice", "Practice", ""], ["mistakes", "Mistakes", mistakes], ["flagged", "Flagged", flagged], ["challenges", "Challenges", ""]].map(([key, label, count]) => `<button aria-pressed="${active === key}" class="${active === key ? "is-active" : ""}" data-practice-review-tab="${key}" type="button">${label}${count !== "" ? ` <small>${count}</small>` : ""}</button>`).join("")}
     </div>`;
   }
 
@@ -4493,6 +5420,7 @@
     if (target.tagName === "A") event.preventDefault();
     const action = target.dataset.action;
     try {
+      if (await chHandleClick(target, action)) return;
       if (app.fixtureMode && handleFixtureClick(target, action)) return;
       if (target.dataset.fxLevel) {
         app.audio.effects = target.dataset.fxLevel;
@@ -4728,6 +5656,15 @@
 
   function handleKeydown(event) {
     if (event.key === "Tab") root.dataset.inputMode = "keyboard";
+    if (app.view.name === "challenge-play" && !event.altKey && !event.ctrlKey && !event.metaKey && !(event.target instanceof HTMLInputElement)) {
+      const position = "abcd".indexOf(event.key.toLowerCase()) >= 0 ? "abcd".indexOf(event.key.toLowerCase()) : "1234".indexOf(event.key);
+      const tile = position >= 0 ? root.querySelectorAll("[data-ch-choice]")[position] : null;
+      if (tile && !tile.disabled) {
+        event.preventDefault();
+        tile.click();
+        return;
+      }
+    }
     if (event.key === "Enter" && !event.shiftKey && event.target instanceof HTMLInputElement) {
       const form = event.target.closest("form");
       const action = form?.dataset.form === "signin"
