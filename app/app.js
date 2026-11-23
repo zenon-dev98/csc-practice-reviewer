@@ -1064,7 +1064,7 @@
   }
 
   function gxPasswordField(name, label, autocomplete, placeholder) {
-    return `<label class="gx-field">${label}<span class="field-with-icon gx-pass"><input name="${name}" type="password" minlength="8" autocomplete="${autocomplete}" placeholder="${escapeAttr(placeholder)}" required /><button class="password-toggle gx-icon-btn is-bare" data-action="toggle-password" type="button" aria-label="Show password"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>`;
+    return `<label class="gx-field">${label}<span class="gx-pass"><input name="${name}" type="password" minlength="8" autocomplete="${autocomplete}" placeholder="${escapeAttr(placeholder)}" required /><button class="password-toggle gx-icon-btn is-bare" data-action="toggle-password" type="button" aria-label="Show password"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>`;
   }
 
   function gxPublicPage(content, { bare = false } = {}) {
@@ -3217,7 +3217,7 @@
 
   function passwordModal() {
     if (app.modal !== "password") return "";
-    const field = (name, label, autocomplete) => `<label class="gx-field">${label}<span class="field-with-icon gx-pass"><input name="${name}" type="password" minlength="8" autocomplete="${autocomplete}" required /><button class="password-toggle gx-icon-btn is-bare" data-action="toggle-password" type="button" aria-label="Show password"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>`;
+    const field = (name, label, autocomplete) => `<label class="gx-field">${label}<span class="gx-pass"><input name="${name}" type="password" minlength="8" autocomplete="${autocomplete}" required /><button class="password-toggle gx-icon-btn is-bare" data-action="toggle-password" type="button" aria-label="Show password"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>`;
     return `
       <div class="gx-backdrop">
         <section class="gx-modal" role="dialog" aria-modal="true" aria-labelledby="password-title" tabindex="-1">
@@ -4710,7 +4710,7 @@
   }
 
   function togglePasswordVisibility(button) {
-    const field = button.closest(".field-with-icon");
+    const field = button.closest(".gx-pass, .field-with-icon");
     const input = field?.querySelector("input");
     if (!input) return;
     const visible = input.type === "password";

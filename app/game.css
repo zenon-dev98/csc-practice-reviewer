@@ -509,6 +509,7 @@ a.gx-btn { text-decoration: none; }
 .gx-field { display: flex; flex-direction: column; gap: 6px; font-weight: 900; }
 .gx-field small { color: var(--muted); font-size: 13px; font-weight: 700; }
 .gx-pass { position: relative; display: block; }
+#app .gx .gx-pass input { padding-right: 52px; }
 .gx-pass .gx-icon-btn { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 42px; height: 42px; }
 .gx-error { padding: 10px 14px; border-radius: 12px; background: color-mix(in srgb, var(--bad) 14%, transparent); color: var(--bad); font-weight: 800; }
 .gx-profile-head { display: flex; align-items: center; gap: 14px; }
@@ -888,3 +889,10 @@ html body #app .gx .exam-answered-value.is-tick { display: inline-block !importa
   .gx-fx-coach.is-out { animation: gx-fx-fade-out .2s ease forwards; }
   .gx-fx-fuse i { transition: none; }
 }
+
+/* Focus: one ring in the game's select blue. cockpit-theme.css forces a teal outline on every #app input and button
+   with !important, which doubled up around password fields; inside the game screens this rule wins. */
+#app .gx input:focus-visible, #app .gx select:focus-visible, #app .gx textarea:focus-visible, #app .gx button:focus-visible, #app .gx summary:focus-visible, #app .gx a:focus-visible {
+  outline: 3px solid var(--select) !important; outline-offset: 2px !important;
+}
+#app .gx .gx-pass .gx-icon-btn:focus-visible { outline-offset: -3px !important; }
