@@ -849,3 +849,42 @@ html body #app .gx .exam-answered-value.is-tick { display: inline-block !importa
   .gx-seg.is-cleared::after, .gx-fx-aura { animation: none; display: none; }
 }
 @keyframes gx-fx-fade-out { to { opacity: 0; } }
+
+/* ---- Exam effects, phase 2 (2026-11-23) ----
+   .gx-combo = flow chip (x3 on, x10 hot) · .gx-fx-fire = header flames, a canvas moved into each new header and
+   drawn behind its content · .gx-fx-inferno = x25 ring, spins 8 s then settles dim and still · .gx-fx-coach = pace
+   coach card above the bottom bar, 4.2 s · .gx-fx-fuse + .gx-timer.is-bomb = final ten minutes. */
+.gx-top { isolation: isolate; }
+.gx-fx-fire { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; pointer-events: none; }
+.gx-top.has-fire .gx-progress-meta, .gx-top.has-fire .gx-timer small { text-shadow: 0 1px 3px rgba(0, 0, 0, .85); }
+.gx-top.is-ember { box-shadow: inset 0 -18px 18px -14px rgba(255, 122, 26, .6); }
+/* One line: the run label truncates so the chip and the answered count never wrap the header. */
+.gx-run { display: flex; align-items: center; min-width: 0; }
+.gx-run > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-progress-meta > span:last-child { flex: none; white-space: nowrap; }
+.gx-combo { flex: none; display: inline-flex; align-items: center; margin-left: 8px; padding: 1px 8px; border-radius: 10px; background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); font-size: 12px; font-weight: 900; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.gx-combo.is-hot { background: linear-gradient(90deg, #ff7a1a, #ffc93c); color: #2a1200; }
+.gx-combo.is-pop, .gx-streak.is-pop { animation: gx-fx-combo-pop .5s var(--gx-spring); }
+@keyframes gx-fx-combo-pop { 0% { transform: scale(.6) rotate(-8deg); } 100% { transform: none; } }
+.gx-fx-inferno { position: absolute; inset: 0; padding: 4px; background: conic-gradient(from var(--gx-fx-angle), #ff7a1a, #ffc93c, #ff4d6d, #b07cff, #4db8ff, #7bd66b, #ff7a1a); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); animation: gx-fx-spin 3.2s linear infinite; transition: opacity .8s; }
+.gx-fx-inferno.is-dim { opacity: .4; animation-play-state: paused; }
+@keyframes gx-fx-spin { to { --gx-fx-angle: 360deg; } }
+.gx-fx-coach { position: absolute; left: 16px; right: 16px; width: fit-content; max-width: min(460px, calc(100% - 32px)); margin-inline: auto; display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border: 2px solid var(--fx-accent); border-radius: 18px; background: var(--fx-bg); color: var(--fx-text); font-size: 15px; line-height: 1.4; box-shadow: 0 16px 40px rgba(0, 0, 0, .4); opacity: 0; }
+.gx-fx-coach strong { display: block; color: var(--fx-accent); font-size: 15px; font-weight: 900; }
+.gx-fx-coach-face { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--fx-accent); color: #111; font-weight: 900; }
+.gx-fx-coach.is-in { animation: gx-fx-coach-in .45s var(--gx-spring) forwards; }
+.gx-fx-coach.is-wobble { animation: gx-fx-coach-in .45s var(--gx-spring) forwards, gx-fx-wobble .5s ease-in-out .4s; }
+.gx-fx-coach.is-calm { opacity: 1; }
+.gx-fx-coach.is-out { animation: gx-fx-banner-out .25s ease-in forwards; }
+@keyframes gx-fx-coach-in { from { opacity: 0; transform: translateY(26px) scale(.85); } to { opacity: 1; transform: none; } }
+@keyframes gx-fx-wobble { 0%, 100% { rotate: 0deg; } 25% { rotate: -2deg; } 75% { rotate: 2deg; } }
+.gx-fx-fuse { position: absolute; left: 0; right: 0; top: 0; height: 4px; }
+.gx-fx-fuse i { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, #8a6a3a 0 6px, #5e4526 6px 9px); transform-origin: left; transition: transform .9s linear; }
+.gx .gx-timer.is-bomb { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 14%, var(--surface)); }
+.gx .gx-timer.is-bomb > svg { color: var(--bad); }
+@media (prefers-reduced-motion: reduce) {
+  .gx-fx-inferno { display: none; }
+  .gx-fx-coach.is-in, .gx-fx-coach.is-wobble { animation: gx-fade .2s ease forwards; }
+  .gx-fx-coach.is-out { animation: gx-fx-fade-out .2s ease forwards; }
+  .gx-fx-fuse i { transition: none; }
+}

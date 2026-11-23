@@ -1,6 +1,6 @@
 # Motion QA
 
-- Build: `4cd21ac23af4f828`
+- Build: `b9a498e602499df6`
 - Viewport: 1536x736, headless Edge
 - Expected: 13
 - Passed: 13

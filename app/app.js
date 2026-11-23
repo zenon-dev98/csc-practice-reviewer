@@ -85,6 +85,7 @@
     "results-fail",
     "results-practice",
     "practice-exam",
+    "exam-final",
     "review",
     "review-empty",
     "practice",
@@ -469,6 +470,11 @@
     }
     if (fixtureState === "submit") {
       app.modal = "submit";
+      return setView({ name: "exam", attemptId: active.id });
+    }
+    if (fixtureState === "exam-final") {
+      // Nine minutes left, for the final-ten-minutes effects.
+      active.elapsed_seconds = active.total_time_seconds - 540;
       return setView({ name: "exam", attemptId: active.id });
     }
     if (fixtureState === "timeout") {
@@ -1224,6 +1230,7 @@
       flag: `<path d="M5 21V4h13l-3 4.5 3 4.5H5"/>`,
       menu: `<path d="M4 6h16M4 12h16M4 18h16"/>`,
       clock: `<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/>`,
+      bomb: `<circle cx="10" cy="14.5" r="6.5"/><path d="M6.8 13a3.3 3.3 0 0 1 2.5-2.7"/><path d="M13.6 9.6l1.9-1.9"/><path d="M15.5 7.7c.8-1.6 2.4-2.2 3.6-1.4"/><path d="M20.5 2.5v1.6M22.5 4.7h-1.6M21.9 3.1l-1 1"/>`,
       sound: `<path d="M4 9.5v5h4l5 4v-13l-5 4z"/><path d="M16.5 9a4.5 4.5 0 0 1 0 6M19 6.5a8 8 0 0 1 0 11"/>`,
       mute: `<path d="M4 9.5v5h4l5 4v-13l-5 4z"/><path d="M17 9.5l5 5M22 9.5l-5 5"/>`,
       back: `<path d="M15 18l-6-6 6-6"/>`,
@@ -1597,10 +1604,9 @@
             <button class="gx-icon-btn is-bare" data-action="save-exit" type="button" aria-label="Save and exit">${gxIcon("x", 24)}</button>
             <div class="gx-progress">
               ${gxProgressBar(attempt, current, groups)}
-              <div class="gx-progress-meta"><span>${escapeHtml(runLabel)}</span><span>${paperMode ? "Paper answer sheet" : `<strong class="exam-answered-value">${answeredCount(attempt)}</strong> of ${attempt.total_questions} answered`}</span></div>
+              <div class="gx-progress-meta"><span class="gx-run"><span>${escapeHtml(runLabel)}</span>${gxFxComboChip(attempt)}</span><span>${paperMode ? "Paper answer sheet" : `<strong class="exam-answered-value">${answeredCount(attempt)}</strong> of ${attempt.total_questions} answered`}</span></div>
             </div>
-            <div class="gx-timer">${gxIcon("clock", 24)}<div><strong class="exam-time-value">${escapeHtml(timerValue)}</strong>${pace ? `<small class="${pace.tone}">${pace.text}</small>` : `<small>${isPaused ? "Paused" : attempt.mode === "practice" ? "Practice" : "Time left"}</small>`}</div></div>
-            ${practice && gxStreak(attempt) > 1 ? `<span class="gx-streak"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5 .2 2 1 3 2 3.5C11 9 11 5.5 12 2z"/></svg>${gxStreak(attempt)} in a row</span>` : ""}
+            <div class="gx-timer ${gxFxTntActive(attempt, remaining) ? "is-bomb" : ""}">${gxIcon(gxFxTntActive(attempt, remaining) ? "bomb" : "clock", 24)}<div><strong class="exam-time-value">${escapeHtml(timerValue)}</strong>${pace ? `<small class="${pace.tone}">${pace.text}</small>` : `<small>${isPaused ? "Paused" : attempt.mode === "practice" ? "Practice" : "Time left"}</small>`}</div></div>
             <button class="gx-icon-btn gx-nav-toggle" data-action="toggle-exam-nav" type="button" aria-label="Open question map" aria-expanded="${app.examNavOpen ? "true" : "false"}">${gxIcon("menu")}</button>
             <button class="gx-icon-btn gx-top-theme" data-action="toggle-theme" type="button" aria-label="Switch to ${theme === "light" ? "dark" : "light"} theme">${gxIcon(theme === "light" ? "moon" : "sun")}</button>
             <div class="exam-audio-control"><button class="gx-icon-btn header-audio-button" data-action="toggle-audio-menu" type="button" aria-label="Sound and effects" aria-expanded="${app.audioMenuOpen ? "true" : "false"}">${gxIcon(app.audio.sfx ? "sound" : "mute")}</button>${audioPopover()}</div>
@@ -1735,6 +1741,13 @@
       particle.y += particle.vy;
       particle.vy += particle.kind === "confetti" ? 0.09 : 0.12;
       particle.vx *= 0.97;
+      if (particle.kind === "smoke") {
+        particle.vy -= 0.02;
+        context.beginPath();
+        context.arc(particle.x, particle.y, 6 + (1 - particle.life) * 14, 0, Math.PI * 2);
+        context.fill();
+        continue;
+      }
       if (particle.kind === "confetti") {
         particle.turn += particle.spin;
         context.save();
@@ -1788,6 +1801,8 @@
   function gxFxAdvance(kind) {
     playSound(kind === "skip" ? "skip" : "advance");
     const attempt = getAttempt(app.view.attemptId);
+    const leaving = attempt && currentAnswer(attempt);
+    if (leaving) gxFx.pending = { attemptId: attempt.id, questionId: leaving.question_id, kind };
     const column = root.querySelector(".gx-qcol");
     const gx = root.querySelector(".gx");
     if (!column || !gx || gxFxLevel(attempt) === "calm" || gxReducedMotion()) return;
@@ -1858,7 +1873,10 @@
       fired.add(groups[index].section);
       return gxFxSectionClear(gx, groups[index], index, level);
     }
-    if (freshPct.length) gxFxMilestone(gx, attempt, freshPct[freshPct.length - 1], level);
+    if (freshPct.length) {
+      gxFx.milestoneJustFired = true;
+      gxFxMilestone(gx, attempt, freshPct[freshPct.length - 1], level);
+    }
   }
 
   function gxFxSectionClear(gx, group, index, level) {
@@ -1927,6 +1945,351 @@
     gxFxBanner(gx, `All ${attempt.total_questions} answered`, `${spare}${flags} flagged · review or submit`, accent);
   }
 
+  // ---- Exam effects, phase 2 (2026-11-23): flow combo with header fire, pace coach, TNT final ten minutes. ----
+  // Flow (mocks): an item answered on its first visit within 25-100% of its expected seconds adds one; a skip or
+  // over 150% of the budget breaks it; going back or flagging never does. Practice uses the correct-check streak.
+  // Flow lives in memory only, so a refresh starts it again; nothing new is saved.
+  const GX_FLOW_TIERS = [3, 5, 10, 15, 25];
+  const GX_COACH_LINES = {
+    ahead: [
+      (m) => `${m.left} left for ${m.qLeft} questions: ${m.each} each. You're ${m.slackText} ahead. Save it for the passages.`,
+      (m) => `${m.slackText} in the bank. Don't spend it all on one hard item.`,
+      (m) => `Ahead by ${m.slackText}. Keep this rhythm.`,
+      (m) => `${m.qLeft} to go and time to spare. Read carefully, no need to rush.`
+    ],
+    pace: [
+      () => "Right on pace. About a minute a question and you finish with time to check.",
+      (m) => `${m.qLeft} to go, ${m.each} each. Steady.`,
+      (m) => `On track: ${m.left} for ${m.qLeft} questions.`
+    ],
+    behind: [
+      (m) => `${m.slackText} behind. ${m.qLeft} left, ${m.left} on the clock: ${m.each} each. If one stalls past a minute, flag it and move on.`,
+      (m) => `You need ${m.each} a question from here. Do the quick ones first.`,
+      (m) => `Pick up the pace a little: ${m.each} each for the last ${m.qLeft}.`
+    ],
+    catchup: [
+      (m) => `${m.slackText} behind. Answer every quick one first, flag the long ones, then come back.`,
+      (m) => `${m.qLeft} left and ${m.left} on the clock. Skip anything slow; a guess beats a blank.`
+    ],
+    final: [
+      (m) => `${m.left} left, ${m.qLeft} blank. A blank can't score, so give every item an answer.`
+    ],
+    done: [
+      (m) => `All answered with ${m.left} to spare. Spend it on your ${m.flags} flag${m.flags === 1 ? "" : "s"}.`
+    ]
+  };
+  const GX_COACH_TITLES = { ahead: "Cruising", pace: "On pace", behind: "Catch up", catchup: "Speed up", final: "Final minutes", done: "All answered" };
+
+  function gxFlowCount(attempt) {
+    if (!attempt) return 0;
+    if (attempt.mode === "practice") return gxStreak(attempt);
+    return gxFx.flow?.[attempt.id]?.count || 0;
+  }
+
+  function gxFlowTier(count) {
+    return GX_FLOW_TIERS.filter((tier) => count >= tier).length;
+  }
+
+  // Sits in the progress row, not the header, so the phone header stays on one line.
+  function gxFxComboChip(attempt) {
+    if (isPaperAttempt(attempt)) return "";
+    const count = gxFlowCount(attempt);
+    // Practice keeps its correct-answer streak at every effects level; it was shown before effects existed.
+    if (attempt.mode === "practice") return count > 1 ? `<b class="gx-combo ${count >= 10 && gxFxLevel(attempt) === "full" ? "is-hot" : ""}">${count} in a row</b>` : "";
+    if (gxFxLevel(attempt) === "calm" || count < 3) return "";
+    const label = count >= 25 ? "Inferno" : count >= 10 ? "On fire" : "Flow";
+    return `<b class="gx-combo ${count >= 10 ? "is-hot" : ""}" title="Answered on pace in a row">×${count} ${label}</b>`;
+  }
+
+  function gxFxExpectedSeconds(attempt, answer) {
+    const fromBank = Number(questionsById.get(answer.question_id)?.expectedSeconds);
+    if (fromBank > 0) return fromBank;
+    return attempt.total_time_seconds ? attempt.total_time_seconds / Math.max(1, attempt.total_questions) : 67;
+  }
+
+  function gxFxScoreFlow(gx, attempt, advance) {
+    const memo = (gxFx.flow ||= {})[attempt.id] ||= { count: 0 };
+    const answer = attempt.answers[advance.questionId];
+    if (!answer) return;
+    const before = memo.count;
+    const expected = gxFxExpectedSeconds(attempt, answer);
+    const spent = Number(answer.time_spent_seconds || 0);
+    if (advance.kind === "skip" || !answer.selected_choice || spent > expected * 1.5) memo.count = 0;
+    else if ((answer.visit_count || 0) <= 1 && spent >= expected * 0.25 && spent <= expected) memo.count += 1;
+    gxFxFlowChanged(gx, attempt, before, memo.count);
+  }
+
+  function gxFxFlowChanged(gx, attempt, before, after) {
+    const level = gxFxLevel(attempt);
+    if (before === after) return;
+    // Flow is scored after the render (the item's time is final only then), so the chip is refreshed in place.
+    const run = gx.querySelector(".gx-run");
+    if (run) {
+      run.querySelector(".gx-combo")?.remove();
+      run.insertAdjacentHTML("beforeend", gxFxComboChip(attempt));
+    }
+    if (level === "calm") return;
+    if (after === 0 && before >= 5) {
+      playSound("fizz");
+      if (level === "full" && !gxReducedMotion()) gxFxSmoke(gx.querySelector(".gx-top"), 14);
+      return;
+    }
+    if (gxFlowTier(after) > gxFlowTier(before)) {
+      playSound([[520 + gxFlowTier(after) * 120, 0.2, "triangle", 0.05]]);
+      const chip = gx.querySelector(".gx-combo");
+      if (chip) {
+        chip.classList.add("is-pop");
+        if (level === "full" && !gxReducedMotion()) {
+          const point = gxFxCenter(chip);
+          gxFxBurst(point.x, point.y, ["#ffb25e", "#ffc93c"], 10 + gxFlowTier(after) * 4, 3);
+        }
+      }
+    }
+  }
+
+  // Header fire: one canvas kept across re-renders and moved into each new header, drawn behind its content.
+  function gxFxFire(gx, attempt) {
+    const level = gxFxLevel(attempt);
+    const count = gxFlowCount(attempt);
+    const header = gx.querySelector(".gx-top");
+    const strength = level !== "full" || !header ? 0 : count >= 25 ? 3 : count >= 15 ? 2.4 : count >= 10 ? 1.6 : count >= 5 ? 0.5 : 0;
+    header?.classList.toggle("is-ember", strength > 0 && gxReducedMotion());
+    header?.classList.toggle("has-fire", strength > 0);
+    gxFx.fireStrength = gxReducedMotion() ? 0 : strength;
+    if (gxFx.fireStrength > 0) {
+      if (!gxFx.fireCanvas) {
+        gxFx.fireCanvas = document.createElement("canvas");
+        gxFx.fireCanvas.className = "gx-fx-fire";
+        gxFx.fireCanvas.setAttribute("aria-hidden", "true");
+      }
+      if (gxFx.fireCanvas.parentElement !== header) header.prepend(gxFx.fireCanvas);
+      if (!gxFx.fireRaf) gxFx.fireRaf = requestAnimationFrame(gxFxFireFrame);
+    }
+    gxFxInferno(level === "full" && count >= 25 && !gxReducedMotion());
+  }
+
+  function gxFxFireFrame() {
+    gxFx.fireRaf = 0;
+    const canvas = gxFx.fireCanvas;
+    const flames = (gxFx.flames ||= []);
+    if (!canvas?.isConnected || document.hidden) {
+      flames.length = 0;
+      return;
+    }
+    const ratio = window.devicePixelRatio || 1;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    if (canvas.width !== Math.round(width * ratio) || canvas.height !== Math.round(height * ratio)) {
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
+    }
+    const context = canvas.getContext("2d");
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    context.clearRect(0, 0, width, height);
+    const strength = gxFx.fireStrength || 0;
+    const spawn = strength < 1 ? (Math.random() < 0.6 ? 1 : 0) : Math.round(strength * 3.2);
+    for (let index = 0; index < spawn; index += 1) {
+      flames.push({ x: Math.random() * width, y: height + 4, vy: -(1 + Math.random() * 1.6) * (strength < 1 ? 0.5 : 0.7 + strength * 0.25), vx: (Math.random() - 0.5) * 0.6, life: 1, decay: 0.018 + Math.random() * 0.02, size: (strength < 1 ? 3 : 7 + strength * 4) * (0.6 + Math.random() * 0.6) });
+    }
+    context.globalCompositeOperation = "lighter";
+    for (let index = flames.length - 1; index >= 0; index -= 1) {
+      const flame = flames[index];
+      flame.life -= flame.decay;
+      if (flame.life <= 0) {
+        flames.splice(index, 1);
+        continue;
+      }
+      flame.x += flame.vx + Math.sin((flame.y + flame.x) * 0.05) * 0.4;
+      flame.y += flame.vy;
+      const radius = flame.size * flame.life;
+      const hue = 12 + flame.life * 22;
+      const gradient = context.createRadialGradient(flame.x, flame.y, 0, flame.x, flame.y, radius);
+      gradient.addColorStop(0, `hsla(${hue}, 100%, 58%, ${flame.life * 0.5})`);
+      gradient.addColorStop(1, `hsla(${hue - 10}, 100%, 45%, 0)`);
+      context.fillStyle = gradient;
+      context.beginPath();
+      context.arc(flame.x, flame.y, radius, 0, Math.PI * 2);
+      context.fill();
+    }
+    context.globalCompositeOperation = "source-over";
+    // Keeps burning only while the combo holds; the last flames die out after it breaks.
+    if (strength > 0 || flames.length) gxFx.fireRaf = requestAnimationFrame(gxFxFireFrame);
+  }
+
+  // At x25 a rainbow ring spins around the screen for 8 s, then settles to a still, dim glow while the combo holds.
+  function gxFxInferno(on) {
+    const layer = gxFxLayer();
+    let ring = layer.querySelector(".gx-fx-inferno");
+    if (!on) {
+      ring?.remove();
+      return;
+    }
+    if (ring) return;
+    ring = document.createElement("div");
+    ring.className = "gx-fx-inferno";
+    layer.appendChild(ring);
+    setTimeout(() => ring.classList.add("is-dim"), 8000);
+  }
+
+  function gxFxSmoke(element, count) {
+    if (!element) return;
+    const rect = element.getBoundingClientRect();
+    for (let index = 0; index < count; index += 1) {
+      gxFx.particles.push({ x: rect.left + Math.random() * rect.width, y: rect.top + rect.height * (0.4 + Math.random() * 0.5), vx: (Math.random() - 0.5), vy: -0.6, life: 1, decay: 0.02, kind: "smoke", color: "rgba(160, 165, 180, .5)" });
+    }
+    gxFxLoop();
+  }
+
+  // Pace coach: speaks only right after NEXT/SKIP, at milestones, every 30 minutes of clock and when the pace state
+  // changes; at most once per 8 answers and never before 10 are answered.
+  function gxFxPaceMath(attempt) {
+    const total = attempt.total_time_seconds;
+    const remaining = Math.max(0, timeRemaining(attempt));
+    const qLeft = attempt.total_questions - answeredCount(attempt);
+    const slack = remaining - qLeft * (total / Math.max(1, attempt.total_questions));
+    return { remaining, qLeft, slack, elapsed: total - remaining, left: formatDuration(remaining), each: qLeft ? `${Math.round(remaining / qLeft)} s` : "–", slackText: `${Math.max(1, Math.round(Math.abs(slack) / 60))} min`, flags: flaggedCount(attempt) };
+  }
+
+  function gxFxPaceState(math, previous) {
+    if (math.qLeft === 0) return "done";
+    if (math.remaining <= 600) return "final";
+    const at = (slack) => slack >= 300 ? "ahead" : slack > -180 ? "pace" : slack > -600 ? "behind" : "catchup";
+    const raw = at(math.slack);
+    // A minute of hysteresis so the state does not flicker on a boundary.
+    if (previous && previous !== raw && (at(math.slack - 60) === previous || at(math.slack + 60) === previous)) return previous;
+    return raw;
+  }
+
+  function gxFxCoachCheck(gx, attempt, milestone) {
+    if (attempt.mode === "practice" || !attempt.total_time_seconds || attempt.options?.showTimer === false) return;
+    const math = gxFxPaceMath(attempt);
+    const answered = attempt.total_questions - math.qLeft;
+    const memo = (gxFx.coach ||= {})[attempt.id] ||= { lastAt: -99, state: null, block: Math.floor(math.elapsed / 1800), turn: {} };
+    const state = gxFxPaceState(math, memo.state);
+    const block = Math.floor(math.elapsed / 1800);
+    const reason = milestone || block > memo.block || (memo.state !== null && state !== memo.state);
+    memo.block = block;
+    memo.state = state;
+    if (!reason || answered < 10 || answered - memo.lastAt < 8) return;
+    memo.lastAt = answered;
+    const lines = GX_COACH_LINES[state];
+    const index = memo.turn[state] = ((memo.turn[state] ?? -1) + 1) % lines.length;
+    setTimeout(() => gxFxCoach(gx, attempt, state, lines[index](math)), milestone ? 900 : 0);
+  }
+
+  function gxFxCoach(gx, attempt, state, text) {
+    const level = gxFxLevel(attempt);
+    const layer = gxFxLayer();
+    let card = layer.querySelector(".gx-fx-coach");
+    if (!card) {
+      card = document.createElement("div");
+      card.className = "gx-fx-coach";
+      card.setAttribute("role", "status");
+      layer.appendChild(card);
+    }
+    const live = root.querySelector(".gx") || gx;
+    const tones = { ahead: "--good", pace: "--select", behind: "--warn", catchup: "--bad", final: "--bad", done: "--primary" };
+    const footer = live.querySelector(".gx-foot, .gx-feedback");
+    card.style.bottom = `${Math.round(window.innerHeight - (footer?.getBoundingClientRect().top || window.innerHeight) + 10)}px`;
+    card.style.setProperty("--fx-bg", gxFxVar(live, "--surface"));
+    card.style.setProperty("--fx-text", gxFxVar(live, "--text"));
+    card.style.setProperty("--fx-accent", gxFxVar(live, tones[state]));
+    card.innerHTML = `<span class="gx-fx-coach-face" aria-hidden="true">${state === "ahead" || state === "done" ? "★" : state === "pace" ? "♪" : "!"}</span><span><strong>${escapeHtml(GX_COACH_TITLES[state])}</strong>${escapeHtml(text)}</span>`;
+    card.className = "gx-fx-coach";
+    void card.offsetWidth;
+    card.classList.add(level === "calm" ? "is-calm" : state === "behind" || state === "catchup" ? "is-wobble" : "is-in");
+    playSound(state === "behind" || state === "catchup" || state === "final" ? "warning" : "coach");
+    clearTimeout(gxFx.coachTimer);
+    gxFx.coachTimer = setTimeout(() => card.classList.add("is-out"), 4200);
+  }
+
+  // TNT: under ten minutes with blanks left, the timer becomes a bomb and a fuse burns across the top of the
+  // screen in step with the clock. At zero: a puff of smoke, then the normal Time's up dialog.
+  function gxFxTntActive(attempt, remaining) {
+    return Boolean(attempt && attempt.mode !== "practice" && !isPaperAttempt(attempt) && attempt.total_time_seconds && attempt.options?.showTimer !== false && attempt.status === "in_progress" && remaining > 0 && remaining <= 600 && answeredCount(attempt) < attempt.total_questions && gxFxLevel(attempt) !== "calm");
+  }
+
+  function gxFxTnt(attempt, remaining) {
+    const active = app.view.name === "exam" && gxFxTntActive(attempt, remaining);
+    const layer = gxFxLayer();
+    let fuse = layer.querySelector(".gx-fx-fuse");
+    const timerBox = root.querySelector(".gx-timer");
+    if (timerBox && timerBox.classList.contains("is-bomb") !== active) {
+      timerBox.classList.toggle("is-bomb", active);
+      timerBox.querySelector("svg")?.replaceWith(document.createRange().createContextualFragment(gxIcon(active ? "bomb" : "clock", 24)));
+    }
+    if (!active) {
+      if (fuse && gxFx.tntWasActive && remaining <= 0 && timerBox) {
+        playSound("puff");
+        if (!gxReducedMotion()) gxFxSmoke(timerBox, 24);
+      }
+      fuse?.remove();
+      gxFx.tntWasActive = false;
+      return;
+    }
+    if (!fuse) {
+      fuse = document.createElement("div");
+      fuse.className = "gx-fx-fuse";
+      fuse.innerHTML = "<i></i>";
+      layer.appendChild(fuse);
+    }
+    gxFx.tntWasActive = true;
+    gxFx.tntFraction = remaining / 600;
+    gxFx.tntSparks = gxFxLevel(attempt) === "full" && !gxReducedMotion();
+    gxFx.tntFinal = remaining <= 60;
+    fuse.firstChild.style.transform = `scaleX(${gxFx.tntFraction.toFixed(4)})`;
+    if (gxFx.tntSparks && !gxFx.tntRaf) gxFx.tntRaf = requestAnimationFrame(gxFxTntFrame);
+  }
+
+  function gxFxTntFrame() {
+    gxFx.tntRaf = 0;
+    if (!gxFx.tntWasActive || !gxFx.tntSparks || document.hidden) return;
+    const x = window.innerWidth * gxFx.tntFraction;
+    for (let index = 0; index < (gxFx.tntFinal ? 4 : 2); index += 1) {
+      gxFx.particles.push({ x, y: 3, vx: (Math.random() - 0.5) * 3, vy: Math.random() * 2.2, life: 1, decay: 0.06, kind: "spark", color: Math.random() < 0.5 ? "#ffc93c" : "#ff7a1a" });
+    }
+    gxFxLoop();
+    gxFx.tntRaf = requestAnimationFrame(gxFxTntFrame);
+  }
+
+  function gxFxTimerTick(attempt, remaining) {
+    gxFxTnt(attempt, remaining);
+    if (!gxFxTntActive(attempt, remaining)) return;
+    if (remaining % 60 === 0) playSound("thump");
+    else if (remaining < 60 && gxFxLevel(attempt) === "full") playSound("tick");
+  }
+
+  // Everything the exam screen owns stops when the exam is no longer on screen.
+  function gxFxLeaveExam() {
+    gxFx.fireStrength = 0;
+    gxFxInferno(false);
+    gxFx.tntWasActive = false;
+    const layer = document.getElementById("gx-fx");
+    layer?.querySelector(".gx-fx-fuse")?.remove();
+    layer?.querySelector(".gx-fx-coach")?.remove();
+  }
+
+  function gxFxAfterExam(gx, attempt, current) {
+    if (!attempt || isPaperAttempt(attempt) || attempt.status === "submitted") return gxFxLeaveExam();
+    const advance = gxFx.pending;
+    let milestone = false;
+    if (advance && advance.attemptId === attempt.id && advance.questionId !== current?.question_id) {
+      gxFx.pending = null;
+      if (attempt.mode !== "practice") gxFxScoreFlow(gx, attempt, advance);
+      milestone = Boolean(gxFx.milestoneJustFired);
+      gxFx.milestoneJustFired = false;
+      gxFxCoachCheck(gx, attempt, milestone);
+    }
+    if (attempt.mode === "practice") {
+      const streak = gxStreak(attempt);
+      const memo = (gxFx.flow ||= {})[attempt.id] ||= { count: streak };
+      if (streak !== memo.count) gxFxFlowChanged(gx, attempt, memo.count, streak);
+      memo.count = streak;
+    }
+    gxFxFire(gx, attempt);
+    gxFxTnt(attempt, Math.max(0, Math.floor(timeRemaining(attempt))));
+  }
+
   function gxReducedMotion() {
     return Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
   }
@@ -1969,6 +2332,8 @@
       motion.stimulus = current.stimulus?.id || "";
     }
     if (attempt && view.name === "exam" && attempt.mode !== "practice" && !isPaperAttempt(attempt)) gxFxProgress(gx, attempt);
+    if (view.name === "exam") gxFxAfterExam(gx, attempt, current);
+    else gxFxLeaveExam();
     // The pause dialog follows the attempt's status rather than app.modal.
     const modal = app.modal || (attempt?.status === "paused" ? "paused" : "");
     if (modal && modal !== motion.modal) gx.querySelector(".gx-backdrop")?.classList.add("is-entering");
@@ -3600,6 +3965,11 @@
       advance: [[480, 0.05, "sine", 0.035], [760, 0.07, "sine", 0.03]],
       skip: [[300, 0.07, "triangle", 0.03]],
       chime: [[880, 0.16, "sine", 0.045], [1320, 0.3, "sine", 0.03]],
+      coach: [[740, 0.12, "sine", 0.04]],
+      thump: [[90, 0.2, "sine", 0.12]],
+      tick: [[1500, 0.03, "square", 0.012]],
+      fizz: [[700, 0.08, "sawtooth", 0.012], [420, 0.12, "sawtooth", 0.01], [260, 0.2, "sawtooth", 0.008]],
+      puff: [[160, 0.25, "triangle", 0.05], [110, 0.35, "sine", 0.04]],
       fanfare: [[523, 0.12, "triangle", 0.05], [659, 0.12, "triangle", 0.05], [784, 0.12, "triangle", 0.05], [1047, 0.35, "sine", 0.05]]
     };
     const sequence = Array.isArray(kind) ? kind : definitions[kind] || definitions.navigation;
@@ -4773,6 +5143,7 @@
           void box.offsetWidth;
           box.classList.add("is-pulse");
         }
+        gxFxTimerTick(attempt, remaining);
       }
     }
     if (answered) answered.textContent = String(answeredCount(attempt));
@@ -5109,7 +5480,8 @@
     recordAttemptEvent(attempt, "answer-selected", { choice, previousChoice: previous || null });
     touchAnswer(attempt, answer.question_id);
     touchAttempt(attempt);
-    playSound("selection");
+    const lift = 2 ** (Math.min(gxFlowCount(attempt), 12) / 12);
+    playSound([[620 * lift, 0.055, "triangle", 0.04], [820 * lift, 0.045, "triangle", 0.025]]);
     renderExam();
   }
 
