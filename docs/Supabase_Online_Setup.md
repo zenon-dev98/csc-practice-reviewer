@@ -35,6 +35,28 @@ Administrator attempt deletion controls:
   `admin_attempt_deletions`, and no replacement attempt is created.
 - Never grant the browser a service-role key or direct cross-user delete access.
 
+Friends' challenge (added 2026-11-23):
+
+- Run `supabase/challenges.sql` after `schema.sql` and `admin_console.sql`. It only
+  adds three tables (`challenges`, `challenge_players`, `challenge_answers`), their
+  read-only policies and the challenge functions; nothing existing changes.
+- Players can read only challenges they joined, the player list (copied display
+  name and badge colour, never profiles or emails), their own answers, and other
+  players' answers after the reveal. All writes go through the functions.
+- Verify without passwords by running `supabase/challenges_rls_check.sql` in the SQL
+  editor. It acts as three existing members and anon, always rolls back, and must
+  report `RLS CHECK: 23/23 passed` (as an error message, which forces the rollback).
+- Or verify over the REST API with three signed-in test accounts (A hosts, B joins, C stays outside):
+
+  ```powershell
+  $env:CHALLENGE_TEST_A="a@example.com:password"; $env:CHALLENGE_TEST_B="b@example.com:password"; $env:CHALLENGE_TEST_C="c@example.com:password"; npm run check:challenges
+  ```
+
+  The run leaves one challenge titled `RLS check`; remove it with
+  `delete from public.challenges where title = 'RLS check';`.
+- Rollback: the commented block at the bottom of `supabase/challenges.sql` drops
+  the functions and tables (and every challenge stored).
+
 ## Auth
 
 Dashboard settings:
